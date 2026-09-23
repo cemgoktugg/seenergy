@@ -22,11 +22,13 @@ import Link from 'next/link';
 import { ArrowLeft, Scale, X } from 'lucide-react';
 
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
-import { byId, categoryMeta, discountPercent, formatPrice } from '@/data/catalog';
+import { useCatalog } from '@/components/catalog-provider';
+import { categoryMeta, discountPercent, formatPrice } from '@/data/catalog';
 import { keySpecsOf } from '@/data/specs';
 
 export default function ComparePage() {
   const { state, ready, remove, clear } = useStore();
+  const { byId } = useCatalog();
 
   const products = state.compare
     .map((id) => byId(id))

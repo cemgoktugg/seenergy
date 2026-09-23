@@ -6,6 +6,8 @@
   "description": "Reference-driven visual development workbench for the VOLTA electronics storefront.",
   "scripts": {
     "dev": "next dev -p 3100",
+    "backend:dev": "npm --prefix backend/apps/backend run dev",
+    "backend:migrate": "npm --prefix backend/apps/backend exec medusa db:migrate",
     "build": "next build",
     "start": "next start -p 3100",
     "lint": "eslint .",

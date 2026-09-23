@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 
+import { CatalogProvider } from '@/components/catalog-provider';
+import { loadProducts } from '@/lib/medusa/catalog';
+
 /**
  * The cart page is a client component, and a client component cannot export
  * `metadata`. This layout exists only to carry it.
@@ -12,6 +15,6 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 
-export default function CartLayout({ children }: { children: React.ReactNode }) {
-  return children;
+export default async function CartLayout({ children }: { children: React.ReactNode }) {
+  return <CatalogProvider products={await loadProducts()}>{children}</CatalogProvider>;
 }

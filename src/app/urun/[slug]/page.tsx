@@ -42,18 +42,15 @@ import { ProductBuy } from '@/components/product-buy';
 import { ProductRow } from '@/components/product-row';
 import { ProductGrid } from '@/components/sections';
 import {
-  PRODUCTS,
   brandSlug,
-  bySlug,
-  alternativesTo,
   categoryMeta,
   discountPercent,
   formatPrice,
-  otherModelsOf,
   type Product,
 } from '@/data/catalog';
 import { PRODUCT_TRUST, SITE } from '@/data/site';
 import { categorySpec, keySpecsOf, type CompatibilityItem } from '@/data/specs';
+import { loadCatalog, loadProducts } from '@/lib/medusa/catalog';
 
 const TRUST_ICONS = {
   invoice: ReceiptText,
@@ -63,9 +60,13 @@ const TRUST_ICONS = {
   support: Headphones,
 };
 
-/** Every product is a known path, so none of them is resolved at request time. */
-export function generateStaticParams() {
-  return PRODUCTS.map((product) => ({ slug: product.slug }));
+/**
+ * Every product known at build time is prerendered. One added in the Medusa
+ * admin afterwards still resolves: dynamicParams stays on, so its first visit
+ * renders it and the result is cached like the rest.
+ */
+export async function generateStaticParams() {
+  return (await loadProducts()).map((product) => ({ slug: product.slug }));
 }
 
 export async function generateMetadata({
@@ -74,6 +75,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const { bySlug } = await loadCatalog();
   const product = bySlug(slug);
   if (!product) return { title: 'Ürün bulunamadı' };
 
@@ -373,6 +375,7 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
+  const { bySlug, otherModelsOf, alternativesTo } = await loadCatalog();
   const product = bySlug(slug);
   if (!product) notFound();
 

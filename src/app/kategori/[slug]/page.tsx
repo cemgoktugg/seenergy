@@ -13,8 +13,9 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { CatalogShell } from '@/components/catalog-shell';
-import { CATEGORY_META, byCategory, categoryMeta } from '@/data/catalog';
+import { CATEGORY_META, categoryMeta } from '@/data/catalog';
 import type { SearchParams } from '@/lib/catalog-query';
+import { loadCatalog } from '@/lib/medusa/catalog';
 
 const keyFor = (slug: string) =>
   Object.keys(CATEGORY_META).find((key) => CATEGORY_META[key].href === `/kategori/${slug}`);
@@ -78,6 +79,7 @@ export default async function CategoryPage({
   }
 
   const meta = categoryMeta(key);
+  const { byCategory } = await loadCatalog();
   const scope = byCategory(key);
 
   return (

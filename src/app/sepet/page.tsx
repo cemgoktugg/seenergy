@@ -18,10 +18,12 @@ import Link from 'next/link';
 import { ArrowLeft, ShoppingCart, Trash2 } from 'lucide-react';
 
 import { useStore } from '@/components/cart-store';
-import { byId, formatPrice } from '@/data/catalog';
+import { useCatalog } from '@/components/catalog-provider';
+import { formatPrice } from '@/data/catalog';
 
 export default function CartPage() {
   const { state, ready, remove, clear } = useStore();
+  const { byId } = useCatalog();
 
   const lines = state.cart
     .map((id) => byId(id))

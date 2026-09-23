@@ -10,13 +10,13 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { CatalogShell } from '@/components/catalog-shell';
-import { PRODUCTS, brandFromSlug, brandSlug, byBrandSlug } from '@/data/catalog';
+import { brandSlug } from '@/data/catalog';
 import type { SearchParams } from '@/lib/catalog-query';
+import { loadCatalog } from '@/lib/medusa/catalog';
 
-export function generateStaticParams() {
-  return [...new Set(PRODUCTS.map((product) => brandSlug(product.brand)))].map((slug) => ({
-    slug,
-  }));
+export async function generateStaticParams() {
+  const { brands } = await loadCatalog();
+  return brands.map((brand) => ({ slug: brandSlug(brand) }));
 }
 
 export async function generateMetadata({
@@ -25,6 +25,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  const { brandFromSlug } = await loadCatalog();
   const brand = brandFromSlug(slug);
   return {
     title: brand ? `${brand} ürünleri` : 'Marka',
@@ -39,13 +40,12 @@ export default async function BrandPage({
   params: Promise<{ slug: string }>;
   searchParams: Promise<SearchParams>;
 }) {
-  const [{ slug }, query] = await Promise.all([params, searchParams]);
+  const [{ slug }, query, { brands: catalogBrands, brandFromSlug, byBrandSlug }] =
+    await Promise.all([params, searchParams, loadCatalog()]);
   const brand = brandFromSlug(slug);
 
   if (!brand) {
-    const brands = [...new Set(PRODUCTS.map((product) => product.brand))].sort((a, b) =>
-      a.localeCompare(b, 'tr'),
-    );
+    const brands = [...catalogBrands].sort((a, b) => a.localeCompare(b, 'tr'));
     return (
       <div className="container-main py-16">
         <div className="mx-auto max-w-2xl rounded-(--panel-radius) border border-line bg-surface-card shadow-e1 px-6 py-12 text-center">

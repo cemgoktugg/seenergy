@@ -13,7 +13,8 @@ import { Check, X } from 'lucide-react';
 
 import { FilterDrawer } from '@/components/filter-drawer';
 import { ProductGrid } from '@/components/sections';
-import { brandFromSlug, formatPrice, type Product } from '@/data/catalog';
+import { formatPrice, type Product } from '@/data/catalog';
+import { loadCatalog } from '@/lib/medusa/catalog';
 import {
   SORTS,
   activeCount,
@@ -81,10 +82,12 @@ function FilterPanel({
   basePath,
   params,
   scope,
+  brandFromSlug,
 }: {
   basePath: string;
   params: SearchParams;
   scope: Product[];
+  brandFromSlug: (slug: string) => string | undefined;
 }) {
   const filters = parseFilters(params);
   const facets = facetsOf(scope, filters);
@@ -186,7 +189,7 @@ function FilterPanel({
   );
 }
 
-export function CatalogShell({
+export async function CatalogShell({
   title,
   eyebrow,
   description,
@@ -208,6 +211,7 @@ export function CatalogShell({
   scope: Product[];
   params: SearchParams;
 }) {
+  const { brandFromSlug } = await loadCatalog();
   const clearTo = clearHref ?? basePath;
   const filters = parseFilters(params);
   const results = applyFilters(scope, filters);
@@ -370,7 +374,12 @@ export function CatalogShell({
                   </Link>
                 )}
               </div>
-              <FilterPanel basePath={basePath} params={params} scope={scope} />
+              <FilterPanel
+                basePath={basePath}
+                params={params}
+                scope={scope}
+                brandFromSlug={brandFromSlug}
+              />
             </div>
           </aside>
 
@@ -385,7 +394,12 @@ export function CatalogShell({
               </p>
 
               <FilterDrawer count={active}>
-                <FilterPanel basePath={basePath} params={params} scope={scope} />
+                <FilterPanel
+                basePath={basePath}
+                params={params}
+                scope={scope}
+                brandFromSlug={brandFromSlug}
+              />
               </FilterDrawer>
 
               <div className="rail ml-auto auto-cols-max gap-1 dt:flex dt:overflow-visible">

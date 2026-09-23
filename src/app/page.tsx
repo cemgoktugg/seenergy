@@ -32,10 +32,12 @@ import {
   TrustRow,
   WideBanner,
 } from '@/components/sections';
-import { byBrand, mixed } from '@/data/catalog';
 import { BRAND_SECTIONS } from '@/data/site';
+import { loadCatalog } from '@/lib/medusa/catalog';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { byBrand, mixed } = await loadCatalog();
+
   /**
    * One brand band, rendered in two runs below.
    *

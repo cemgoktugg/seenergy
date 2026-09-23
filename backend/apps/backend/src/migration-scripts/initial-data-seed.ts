@@ -29,9 +29,9 @@ import catalog from "../seed/catalog.json";
  * SEENERGY initial data.
  *
  * Runs once, as a migration script, on a fresh database. The catalogue comes
- * from `src/seed/catalog.json`, which `scripts/medusa/export-catalog.mjs`
- * snapshots from the storefront's former static catalogue — regenerate it
- * there rather than editing the JSON by hand.
+ * from `src/seed/catalog.json` — a one-time snapshot of the storefront's
+ * former static catalogue. Medusa is the source of truth from here on: change
+ * products in the admin, not in the JSON.
  *
  * Commerce rules carried over from the storefront:
  *   - Prices are TRY and KDV-inclusive, as Turkish shelf prices are.

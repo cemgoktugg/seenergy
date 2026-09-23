@@ -15,8 +15,9 @@ import Link from 'next/link';
 import { Search } from 'lucide-react';
 
 import { CatalogShell } from '@/components/catalog-shell';
-import { CATEGORY_META, PRODUCTS, brandSlug } from '@/data/catalog';
+import { CATEGORY_META, brandSlug } from '@/data/catalog';
 import { hrefWith, searchProducts, type SearchParams } from '@/lib/catalog-query';
+import { loadCatalog } from '@/lib/medusa/catalog';
 
 export const metadata: Metadata = {
   title: 'Arama',
@@ -31,13 +32,16 @@ export default async function SearchPage({
 }: {
   searchParams: Promise<SearchParams>;
 }) {
-  const params = await searchParams;
+  const [params, { products, brands: catalogBrands }] = await Promise.all([
+    searchParams,
+    loadCatalog(),
+  ]);
   const query = first(params.q).trim();
 
   /* No query: a prompt, not an empty result. Telling someone "0 ürün bulundu"
      when they have not searched for anything yet is just wrong. */
   if (query === '') {
-    const brands = [...new Set(PRODUCTS.map((product) => product.brand))]
+    const brands = [...catalogBrands]
       .sort((a, b) => a.localeCompare(b, 'tr'))
       .slice(0, 12);
 
@@ -97,7 +101,7 @@ export default async function SearchPage({
     );
   }
 
-  const matches = searchProducts(PRODUCTS, query);
+  const matches = searchProducts(products, query);
 
   if (matches.length === 0) {
     return (

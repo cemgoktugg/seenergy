@@ -17,10 +17,11 @@ import { ArrowLeft, Heart } from 'lucide-react';
 
 import { useStore } from '@/components/cart-store';
 import { ProductGrid } from '@/components/sections';
-import { byId } from '@/data/catalog';
+import { useCatalog } from '@/components/catalog-provider';
 
 export default function FavouritesPage() {
   const { state, ready, clear } = useStore();
+  const { byId } = useCatalog();
 
   const products = state.favourites
     .map((id) => byId(id))

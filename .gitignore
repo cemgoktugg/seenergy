@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.*
 !.env.visual.example
+!.env.example
 !backend/apps/backend/.env.template
 
 # Generated visual artifacts: screenshots, diffs, traces, reports.
