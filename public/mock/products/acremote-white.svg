@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600" role="img"><defs>
+    
+  <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#ffffff"/><stop offset="1" stop-color="#d7dce2"/>
+  </linearGradient>
+    
+  <linearGradient id="gloss" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#fff" stop-opacity=".55"/>
+    <stop offset="1" stop-color="#fff" stop-opacity="0"/>
+  </linearGradient>
+    <linearGradient id="screen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#12314f"/><stop offset=".5" stop-color="#2b6fa8"/><stop offset="1" stop-color="#0d1b2a"/>
+    </linearGradient>
+  </defs><rect width="600" height="600" fill="#fff"/>
+    <ellipse cx="300" cy="478" rx="78" ry="14" fill="rgba(15,23,42,.13)"/>
+    <rect x="216" y="132" width="168" height="330" rx="26" fill="url(#g)"/>
+    <rect x="216" y="132" width="168" height="120" rx="26" fill="url(#gloss)"/>
+    <rect x="242" y="162" width="116" height="72" rx="8" fill="#0d2018"/>
+    <text x="300" y="212" font-family="monospace" font-size="30" fill="#7dffb0" text-anchor="middle">24</text>
+    <circle cx="300" cy="300" r="30" fill="#2196f3"/>
+    <path d="M286 300h28M300 286v28" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+    <rect x="244" y="356" width="30" height="26" rx="8" fill="#0d1117" opacity=".5"/><rect x="284" y="356" width="30" height="26" rx="8" fill="#0d1117" opacity=".5"/><rect x="324" y="356" width="30" height="26" rx="8" fill="#0d1117" opacity=".5"/><rect x="244" y="400" width="30" height="26" rx="8" fill="#0d1117" opacity=".5"/><rect x="284" y="400" width="30" height="26" rx="8" fill="#0d1117" opacity=".5"/><rect x="324" y="400" width="30" height="26" rx="8" fill="#0d1117" opacity=".5"/></svg>

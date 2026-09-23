@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Environment — the .example file is committed, real values are not
+.env
+.env.*
+!.env.visual.example
+
+# Generated visual artifacts: screenshots, diffs, traces, reports.
+# The directory skeleton is kept via .gitkeep files.
+artifacts/visual/reference/*
+artifacts/visual/local/*
+artifacts/visual/diff/*
+artifacts/visual/reports/*
+artifacts/visual/test-results/
+# Scratch capture directories: Playwright's reference project and any
+# determinism / A-B run created with `--out`.
+artifacts/visual/reference-live/
+artifacts/visual/_*/
+!artifacts/visual/**/.gitkeep
+
+# Playwright
+/playwright-report/
+/test-results/
+/blob-report/
+/playwright/.cache/
+
+# OS / editor noise
+Thumbs.db
+.DS_Store
+
+# Next.js build output
+.next/
+*.tsbuildinfo
+next-env.d.ts
+
+# Reference-site captures and analysis screenshots: regenerable with the
+# scripts/visual probes, large, and they contain the reference site's imagery.
+reference/
+reference-analysis/
+
+# Medusa backend
+backend/.medusa/
+backend/node_modules/
+backend/uploads/

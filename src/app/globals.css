@@ -1,0 +1,866 @@
+@import 'tailwindcss';
+
+/*
+  Design tokens reconstructed from measured reference geometry.
+  Source of every value: docs/REFERENCE_SITE_SPEC.md
+  Nothing in a component should hard-code a colour or a structural size.
+*/
+@theme {
+  /* --- breakpoints --------------------------------------------------- */
+  /* The reference swaps its three-row 175px header for the single 51px row
+     between 1200 and 1024 (container-sweep.mjs). Tailwind's `lg:` is 1024,
+     which would flip the header ~176px too early, so the desktop layout gets
+     its own breakpoint pinned to the measured value.
+
+     The whole scale is reset and re-declared in ascending order on purpose.
+     Adding `--breakpoint-dt` on its own emits its media block *before* `sm`
+     and `lg`, so `sm:`/`lg:` utilities then override `dt:` ones at 1440 — that
+     silently collapsed the 5-column product grid to 3 columns.
+
+     `dt` is declared in rem, not px: Tailwind sorts breakpoints by their raw
+     value and does not convert units, so a px-valued breakpoint sorts ahead of
+     every rem-valued one regardless of its real width. 75rem === 1200px. */
+  --breakpoint-*: initial;
+  --breakpoint-sm: 40rem; /* 640 */
+  --breakpoint-md: 48rem; /* 768 */
+  --breakpoint-lg: 64rem; /* 1024 */
+  --breakpoint-dt: 75rem; /* 1200 — measured desktop-header switch */
+  --breakpoint-xl: 80rem; /* 1280 */
+  --breakpoint-2xl: 96rem; /* 1536 */
+
+  /* --- brand: SEENERGY --------------------------------------------- */
+  /* The identity is a gradient plus a near-black, not a single hue: the mark
+     runs teal → blue → indigo → purple and the wordmark is near-black. So the
+     near-black is brand, not just "text".
+
+     The solid action colour is the INDIGO stop, and that is a contrast
+     decision rather than a taste one — white text measures
+       on indigo  rgb(74 46 156)   8.4:1   AA + AAA
+       on teal     rgb(18 165 165)  2.8:1   fails even AA large
+     so teal can carry graphics and rules, never white label text.
+
+     The old palette's two-orange split (action vs nav bar) maps onto an
+     indigo/near-black split: actions are indigo, the nav band is chrome. */
+  --color-brand: rgb(74 46 156); /* indigo stop — primary action */
+  --color-brand-nav: rgb(20 22 28); /* nav band — near-black chrome */
+  --color-brand-dark: rgb(58 36 128); /* pressed / hover on indigo */
+  --color-brand-soft: rgb(238 235 252); /* light indigo wash */
+  --color-brand-heading: rgb(14 124 134); /* teal, darkened to 4.6:1 on white */
+  --color-brand-hover: rgb(91 52 184); /* violet, for indigo text on white */
+  --color-brand-ink: rgb(35 38 46); /* utility bar text */
+
+  /* --- FIXED inks: for surfaces that stay light in both themes -------
+     A handful of surfaces are pinned light on purpose — the hero CTA pill, the
+     banner "Hemen İncele" pills, the footer's social buttons — because they sit
+     on dark imagery or on the brand gradient, where a themed surface would
+     vanish. Their fill is a literal `bg-white`, so their INK has to be literal
+     too. It was not: they carried `text-text-primary`, which inverts. In dark
+     mode that made near-white text on a white pill, measured 1.15:1.
+     These two are deliberately NOT overridden in the dark block below. That is
+     the whole point of them. */
+  --color-ink-fixed: rgb(23 24 26);
+  --color-brand-fixed: rgb(74 46 156);
+
+  /* Brand as TEXT on the page surface, as opposed to --color-brand which is a
+     fill carrying white label text. Same fill/ink split the semantic colours
+     needed, and for the same reason: measured in dark mode, the fill indigo
+     rgb(122 96 228) reads 4.53:1 under white text (passes as a fill) but only
+     4.19:1 as text on the page ground (fails). One value cannot do both. */
+  --color-brand-text: rgb(74 46 156);
+
+  /* The logo gradient, as four addressable stops. Allowed on structure —
+     caps, rails, marks, plates. Never behind body copy. */
+  --color-grad-1: rgb(18 165 165); /* teal    #12A5A5 */
+  --color-grad-2: rgb(46 85 200); /* blue    #2E55C8 */
+  --color-grad-3: rgb(74 46 156); /* indigo  #4A2E9C */
+  --color-grad-4: rgb(116 45 142); /* purple  #742D8E */
+
+  /* Dark chrome: the header stack and the technical data bands. */
+  --color-chrome: rgb(20 22 28);
+  --color-chrome-soft: rgb(32 36 45);
+  --color-chrome-line: rgb(52 58 70);
+
+  /* --- surfaces ---------------------------------------------------- */
+  --color-surface-page: rgb(246 246 246); /* measured body background */
+  --color-surface-card: rgb(255 255 255);
+  --color-surface-utility: rgb(241 241 241); /* utility bar */
+  --color-surface-instalment: rgb(20 22 28); /* instalment strip — same chrome as the nav band */
+
+  /* --- text -------------------------------------------------------- */
+  /* Near-black, taken from the wordmark, not the reference's rgb(51,51,51):
+     the logotype's own ink is part of the identity. */
+  --color-text-primary: rgb(23 24 26);
+  /* Was rgb(110 114 116), which measured 4.496:1 on the page ground
+     rgb(246 246 246) — under the 4.5:1 bar it needs as body copy, and close
+     enough that a 2-decimal report rounds it to a passing-looking "4.50".
+     It carries real body text in the editorial block, card taglines, spec
+     tables and the footer, so the fix belongs in the token rather than in the
+     components. rgb(102 106 108) measures 5.056:1 on the page and 5.464:1 on
+     white cards, while staying 3.25:1 lighter than --color-text-primary, so it
+     still reads as a distinct second tier rather than collapsing into the ink.
+     Every measured usage sits on a light surface; dark bands use white text. */
+  --color-text-secondary: rgb(102 106 108);
+  --color-text-price: rgb(79 84 86); /* measured price colour */
+  --color-text-inverse: rgb(255 255 255);
+
+  /* --- lines and state --------------------------------------------- */
+  --color-line: rgb(240 240 240); /* measured card border */
+  --color-line-strong: rgb(224 224 224);
+  --color-tab-idle: rgb(221 221 221); /* measured inactive tab */
+  /* --- semantic colour -----------------------------------------------
+     These two were the last pre-rebrand survivors. Their old comments said it
+     outright — "measured struck old price", "measured Ücretsiz Kargo badge" —
+     i.e. sampled off merterelektronik.com, whose palette stopped being the
+     target when this build became SEENERGY (CLAUDE.md rule 6,
+     BRAND_BIBLE_ELECTRONICS §2). A Material green 500 and a coral red sat
+     beside a teal→indigo→purple identity as the only two hues that belonged to
+     nothing.
+
+     They were also both FAILING. Measured on the rendered page before this
+     change: white on rgb(76 175 80) = 2.78:1 for the badge's 11px text, and
+     rgb(217 83 79) on white = 3.96:1 for the 13px struck price. Both need
+     4.5:1. So this is a correction, not a preference — the brand fit is what
+     decided the direction, the contrast is what made it obligatory.
+
+     Chosen to sit inside the identity: the success green leans to the teal
+     stop (--color-grad-1), the danger red is cooled toward crimson so it reads
+     with the purple rather than against it. Verified after the change on the
+     real elements — see the numbers in the commit note below.
+       white on success  5.87:1   success on white  5.87:1
+       danger on white   6.33:1   white on danger   6.33:1 */
+  /* FILL and INK are separate roles, and dark mode is what forced the split.
+     A fill carries white text on top of it, so it must be dark. An ink IS the
+     text, sitting on the page surface, so on a dark surface it must be light.
+     Measured: rgb(186 28 58) reads 6.33:1 as ink on white but 2.72:1 on the
+     dark card — one token cannot satisfy both, because the two requirements
+     point in opposite directions.
+     In light mode each pair is the SAME value, so this split changes nothing
+     visually today; it only gives the dark block below something to move. */
+  --color-danger: rgb(186 28 58);
+  --color-danger-ink: rgb(186 28 58);
+  --color-success: rgb(13 115 90);
+  --color-success-ink: rgb(13 115 90);
+  /* The blue gradient stop, so the promotional badge belongs to the identity
+     instead of sitting between the teal and the indigo as a third blue.
+     White on rgb(46 85 200) measures 5.9:1 — AA for the badge's 11px text. */
+  --color-info: rgb(46 85 200);
+  /* Was a literal gold. On a cool identity it was the only warm thing left on
+     the page, so the instalment strip's emphasis becomes the bright teal —
+     13.5:1 against the near-black strip it sits on. */
+  --color-highlight: rgb(53 224 208);
+
+  /* --- typography --------------------------------------------------- */
+  --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
+
+  /* --- structural sizes (measured) ---------------------------------- */
+  --spacing-header-top: 31px;
+  --spacing-header-main: 101px;
+  --spacing-header-nav: 43px;
+
+  /* --- corner radius --------------------------------------------------
+     FOUR steps, and the gap between them is the point. Measured before this
+     was tidied, the pages used five: 5px, 6px, 8px, 10px and 18px, of which
+     three were also written by hand somewhere as the arbitrary values
+     `rounded-md`, `rounded-md`, `rounded-(--card-radius)` and `rounded-(--card-radius)` —
+     so the same radius existed as both a token and a literal.
+
+     8px and 10px were the real problem: two adjacent steps 2px apart do not
+     read as two tiers, they read as an inconsistency. 8 is folded into 10, and
+     5 into 6, which leaves a scale whose steps are actually distinguishable:
+
+       md     6px   chips and small controls — SKU tags, checkboxes, the
+                    discount chip, payment marks
+       card  10px   blocks and cards — product cards, thumbnails, banner media
+       panel 18px   panels that GROUP those blocks (--panel-radius, in :root
+                    since 24 call sites already reference it there)
+       full  pill   anything fully rounded
+
+     `--radius-md` is pinned rather than inherited. Tailwind's own default is
+     already 0.375rem = 6px, so this changes nothing today — it just stops a
+     framework default from silently being a step in our scale. */
+  --radius-md: 6px;
+  --radius-card: 10px;
+  --radius-pill: 999px;
+
+  /* --- motion: easing --------------------------------------------------
+     These two names already exist in Tailwind; redefining them here retunes
+     every `ease-out` and `ease-in-out` in the codebase — 41 call sites —
+     without touching one of them.
+
+     The curve is not new either. `cubic-bezier(0.22, 1, 0.36, 1)` was already
+     the site's decelerate, hand-written in the hero entrance, the drawer and
+     the scroll reveal — and written TWO ways, with and without spaces, so
+     Tailwind was emitting it as two separate classes. Promoting it to the
+     token makes it the one decelerate the whole site shares, and Tailwind's
+     own flatter default (`0, 0, 0.2, 1`) stops leaking in beside it. */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* --- elevation ------------------------------------------------------
+     There was no elevation system at all. Measured across three routes,
+     resting `box-shadow` was `none` on 2711 / 544 / 550 visible nodes — every
+     surface on this site was a 1px border on a flat plane, and the page read
+     flat because it literally was. The one shadow that existed was
+     `0 3px 10px rgb(0 0 0 / 0.16)` on card hover: a single layer at 16%, which
+     is the shape of a 2014 shadow — one hard smudge rather than the contact
+     edge plus ambient falloff that a real surface casts.
+
+     Three steps, deliberately few, so this stays a scale instead of becoming
+     the sprawl it replaces:
+       e1  resting  — cards and panels; the page stops being one plane
+       e2  raised   — hover and the header once it detaches on scroll
+       e3  overlay  — things that float over content: drawers, sticky bars
+
+     Two layers each. The tight layer is the contact shadow that seats the
+     element; the wide layer is the ambient one that gives it height. Opacities
+     stay low because the layers accumulate — the old 16% single layer is
+     heavier than e2's two combined.
+
+     The ink is rgb(20 22 28), the chrome hue, not black. On a warm-neutral
+     page a pure-black shadow greys out; tinting it toward the identity's dark
+     keeps the shadow reading as the same material as the nav band. */
+  --shadow-e1: 0 1px 2px rgb(20 22 28 / 0.04), 0 2px 6px rgb(20 22 28 / 0.06);
+  --shadow-e2: 0 2px 4px rgb(20 22 28 / 0.05), 0 8px 20px rgb(20 22 28 / 0.09);
+  --shadow-e3: 0 4px 10px rgb(20 22 28 / 0.07), 0 18px 40px rgb(20 22 28 / 0.14);
+}
+
+:root {
+  --header-top-height: 31px;
+  --header-main-height: 101px;
+  --nav-height: 43px;
+
+  /* Product media ratio, fixed so a product frame reserves its space before
+     anything loads (docs/PRODUCT_MODEL §media). The product page *contains*
+     inside this box; listing cards fill their own. */
+  --ratio-product: 4 / 3;
+
+  /* --- motion: duration ------------------------------------------------
+     THREE steps, collapsed from the five that were in use: 100, 150, 200, 300
+     and 500ms, picked per call site with no system behind them.
+
+     The five were not arbitrary in intent — read together they fell into three
+     jobs — but 100 vs 150 and 200 vs 300 are differences nobody perceives,
+     which is the same failure the radius scale had at 8px vs 10px. The steps
+     below are ~1.7× apart, so they actually read as different speeds:
+
+       fast  150ms  colour and opacity state — hover tints, focus, link colour
+       base  250ms  anything that moves or resizes — shadows, transforms,
+                    the card's cart bar, drawer fades
+       slow  500ms  large slow motion — the hover zoom on banner and category
+                    imagery, where the whole point is that it is unhurried
+
+     `prefers-reduced-motion` still overrides all three at the foot of this
+     file; these are the values for people who have not asked for less. */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 500ms;
+
+  color-scheme: light;
+
+  --card-radius: 10px;
+  /* Panels that group cards (the paired product sliders under the hero) sit one
+     step softer than the cards inside them, so the grouping reads first. */
+  --panel-radius: 18px;
+  --card-border: 1px solid rgb(240 240 240);
+  /* Kept as an alias so nothing that still asks for it breaks, but it is no
+     longer its own value: hover is simply the second step of the elevation
+     scale. The old note here said a reference card "carries no shadow until
+     the pointer enters it" — true of the reference, and the reason this site
+     had no resting elevation anywhere. Cards now rest on e1 and rise to e2,
+     which is what makes the lift read as a lift rather than as a shadow
+     appearing out of nothing. */
+  --card-shadow-hover: var(--shadow-e2);
+
+  /* Grid gutter. The reference lays cards out as cells with 10px side padding,
+     which is exactly a 20px gap: at 1440 that gives (1320 - 4×20)/5 = 248px,
+     the measured card width. At 390 the measured gutter is ~10px, which is what
+     puts a 2-across card on 182 rather than 177. */
+  --space-grid-gap: 10px;
+
+  /* Section rhythm.
+
+     This was 28px and DEAD: defined here and referenced nowhere, while every
+     band on the homepage carried its own ad-hoc pt-2.5 / pt-3 / pt-[30px].
+     Measured band gaps were 0, which is why an 8676px homepage read as one
+     uncut flow with no hierarchy.
+
+     The value is deliberately larger than the reference's dense original. The
+     earlier note here said tightness was intentional, and for a straight
+     reproduction it was — but the client asked for a more modern, better
+     separated homepage, and separation is what turns 19 stacked bands into
+     readable sections. Applied in exactly one place, <Section>, so the whole
+     page's rhythm retunes from this line. */
+  --space-section: 40px;
+}
+
+@media (min-width: 1200px) {
+  :root {
+    --space-grid-gap: 20px;
+    /* Desktop has the height to spend, and it is where the seven brand bands
+       otherwise run together most. */
+    --space-section: 64px;
+  }
+}
+
+/* ==================================================================== */
+/* DARK MODE                                                            */
+/* ==================================================================== */
+/*
+  Follows the system setting only. No toggle, and that is a decision rather
+  than an omission: a toggle needs a client component, persisted state and a
+  pre-paint script to avoid flashing the wrong theme through hydration. The
+  media query is the honest foundation and works with JavaScript off; a toggle
+  can sit on top of it later without any of the values below changing.
+
+  THE HARD PART IS NOT THE COLOURS, IT IS THE BAND RHYTHM.
+
+  This homepage is composed as light → dark → light → dark → footer. The dark
+  anchors — the header stack, the technical band, the blog/brand band — are
+  near-black against a light page, and they are what give an 10.000px page its
+  sections. Darkening the page the naive way puts the page at rgb(14 16 20) and
+  leaves the anchors at rgb(20 22 28): a 6-value difference nobody can see, and
+  the composition collapses into one flat dark column.
+
+  So the anchors INVERT. In dark mode chrome becomes LIGHTER than the page, not
+  darker. The rhythm survives because it was never about darkness — it was
+  about a band that differs from its surroundings.
+
+  TWO SURFACES STAY LIGHT ON PURPOSE.
+
+  All 45 brand marks and all 72 product SVGs carry an opaque white plate, so
+  any surface that shows one has to remain light or it renders a white
+  rectangle. That sounds like it should block dark mode, and it nearly did —
+  but the card's media area is already a literal `bg-white` rather than a
+  token, so it needs nothing. Only the brand wall had to be pinned, below.
+  Keeping product media on a light plate is also simply right: product
+  photography on a white bed is a convention, not a compromise.
+*/
+/*
+  THREE THEME STATES, AND WHY THE RULES BELOW LOOK REPETITIVE
+
+  The theme has three states, not two:
+    system   no data-theme attribute — follow prefers-color-scheme
+    light    data-theme="light"      — explicit, wins over a dark OS
+    dark     data-theme="dark"       — explicit, wins over a light OS
+
+  CSS cannot OR a media query with a selector, so the dark values have to be
+  applied from two places: inside the media query for the system state, and on
+  the attribute for the explicit one. What it CAN avoid is stating the values
+  twice — they live once, below, as --dk-*, and the two blocks only map them
+  onto the real tokens. A colour is therefore never edited in two places.
+
+  The media query is guarded with :not([data-theme="light"]) so that choosing
+  light on a dark-set OS actually works; without it the media query would win
+  and the toggle would only move one way.
+
+  The media-query half works with JavaScript disabled. The attribute half needs
+  the pre-paint script in layout.tsx, which is why that script is inline and
+  blocking rather than a component effect.
+*/
+:root {
+  --dk-surface-page: rgb(14 16 20);
+  --dk-surface-card: rgb(24 27 33);
+  --dk-surface-utility: rgb(20 22 28);
+  /* NOT inverted: this chip sits on the product's white media plate in both
+     themes, so it stays the dark chip it always was. */
+  --dk-surface-instalment: rgb(20 22 28);
+
+  /* The inverted anchors — lighter than the page, which is the whole point. */
+  --dk-chrome: rgb(33 37 46);
+  --dk-chrome-soft: rgb(45 50 61);
+  --dk-chrome-line: rgb(64 71 84);
+  --dk-brand-nav: rgb(28 32 40);
+
+  --dk-text-primary: rgb(237 239 243);
+  --dk-text-secondary: rgb(163 170 181);
+  --dk-text-price: rgb(226 230 236);
+
+  --dk-line: rgb(44 49 59);
+  --dk-line-strong: rgb(62 69 82);
+  --dk-tab-idle: rgb(78 86 100);
+
+  /* The indigo lightens enough to read as an action on a dark ground while
+     staying dark enough to carry white label text. The soft wash inverts from
+     a pale tint to a deep one. The teal heading was darkened for white
+     backgrounds; on dark it has to go the other way. */
+  --dk-brand: rgb(122 96 228);
+  --dk-brand-dark: rgb(146 124 240);
+  --dk-brand-soft: rgb(38 33 62);
+  --dk-brand-heading: rgb(64 214 214);
+  --dk-brand-hover: rgb(160 138 246);
+  --dk-brand-ink: rgb(213 218 226);
+  /* Lighter than the fill above, because this one IS the text. Measured on
+     both grounds it has to sit on: 5.98:1 on the page rgb(14 16 20), 5.42:1 on
+     the card rgb(24 27 33). The fill's rgb(122 96 228) read 4.19:1 there. */
+  --dk-brand-text: rgb(150 126 245);
+
+  /* Fills keep carrying white text, unchanged, because both sit on product
+     media that is still light. The inks are text on the dark card and have to
+     move — rgb(186 28 58) measures 2.72:1 there. */
+  --dk-danger-ink: rgb(255 138 160);
+  --dk-success-ink: rgb(74 214 174);
+
+  /* Shadow is a poor depth cue on a dark ground — there is little light to
+     occlude. The steps stay defined so nothing referencing them breaks, but
+     they carry almost nothing and the border tokens do the separating. */
+  --dk-e1: 0 1px 2px rgb(0 0 0 / 0.3);
+  --dk-e2: 0 2px 4px rgb(0 0 0 / 0.35), 0 8px 20px rgb(0 0 0 / 0.4);
+  --dk-e3: 0 4px 10px rgb(0 0 0 / 0.45), 0 18px 40px rgb(0 0 0 / 0.55);
+
+  /* The brand wall stays light in dark mode: 45 marks, every one of them on an
+     opaque white plate, would otherwise render as 45 white rectangles. */
+  --dk-wall-bg: rgb(244 245 247);
+  --dk-wall-border: rgb(214 218 224);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+
+    --color-surface-page: var(--dk-surface-page);
+    --color-surface-card: var(--dk-surface-card);
+    --color-surface-utility: var(--dk-surface-utility);
+    --color-surface-instalment: var(--dk-surface-instalment);
+    --color-chrome: var(--dk-chrome);
+    --color-chrome-soft: var(--dk-chrome-soft);
+    --color-chrome-line: var(--dk-chrome-line);
+    --color-brand-nav: var(--dk-brand-nav);
+    --color-text-primary: var(--dk-text-primary);
+    --color-text-secondary: var(--dk-text-secondary);
+    --color-text-price: var(--dk-text-price);
+    --color-line: var(--dk-line);
+    --color-line-strong: var(--dk-line-strong);
+    --color-tab-idle: var(--dk-tab-idle);
+    --color-brand: var(--dk-brand);
+    --color-brand-dark: var(--dk-brand-dark);
+    --color-brand-soft: var(--dk-brand-soft);
+    --color-brand-heading: var(--dk-brand-heading);
+    --color-brand-hover: var(--dk-brand-hover);
+    --color-brand-ink: var(--dk-brand-ink);
+    --color-brand-text: var(--dk-brand-text);
+    --color-danger-ink: var(--dk-danger-ink);
+    --color-success-ink: var(--dk-success-ink);
+    --shadow-e1: var(--dk-e1);
+    --shadow-e2: var(--dk-e2);
+    --shadow-e3: var(--dk-e3);
+  }
+
+  :root:not([data-theme='light']) .brand-wall-plate {
+    background-color: var(--dk-wall-bg);
+    border-color: var(--dk-wall-border);
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-surface-page: var(--dk-surface-page);
+  --color-surface-card: var(--dk-surface-card);
+  --color-surface-utility: var(--dk-surface-utility);
+  --color-surface-instalment: var(--dk-surface-instalment);
+  --color-chrome: var(--dk-chrome);
+  --color-chrome-soft: var(--dk-chrome-soft);
+  --color-chrome-line: var(--dk-chrome-line);
+  --color-brand-nav: var(--dk-brand-nav);
+  --color-text-primary: var(--dk-text-primary);
+  --color-text-secondary: var(--dk-text-secondary);
+  --color-text-price: var(--dk-text-price);
+  --color-line: var(--dk-line);
+  --color-line-strong: var(--dk-line-strong);
+  --color-tab-idle: var(--dk-tab-idle);
+  --color-brand: var(--dk-brand);
+  --color-brand-dark: var(--dk-brand-dark);
+  --color-brand-soft: var(--dk-brand-soft);
+  --color-brand-heading: var(--dk-brand-heading);
+  --color-brand-hover: var(--dk-brand-hover);
+  --color-brand-ink: var(--dk-brand-ink);
+  --color-brand-text: var(--dk-brand-text);
+  --color-danger-ink: var(--dk-danger-ink);
+  --color-success-ink: var(--dk-success-ink);
+  --shadow-e1: var(--dk-e1);
+  --shadow-e2: var(--dk-e2);
+  --shadow-e3: var(--dk-e3);
+}
+
+:root[data-theme='dark'] .brand-wall-plate {
+  background-color: var(--dk-wall-bg);
+  border-color: var(--dk-wall-border);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hero autoplay indicator: the active segment fills across the dwell time, so
+   the slider shows how long is left instead of only which slide is up. The
+   reduced-motion block below collapses the duration, which makes the segment
+   read as simply "current" — the correct behaviour when autoplay is off. */
+@keyframes hero-progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* Hero copy entrance. Each element runs the same 600ms curve with a staggered
+   delay, so the slide assembles itself instead of appearing all at once —
+   30–50ms between items is the documented stagger range.
+   `both` matters: it holds the FROM state before the delay elapses (no flash of
+   final-position text) and the TO state afterwards. The reduced-motion block at
+   the foot of this file collapses the duration to 0.01ms, and because the fill
+   mode is `both` the element still lands on its final frame — the animation
+   disappears without the content disappearing with it. */
+@keyframes hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Slow push-in on the active slide's artwork. 7s against a 5s dwell so the
+   movement never completes and therefore never visibly stops — a zoom that
+   lands is a zoom you notice. */
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.08);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* Mobile drawer. It arrives from the edge it is anchored to, which is what
+   tells you where it came from and where dismissing it will send it back. */
+@keyframes drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes drawer-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+body {
+  background: var(--color-surface-page);
+  color: var(--color-text-primary);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/*
+  One container definition, used by every section.
+
+  The reference container is *stepped*, not fluid — measured across 13 widths
+  with `scripts/visual/container-sweep.mjs`:
+
+      1920 → 1480    1280 → 1180    768 → 737
+      1600 → 1480    1200 → 1100    430 → 413
+      1440 → 1320    1024 →  983    390 → 374
+      1366 → 1240     900 →  864    375 → 360
+
+  Each media query below reproduces one of those measurements exactly. A single
+  fluid `min(91.7%, 1320px)` matches 1440 but drifts 6px at 1366 and 20px at
+  1280, and every column width on the page is derived from this number.
+*/
+.container-main {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 8px; /* 390 → 374, 375 → 360 */
+}
+@media (min-width: 600px) {
+  .container-main {
+    padding-inline: 16px; /* 768 → 736 (measured 737) */
+  }
+}
+@media (min-width: 1025px) {
+  .container-main {
+    padding-inline: 21px; /* 1024 → 982 (measured 983) */
+  }
+}
+@media (min-width: 1200px) {
+  .container-main {
+    max-width: 1100px;
+    padding-inline: 0;
+  }
+}
+@media (min-width: 1280px) {
+  .container-main {
+    max-width: 1180px;
+  }
+}
+@media (min-width: 1366px) {
+  .container-main {
+    max-width: 1240px;
+  }
+}
+@media (min-width: 1440px) {
+  .container-main {
+    max-width: 1320px;
+  }
+}
+@media (min-width: 1600px) {
+  .container-main {
+    max-width: 1480px;
+  }
+}
+
+/*
+  Navigation track.
+
+  The header's nav row does NOT share the content container: measured at 1440,
+  the content container is 1320 starting at x=60, while the nav list is 1400
+  starting at x=20 — the orange bar's items run noticeably closer to the
+  viewport edge than the page content does. The mega panel is measured at the
+  same 1400 width, so it uses this track too.
+*/
+.container-nav {
+  width: calc(100% - 40px);
+  max-width: 1400px;
+  margin-inline: auto;
+}
+
+/*
+  Header track. Below the desktop breakpoint the header shares the content
+  container (the 51px mobile row lines up with the page); from 1200 up it
+  switches to the wider 1400 chrome track measured above.
+*/
+.container-header {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 8px;
+}
+@media (min-width: 600px) {
+  .container-header {
+    padding-inline: 16px;
+  }
+}
+@media (min-width: 1025px) {
+  .container-header {
+    padding-inline: 21px;
+  }
+}
+@media (min-width: 1200px) {
+  .container-header {
+    width: calc(100% - 40px);
+    max-width: 1400px;
+    padding-inline: 0;
+  }
+}
+
+/* A single focus treatment, applied through a token rather than per component. */
+:where(a, button, input, select, textarea, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-brand-dark);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Product name clamped to two lines, exactly as the reference does. */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Horizontal rails: native scroll with snap, next card peeking — the mobile
+   behaviour observed on the reference. No carousel library. */
+.rail {
+  display: grid;
+  grid-auto-flow: column;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+.rail > * {
+  scroll-snap-align: start;
+}
+
+/*
+  Opt-in companion for the rails that become a REAL grid at `lg`.
+
+  `.rail` sets `grid-auto-flow: column`, which has to be turned off wherever the
+  element also gets `lg:grid-cols-*`. A Tailwind utility cannot do it: `.rail`
+  is unlayered CSS while utilities live in the `utilities` layer, and unlayered
+  rules beat layered ones whatever the source order. Hence a class here, beside
+  the rule it corrects, rather than `lg:grid-flow-row` at the call site.
+
+  Measured consequence of leaving it on — the category listing, 6 products into
+  `lg:grid-cols-4`:
+      grid-template-columns: 72.5 72.5 72.5 72.5 286 359
+      card widths:           73 · 73 · 73 · 73 · 286 · 359
+  Column-first placement filled the four template columns, then created two
+  implicit `auto` columns for the extra items; those took their content width
+  and squeezed the four `1fr` columns to 73px. Names truncated to "F…", prices
+  cut to "₺1.34". The homepage never showed it because every band there holds
+  exactly as many cards as it has columns.
+
+  Deliberately opt-in: the tab strip, the sort pills, the paired sliders and the
+  footer payment row all need the column flow at every width.
+*/
+@media (min-width: 1024px) {
+  .rail-rows-lg {
+    grid-auto-flow: row;
+  }
+}
+
+/*
+  Companion for the tab rail, which stops being a horizontal scroller and
+  becomes a vertical list from `dt`.
+
+  Same layering reason as `.rail-rows-lg` above: `.rail` is unlayered CSS, so
+  its `display: grid` beats a `dt:flex` utility whatever the source order. The
+  switch has to happen here, beside the rule it overrides.
+*/
+@media (min-width: 1200px) {
+  .rail-stack-dt {
+    display: flex;
+    flex-direction: column;
+    overflow: visible;
+  }
+}
+
+/*
+  Brand wall marquee.
+
+  The track holds the brand list twice, so translating it by exactly -50% lands
+  on an identical frame and the loop is seamless. The duplicate is aria-hidden:
+  a screen reader should hear 45 brands, not 90.
+
+  ON TOUCH IT DOES NOT MOVE. These are 45 links, and a moving link is a link
+  that is hard to hit — with a pointer you can stop it by hovering, with a
+  finger you cannot. So `(hover: none)` turns the track back into a static
+  wrapped set and drops the duplicate. The animation only exists where the
+  means to stop it exists.
+
+  `prefers-reduced-motion` is handled globally at the foot of this file, which
+  collapses the duration; combined with `infinite` that leaves the track
+  parked at its first frame rather than racing.
+*/
+/*
+  Scroll reveal.
+
+  The hiding rule is deliberately gated on `html.reveal-ready`, which only
+  RevealOnScroll adds and only once its observer exists. Without JavaScript the
+  class never appears and every band renders visible — the animation is
+  additive, never load-bearing. See the note in reveal-on-scroll.tsx.
+
+  The transition lives on the element unconditionally so that the reveal is
+  smooth the first time; the reduced-motion block at the foot of this file
+  collapses it to 0.01ms, and the component declines to arm at all there.
+*/
+[data-reveal] {
+  /* 600ms is deliberately longer than --duration-slow: a band arriving on
+     scroll is the one motion on this page that should feel unhurried, and it
+     is the only thing at this speed. The CURVE comes from the token, so the
+     reveal decelerates exactly like the hero and the drawer. */
+  transition:
+    opacity 600ms var(--ease-out),
+    transform 600ms var(--ease-out);
+}
+
+html.reveal-ready [data-reveal]:not(.is-revealed) {
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+@keyframes brand-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (hover: none) {
+  .brand-track {
+    animation: none !important;
+    width: auto !important;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .brand-dup {
+    display: none;
+  }
+
+  /* Four per row rather than three. The cells are a fixed 120px so the
+     marquee spacing is even; wrapped on a 374px phone that fits only three
+     and the wall ran 1154px — 9% of the page for a logo list. A quarter each
+     puts it near 840px without shrinking the marks. */
+  .brand-track > li {
+    width: 25%;
+  }
+}
+
+/*
+  Product card, touch devices.
+
+  Tailwind's `hover:` and `group-hover:` are themselves wrapped in
+  `@media (hover: hover)`, so on a touch device the card's reveal-on-hover cart
+  control never fires. Measured in a touch context: opacity 0, pointer-events
+  none — the card offered no route to the cart at all, and the only way to buy
+  was to open the product page.
+
+  Here the control leaves the overlay and joins the flow beneath the price, and
+  the detail block grows from its measured 120px to fit it. Every card grows by
+  the same amount, so grid rows stay aligned and no card outgrows its
+  neighbour — which is why this is a height change rather than an overlay that
+  would have to cover the price or the instalment strip permanently.
+
+  Unlayered on purpose: these have to beat the Tailwind utilities on the same
+  elements, and layered rules cannot.
+*/
+@media (hover: none) {
+  .card-detail {
+    height: auto;
+    padding-bottom: 10px;
+  }
+
+  .card-cta {
+    position: static;
+    margin-top: 10px;
+    padding-inline: 0;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* 44px, not the 36px it carries as a pointer overlay. As an overlay it only
+     ever met a mouse, where 24×24 is the floor; in the flow it is the card's
+     primary action under a finger, and measured at 160×36 it was under the
+     touch minimum this build holds everywhere else. */
+  .card-cta button {
+    height: 44px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

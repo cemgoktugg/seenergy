@@ -1,0 +1,48 @@
+{
+  "name": "elektro-2-visual-workbench",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Reference-driven visual development workbench for the VOLTA electronics storefront.",
+  "scripts": {
+    "dev": "next dev -p 3100",
+    "build": "next build",
+    "start": "next start -p 3100",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
+    "mock:assets": "node scripts/mock/generate-assets.mjs && node scripts/mock/normalize-cutouts.mjs",
+    "mock:normalize": "node scripts/mock/normalize-cutouts.mjs",
+    "reference:probe": "node scripts/visual/probe-reference.mjs",
+    "reference:shots": "node scripts/visual/capture-slices.mjs",
+    "visual:reference": "node scripts/visual/capture-reference.mjs",
+    "visual:local": "node scripts/visual/capture-local.mjs",
+    "visual:compare": "node scripts/visual/compare-screenshots.mjs",
+    "visual:report": "node scripts/visual/visual-report.mjs",
+    "visual:test": "playwright test",
+    "visual:smoke": "playwright test responsive-smoke",
+    "visual:touch": "node scripts/visual/touch-probe.mjs",
+    "visual:update-baseline": "node scripts/visual/capture-reference.mjs --refresh-baseline",
+    "quality:gate": "node scripts/visual/quality-gate.mjs",
+    "quality:full": "node scripts/visual/quality-gate.mjs --full"
+  },
+  "devDependencies": {
+    "@eslint/eslintrc": "^3.3.6",
+    "@playwright/test": "^1.56.0",
+    "@tailwindcss/postcss": "^4.3.3",
+    "@types/node": "^26.2.0",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "eslint": "^9.39.5",
+    "eslint-config-next": "^16.3.1",
+    "pixelmatch": "^6.0.0",
+    "pngjs": "^7.0.0",
+    "tailwindcss": "^4.3.3",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "lucide-react": "^1.31.0",
+    "next": "^15.5.23",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  }
+}
