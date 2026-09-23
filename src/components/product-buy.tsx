@@ -14,31 +14,44 @@
 
 import { Heart, Scale, ShoppingCart } from 'lucide-react';
 
+import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
 import { formatPrice, type Product } from '@/data/catalog';
 
 export function ProductBuy({ product }: { product: Product }) {
-  /* The cart lives in the shared store rather than in this component: a local
-     `useState` here forgot the product the moment you navigated away, and the
-     header badge could never see it. */
-  const { has, add, toggle, count, ready } = useStore();
-  const added = ready && has('cart', product.id);
+  /* The cart is Medusa's, shared through CartProvider: the header badge, the
+     cards and the cart page all read the same response this button updates. */
+  const cart = useCart();
+  const inCart = cart.quantityOf(product.variantId);
+  const { has, toggle, count, ready } = useStore();
   const favourite = ready && has('favourites', product.id);
   const comparing = ready && has('compare', product.id);
   /* The limit is enforced in the store; surfacing it here stops the control
      from looking broken when a fifth product silently refuses to be added. */
   const compareFull = ready && !comparing && count('compare') >= COMPARE_LIMIT;
   const soldOut = product.stock === 0;
+  /* Stock is enforced by Medusa; stopping at the known level here just saves
+     the visitor a round trip to an error. */
+  const atStock = !soldOut && inCart >= product.stock;
 
-  const label = soldOut ? 'Tükendi' : added ? 'Sepete Eklendi' : 'Sepete Ekle';
+  const label = soldOut
+    ? 'Tükendi'
+    : cart.busy
+      ? 'Ekleniyor…'
+      : atStock
+        ? 'Stoktaki tüm ürünler sepette'
+        : inCart > 0
+          ? `Sepete Eklendi (${inCart})`
+          : 'Sepete Ekle';
+  const addToCart = () => void cart.add(product.variantId);
 
   return (
     <>
       <div className="mt-5 flex items-stretch gap-2.5">
         <button
           type="button"
-          disabled={soldOut}
-          onClick={() => add('cart', product.id)}
+          disabled={soldOut || atStock || cart.busy}
+          onClick={addToCart}
           className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[16px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary dt:h-14 dt:text-[16px]"
         >
           <ShoppingCart size={19} strokeWidth={2} aria-hidden />
@@ -95,8 +108,8 @@ export function ProductBuy({ product }: { product: Product }) {
           </div>
           <button
             type="button"
-            disabled={soldOut}
-            onClick={() => add('cart', product.id)}
+            disabled={soldOut || atStock || cart.busy}
+            onClick={addToCart}
             className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
           >
             <ShoppingCart size={17} strokeWidth={2} aria-hidden />

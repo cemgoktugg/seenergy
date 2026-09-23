@@ -35,7 +35,7 @@ import {
 
 import { BrandMark } from '@/components/brand-mark';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { useStore } from '@/components/cart-store';
+import { useCart } from '@/components/cart-provider';
 import { PRIMARY_NAV, SITE, UTILITY_LINKS } from '@/data/site';
 
 const UTILITY_ICONS = { info: Info, phone: Phone, truck: Truck, badge: BadgeIcon };
@@ -205,11 +205,10 @@ function SearchField({
 }
 
 function HeaderActions() {
-  /* `ready` is false until the store has read localStorage, and the badge shows
-     0 until then on purpose: rendering a count during the first client pass
-     would disagree with the server HTML. */
-  const { count, ready } = useStore();
-  const cartCount = ready ? count('cart') : 0;
+  /* The badge shows 0 until the cart has been read, on purpose: pages render
+     statically, so the server HTML cannot know this visitor's cart, and a
+     count in the first client pass would disagree with it. */
+  const { count: cartCount } = useCart();
 
   return (
     <div className="flex shrink-0 items-center gap-1 dt:gap-2.5">
@@ -258,8 +257,7 @@ export function SiteHeader() {
   /* The condensed bar carries its own cart badge. It reads the same store as
      the masthead's, so the two cannot disagree — a sticky bar still showing 0
      after something was added would be worse than having no badge there. */
-  const { count, ready } = useStore();
-  const cartCount = ready ? count('cart') : 0;
+  const { count: cartCount } = useCart();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);

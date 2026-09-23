@@ -34,6 +34,7 @@
 import Link from 'next/link';
 import { Heart, ShoppingCart, CreditCard } from 'lucide-react';
 
+import { useCart } from '@/components/cart-provider';
 import { useStore } from '@/components/cart-store';
 import { discountPercent, formatPrice, type Product } from '@/data/catalog';
 
@@ -66,8 +67,9 @@ export function ProductCard({ product }: { product: Product }) {
   /* Shared store, not local state: a favourite added from a listing used to be
      forgotten the moment you navigated, and the header badge never saw a cart
      addition made from a card. */
-  const { has, add, toggle, ready } = useStore();
-  const added = ready && has('cart', product.id);
+  const { has, toggle, ready } = useStore();
+  const cart = useCart();
+  const added = cart.quantityOf(product.variantId) > 0;
   const favourite = ready && has('favourites', product.id);
   // Derived, never authored, so it cannot disagree with the prices beside it.
   const discount = discountPercent(product);
@@ -265,7 +267,7 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             type="button"
             disabled={soldOut}
-            onClick={() => add('cart', product.id)}
+            onClick={() => void cart.add(product.variantId)}
             aria-label={`${product.name} ürününü sepete ekle`}
             className="flex h-9 w-full items-center justify-center gap-2 rounded-(--card-radius) bg-brand text-[14px] font-semibold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
           >

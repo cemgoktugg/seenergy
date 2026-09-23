@@ -1,17 +1,14 @@
 'use client';
 
 /**
- * Cart, favourites and compare — one client store behind all three.
+ * Favourites and compare — one client store behind both.
  *
- * These three surfaces are the same problem: a set of product ids the visitor
- * builds up, which must survive navigation and a reload. Three separate
- * mechanisms would drift; one store keeps the header badge, the product page
- * and the list pages reading the same truth.
+ * Both are a set of product ids the visitor builds up, which must survive
+ * navigation and a reload. The cart used to live here too; it is Medusa's now
+ * (see cart-provider.tsx), because a cart has to become an order.
  *
- * Persistence is `localStorage`, deliberately:
- *   - it is per-browser, which is what a demo cart should be;
- *   - nothing is sent anywhere, which matches the footer's statement that this
- *     is a demo store with no order or payment flow.
+ * Persistence is `localStorage`, deliberately: these lists are per-browser
+ * conveniences, not commerce data, and nothing about them is sent anywhere.
  *
  * WHY `useSyncExternalStore` AND NOT AN EFFECT
  *
@@ -35,14 +32,14 @@ import { createContext, useContext, useMemo, useSyncExternalStore } from 'react'
 
 const KEY = 'seenergy.store.v1';
 
-export type Bucket = 'cart' | 'favourites' | 'compare';
+export type Bucket = 'favourites' | 'compare';
 
 /** Compare is capped: a comparison table stops being readable past four. */
 export const COMPARE_LIMIT = 4;
 
 type State = Record<Bucket, string[]>;
 
-const EMPTY: State = { cart: [], favourites: [], compare: [] };
+const EMPTY: State = { favourites: [], compare: [] };
 
 /* ------------------------------------------------------------------ */
 /* The store itself — a module singleton, not per-component state       */
@@ -62,7 +59,6 @@ function parse(raw: string | null): State {
   try {
     const parsed = JSON.parse(raw) as Partial<State>;
     return {
-      cart: asIds(parsed.cart),
       favourites: asIds(parsed.favourites),
       compare: asIds(parsed.compare),
     };

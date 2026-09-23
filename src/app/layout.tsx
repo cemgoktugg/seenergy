@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { Montserrat } from 'next/font/google';
 
+import { CartProvider } from '@/components/cart-provider';
 import { StoreProvider } from '@/components/cart-store';
 import { SiteHeader } from '@/components/site-header';
 import { NewsletterBar, SiteFooter } from '@/components/site-footer';
@@ -59,14 +60,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           İçeriğe geç
         </a>
 
-        {/* One store for cart, favourites and compare. It wraps the header too,
-            because the header's cart badge reads the same truth the pages do. */}
-        <StoreProvider>
-          <SiteHeader />
-          <main id="icerik">{children}</main>
-          <NewsletterBar />
-          <SiteFooter />
-        </StoreProvider>
+        {/* The Medusa cart and the browser-local favourites/compare lists. Both
+            wrap the header too, because its cart badge reads the same truth the
+            pages do. */}
+        <CartProvider>
+          <StoreProvider>
+            <SiteHeader />
+            <main id="icerik">{children}</main>
+            <NewsletterBar />
+            <SiteFooter />
+          </StoreProvider>
+        </CartProvider>
       </body>
     </html>
   );
