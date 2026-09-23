@@ -20,6 +20,7 @@ import { PAYMENT_OPTIONS, type CheckoutState } from '@/data/checkout';
 import { PROVINCES } from '@/data/provinces';
 import { clearCartId, currentCart } from '@/lib/medusa/cart-cookie';
 import { MedusaError, medusa } from '@/lib/medusa/client';
+import { readToken } from '@/lib/medusa/session';
 
 const FIELDS = [
   'email',
@@ -104,6 +105,15 @@ export async function placeOrder(_previous: CheckoutState, form: FormData): Prom
 
   let orderId: string;
   try {
+    // A signed-in customer's order must land in their account. Signing in
+    // already attaches the cart; this covers a cart started in another tab.
+    const token = await readToken();
+    if (token) {
+      await medusa(`/store/carts/${cart.id}/customer`, { method: 'POST', token, cache: 'no-store' }).catch(
+        () => undefined,
+      );
+    }
+
     await medusa(`/store/carts/${cart.id}`, {
       method: 'POST',
       cache: 'no-store',

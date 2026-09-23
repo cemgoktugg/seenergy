@@ -5,6 +5,7 @@ import { CheckoutForm, type ShippingChoice } from '@/app/odeme/checkout-form';
 import { currentCart } from '@/lib/medusa/cart-cookie';
 import { toCartSummary } from '@/lib/medusa/cart-summary';
 import { medusa } from '@/lib/medusa/client';
+import { currentCustomer } from '@/lib/medusa/session';
 
 /**
  * Checkout — `/odeme`.
@@ -27,7 +28,7 @@ interface StoreShippingOption {
 }
 
 export default async function CheckoutPage() {
-  const cart = await currentCart();
+  const [cart, customer] = await Promise.all([currentCart(), currentCustomer()]);
   const summary = toCartSummary(cart);
   if (!cart || !summary || summary.lines.length === 0) redirect('/sepet');
 
@@ -56,7 +57,21 @@ export default async function CheckoutPage() {
         </h1>
       </section>
 
-      <CheckoutForm cart={summary} shipping={shipping} />
+      <CheckoutForm
+        cart={summary}
+        shipping={shipping}
+        signedIn={customer !== null}
+        prefill={
+          customer
+            ? {
+                email: customer.email,
+                first_name: customer.first_name ?? '',
+                last_name: customer.last_name ?? '',
+                phone: customer.phone ?? '',
+              }
+            : undefined
+        }
+      />
     </>
   );
 }

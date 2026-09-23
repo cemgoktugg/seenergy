@@ -16,6 +16,7 @@ import { useActionState, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Lock, ShieldCheck } from 'lucide-react';
 
+import { Field, inputClass, invalidProps } from '@/components/form-field';
 import { PAYMENT_OPTIONS, type CheckoutState } from '@/data/checkout';
 import { formatPrice } from '@/data/catalog';
 import { PROVINCES_SORTED } from '@/data/provinces';
@@ -27,41 +28,6 @@ export interface ShippingChoice {
   name: string;
   amount: number;
   description: string;
-}
-
-const inputClass =
-  'mt-1 block h-11 w-full rounded-(--card-radius) border border-line-strong bg-surface-card px-3 text-[14px] text-text-primary outline-none transition-colors placeholder:text-text-secondary focus:border-brand aria-invalid:border-danger';
-
-function Field({
-  name,
-  label,
-  error,
-  hint,
-  className = '',
-  children,
-}: {
-  name: string;
-  label: string;
-  error?: string;
-  hint?: string;
-  className?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={className}>
-      <label htmlFor={name} className="text-[13px] font-semibold text-text-primary">
-        {label}
-      </label>
-      {children}
-      {error ? (
-        <p id={`${name}-error`} className="mt-1 text-[12px] font-medium text-danger-ink">
-          {error}
-        </p>
-      ) : hint ? (
-        <p className="mt-1 text-[12px] text-text-secondary">{hint}</p>
-      ) : null}
-    </div>
-  );
 }
 
 function Step({ index, title, children }: { index: number; title: string; children: React.ReactNode }) {
@@ -95,12 +61,22 @@ function SubmitButton() {
   );
 }
 
-export function CheckoutForm({ cart, shipping }: { cart: CartSummary; shipping: ShippingChoice[] }) {
+export function CheckoutForm({
+  cart,
+  shipping,
+  signedIn,
+  prefill,
+}: {
+  cart: CartSummary;
+  shipping: ShippingChoice[];
+  signedIn: boolean;
+  /** The signed-in customer's details; typed input wins after a failed submit. */
+  prefill?: Record<string, string>;
+}) {
   const [state, action] = useActionState<CheckoutState, FormData>(placeOrder, {});
-  const v = state.values ?? {};
+  const v = state.values ?? prefill ?? {};
   const err = state.fieldErrors ?? {};
-  const invalid = (name: string) =>
-    err[name] ? { 'aria-invalid': true as const, 'aria-describedby': `${name}-error` } : {};
+  const invalid = (name: string) => invalidProps(err, name);
 
   const [shippingId, setShippingId] = useState(v.shipping_option || shipping[0]?.id || '');
   const [invoice, setInvoice] = useState(v.invoice || 'bireysel');
@@ -120,6 +96,15 @@ export function CheckoutForm({ cart, shipping }: { cart: CartSummary; shipping: 
       <div className="grid gap-(--space-grid-gap) dt:grid-cols-[minmax(0,1fr)_360px]">
         <div className="space-y-(--space-grid-gap)">
           <Step index={1} title="İletişim bilgileri">
+            {signedIn ? null : (
+              <p className="-mt-1 mb-4 text-[13px] text-text-secondary">
+                Üye misiniz?{' '}
+                <Link href="/hesabim?next=/odeme" className="font-semibold text-brand-text hover:underline">
+                  Giriş yapın
+                </Link>
+                , siparişiniz hesabınızda görünsün. Üye olmadan da devam edebilirsiniz.
+              </p>
+            )}
             <div className="grid gap-4 md:grid-cols-2">
               <Field name="email" label="E-posta" error={err.email} hint="Siparişinizle ilgili bu adresten size ulaşırız.">
                 <input id="email" name="email" type="email" autoComplete="email" required defaultValue={v.email} className={inputClass} {...invalid('email')} />
