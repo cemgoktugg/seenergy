@@ -23,14 +23,15 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
-import { HERO_SIDE } from '@/data/site';
+import type { Banner } from '@/lib/medusa/vitrin';
 
-export function HeroSide() {
+/** Tiles come from the Vitrin module (admin → Vitrin → Slayt yanı kartlar). */
+export function HeroSide({ items }: { items: Banner[] }) {
   return (
     <div className="grid grid-cols-2 gap-(--space-grid-gap) dt:h-full dt:grid-cols-1 dt:grid-rows-2">
-      {HERO_SIDE.map((item) => (
+      {items.map((item, i) => (
         <Link
-          key={item.href}
+          key={`${i}-${item.href}`}
           href={item.href}
           className="group/tile relative block aspect-[172/104] overflow-hidden rounded-(--panel-radius) sm:aspect-[340/120] dt:aspect-auto dt:h-full"
         >

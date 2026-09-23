@@ -32,11 +32,36 @@ import {
   TrustRow,
   WideBanner,
 } from '@/components/sections';
-import { BRAND_SECTIONS } from '@/data/site';
+import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
+import { loadVitrin, type BrandBand } from '@/lib/medusa/vitrin';
 
 export default async function HomePage() {
-  const { byBrand, mixed } = await loadCatalog();
+  const [{ byId, byBrandSlug, brandFromSlug, mixed }, vitrin] = await Promise.all([
+    loadCatalog(),
+    loadVitrin(),
+  ]);
+
+  /**
+   * A Vitrin list (admin → Vitrin), resolved against the catalogue. Ids of
+   * products that were deleted or unpublished simply drop out. Until a list
+   * exists the old deterministic pick stands in, so the page is never empty.
+   */
+  const pick = (key: string, count: number, fallbackOffset: number): Product[] => {
+    const ids = vitrin.lists[key];
+    if (!ids) return mixed(fallbackOffset, count);
+    return ids
+      .map((id) => byId(id))
+      .filter((product): product is Product => Boolean(product))
+      .slice(0, count);
+  };
+
+  const banner = (key: keyof typeof vitrin.banners, fallback: NonNullable<(typeof vitrin.banners)['wide']>) =>
+    vitrin.banners[key] ?? fallback;
+
+  /* Only bands whose brand still has products — a band with no products
+     would be a logo over an empty shelf. */
+  const brandBands = vitrin.brandBands.filter((band) => brandFromSlug(band.brandHandle));
 
   /**
    * One brand band, rendered in two runs below.
@@ -47,17 +72,20 @@ export default async function HomePage() {
    * of the unbroken run, not the sameness of the bands, so the technical band
    * splits the run instead of the bands varying.
    */
-  const brandBand = (item: (typeof BRAND_SECTIONS)[number]) => (
-    <Section key={item.brand}>
-      <BrandSection
-        brand={item.brand}
-        tagline={item.tagline}
-        href={item.href}
-        logo={item.logo}
-        products={byBrand(item.brand, 4)}
-      />
-    </Section>
-  );
+  const brandBand = (band: BrandBand) => {
+    const chosen = band.productIds.map((id) => byId(id)).filter((p): p is Product => Boolean(p));
+    return (
+      <Section key={band.brandHandle}>
+        <BrandSection
+          brand={brandFromSlug(band.brandHandle) ?? band.brandHandle}
+          tagline={band.tagline}
+          href={`/marka/${band.brandHandle}`}
+          logo={band.logo}
+          products={chosen.length > 0 ? chosen.slice(0, 4) : byBrandSlug(band.brandHandle).slice(0, 4)}
+        />
+      </Section>
+    );
+  };
 
   return (
     <>
@@ -72,8 +100,8 @@ export default async function HomePage() {
              tiles as a short pair beneath it. */}
       <Section first>
         <div className="grid gap-(--space-grid-gap) dt:h-[423px] dt:grid-cols-[minmax(0,62fr)_minmax(0,38fr)]">
-          <Hero />
-          <HeroSide />
+          {vitrin.slides.length > 0 ? <Hero slides={vitrin.slides} /> : null}
+          <HeroSide items={vitrin.heroSide} />
         </div>
       </Section>
 
@@ -97,14 +125,14 @@ export default async function HomePage() {
             eyebrow="Bu hafta öne çıkanlar"
             title="Haftanın Ürünleri"
             href="/kampanyalar/haftanin-urunleri"
-            products={mixed(4, 8)}
+            products={pick('haftanin', 8, 2)}
             accent="violet"
           />
           <ProductSlider
             eyebrow="Rafa yeni girenler"
             title="Yeni Gelenler"
             href="/yeni-gelenler"
-            products={mixed(17, 8)}
+            products={pick('yeni', 8, 11)}
             accent="teal"
           />
         </div>
@@ -112,39 +140,49 @@ export default async function HomePage() {
 
       {/* 06 — wide campaign banner */}
       <Section>
-        <WideBanner
-          image="/mock/campaigns/wide-1.svg"
-          title="Türkiye'nin en geniş yedek parça stoğu"
-          subtitle="13.000+ televizyona uyumlu led bar çeşitleri"
-          href="/kategori/tv-yedek-parca"
-        />
+        {(() => {
+          const wide = banner('wide', {
+            image: '/mock/campaigns/wide-1.svg',
+            title: "Türkiye'nin en geniş yedek parça stoğu",
+            subtitle: '13.000+ televizyona uyumlu led bar çeşitleri',
+            href: '/kategori/tv-yedek-parca',
+          });
+          return (
+            <WideBanner image={wide.image} title={wide.title} subtitle={wide.subtitle ?? ''} href={wide.href} />
+          );
+        })()}
       </Section>
 
       {/* 07 — promo tile + 4 products */}
       <Section label="Süper fırsat ürünleri">
         <PromoProductRow
-          promo={{
-            title: 'Süper Fırsat',
-            subtitle: 'Ürünleri',
-            href: '/kampanyalar',
-            /* A transparent CUTOUT, not the category illustration that stood
-               here. `/mock/categories/*.svg` carry their own background plate,
-               which was invisible while the art was a 45%-opacity texture and
-               became an amorphous purple blob the moment the tile gave it real
-               space. Cutouts composite cleanly onto brand colour — the same
-               pairing CATEGORY_TILES already uses for its filled tiles. */
-            image: '/mock/products/cutout/dish-white.svg',
-          }}
-          products={mixed(0, 4)}
+          promo={(() => {
+            const promo = banner('super-firsat-promo', {
+              title: 'Süper Fırsat',
+              subtitle: 'Ürünleri',
+              href: '/kampanyalar',
+              /* A transparent CUTOUT, not the category illustration that stood
+                 here. `/mock/categories/*.svg` carry their own background
+                 plate, which was invisible while the art was a 45%-opacity
+                 texture and became an amorphous purple blob the moment the
+                 tile gave it real space. Cutouts composite cleanly onto brand
+                 colour — the same pairing CATEGORY_TILES already uses. The
+                 shop should upload cutouts here too (admin → Vitrin →
+                 Bannerlar → Süper Fırsat kartı). */
+              image: '/mock/products/cutout/dish-white.svg',
+            });
+            return { title: promo.title, subtitle: promo.subtitle ?? '', href: promo.href, image: promo.image };
+          })()}
+          products={pick('super-firsat', 4, 0)}
         />
       </Section>
 
-      {/* 08 — seven brand showcases, one per featured brand.
+      {/* 08 — brand showcases (admin → Vitrin → Marka vitrinleri).
              These replace the two category bands that stood here (All In One
              Bilgisayarlar / Oto Ses ve Görüntü): the client wants this stretch
              of the homepage organised by brand, and Tekniva leads because the
              all-in-one band was the model for the whole series. */}
-      {BRAND_SECTIONS.slice(0, 4).map(brandBand)}
+      {brandBands.slice(0, 4).map(brandBand)}
 
       {/* 08b — full-bleed technical band, placed INSIDE the brand run.
              Measured: the seven showcases ran y=1793→5576 as one unbroken
@@ -152,24 +190,27 @@ export default async function HomePage() {
              seven left that stretch intact and only capped it; splitting it
              four/three breaks the monotony where it actually occurs, into two
              runs of roughly 1900px.
-             Figures are placeholders pending the client's numbers. */}
+             Figures are the shop's to set (admin → Vitrin → Neden SEENERGY). */}
       <Section track="bleed">
         <TechBand
-          eyebrow="Neden SEENERGY"
-          title="Elektronikte tedarik, tek adresten"
-          description="Uydu ve güvenlik sistemlerinden televizyon yedek parçaya, oto ses sistemlerinden devre elemanlarına kadar geniş bir katalog; hem son kullanıcıya hem kurumsal alıcıya aynı stok derinliğiyle."
-          stats={[
-            { value: '12.000+', label: 'Katalogdaki ürün çeşidi' },
-            { value: '45+', label: 'Yetkili satıcısı olduğumuz marka' },
-            { value: '16:00', label: "Aynı gün kargo için son saat" },
-            { value: '24 ay', label: 'Garanti kapsamındaki ürünler' },
-          ]}
-          cta={{ label: 'Kurumsal alım ve bayilik', href: '/toptan-satis' }}
+          {...(vitrin.techBand ?? {
+            eyebrow: 'Neden SEENERGY',
+            title: 'Elektronikte tedarik, tek adresten',
+            description:
+              'Uydu ve güvenlik sistemlerinden televizyon yedek parçaya, oto ses sistemlerinden devre elemanlarına kadar geniş bir katalog; hem son kullanıcıya hem kurumsal alıcıya aynı stok derinliğiyle.',
+            stats: [
+              { value: '12.000+', label: 'Katalogdaki ürün çeşidi' },
+              { value: '45+', label: 'Yetkili satıcısı olduğumuz marka' },
+              { value: '16:00', label: 'Aynı gün kargo için son saat' },
+              { value: '24 ay', label: 'Garanti kapsamındaki ürünler' },
+            ],
+            cta: { label: 'Kurumsal alım ve bayilik', href: '/toptan-satis' },
+          })}
         />
       </Section>
 
-      {/* 08c — the remaining three showcases, after the break. */}
-      {BRAND_SECTIONS.slice(4).map(brandBand)}
+      {/* 08c — the remaining showcases, after the break. */}
+      {brandBands.slice(4).map(brandBand)}
 
       {/* 12 — tabbed product block: 3 tabs + 5×3 grid.
              The largest single section on the reference homepage. */}
@@ -179,9 +220,11 @@ export default async function HomePage() {
             /* 12, not 15: the grid is four columns beside the vertical tab
                rail now, so twelve fills exactly three rows. Fifteen would
                leave a ragged final row of three. */
-            { id: 'haftanin', label: 'Haftanın Ürünleri', products: mixed(2, 12) },
-            { id: 'yeni', label: 'Yeni Ürünler', products: mixed(11, 12) },
-            { id: 'cok-satan', label: 'Çok Satanlar', products: mixed(23, 12) },
+            /* The same Vitrin lists as the sliders above: the shop keeps
+               "Haftanın Ürünleri" in one place, not two. */
+            { id: 'haftanin', label: 'Haftanın Ürünleri', products: pick('haftanin', 12, 2) },
+            { id: 'yeni', label: 'Yeni Ürünler', products: pick('yeni', 12, 11) },
+            { id: 'cok-satan', label: 'Çok Satanlar', products: pick('cok-satan', 12, 23) },
           ]}
         />
       </Section>
@@ -219,18 +262,18 @@ export default async function HomePage() {
             <div className="pt-(--space-section)">
               <DualBanners
                 items={[
-                  {
+                  banner('dual-1', {
                     image: '/mock/campaigns/half-1.svg',
                     eyebrow: 'Kendi markalarımız',
                     title: 'Tescilli Markalarımız',
                     href: '/markalar',
-                  },
-                  {
+                  }),
+                  banner('dual-2', {
                     image: '/mock/campaigns/half-2.svg',
                     eyebrow: 'Yetkili satıcılık',
                     title: 'Resmi Yetkili Satıcısı Olduğumuz Markalar',
                     href: '/markalar',
-                  },
+                  }),
                 ]}
               />
             </div>
@@ -250,7 +293,7 @@ export default async function HomePage() {
       {/* 19 — trust row. Part of the footer stack, so it uses the wider 1400
              chrome track rather than the 1320 content container. */}
       <Section track="nav" className="pb-6">
-        <TrustRow />
+        <TrustRow items={vitrin.trust} />
       </Section>
 
       {/* Renders nothing. Arms the band reveal, and only once its observer

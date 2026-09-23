@@ -6,6 +6,7 @@ import { StoreProvider } from '@/components/cart-store';
 import { SiteHeader } from '@/components/site-header';
 import { NewsletterBar, SiteFooter } from '@/components/site-footer';
 import { SITE } from '@/data/site';
+import { loadVitrin } from '@/lib/medusa/vitrin';
 
 import './globals.css';
 
@@ -46,7 +47,10 @@ export const metadata: Metadata = {
  */
 const THEME_SCRIPT = `try{var t=localStorage.getItem('seenergy-theme');if(t==='dark'||t==='light'){document.documentElement.dataset.theme=t}}catch(e){}`;
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Cached under the `vitrin` tag, so every page stays static.
+  const { announcement } = await loadVitrin();
+
   return (
     <html lang="tr" className={montserrat.variable} suppressHydrationWarning>
       <head>
@@ -65,7 +69,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             pages do. */}
         <CartProvider>
           <StoreProvider>
-            <SiteHeader />
+            <SiteHeader promo={announcement} />
             <main id="icerik">{children}</main>
             <NewsletterBar />
             <SiteFooter />

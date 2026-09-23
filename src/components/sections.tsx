@@ -10,19 +10,19 @@
  */
 
 import Link from 'next/link';
-import { ArrowRight, BadgeCheck, Lock, RefreshCcw, Truck } from 'lucide-react';
+import { ArrowRight, BadgeCheck, Headphones, Lock, RefreshCcw, Truck } from 'lucide-react';
 
 import { ProductCard } from '@/components/product-card';
 import type { Product } from '@/data/catalog';
 import {
   BLOG_POSTS,
   BRANDS,
-  TRUST_ITEMS,
   type CategoryTile,
   type NavItem,
 } from '@/data/site';
+import type { TrustItem } from '@/lib/medusa/vitrin';
 
-const TRUST_ICONS = { truck: Truck, badge: BadgeCheck, lock: Lock, refresh: RefreshCcw };
+const TRUST_ICONS = { truck: Truck, badge: BadgeCheck, lock: Lock, refresh: RefreshCcw, support: Headphones };
 
 /* ------------------------------------------------------------------ */
 /* section headers                                                     */
@@ -523,7 +523,8 @@ export function TechBand({
   description: string;
   /** Placeholder figures — confirm with the client before launch. */
   stats: { value: string; label: string }[];
-  cta: { label: string; href: string };
+  /** Optional: the shop can leave the button out in the Vitrin admin. */
+  cta?: { label: string; href: string };
 }) {
   return (
     <div className="relative overflow-hidden bg-chrome">
@@ -554,13 +555,15 @@ export function TechBand({
             </p>
           </div>
 
-          <Link
-            href={cta.href}
-            className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-white px-5 py-3 text-[13px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) ease-in-out hover:bg-highlight dt:text-[14px]"
-          >
-            {cta.label}
-            <ArrowRight size={15} strokeWidth={2.5} aria-hidden />
-          </Link>
+          {cta ? (
+            <Link
+              href={cta.href}
+              className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-white px-5 py-3 text-[13px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) ease-in-out hover:bg-highlight dt:text-[14px]"
+            >
+              {cta.label}
+              <ArrowRight size={15} strokeWidth={2.5} aria-hidden />
+            </Link>
+          ) : null}
         </div>
 
         {/* Hairline-separated cells rather than bordered boxes: on a dark
@@ -750,11 +753,11 @@ export function BrandGrid() {
  * Measured at 390: the reference stacks these one per row, not 2×2
  * (reference-analysis/mobile-390/Z-footer.png).
  */
-export function TrustRow() {
+export function TrustRow({ items }: { items: TrustItem[] }) {
   return (
     <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
-      {TRUST_ITEMS.map((item) => {
-        const Icon = TRUST_ICONS[item.icon];
+      {items.map((item) => {
+        const Icon = TRUST_ICONS[item.icon] ?? BadgeCheck;
         return (
           <li
             key={item.title}

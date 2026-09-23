@@ -1,0 +1,158 @@
+import { cache } from 'react';
+
+import { BRAND_SECTIONS, HERO_SIDE, HERO_SLIDES, SITE, TRUST_ITEMS } from '@/data/site';
+import { medusa } from '@/lib/medusa/client';
+
+/**
+ * The storefront's editable content, from the SEENERGY Vitrin module in Medusa
+ * (admin → Vitrin). Cached under the `vitrin` tag: an admin save calls
+ * /api/revalidate and the next page view has it; otherwise it refreshes
+ * within a minute on its own.
+ *
+ * If the request fails, the site falls back to the content that shipped in
+ * src/data/site.ts rather than rendering an empty homepage.
+ */
+
+export interface HeroSlide {
+  eyebrow: string;
+  title: string;
+  description: string;
+  chips: string[];
+  cta: string;
+  href: string;
+  image: string;
+}
+
+export interface Banner {
+  eyebrow?: string;
+  title: string;
+  subtitle?: string;
+  href: string;
+  image: string;
+}
+
+export interface BrandBand {
+  brandHandle: string;
+  tagline: string;
+  logo: string;
+  productIds: string[];
+}
+
+export interface TechBandContent {
+  eyebrow: string;
+  title: string;
+  description: string;
+  stats: { value: string; label: string }[];
+  cta?: { label: string; href: string };
+}
+
+export type TrustIcon = 'truck' | 'badge' | 'lock' | 'refresh' | 'support';
+
+export interface TrustItem {
+  title: string;
+  subtitle: string;
+  icon: TrustIcon;
+}
+
+export interface Vitrin {
+  announcement: string;
+  slides: HeroSlide[];
+  heroSide: Banner[];
+  banners: Partial<Record<'wide' | 'dual-1' | 'dual-2' | 'super-firsat-promo', Banner>>;
+  brandBands: BrandBand[];
+  techBand: TechBandContent | null;
+  trust: TrustItem[];
+  /** List key → product ids, in the order the shop set. */
+  lists: Record<string, string[]>;
+}
+
+type Block<T> = { id: string; key: string | null; data: T };
+
+interface StoreVitrin {
+  lists: Record<string, { title: string; product_ids: string[] }>;
+  blocks: Partial<{
+    announcement: Block<{ text: string }>[];
+    'hero-slide': Block<HeroSlide>[];
+    'hero-side': Block<Banner>[];
+    banner: Block<Banner>[];
+    'brand-band': Block<{ brand_handle: string; tagline: string; logo: string; product_ids?: string[] }>[];
+    'tech-band': Block<{
+      eyebrow: string;
+      title: string;
+      description: string;
+      stats: { value: string; label: string }[];
+      cta_label?: string;
+      cta_href?: string;
+    }>[];
+    trust: Block<TrustItem>[];
+  }>;
+}
+
+const str = (value: unknown) => (typeof value === 'string' ? value : '');
+
+/** What the site showed before the Vitrin module existed. */
+const FALLBACK: Vitrin = {
+  announcement: SITE.promo,
+  slides: HERO_SLIDES.map((slide) => ({ ...slide, chips: [...slide.chips] })),
+  heroSide: HERO_SIDE.map((item) => ({ ...item })),
+  banners: {},
+  brandBands: BRAND_SECTIONS.map((band) => ({
+    brandHandle: band.href.replace('/marka/', ''),
+    tagline: band.tagline,
+    logo: band.logo,
+    productIds: [],
+  })),
+  techBand: null,
+  trust: TRUST_ITEMS.map((item) => ({ ...item })),
+  lists: {},
+};
+
+export const loadVitrin = cache(async (): Promise<Vitrin> => {
+  let raw: StoreVitrin;
+  try {
+    raw = await medusa<StoreVitrin>('/store/vitrin', { next: { revalidate: 60, tags: ['vitrin'] } });
+  } catch {
+    return FALLBACK;
+  }
+
+  const b = raw.blocks;
+  const tech = b['tech-band']?.[0]?.data;
+  const banners: Vitrin['banners'] = {};
+  for (const block of b.banner ?? []) {
+    if (block.key === 'wide' || block.key === 'dual-1' || block.key === 'dual-2' || block.key === 'super-firsat-promo') {
+      banners[block.key] = block.data;
+    }
+  }
+
+  return {
+    announcement: str(b.announcement?.[0]?.data.text),
+    slides: (b['hero-slide'] ?? [])
+      .map((block) => ({ ...block.data, chips: Array.isArray(block.data.chips) ? block.data.chips : [] }))
+      // A slide without a picture would render a blank frame; skip it.
+      .filter((slide) => slide.image && slide.title),
+    heroSide: (b['hero-side'] ?? [])
+      .sort((x, y) => str(x.key).localeCompare(str(y.key)))
+      .map((block) => block.data)
+      .filter((item) => item.image),
+    banners,
+    brandBands: (b['brand-band'] ?? [])
+      .map((block) => ({
+        brandHandle: str(block.data.brand_handle),
+        tagline: str(block.data.tagline),
+        logo: str(block.data.logo),
+        productIds: Array.isArray(block.data.product_ids) ? block.data.product_ids : [],
+      }))
+      .filter((band) => band.brandHandle),
+    techBand: tech
+      ? {
+          eyebrow: str(tech.eyebrow),
+          title: str(tech.title),
+          description: str(tech.description),
+          stats: Array.isArray(tech.stats) ? tech.stats.filter((s) => s.value || s.label) : [],
+          cta: tech.cta_label && tech.cta_href ? { label: tech.cta_label, href: tech.cta_href } : undefined,
+        }
+      : null,
+    trust: (b.trust ?? []).map((block) => block.data).filter((item) => item.title),
+    lists: Object.fromEntries(Object.entries(raw.lists).map(([key, list]) => [key, list.product_ids])),
+  };
+});

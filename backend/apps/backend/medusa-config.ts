@@ -12,5 +12,9 @@ module.exports = defineConfig({
       jwtSecret: process.env.JWT_SECRET,
       cookieSecret: process.env.COOKIE_SECRET,
     }
-  }
+  },
+  modules: [
+    // SEENERGY Vitrin: the storefront's editable design content.
+    { resolve: './src/modules/vitrin' },
+  ],
 })

@@ -95,6 +95,41 @@ Backend customisation: `GET /store/order-details/:id`
 payment method and invoice type, because the core Store API never returns order
 metadata.
 
+### SEENERGY Vitrin (admin extension)
+
+The homepage's content is edited in the Medusa admin, not in code: admin →
+**Vitrin** shows the homepage as a top-to-bottom map, and **Vitrin → Ürün
+Yönetimi** is a one-page product form (name, brand, category, price, sale
+price, stock, image, badge, homepage lists) for people who should not need to
+know what a variant or a price list is.
+
+```
+backend/apps/backend/src/modules/vitrin/    module: vitrin_list (ordered product
+                                            ids) + vitrin_block (group, key,
+                                            rank, is_active, data JSON)
+backend/.../src/migration-scripts/vitrin-seed.ts   first content = what
+                                            site.ts hard-coded, so the switch
+                                            changed nothing visible
+backend/.../src/lib/quick-product.ts        flat form ⇄ product/variant/price
+                                            list/inventory workflows
+backend/.../src/api/admin/vitrin/**         admin routes; store: /store/vitrin
+backend/.../src/admin/**                    Vitrin pages, product widget
+src/lib/medusa/vitrin.ts                    storefront loader, falls back to
+                                            src/data/site.ts if unreachable
+src/app/api/revalidate/route.ts             admin saves flush the `catalog` /
+                                            `vitrin` cache tags immediately
+```
+
+Lists: `haftanin`, `yeni`, `cok-satan`, `super-firsat`. "Haftanın Ürünleri"
+feeds BOTH the slider (first 8) and the tab (first 12) — one list, one place
+to maintain it; same for `yeni`. Do not split them back into separate picks.
+
+When adding an editable homepage field: add it to the block's `fields` in
+`src/admin/lib/blocks.ts` (the form renders from it), to the seed, and to the
+mapping in `src/lib/medusa/vitrin.ts`. The instant refresh needs the same
+secret in `STOREFRONT_REVALIDATE_SECRET` (backend) and `REVALIDATE_SECRET`
+(storefront).
+
 Not built yet: online card payment (iyzico/PayTR), transactional e-mail (no
 notification provider — nothing is e-mailed automatically), password reset
 (needs e-mail), the legal pages checkout links to.

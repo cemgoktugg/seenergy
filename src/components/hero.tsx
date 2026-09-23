@@ -34,7 +34,7 @@ import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
 import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 
-import { HERO_SLIDES } from '@/data/site';
+import type { HeroSlide } from '@/lib/medusa/vitrin';
 
 const AUTOPLAY_MS = 5000;
 
@@ -46,7 +46,8 @@ const AUTOPLAY_MS = 5000;
  */
 const RISE = 'animate-[hero-rise_600ms_var(--ease-out)_both]';
 
-export function Hero() {
+/** Slides come from the Vitrin module (admin → Vitrin → Ana slayt). */
+export function Hero({ slides }: { slides: HeroSlide[] }) {
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -69,8 +70,8 @@ export function Hero() {
   );
 
   const go = useCallback((next: number) => {
-    setIndex(((next % HERO_SLIDES.length) + HERO_SLIDES.length) % HERO_SLIDES.length);
-  }, []);
+    setIndex(((next % slides.length) + slides.length) % slides.length);
+  }, [slides.length]);
 
   const running = !paused && !hovered && !reduced;
 
@@ -115,12 +116,12 @@ export function Hero() {
           className="flex h-full w-full transition-transform duration-[800ms] ease-in-out"
           style={{ transform: `translateX(-${index * 100}%)` }}
         >
-          {HERO_SLIDES.map((slide, i) => (
+          {slides.map((slide, i) => (
             <div
               key={slide.title}
               role="group"
               aria-roledescription="slayt"
-              aria-label={`${i + 1} / ${HERO_SLIDES.length}`}
+              aria-label={`${i + 1} / ${slides.length}`}
               aria-hidden={i !== index}
               className="relative h-full w-full shrink-0"
             >
@@ -265,7 +266,7 @@ export function Hero() {
         {/* 8px between targets below `dt` — the minimum separation adjacent
             touch targets need; tighter again from `dt` up. */}
         <ul className="flex items-center gap-2 dt:gap-1.5">
-          {HERO_SLIDES.map((slide, i) => (
+          {slides.map((slide, i) => (
             <li key={slide.title}>
               <button
                 type="button"

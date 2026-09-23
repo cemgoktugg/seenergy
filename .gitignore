@@ -45,3 +45,4 @@ reference-analysis/
 .medusa/
 .turbo/
 backend/apps/backend/uploads/
+backend/apps/backend/static/

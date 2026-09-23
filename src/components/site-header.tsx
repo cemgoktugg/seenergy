@@ -253,7 +253,8 @@ function HeaderActions() {
   );
 }
 
-export function SiteHeader() {
+/** `promo` is the announcement bar text (admin → Vitrin → Duyuru çubuğu). */
+export function SiteHeader({ promo }: { promo: string }) {
   /* The condensed bar carries its own cart badge. It reads the same store as
      the masthead's, so the two cannot disagree — a sticky bar still showing 0
      after something was added would be worse than having no badge there. */
@@ -395,7 +396,7 @@ export function SiteHeader() {
               aria-hidden
               className="h-1.5 w-1.5 shrink-0 rounded-full bg-linear-to-r from-grad-1 to-grad-4"
             />
-            {SITE.promo}
+            {promo}
           </p>
           <nav aria-label="Yardımcı bağlantılar">
             <ul className="flex items-center gap-5">
