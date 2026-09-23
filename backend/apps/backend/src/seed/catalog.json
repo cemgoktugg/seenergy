@@ -1,0 +1,1006 @@
+{
+  "categories": [
+    {
+      "key": "uydu",
+      "name": "Uydu Sistemleri",
+      "handle": "uydu-sistemleri",
+      "rank": 0
+    },
+    {
+      "key": "kumanda",
+      "name": "Kumanda Çeşitleri",
+      "handle": "kumanda-cesitleri",
+      "rank": 1
+    },
+    {
+      "key": "ses",
+      "name": "Seslendirme Sistemleri",
+      "handle": "seslendirme-sistemleri",
+      "rank": 2
+    },
+    {
+      "key": "guvenlik",
+      "name": "Güvenlik Sistemleri",
+      "handle": "guvenlik-sistemleri",
+      "rank": 3
+    },
+    {
+      "key": "led",
+      "name": "Led ve Aydınlatma",
+      "handle": "led-aydinlatma",
+      "rank": 4
+    },
+    {
+      "key": "adaptor",
+      "name": "Adaptör, Akü, Pil",
+      "handle": "adaptor-aku-pil",
+      "rank": 5
+    },
+    {
+      "key": "oto",
+      "name": "Oto Ses ve Görüntü",
+      "handle": "oto-ses-goruntu",
+      "rank": 6
+    },
+    {
+      "key": "oem",
+      "name": "Oem ve Çevre Birimleri",
+      "handle": "oem-cevre-birimleri",
+      "rank": 7
+    },
+    {
+      "key": "olcum",
+      "name": "Ölçü Aletleri",
+      "handle": "olcu-aletleri",
+      "rank": 8
+    },
+    {
+      "key": "kablo",
+      "name": "Kablo Çeşitleri",
+      "handle": "kablo-cesitleri",
+      "rank": 9
+    },
+    {
+      "key": "bilgisayar",
+      "name": "Bilgisayar ve Monitör",
+      "handle": "bilgisayar",
+      "rank": 10
+    },
+    {
+      "key": "hirdavat",
+      "name": "Hırdavat ve Tamir Malzemeleri",
+      "handle": "hirdavat-tamir",
+      "rank": 11
+    }
+  ],
+  "brands": [
+    {
+      "name": "Orbisat",
+      "handle": "orbisat"
+    },
+    {
+      "name": "Antenix",
+      "handle": "antenix"
+    },
+    {
+      "name": "Kumandax",
+      "handle": "kumandax"
+    },
+    {
+      "name": "Vizyontek",
+      "handle": "vizyontek"
+    },
+    {
+      "name": "Sonora",
+      "handle": "sonora"
+    },
+    {
+      "name": "Sesyapı",
+      "handle": "sesyapi"
+    },
+    {
+      "name": "Fotokam",
+      "handle": "fotokam"
+    },
+    {
+      "name": "Provista",
+      "handle": "provista"
+    },
+    {
+      "name": "Ledora",
+      "handle": "ledora"
+    },
+    {
+      "name": "Lumenta",
+      "handle": "lumenta"
+    },
+    {
+      "name": "Powerin",
+      "handle": "powerin"
+    },
+    {
+      "name": "Bataryam",
+      "handle": "bataryam"
+    },
+    {
+      "name": "Voltra",
+      "handle": "voltra"
+    },
+    {
+      "name": "Sinyalis",
+      "handle": "sinyalis"
+    },
+    {
+      "name": "Nexora",
+      "handle": "nexora"
+    },
+    {
+      "name": "Digiwave",
+      "handle": "digiwave"
+    },
+    {
+      "name": "Metrion",
+      "handle": "metrion"
+    },
+    {
+      "name": "Devrelab",
+      "handle": "devrelab"
+    },
+    {
+      "name": "Cabletek",
+      "handle": "cabletek"
+    },
+    {
+      "name": "Kablonis",
+      "handle": "kablonis"
+    },
+    {
+      "name": "Tekniva",
+      "handle": "tekniva"
+    },
+    {
+      "name": "Optivolt",
+      "handle": "optivolt"
+    },
+    {
+      "name": "Tamirix",
+      "handle": "tamirix"
+    },
+    {
+      "name": "Servisan",
+      "handle": "servisan"
+    },
+    {
+      "name": "Megavolt",
+      "handle": "megavolt"
+    }
+  ],
+  "products": [
+    {
+      "legacyId": "p-001",
+      "handle": "orbisat-or-9500-4k-ultra-hd-uydu-alicisi-wi-fi-destekli",
+      "title": "Orbisat OR-9500 4K Ultra HD Uydu Alıcısı Wi-Fi Destekli",
+      "brand": "Orbisat",
+      "sku": "ORB-1000",
+      "category": "uydu",
+      "price": 2849.9,
+      "compareAtPrice": 3238.52,
+      "image": "/mock/products/receiver-graphite.svg",
+      "stock": 24,
+      "instalment": true,
+      "badge": "yeni"
+    },
+    {
+      "legacyId": "p-002",
+      "handle": "orbisat-or-7200-full-hd-mini-uydu-alicisi-usb-kayit",
+      "title": "Orbisat OR-7200 Full HD Mini Uydu Alıcısı USB Kayıt",
+      "brand": "Orbisat",
+      "sku": "ORB-1007",
+      "category": "uydu",
+      "price": 1249.5,
+      "compareAtPrice": null,
+      "image": "/mock/products/receiver-black.svg",
+      "stock": 41,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-003",
+      "handle": "antenix-ax-4400-kaskatli-uydu-santrali-4-cikisli",
+      "title": "Antenix AX-4400 Kaskatlı Uydu Santrali 4 Çıkışlı",
+      "brand": "Antenix",
+      "sku": "ANT-1014",
+      "category": "uydu",
+      "price": 6480,
+      "compareAtPrice": 7043.48,
+      "image": "/mock/products/receiver-silver.svg",
+      "stock": 6,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-004",
+      "handle": "antenix-ax-120-single-lnb-0-1db-gurultu-seviyesi",
+      "title": "Antenix AX-120 Single LNB 0.1dB Gürültü Seviyesi",
+      "brand": "Antenix",
+      "sku": "ANT-1021",
+      "category": "uydu",
+      "price": 389.9,
+      "compareAtPrice": null,
+      "image": "/mock/products/receiver-white.svg",
+      "stock": 120,
+      "instalment": false,
+      "badge": null
+    },
+    {
+      "legacyId": "p-005",
+      "handle": "kumandax-kx-500-universal-uydu-alici-kumandasi",
+      "title": "Kumandax KX-500 Universal Uydu Alıcı Kumandası",
+      "brand": "Kumandax",
+      "sku": "KUM-1028",
+      "category": "kumanda",
+      "price": 189.9,
+      "compareAtPrice": 223.41,
+      "image": "/mock/products/remote-black.svg",
+      "stock": 88,
+      "instalment": false,
+      "badge": null
+    },
+    {
+      "legacyId": "p-006",
+      "handle": "kumandax-kx-780-akilli-tv-kumandasi-sesli-komut",
+      "title": "Kumandax KX-780 Akıllı TV Kumandası Sesli Komut",
+      "brand": "Kumandax",
+      "sku": "KUM-1035",
+      "category": "kumanda",
+      "price": 449.9,
+      "compareAtPrice": null,
+      "image": "/mock/products/remote-graphite.svg",
+      "stock": 33,
+      "instalment": false,
+      "badge": null
+    },
+    {
+      "legacyId": "p-007",
+      "handle": "kumandax-kx-210-klima-kumandasi-cok-markali",
+      "title": "Kumandax KX-210 Klima Kumandası Çok Markalı",
+      "brand": "Kumandax",
+      "sku": "KUM-1042",
+      "category": "kumanda",
+      "price": 149.5,
+      "compareAtPrice": 186.88,
+      "image": "/mock/products/acremote-white.svg",
+      "stock": 64,
+      "instalment": false,
+      "badge": "super-firsat"
+    },
+    {
+      "legacyId": "p-008",
+      "handle": "vizyontek-vt-330-android-tv-box-kumanda-seti",
+      "title": "Vizyontek VT-330 Android TV Box Kumanda Seti",
+      "brand": "Vizyontek",
+      "sku": "VIZ-1049",
+      "category": "kumanda",
+      "price": 279,
+      "compareAtPrice": null,
+      "image": "/mock/products/remote-white.svg",
+      "stock": 17,
+      "instalment": false,
+      "badge": "cok-satan"
+    },
+    {
+      "legacyId": "p-009",
+      "handle": "sonora-sn-1500-15-1000w-aktif-kabin-hoparlor",
+      "title": "Sonora SN-1500 15\" 1000W Aktif Kabin Hoparlör",
+      "brand": "Sonora",
+      "sku": "SON-1056",
+      "category": "ses",
+      "price": 14980,
+      "compareAtPrice": 16461.54,
+      "image": "/mock/products/speaker-black.svg",
+      "stock": 4,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-010",
+      "handle": "sonora-sn-820-bluetooth-tasinabilir-hoparlor-60w",
+      "title": "Sonora SN-820 Bluetooth Taşınabilir Hoparlör 60W",
+      "brand": "Sonora",
+      "sku": "SON-1063",
+      "category": "ses",
+      "price": 2190,
+      "compareAtPrice": 2670.73,
+      "image": "/mock/products/speaker-graphite.svg",
+      "stock": 29,
+      "instalment": true,
+      "badge": "super-firsat"
+    },
+    {
+      "legacyId": "p-011",
+      "handle": "sesyapi-sy-40-tavan-hoparloru-6-40w-beyaz",
+      "title": "Sesyapı SY-40 Tavan Hoparlörü 6\" 40W Beyaz",
+      "brand": "Sesyapı",
+      "sku": "SES-1070",
+      "category": "ses",
+      "price": 649.9,
+      "compareAtPrice": null,
+      "image": "/mock/products/speaker-white.svg",
+      "stock": 74,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-012",
+      "handle": "sesyapi-sy-2400-anfi-ve-mikser-240w-4-kanal",
+      "title": "Sesyapı SY-2400 Anfi ve Mikser 240W 4 Kanal",
+      "brand": "Sesyapı",
+      "sku": "SES-1077",
+      "category": "ses",
+      "price": 8450,
+      "compareAtPrice": 8989.36,
+      "image": "/mock/products/speaker-silver.svg",
+      "stock": 9,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-013",
+      "handle": "fotokam-fk-8200-5mp-ahd-bullet-guvenlik-kamerasi",
+      "title": "Fotokam FK-8200 5MP AHD Bullet Güvenlik Kamerası",
+      "brand": "Fotokam",
+      "sku": "FOT-1084",
+      "category": "guvenlik",
+      "price": 1349.9,
+      "compareAtPrice": 1569.65,
+      "image": "/mock/products/camera-white.svg",
+      "stock": 52,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-014",
+      "handle": "fotokam-fk-360-wi-fi-i-c-mekan-kamera-360-hareketli",
+      "title": "Fotokam FK-360 Wi-Fi İç Mekan Kamera 360° Hareketli",
+      "brand": "Fotokam",
+      "sku": "FOT-1091",
+      "category": "guvenlik",
+      "price": 989,
+      "compareAtPrice": null,
+      "image": "/mock/products/camera-graphite.svg",
+      "stock": 38,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-015",
+      "handle": "provista-pv-16-16-kanal-ahd-kayit-cihazi-5mp",
+      "title": "Provista PV-16 16 Kanal AHD Kayıt Cihazı 5MP",
+      "brand": "Provista",
+      "sku": "PRO-1098",
+      "category": "guvenlik",
+      "price": 5490,
+      "compareAtPrice": 6100,
+      "image": "/mock/products/nvr-black.svg",
+      "stock": 7,
+      "instalment": true,
+      "badge": "cok-satan"
+    },
+    {
+      "legacyId": "p-016",
+      "handle": "provista-pv-kit4-4-kamerali-guvenlik-seti-harddisk-dahil",
+      "title": "Provista PV-KIT4 4 Kameralı Güvenlik Seti Harddisk Dahil",
+      "brand": "Provista",
+      "sku": "PRO-1105",
+      "category": "guvenlik",
+      "price": 12750,
+      "compareAtPrice": 15178.57,
+      "image": "/mock/products/camera-silver.svg",
+      "stock": 3,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-017",
+      "handle": "ledora-ld-3228-32-televizyon-led-bar-takimi",
+      "title": "Ledora LD-3228 32\" Televizyon Led Bar Takımı",
+      "brand": "Ledora",
+      "sku": "LED-1112",
+      "category": "led",
+      "price": 549.9,
+      "compareAtPrice": null,
+      "image": "/mock/products/ledbar-silver.svg",
+      "stock": 96,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-018",
+      "handle": "ledora-ld-5540-55-televizyon-led-bar-takimi-4k-panel",
+      "title": "Ledora LD-5540 55\" Televizyon Led Bar Takımı 4K Panel",
+      "brand": "Ledora",
+      "sku": "LED-1119",
+      "category": "led",
+      "price": 1290,
+      "compareAtPrice": 1449.44,
+      "image": "/mock/products/ledbar-white.svg",
+      "stock": 22,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-019",
+      "handle": "lumenta-lm-5050-serit-led-5-metre-rgb-kumandali",
+      "title": "Lumenta LM-5050 Şerit Led 5 Metre RGB Kumandalı",
+      "brand": "Lumenta",
+      "sku": "LUM-1126",
+      "category": "led",
+      "price": 389.9,
+      "compareAtPrice": 519.87,
+      "image": "/mock/products/ledbar-graphite.svg",
+      "stock": 140,
+      "instalment": false,
+      "badge": "super-firsat"
+    },
+    {
+      "legacyId": "p-020",
+      "handle": "lumenta-lm-p10-p10-led-panel-kontrol-karti",
+      "title": "Lumenta LM-P10 P10 Led Panel Kontrol Kartı",
+      "brand": "Lumenta",
+      "sku": "LUM-1133",
+      "category": "led",
+      "price": 1875,
+      "compareAtPrice": null,
+      "image": "/mock/products/ledbar-black.svg",
+      "stock": 12,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-021",
+      "handle": "powerin-pw-1220-12v-2a-adaptor-fisli-guc-kaynagi",
+      "title": "Powerin PW-1220 12V 2A Adaptör Fişli Güç Kaynağı",
+      "brand": "Powerin",
+      "sku": "POW-1140",
+      "category": "adaptor",
+      "price": 249.9,
+      "compareAtPrice": null,
+      "image": "/mock/products/adapter-black.svg",
+      "stock": 210,
+      "instalment": false,
+      "badge": null
+    },
+    {
+      "legacyId": "p-022",
+      "handle": "powerin-pw-19653-19v-6-53a-notebook-adaptoru",
+      "title": "Powerin PW-19653 19V 6.53A Notebook Adaptörü",
+      "brand": "Powerin",
+      "sku": "POW-1147",
+      "category": "adaptor",
+      "price": 689.9,
+      "compareAtPrice": 783.98,
+      "image": "/mock/products/adapter-graphite.svg",
+      "stock": 45,
+      "instalment": true,
+      "badge": "cok-satan"
+    },
+    {
+      "legacyId": "p-023",
+      "handle": "bataryam-bt-100-12v-100ah-jel-aku-derin-dongu",
+      "title": "Bataryam BT-100 12V 100Ah Jel Akü Derin Döngü",
+      "brand": "Bataryam",
+      "sku": "BAT-1154",
+      "category": "adaptor",
+      "price": 9850,
+      "compareAtPrice": 10591.4,
+      "image": "/mock/products/battery-silver.svg",
+      "stock": 5,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-024",
+      "handle": "bataryam-bt-18650-sarj-edilebilir-li-ion-pil-6li-set",
+      "title": "Bataryam BT-18650 Şarj Edilebilir Li-ion Pil 6lı Set",
+      "brand": "Bataryam",
+      "sku": "BAT-1161",
+      "category": "adaptor",
+      "price": 429.9,
+      "compareAtPrice": 537.37,
+      "image": "/mock/products/battery-white.svg",
+      "stock": 68,
+      "instalment": false,
+      "badge": "super-firsat"
+    },
+    {
+      "legacyId": "p-025",
+      "handle": "voltra-vt-7010-oto-teyp-bluetooth-usb-4x60w",
+      "title": "Voltra VT-7010 Oto Teyp Bluetooth USB 4x60W",
+      "brand": "Voltra",
+      "sku": "VOL-1168",
+      "category": "oto",
+      "price": 1890,
+      "compareAtPrice": 2223.53,
+      "image": "/mock/products/headunit-black.svg",
+      "stock": 31,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-026",
+      "handle": "voltra-vt-9200-7-dokunmatik-oto-multimedya-carplay",
+      "title": "Voltra VT-9200 7\" Dokunmatik Oto Multimedya CarPlay",
+      "brand": "Voltra",
+      "sku": "VOL-1175",
+      "category": "oto",
+      "price": 6490,
+      "compareAtPrice": 7211.11,
+      "image": "/mock/products/headunit-graphite.svg",
+      "stock": 11,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-027",
+      "handle": "voltra-vt-cam1-arac-i-ci-kayit-kamerasi-full-hd",
+      "title": "Voltra VT-CAM1 Araç İçi Kayıt Kamerası Full HD",
+      "brand": "Voltra",
+      "sku": "VOL-1182",
+      "category": "oto",
+      "price": 1450,
+      "compareAtPrice": null,
+      "image": "/mock/products/camera-black.svg",
+      "stock": 27,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-028",
+      "handle": "sinyalis-sg-40-oto-anfi-4-kanal-800w",
+      "title": "Sinyalis SG-40 Oto Anfi 4 Kanal 800W",
+      "brand": "Sinyalis",
+      "sku": "SIN-1189",
+      "category": "oto",
+      "price": 3290,
+      "compareAtPrice": 4012.2,
+      "image": "/mock/products/headunit-white.svg",
+      "stock": 8,
+      "instalment": true,
+      "badge": "super-firsat"
+    },
+    {
+      "legacyId": "p-029",
+      "handle": "nexora-nx-ac1200-dual-band-access-point-router",
+      "title": "Nexora NX-AC1200 Dual Band Access Point Router",
+      "brand": "Nexora",
+      "sku": "NEX-1196",
+      "category": "oem",
+      "price": 1590,
+      "compareAtPrice": null,
+      "image": "/mock/products/router-white.svg",
+      "stock": 36,
+      "instalment": true,
+      "badge": "cok-satan"
+    },
+    {
+      "legacyId": "p-030",
+      "handle": "nexora-nx-300-adsl-modem-4-port-wi-fi-n300",
+      "title": "Nexora NX-300 ADSL Modem 4 Port Wi-Fi N300",
+      "brand": "Nexora",
+      "sku": "NEX-1203",
+      "category": "oem",
+      "price": 749.9,
+      "compareAtPrice": 961.41,
+      "image": "/mock/products/router-graphite.svg",
+      "stock": 54,
+      "instalment": true,
+      "badge": "super-firsat"
+    },
+    {
+      "legacyId": "p-031",
+      "handle": "digiwave-dw-poe8-8-port-poe-switch-gigabit",
+      "title": "Digiwave DW-POE8 8 Port PoE Switch Gigabit",
+      "brand": "Digiwave",
+      "sku": "DIG-1210",
+      "category": "oem",
+      "price": 2890,
+      "compareAtPrice": null,
+      "image": "/mock/products/router-black.svg",
+      "stock": 14,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-032",
+      "handle": "digiwave-dw-ext-menzil-genisletici-wi-fi-6",
+      "title": "Digiwave DW-EXT Menzil Genişletici Wi-Fi 6",
+      "brand": "Digiwave",
+      "sku": "DIG-1217",
+      "category": "oem",
+      "price": 899,
+      "compareAtPrice": 1033.33,
+      "image": "/mock/products/router-silver.svg",
+      "stock": 40,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-033",
+      "handle": "metrion-mt-890-dijital-multimetre-true-rms",
+      "title": "Metrion MT-890 Dijital Multimetre True RMS",
+      "brand": "Metrion",
+      "sku": "MET-1224",
+      "category": "olcum",
+      "price": 1249.9,
+      "compareAtPrice": null,
+      "image": "/mock/products/meter-graphite.svg",
+      "stock": 19,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-034",
+      "handle": "metrion-mt-330-pens-ampermetre-ac-dc-600a",
+      "title": "Metrion MT-330 Pens Ampermetre AC/DC 600A",
+      "brand": "Metrion",
+      "sku": "MET-1231",
+      "category": "olcum",
+      "price": 1890,
+      "compareAtPrice": 2076.92,
+      "image": "/mock/products/meter-black.svg",
+      "stock": 13,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-035",
+      "handle": "devrelab-dl-858-sicak-hava-havya-i-stasyonu-700w",
+      "title": "Devrelab DL-858 Sıcak Hava Havya İstasyonu 700W",
+      "brand": "Devrelab",
+      "sku": "DEV-1238",
+      "category": "olcum",
+      "price": 3450,
+      "compareAtPrice": 4011.63,
+      "image": "/mock/products/meter-silver.svg",
+      "stock": 6,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-036",
+      "handle": "devrelab-dl-psu30-ayarli-guc-kaynagi-30v-5a",
+      "title": "Devrelab DL-PSU30 Ayarlı Güç Kaynağı 30V 5A",
+      "brand": "Devrelab",
+      "sku": "DEV-1245",
+      "category": "olcum",
+      "price": 4290,
+      "compareAtPrice": null,
+      "image": "/mock/products/meter-white.svg",
+      "stock": 4,
+      "instalment": true,
+      "badge": "cok-satan"
+    },
+    {
+      "legacyId": "p-037",
+      "handle": "cabletek-ct-rg6-rg6-u6-anten-kablosu-100-metre",
+      "title": "Cabletek CT-RG6 RG6 U6 Anten Kablosu 100 Metre",
+      "brand": "Cabletek",
+      "sku": "CAB-1252",
+      "category": "kablo",
+      "price": 1890,
+      "compareAtPrice": null,
+      "image": "/mock/products/cable-black.svg",
+      "stock": 58,
+      "instalment": true,
+      "badge": "yeni"
+    },
+    {
+      "legacyId": "p-038",
+      "handle": "cabletek-ct-hdmi21-hdmi-2-1-kablo-8k-3-metre",
+      "title": "Cabletek CT-HDMI21 HDMI 2.1 Kablo 8K 3 Metre",
+      "brand": "Cabletek",
+      "sku": "CAB-1259",
+      "category": "kablo",
+      "price": 389.9,
+      "compareAtPrice": 519.87,
+      "image": "/mock/products/cable-graphite.svg",
+      "stock": 132,
+      "instalment": false,
+      "badge": "super-firsat"
+    },
+    {
+      "legacyId": "p-039",
+      "handle": "kablonis-kb-cat6-cat6-utp-ag-kablosu-305m-makara",
+      "title": "Kablonis KB-CAT6 Cat6 UTP Ağ Kablosu 305m Makara",
+      "brand": "Kablonis",
+      "sku": "KAB-1266",
+      "category": "kablo",
+      "price": 4950,
+      "compareAtPrice": 5380.43,
+      "image": "/mock/products/cable-silver.svg",
+      "stock": 9,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-040",
+      "handle": "kablonis-kb-alarm-6x0-22-alarm-kablosu-100-metre",
+      "title": "Kablonis KB-ALARM 6x0.22 Alarm Kablosu 100 Metre",
+      "brand": "Kablonis",
+      "sku": "KAB-1273",
+      "category": "kablo",
+      "price": 749,
+      "compareAtPrice": null,
+      "image": "/mock/products/cable-white.svg",
+      "stock": 47,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-041",
+      "handle": "tekniva-tk-27aio-27-all-in-one-bilgisayar-i7-16gb-512gb",
+      "title": "Tekniva TK-27AIO 27\" All In One Bilgisayar i7 16GB 512GB",
+      "brand": "Tekniva",
+      "sku": "TEK-1280",
+      "category": "bilgisayar",
+      "price": 29927.45,
+      "compareAtPrice": 31837.71,
+      "image": "/mock/products/aio-white.svg",
+      "stock": 3,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-042",
+      "handle": "tekniva-tk-24aio-24-all-in-one-bilgisayar-i5-8gb-256gb",
+      "title": "Tekniva TK-24AIO 24\" All In One Bilgisayar i5 8GB 256GB",
+      "brand": "Tekniva",
+      "sku": "TEK-1287",
+      "category": "bilgisayar",
+      "price": 19174.92,
+      "compareAtPrice": null,
+      "image": "/mock/products/aio-silver.svg",
+      "stock": 5,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-043",
+      "handle": "tekniva-tk-22mon-22-full-hd-monitor-ips-100hz",
+      "title": "Tekniva TK-22MON 22\" Full HD Monitör IPS 100Hz",
+      "brand": "Tekniva",
+      "sku": "TEK-1294",
+      "category": "bilgisayar",
+      "price": 4890,
+      "compareAtPrice": 5556.82,
+      "image": "/mock/products/monitor-graphite.svg",
+      "stock": 21,
+      "instalment": true,
+      "badge": "cok-satan"
+    },
+    {
+      "legacyId": "p-044",
+      "handle": "optivolt-ov-32sm-32-smart-led-tv-hd-wi-fi",
+      "title": "Optivolt OV-32SM 32\" Smart Led TV HD Wi-Fi",
+      "brand": "Optivolt",
+      "sku": "OPT-1301",
+      "category": "bilgisayar",
+      "price": 8990,
+      "compareAtPrice": 10576.47,
+      "image": "/mock/products/monitor-black.svg",
+      "stock": 10,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-045",
+      "handle": "tamirix-tx-120-elektronik-tamir-seti-120-parca",
+      "title": "Tamirix TX-120 Elektronik Tamir Seti 120 Parça",
+      "brand": "Tamirix",
+      "sku": "TAM-1308",
+      "category": "hirdavat",
+      "price": 1290,
+      "compareAtPrice": 1612.5,
+      "image": "/mock/products/meter-graphite.svg",
+      "stock": 34,
+      "instalment": true,
+      "badge": "super-firsat"
+    },
+    {
+      "legacyId": "p-046",
+      "handle": "tamirix-tx-led-fener-ve-isildak-sarjli-1200-lumen",
+      "title": "Tamirix TX-LED Fener ve Işıldak Şarjlı 1200 Lümen",
+      "brand": "Tamirix",
+      "sku": "TAM-1315",
+      "category": "hirdavat",
+      "price": 549.9,
+      "compareAtPrice": null,
+      "image": "/mock/products/adapter-silver.svg",
+      "stock": 62,
+      "instalment": true,
+      "badge": "yeni"
+    },
+    {
+      "legacyId": "p-047",
+      "handle": "servisan-sv-abs-abs-plastik-kutu-seti-10-adet",
+      "title": "Servisan SV-ABS ABS Plastik Kutu Seti 10 Adet",
+      "brand": "Servisan",
+      "sku": "SER-1322",
+      "category": "hirdavat",
+      "price": 289.9,
+      "compareAtPrice": null,
+      "image": "/mock/products/adapter-white.svg",
+      "stock": 88,
+      "instalment": false,
+      "badge": null
+    },
+    {
+      "legacyId": "p-048",
+      "handle": "megavolt-mv-inv2000-i-nvertor-12v-2000w-modifiye-sinus",
+      "title": "Megavolt MV-INV2000 İnvertör 12V 2000W Modifiye Sinüs",
+      "brand": "Megavolt",
+      "sku": "MEG-1329",
+      "category": "hirdavat",
+      "price": 4750,
+      "compareAtPrice": 5337.08,
+      "image": "/mock/products/adapter-graphite.svg",
+      "stock": 7,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-049",
+      "handle": "orbisat-or-3100-hd-uydu-alicisi-ethernet-portlu",
+      "title": "Orbisat OR-3100 HD Uydu Alıcısı Ethernet Portlu",
+      "brand": "Orbisat",
+      "sku": "ORB-1336",
+      "category": "uydu",
+      "price": 1699.9,
+      "compareAtPrice": 1888.78,
+      "image": "/mock/products/receiver-silver.svg",
+      "stock": 33,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-050",
+      "handle": "orbisat-or-90-90cm-ofset-canak-anten-seti-lnb-dahil",
+      "title": "Orbisat OR-90 90cm Ofset Çanak Anten Seti LNB Dahil",
+      "brand": "Orbisat",
+      "sku": "ORB-1343",
+      "category": "uydu",
+      "price": 1290,
+      "compareAtPrice": null,
+      "image": "/mock/products/dish-white.svg",
+      "stock": 29,
+      "instalment": true,
+      "badge": "cok-satan"
+    },
+    {
+      "legacyId": "p-051",
+      "handle": "kumandax-kx-900-ogrenmeli-universal-kumanda-8-cihaz",
+      "title": "Kumandax KX-900 Öğrenmeli Universal Kumanda 8 Cihaz",
+      "brand": "Kumandax",
+      "sku": "KUM-1350",
+      "category": "kumanda",
+      "price": 329.9,
+      "compareAtPrice": 374.89,
+      "image": "/mock/products/remote-white.svg",
+      "stock": 57,
+      "instalment": false,
+      "badge": null
+    },
+    {
+      "legacyId": "p-052",
+      "handle": "sonora-sn-300-kolon-hoparlor-120w-cift-yonlu",
+      "title": "Sonora SN-300 Kolon Hoparlör 120W Çift Yönlü",
+      "brand": "Sonora",
+      "sku": "SON-1357",
+      "category": "ses",
+      "price": 3890,
+      "compareAtPrice": 4322.22,
+      "image": "/mock/products/column-white.svg",
+      "stock": 15,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-053",
+      "handle": "sonora-sn-950-aktif-kabin-hoparlor-12-600w",
+      "title": "Sonora SN-950 Aktif Kabin Hoparlör 12\" 600W",
+      "brand": "Sonora",
+      "sku": "SON-1364",
+      "category": "ses",
+      "price": 4250,
+      "compareAtPrice": null,
+      "image": "/mock/products/speaker-silver.svg",
+      "stock": 12,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-054",
+      "handle": "provista-pv-8-8-kanal-nvr-ip-kayit-cihazi-4k",
+      "title": "Provista PV-8 8 Kanal NVR IP Kayıt Cihazı 4K",
+      "brand": "Provista",
+      "sku": "PRO-1371",
+      "category": "guvenlik",
+      "price": 4290,
+      "compareAtPrice": 4875,
+      "image": "/mock/products/nvr-white.svg",
+      "stock": 16,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-055",
+      "handle": "provista-pv-dome3-3mp-ip-dome-kamera-gece-goruslu",
+      "title": "Provista PV-DOME3 3MP IP Dome Kamera Gece Görüşlü",
+      "brand": "Provista",
+      "sku": "PRO-1378",
+      "category": "guvenlik",
+      "price": 1690,
+      "compareAtPrice": null,
+      "image": "/mock/products/dome-graphite.svg",
+      "stock": 44,
+      "instalment": true,
+      "badge": "yeni"
+    },
+    {
+      "legacyId": "p-056",
+      "handle": "ledora-ld-4332-43-televizyon-led-bar-takimi",
+      "title": "Ledora LD-4332 43\" Televizyon Led Bar Takımı",
+      "brand": "Ledora",
+      "sku": "LED-1385",
+      "category": "led",
+      "price": 749.9,
+      "compareAtPrice": 833.22,
+      "image": "/mock/products/ledbar-graphite.svg",
+      "stock": 48,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-057",
+      "handle": "ledora-ld-test-led-bar-test-cihazi-0-300v-dokunmatik",
+      "title": "Ledora LD-TEST Led Bar Test Cihazı 0-300V Dokunmatik",
+      "brand": "Ledora",
+      "sku": "LED-1392",
+      "category": "led",
+      "price": 2450,
+      "compareAtPrice": null,
+      "image": "/mock/products/meter-white.svg",
+      "stock": 18,
+      "instalment": true,
+      "badge": "cok-satan"
+    },
+    {
+      "legacyId": "p-058",
+      "handle": "voltra-vt-6100-oto-multimedya-ekrani-9-android",
+      "title": "Voltra VT-6100 Oto Multimedya Ekranı 9\" Android",
+      "brand": "Voltra",
+      "sku": "VOL-1399",
+      "category": "oto",
+      "price": 2190,
+      "compareAtPrice": 2576.47,
+      "image": "/mock/products/headunit-white.svg",
+      "stock": 26,
+      "instalment": true,
+      "badge": null
+    },
+    {
+      "legacyId": "p-059",
+      "handle": "tekniva-tk-32aio-32-all-in-one-bilgisayar-i9-32gb-1tb",
+      "title": "Tekniva TK-32AIO 32\" All In One Bilgisayar i9 32GB 1TB",
+      "brand": "Tekniva",
+      "sku": "TEK-1406",
+      "category": "bilgisayar",
+      "price": 41250,
+      "compareAtPrice": 44836.96,
+      "image": "/mock/products/aio-black.svg",
+      "stock": 2,
+      "instalment": true,
+      "badge": null
+    }
+  ]
+}

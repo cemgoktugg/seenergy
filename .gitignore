@@ -5,6 +5,7 @@ node_modules/
 .env
 .env.*
 !.env.visual.example
+!backend/apps/backend/.env.template
 
 # Generated visual artifacts: screenshots, diffs, traces, reports.
 # The directory skeleton is kept via .gitkeep files.
@@ -40,6 +41,6 @@ reference/
 reference-analysis/
 
 # Medusa backend
-backend/.medusa/
-backend/node_modules/
-backend/uploads/
+.medusa/
+.turbo/
+backend/apps/backend/uploads/

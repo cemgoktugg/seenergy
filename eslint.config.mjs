@@ -10,6 +10,7 @@ const config = [
   {
     ignores: [
       '.next/**',
+      'backend/**',
       'node_modules/**',
       'artifacts/**',
       'reference/**',
