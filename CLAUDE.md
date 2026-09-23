@@ -15,6 +15,9 @@ Guidance for Claude Code working in this repository.
   merterelektronik.com's amber accurately and are deliberately not rewritten.
 - Visual workbench — Playwright, deterministic screenshot capture, pixel diff,
   reporting and a quality gate (added by the reference-driven workflow below).
+- `backend/` — the **Medusa v2** commerce backend (2.21, turborepo; the app is
+  `backend/apps/backend`). Products, stock, prices, carts, orders and customers
+  live there. See "Commerce backend (Medusa)" below.
 
 The storefront **is** scaffolded now: `npm run dev` serves the SEENERGY homepage
 on **port 3100**, and the homepage has been reconstructed against the reference
@@ -30,12 +33,71 @@ These routes are real, not placeholders:
 /kategori/[slug]      category listing over the 12 catalogue categories
 /marka/[slug]         brand listing — the same shell, a brand's products
 /arama                search results — the same shell, a query's matches
+/sepet                Medusa cart — quantities, KDV-inclusive totals
+/odeme                checkout — address, shipping, havale/EFT or kapıda ödeme
+/siparis/[id]         order confirmation (guest-readable by the order id)
+/hesabim              sign in / register; signed in: profile and orders
 ```
 
 The listing shell filters entirely through the URL (`?marka=…&fiyat=…&stok=…&ozellik=…&siralama=…`).
 Every filter is a link and no filter state lives in a client component, so a
 filtered result is shareable, survives the back button and works with
 JavaScript off. `src/lib/catalog-query.ts` parses and applies it.
+
+## Commerce backend (Medusa)
+
+Two servers in development, both required:
+
+```
+npm run backend:dev    # Medusa on :9000 — Store API + admin at /app
+npm run dev            # storefront on :3100
+```
+
+The storefront renders **nothing** without the backend: every catalogue page
+loads its products from the Store API. `npm run build` (and so `quality:full`)
+also needs it up, because `generateStaticParams` enumerates products from
+Medusa.
+
+- **Database:** local PostgreSQL 18, database `seenergy`. Connection string in
+  `backend/apps/backend/.env` (gitignored; `.env.template` beside it).
+- **Storefront env:** `.env.local` — `MEDUSA_BACKEND_URL`,
+  `MEDUSA_PUBLISHABLE_KEY`, optional `BANK_*` (see `.env.example`). None of them
+  is `NEXT_PUBLIC_`: every Medusa call runs on the server.
+- **Seed:** `backend/apps/backend/src/migration-scripts/initial-data-seed.ts`
+  runs once on a fresh database (Türkiye region, TRY, KDV 20% tax-inclusive,
+  Merkez Depo, Standart Kargo free from 1.000 TL + Hızlı Kargo, 12 categories,
+  brands as collections, 59 products from `src/seed/catalog.json`, a sale price
+  list for the discounted ones). It prints the publishable key. Medusa is the
+  source of truth after that — change products in the admin, not the JSON.
+
+Where the storefront meets Medusa (`src/lib/medusa/`):
+
+```
+client.ts        thin fetch wrapper (no @medusajs/js-sdk — dependency budget)
+catalog.ts       loadCatalog(): products → the storefront's Product, cached 60s,
+                 sorted by the seed's legacy id so every rail keeps its order
+cart.ts          'use server' cart actions; cart id in an httpOnly cookie
+cart-cookie.ts   cookie + cart lookup (NOT 'use server' — not client-callable)
+checkout.ts      placeOrder: address → shipping → payment session → complete
+session.ts       customer JWT cookie + currentCustomer()
+account.ts       signIn / register / signOut actions
+```
+
+`src/data/catalog.ts` holds the `Product` model and `indexCatalog()` — pure, no
+data, safe in client components. Pages call `await loadCatalog()` and use the
+same helpers (`bySlug`, `byBrand`, `mixed`…) they always did.
+
+Pages stay static: the cart is read by `CartProvider` after mount, never during
+a server render. Only `/odeme`, `/siparis/[id]` and `/hesabim` are per-request.
+
+Backend customisation: `GET /store/order-details/:id`
+(`backend/apps/backend/src/api/store/order-details/[id]/route.ts`) exposes the
+payment method and invoice type, because the core Store API never returns order
+metadata.
+
+Not built yet: online card payment (iyzico/PayTR), transactional e-mail (no
+notification provider — nothing is e-mailed automatically), password reset
+(needs e-mail), the legal pages checkout links to.
 
 ### Homepage vertical rhythm — do not set section spacing by hand
 
@@ -59,7 +121,7 @@ monotony. The bands themselves stay structurally identical on purpose; see the
 note in `src/components/brand-section.tsx` before varying them.
 
 `/[...slug]` still answers for the navigation entries that genuinely are not
-built — cart, favourites, compare, blog, the corporate pages — and says so
+built — blog, the corporate and legal pages — and says so
 plainly rather than faking them. A category or brand slug the catalogue does not
 carry gets its own honest panel listing the ones that exist, not a 404.
 
