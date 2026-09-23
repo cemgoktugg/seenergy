@@ -201,11 +201,13 @@ export function SiteFooter() {
           {/* Measured 105 characters on a single line at 12px across the 1400
               track — the longest measure left on the page once the editorial
               block was bounded. Capped so it wraps to two readable lines. */}
+          {/* States only what is true: orders are taken, paid by transfer or
+              on delivery. The old card/SSL line promised a card payment that
+              does not exist — restore it only when a card provider is live. */}
           <p className="max-w-[60ch]">
-            © {new Date().getFullYear()} {SITE.name}. Tüm hakları saklıdır. Kredi
-            kartı bilgileriniz 256bit SSL sertifikası ile korunmaktadır.
+            © {new Date().getFullYear()} {SITE.name}. Tüm hakları saklıdır.
           </p>
-          <p>Bu bir demo mağazadır; sipariş ve ödeme akışı çalışmaz.</p>
+          <p>Siparişlerinizi havale / EFT veya kapıda ödeme ile verebilirsiniz.</p>
         </div>
       </div>
     </footer>

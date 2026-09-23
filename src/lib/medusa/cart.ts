@@ -14,47 +14,15 @@
  * is information the visitor needs verbatim.
  */
 
-import { cookies } from 'next/headers';
-
 import { getRegion } from '@/lib/medusa/catalog';
+import { readCartId, retrieveCart, writeCartId } from '@/lib/medusa/cart-cookie';
 import { MedusaError, medusa } from '@/lib/medusa/client';
 import { toCartSummary, type CartResult, type StoreCart } from '@/lib/medusa/cart-summary';
-
-const CART_COOKIE = 'seenergy_cart';
-
-async function readCartId(): Promise<string | undefined> {
-  return (await cookies()).get(CART_COOKIE)?.value;
-}
-
-async function writeCartId(id: string) {
-  (await cookies()).set(CART_COOKIE, id, {
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production',
-    path: '/',
-    maxAge: 60 * 60 * 24 * 30,
-  });
-}
-
-export async function clearCartCookie() {
-  (await cookies()).delete(CART_COOKIE);
-}
-
-async function retrieve(id: string): Promise<StoreCart | null> {
-  try {
-    const { cart } = await medusa<{ cart: StoreCart }>(`/store/carts/${id}`, { cache: 'no-store' });
-    // A completed cart has become an order; it must not collect new lines.
-    return cart.completed_at ? null : cart;
-  } catch (error) {
-    if (error instanceof MedusaError && error.status === 404) return null;
-    throw error;
-  }
-}
 
 /** The visitor's open cart, or a new one when they have none (or a stale id). */
 async function ensureCart(): Promise<StoreCart> {
   const id = await readCartId();
-  const existing = id ? await retrieve(id) : null;
+  const existing = id ? await retrieveCart(id) : null;
   if (existing) return existing;
 
   const region = await getRegion();
@@ -81,7 +49,7 @@ function failure(error: unknown): CartResult {
 export async function getCart(): Promise<CartResult> {
   try {
     const id = await readCartId();
-    const cart = id ? await retrieve(id) : null;
+    const cart = id ? await retrieveCart(id) : null;
     return { ok: true, cart: toCartSummary(cart) };
   } catch (error) {
     return failure(error);

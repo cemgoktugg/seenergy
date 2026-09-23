@@ -974,7 +974,7 @@ export const POPULAR_CATEGORIES = [
  * trademarks, so the row's *shape* is reproduced with generic labels instead
  * (brief §10).
  */
-export const PAYMENT_METHODS = [
-  'Kredi Kartı', 'Banka Kartı', 'Havale / EFT', 'Kapıda Ödeme',
-  'Taksitli Ödeme', 'Kurumsal Fatura',
-];
+/* What checkout actually accepts (src/data/checkout.ts). Card, debit and
+   instalment badges come back when an online card provider goes live — a
+   badge for a method the checkout refuses is a broken promise. */
+export const PAYMENT_METHODS = ['Havale / EFT', 'Kapıda Ödeme', 'Kurumsal Fatura'];
