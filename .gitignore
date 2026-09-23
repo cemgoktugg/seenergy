@@ -18,7 +18,7 @@ artifacts/visual/test-results/
 # Scratch capture directories: Playwright's reference project and any
 # determinism / A-B run created with `--out`.
 artifacts/visual/reference-live/
-artifacts/visual/_*/
+artifacts/visual/_*
 !artifacts/visual/**/.gitkeep
 
 # Playwright
