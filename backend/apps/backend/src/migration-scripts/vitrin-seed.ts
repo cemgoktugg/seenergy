@@ -83,6 +83,8 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
       cta: "Alışverişe Başla",
       href: "/kategori/akilli-ev",
       image: "/mock/hero/hero-1.svg",
+      // Wide campaign art: fills the stage (a product shot would use "contain").
+      fit: "cover",
     }, 0),
     block("hero-slide", {
       eyebrow: "Seslendirme sistemleri",
@@ -92,6 +94,8 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
       cta: "Ürünleri İncele",
       href: "/kategori/seslendirme-sistemleri",
       image: "/mock/hero/hero-2.svg",
+      // Wide campaign art: fills the stage (a product shot would use "contain").
+      fit: "cover",
     }, 1),
     block("hero-slide", {
       eyebrow: "Televizyon yedek parça",
@@ -101,6 +105,8 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
       cta: "Stoğu Görüntüle",
       href: "/kategori/tv-yedek-parca",
       image: "/mock/hero/hero-3.svg",
+      // Wide campaign art: fills the stage (a product shot would use "contain").
+      fit: "cover",
     }, 2),
 
     block("hero-side", { eyebrow: "Kampanya", title: "Süper Fırsat Ürünleri", href: "/kampanyalar", image: "/mock/campaigns/wide-2.svg" }, 0, "hero-side-1"),

@@ -256,6 +256,22 @@ export function BlockField({
         </Select>
       )
       break
+    case "choice":
+      control = (
+        <Select value={value || field.options?.[0]?.value} onValueChange={onChange}>
+          <Select.Trigger>
+            <Select.Value />
+          </Select.Trigger>
+          <Select.Content>
+            {(field.options ?? []).map((option) => (
+              <Select.Item key={option.value} value={option.value}>
+                {option.label}
+              </Select.Item>
+            ))}
+          </Select.Content>
+        </Select>
+      )
+      break
     case "products":
       control = (
         <ProductListEditor ids={Array.isArray(value) ? value : []} onChange={onChange} limit={4} storefront={storefront} />

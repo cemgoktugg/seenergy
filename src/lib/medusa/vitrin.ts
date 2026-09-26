@@ -21,6 +21,12 @@ export interface HeroSlide {
   cta: string;
   href: string;
   image: string;
+  /**
+   * contain: a product shot or logo, shown whole on the light stage (default —
+   *   it is what the shop actually uploads).
+   * cover: a wide campaign photo that fills the stage edge to edge.
+   */
+  fit: 'contain' | 'cover';
 }
 
 export interface Banner {
@@ -93,7 +99,8 @@ const str = (value: unknown) => (typeof value === 'string' ? value : '');
 /** What the site showed before the Vitrin module existed. */
 const FALLBACK: Vitrin = {
   announcement: SITE.promo,
-  slides: HERO_SLIDES.map((slide) => ({ ...slide, chips: [...slide.chips] })),
+  // The shipped artwork is wide campaign art, drawn to fill the stage.
+  slides: HERO_SLIDES.map((slide) => ({ ...slide, chips: [...slide.chips], fit: 'cover' as const })),
   heroSide: HERO_SIDE.map((item) => ({ ...item })),
   banners: {},
   brandBands: BRAND_SECTIONS.map((band) => ({
@@ -127,7 +134,11 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
   return {
     announcement: str(b.announcement?.[0]?.data.text),
     slides: (b['hero-slide'] ?? [])
-      .map((block) => ({ ...block.data, chips: Array.isArray(block.data.chips) ? block.data.chips : [] }))
+      .map((block) => ({
+        ...block.data,
+        chips: Array.isArray(block.data.chips) ? block.data.chips : [],
+        fit: block.data.fit === 'cover' ? ('cover' as const) : ('contain' as const),
+      }))
       // A slide without a picture would render a blank frame; skip it.
       .filter((slide) => slide.image && slide.title),
     heroSide: (b['hero-side'] ?? [])

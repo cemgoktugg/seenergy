@@ -8,7 +8,17 @@ import type { BlockGroup } from "./vitrin"
  * form: people edit confidently when they know which part of the site moves.
  */
 
-export type FieldType = "text" | "textarea" | "image" | "link" | "tags" | "stats" | "icon" | "brand" | "products"
+export type FieldType =
+  | "text"
+  | "textarea"
+  | "image"
+  | "link"
+  | "tags"
+  | "stats"
+  | "icon"
+  | "brand"
+  | "products"
+  | "choice"
 
 export interface FieldDef {
   name: string
@@ -17,6 +27,8 @@ export interface FieldDef {
   hint?: string
   required?: boolean
   placeholder?: string
+  /** For "choice": the options, first one is the default. */
+  options?: { value: string; label: string }[]
 }
 
 export interface GroupDef {
@@ -81,7 +93,17 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       { name: "chips", label: "Öne çıkan maddeler", type: "tags", hint: "En fazla 3 kısa madde." },
       { name: "cta", label: "Buton yazısı", type: "text", required: true, placeholder: "Alışverişe Başla" },
       link,
-      { name: "image", label: "Görsel", type: "image", required: true, hint: "Yatay görsel, en az 1600×900 px." },
+      { name: "image", label: "Görsel", type: "image", required: true },
+      {
+        name: "fit",
+        label: "Görsel yerleşimi",
+        type: "choice",
+        options: [
+          { value: "contain", label: "Ürün görseli — tamamı görünsün (önerilen)" },
+          { value: "cover", label: "Fotoğraf — alanı kaplasın" },
+        ],
+        hint: "Ürün fotoğrafı veya logo için 'tamamı görünsün'. Kenarları kırpılabilecek geniş bir kampanya fotoğrafı için 'alanı kaplasın'.",
+      },
     ],
     newItem: () => ({
       eyebrow: "",
@@ -91,6 +113,7 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       cta: "Alışverişe Başla",
       href: "/",
       image: "",
+      fit: "contain",
     }),
   },
   "hero-side": {
