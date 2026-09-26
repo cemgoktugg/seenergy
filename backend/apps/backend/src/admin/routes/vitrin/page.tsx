@@ -99,7 +99,13 @@ function ImagePreview({ blocks, storefront, field = "image" }: { blocks: VitrinB
           className={`bg-ui-bg-subtle relative h-14 w-24 overflow-hidden rounded-md border ${b.is_active ? "" : "opacity-40"}`}
           title={b.data.title}
         >
-          {b.data[field] ? <img src={mediaUrl(b.data[field], storefront)} alt="" className="h-full w-full object-cover" /> : null}
+          {b.data.product_image || b.data[field] ? (
+            <img
+              src={mediaUrl(b.data.product_image || b.data[field], storefront)}
+              alt=""
+              className={`h-full w-full ${b.data.product_image ? "object-contain p-1" : "object-cover"}`}
+            />
+          ) : null}
         </div>
       ))}
     </div>

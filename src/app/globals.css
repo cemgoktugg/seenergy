@@ -79,6 +79,13 @@
   --color-grad-2: rgb(46 85 200); /* blue    #2E55C8 */
   --color-grad-3: rgb(74 46 156); /* indigo  #4A2E9C */
   --color-grad-4: rgb(116 45 142); /* purple  #742D8E */
+  /* Campaign-card tones (src/components/campaign-card.tsx). White on the teal
+     stop itself measures 3.02:1 — under AA for body text — so the teal tone
+     starts from this deeper teal (6.69:1) and runs to the blue stop (6.46:1). */
+  --color-teal-deep: rgb(11 102 110);
+  /* The light tone's surface. Fixed, not themed: its text is dark ink in both
+     themes (15.2:1), so the surface must stay light in both. */
+  --color-wash-fixed: rgb(238 235 252);
 
   /* Dark chrome: the header stack and the technical data bands. */
   --color-chrome: rgb(20 22 28);

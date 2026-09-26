@@ -137,14 +137,13 @@ export default async function HomePage() {
       <Section>
         {(() => {
           const wide = banner('wide', {
-            image: '/mock/campaigns/wide-1.svg',
             title: "Türkiye'nin en geniş yedek parça stoğu",
             subtitle: '13.000+ televizyona uyumlu led bar çeşitleri',
             href: '/kategori/tv-yedek-parca',
+            tone: 'koyu',
+            productImage: '/mock/products/cutout/ledbar-white.svg',
           });
-          return (
-            <WideBanner image={wide.image} title={wide.title} subtitle={wide.subtitle ?? ''} href={wide.href} />
-          );
+          return <WideBanner banner={wide} />;
         })()}
       </Section>
 
@@ -164,9 +163,12 @@ export default async function HomePage() {
                  colour — the same pairing CATEGORY_TILES already uses. The
                  shop should upload cutouts here too (admin → Vitrin →
                  Bannerlar → Süper Fırsat kartı). */
-              image: '/mock/products/cutout/dish-white.svg',
+              productImage: '/mock/products/cutout/dish-white.svg',
+              tone: 'mor',
             });
-            return { title: promo.title, subtitle: promo.subtitle ?? '', href: promo.href, image: promo.image };
+            // Older content kept this tile's cut-out in `image`.
+            const art = promo.productImage ?? promo.image ?? '';
+            return { title: promo.title, subtitle: promo.subtitle ?? '', href: promo.href, image: art };
           })()}
           products={pick('super-firsat', 4, 0)}
         />
@@ -254,16 +256,18 @@ export default async function HomePage() {
               <DualBanners
                 items={[
                   banner('dual-1', {
-                    image: '/mock/campaigns/half-1.svg',
                     eyebrow: 'Kendi markalarımız',
                     title: 'Tescilli Markalarımız',
                     href: '/markalar',
+                    tone: 'acik',
+                    productImage: '/mock/products/cutout/receiver-white.svg',
                   }),
                   banner('dual-2', {
-                    image: '/mock/campaigns/half-2.svg',
                     eyebrow: 'Yetkili satıcılık',
                     title: 'Resmi Yetkili Satıcısı Olduğumuz Markalar',
                     href: '/markalar',
+                    tone: 'turkuaz',
+                    productImage: '/mock/products/cutout/camera-white.svg',
                   }),
                 ]}
               />

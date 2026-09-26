@@ -29,12 +29,20 @@ export interface HeroSlide {
   fit: 'contain' | 'cover';
 }
 
+/** Campaign-card surface colours, chosen per card in the admin. */
+export const TONES = ['koyu', 'mor', 'turkuaz', 'acik'] as const;
+export type Tone = (typeof TONES)[number];
+
 export interface Banner {
   eyebrow?: string;
   title: string;
   subtitle?: string;
   href: string;
-  image: string;
+  /** Optional background PHOTO; covers the card under a legibility scrim. */
+  image?: string;
+  /** Optional product picture, shown whole on a light plate. */
+  productImage?: string;
+  tone: Tone;
 }
 
 export interface BrandBand {
@@ -79,8 +87,8 @@ interface StoreVitrin {
   blocks: Partial<{
     announcement: Block<{ text: string }>[];
     'hero-slide': Block<HeroSlide>[];
-    'hero-side': Block<Banner>[];
-    banner: Block<Banner>[];
+    'hero-side': Block<RawBanner>[];
+    banner: Block<RawBanner>[];
     'brand-band': Block<{ brand_handle: string; tagline: string; logo: string; product_ids?: string[] }>[];
     'tech-band': Block<{
       eyebrow: string;
@@ -95,6 +103,26 @@ interface StoreVitrin {
 }
 
 const str = (value: unknown) => (typeof value === 'string' ? value : '');
+
+interface RawBanner {
+  eyebrow?: string;
+  title?: string;
+  subtitle?: string;
+  href?: string;
+  image?: string;
+  product_image?: string;
+  tone?: string;
+}
+
+const toBanner = (data: RawBanner): Banner => ({
+  eyebrow: str(data.eyebrow) || undefined,
+  title: str(data.title),
+  subtitle: str(data.subtitle) || undefined,
+  href: str(data.href) || '/',
+  image: str(data.image) || undefined,
+  productImage: str(data.product_image) || undefined,
+  tone: (TONES as readonly string[]).includes(str(data.tone)) ? (data.tone as Tone) : 'koyu',
+});
 
 /** What the site showed before the Vitrin module existed. */
 const FALLBACK: Vitrin = {
@@ -127,7 +155,7 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
   const banners: Vitrin['banners'] = {};
   for (const block of b.banner ?? []) {
     if (block.key === 'wide' || block.key === 'dual-1' || block.key === 'dual-2' || block.key === 'super-firsat-promo') {
-      banners[block.key] = block.data;
+      banners[block.key] = toBanner(block.data);
     }
   }
 
@@ -143,8 +171,8 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
       .filter((slide) => slide.image && slide.title),
     heroSide: (b['hero-side'] ?? [])
       .sort((x, y) => str(x.key).localeCompare(str(y.key)))
-      .map((block) => block.data)
-      .filter((item) => item.image),
+      .map((block) => toBanner(block.data))
+      .filter((item) => item.title),
     banners,
     brandBands: (b['brand-band'] ?? [])
       .map((block) => ({

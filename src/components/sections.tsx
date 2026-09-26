@@ -20,7 +20,8 @@ import {
   type CategoryTile,
   type NavItem,
 } from '@/data/site';
-import type { TrustItem } from '@/lib/medusa/vitrin';
+import { CampaignCard, TONE } from '@/components/campaign-card';
+import type { Banner, TrustItem } from '@/lib/medusa/vitrin';
 
 const TRUST_ICONS = { truck: Truck, badge: BadgeCheck, lock: Lock, refresh: RefreshCcw, support: Headphones };
 
@@ -367,122 +368,20 @@ export function CategoryTiles({ tiles }: { tiles: CategoryTile[] }) {
 }
 
 /**
- * Full-width campaign banner.
- *
- * The reference band is 1320×264 (5:1) and that is what this reproduced. The
- * client's note was that it eats the page for what it says — two lines of copy
- * floating in 264px of artwork. It is now a 150px strip at 1440 (43% shorter)
- * that earns its height: accent tick, eyebrow, headline and a real call to
- * action on one line, over a scrim that keeps the copy legible against any
- * artwork behind it.
- *
- * A deliberate departure from the measured reference, at the client's request.
+ * Wide campaign banner and the dual banners — both are campaign cards now
+ * (see campaign-card.tsx for the template and why the sound-wave artwork went).
+ * Kept as named exports so the homepage reads as a list of bands.
  */
-export function WideBanner({
-  image,
-  title,
-  subtitle,
-  href,
-}: {
-  image: string;
-  title: string;
-  subtitle: string;
-  href: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group relative block h-[92px] overflow-hidden rounded-(--panel-radius) sm:h-[124px] dt:h-[150px]"
-    >
-      <img
-        src={image}
-        alt=""
-        className="h-full w-full object-cover transition-transform duration-(--duration-slow) ease-out group-hover:scale-[1.03]"
-        loading="lazy"
-      />
-      {/* Scrim: the copy sits on the left, so the artwork stays visible on the
-          right instead of being flattened under a full-width overlay. */}
-      <span
-        aria-hidden
-        className="absolute inset-0 bg-linear-to-r from-surface-instalment/95 via-surface-instalment/70 to-transparent"
-      />
-      <div className="absolute inset-0 flex items-center gap-3 px-4 dt:gap-5 dt:px-8">
-        <span aria-hidden className="h-8 w-1 shrink-0 rounded-full bg-brand dt:h-12" />
-        <div className="min-w-0">
-          <p className="truncate text-[9px] font-bold uppercase tracking-[0.16em] text-white/75 dt:text-[11px]">
-            {title}
-          </p>
-          {/* Two lines rather than one truncated one: at 390 the headline is
-              wider than the strip and `truncate` cut it to "…led bar çeşitl…".
-              It still fits on one line from `dt` up. */}
-          <p className="mt-0.5 line-clamp-2 text-[16px] font-extrabold leading-[1.15] tracking-tight text-white dt:mt-1 dt:text-[24px]">
-            {subtitle}
-          </p>
-        </div>
-        <span className="ml-auto hidden shrink-0 items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[12px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) ease-in-out group-hover:bg-brand group-hover:text-white sm:inline-flex dt:text-[13px]">
-          İncele
-          <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
-        </span>
-      </div>
-    </Link>
-  );
+export function WideBanner({ banner }: { banner: Banner }) {
+  return <CampaignCard size="wide" {...banner} />;
 }
 
-/**
- * Two half-width banners.
- *
- * Measured at 650 × 263 each on the reference. Restated here in the same
- * language as the wide banner — accent tick, eyebrow, title, white CTA over a
- * left-weighted scrim — because the uppercase title with a small amber pill was
- * the last instance of the pattern the wide banner and the promo tile have
- * already left behind. 186px at 1440 rather than 263 for the same reason: the
- * copy never needed the extra height.
- *
- * A deliberate departure from the measured reference, at the client's request.
- */
-export function DualBanners({
-  items,
-}: {
-  items: { image: string; title: string; href: string; eyebrow?: string }[];
-}) {
+export function DualBanners({ items }: { items: Banner[] }) {
   return (
     <div className="grid grid-cols-1 gap-(--space-grid-gap) sm:grid-cols-2">
-      {/* Keyed by title, not href: both banners legitimately point at
-          /markalar, and href would collide. */}
-      {items.map((item) => (
-        <Link
-          key={item.title}
-          href={item.href}
-          className="group relative block h-[132px] overflow-hidden rounded-(--panel-radius) sm:h-[156px] dt:h-[186px]"
-        >
-          <img
-            src={item.image}
-            alt=""
-            className="h-full w-full object-cover transition-transform duration-(--duration-slow) ease-out group-hover:scale-[1.03]"
-            loading="lazy"
-          />
-          <span
-            aria-hidden
-            className="absolute inset-0 bg-linear-to-r from-surface-instalment/95 via-surface-instalment/65 to-transparent"
-          />
-          <div className="absolute inset-0 flex items-center gap-3 px-4 dt:gap-4 dt:px-6">
-            <span aria-hidden className="h-8 w-1 shrink-0 rounded-full bg-brand dt:h-10" />
-            <div className="min-w-0">
-              {item.eyebrow && (
-                <p className="truncate text-[9px] font-bold uppercase tracking-[0.16em] text-white/70 dt:text-[10px]">
-                  {item.eyebrow}
-                </p>
-              )}
-              <p className="mt-0.5 line-clamp-2 text-[16px] font-extrabold leading-[1.15] tracking-tight text-white dt:text-[20px]">
-                {item.title}
-              </p>
-              <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[11px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) ease-in-out group-hover:bg-brand group-hover:text-white">
-                İncele
-                <ArrowRight size={13} strokeWidth={2.5} aria-hidden />
-              </span>
-            </div>
-          </div>
-        </Link>
+      {/* Keyed by position: both banners may point at the same page. */}
+      {items.map((item, i) => (
+        <CampaignCard key={i} size="half" {...item} />
       ))}
     </div>
   );
@@ -618,11 +517,15 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
           }`}
         >
           <Link href={post.href} className="block">
-            <div className="overflow-hidden">
+            {/* The product the post is about, on a brand tone — the campaign
+                card's language, not a stock illustration. Cut-outs, so they
+                composite onto the tone directly. */}
+            <div className={`relative aspect-[315/195] overflow-hidden ${TONE[post.tone].surface}`}>
+              <span aria-hidden className="pointer-events-none absolute -right-10 -top-12 h-36 w-36 rounded-full bg-white/15 blur-2xl" />
               <img
                 src={post.image}
                 alt=""
-                className="aspect-[315/195] w-full object-cover transition-transform duration-(--duration-slow) ease-out group-hover:scale-105"
+                className="absolute inset-0 h-full w-full object-contain p-6 drop-shadow-[0_10px_18px_rgb(0_0_0/0.28)] transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-105 dt:p-8"
                 loading="lazy"
               />
             </div>

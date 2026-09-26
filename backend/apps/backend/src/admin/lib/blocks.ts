@@ -52,6 +52,34 @@ const link: FieldDef = {
   required: true,
 }
 
+/* The campaign-card fields shared by the hero tiles and the banners. */
+const tone: FieldDef = {
+  name: "tone",
+  label: "Renk tonu",
+  type: "choice",
+  options: [
+    { value: "koyu", label: "Koyu" },
+    { value: "mor", label: "Mor" },
+    { value: "turkuaz", label: "Turkuaz" },
+    { value: "acik", label: "Açık" },
+  ],
+  hint: "Kartın zemin rengi. Yan yana duran kartlara farklı tonlar vermek sayfayı canlandırır.",
+}
+
+const productImage: FieldDef = {
+  name: "product_image",
+  label: "Ürün görseli",
+  type: "image",
+  hint: "Kartın sağında beyaz bir zemin üzerinde gösterilir. Şeffaf veya beyaz arka planlı ürün fotoğrafı en iyi sonucu verir.",
+}
+
+const backgroundPhoto: FieldDef = {
+  name: "image",
+  label: "Arka plan fotoğrafı (isteğe bağlı)",
+  type: "image",
+  hint: "Yalnızca gerçek bir kampanya fotoğrafınız varsa. Doldurulursa kartın tamamını kaplar ve ürün görseli gösterilmez.",
+}
+
 const SLOT_NAMES: Record<string, string> = {
   "hero-side-1": "Sağ üst kart",
   "hero-side-2": "Sağ alt kart",
@@ -126,7 +154,9 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       { name: "eyebrow", label: "Üst etiket", type: "text" },
       { name: "title", label: "Başlık", type: "text", required: true },
       link,
-      { name: "image", label: "Arka plan görseli", type: "image", required: true },
+      tone,
+      productImage,
+      backgroundPhoto,
     ],
   },
   banner: {
@@ -140,7 +170,9 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       { name: "title", label: "Başlık", type: "text", required: true },
       { name: "subtitle", label: "Alt başlık", type: "text" },
       link,
-      { name: "image", label: "Görsel", type: "image", required: true },
+      tone,
+      productImage,
+      backgroundPhoto,
     ],
   },
   "brand-band": {

@@ -789,21 +789,23 @@ export const CATEGORY_TILES_SECONDARY: CategoryTile[] = [
  * They are the two most valuable non-category entry points a technical
  * storefront has: what is discounted, and how a business buys.
  */
+/* Campaign cards: a brand tone and a product, not the sound-wave artwork that
+   used to sit behind every banner on the page. Fallback only — the live
+   content comes from admin → Vitrin → Slayt yanı kartlar. */
 export const HERO_SIDE = [
   {
     eyebrow: 'Kampanya',
     title: 'Süper Fırsat Ürünleri',
     href: '/kampanyalar',
-    /* wide-2 and wide-3, not half-1/half-2: those two are the dual brand
-       banners further down the page, and using them here put the same artwork
-       on screen twice. */
-    image: '/mock/campaigns/wide-2.svg',
+    tone: 'mor' as const,
+    productImage: '/mock/products/cutout/speaker-white.svg',
   },
   {
     eyebrow: 'Kurumsal',
     title: 'Toptan alım ve bayilik',
     href: '/toptan-satis',
-    image: '/mock/campaigns/wide-3.svg',
+    tone: 'turkuaz' as const,
+    productImage: '/mock/products/cutout/nvr-white.svg',
   },
 ];
 
@@ -837,11 +839,15 @@ export const HERO_SLIDES = [
   },
 ];
 
+/* Each post shows the product it is about, on a brand tone — the same
+   campaign-card language as the banners, instead of four tints of one
+   sound-wave drawing. No 'koyu': these sit in the dark chrome band, where a
+   dark card has nothing to stand out from. */
 export const BLOG_POSTS = [
-  { title: 'Adaptör Nedir? Adaptör Çeşitleri Nelerdir?', href: '/blog/adaptor-nedir', image: '/mock/blog/blog-1.svg' },
-  { title: 'Access Point ve Router Arasındaki Farklar Nelerdir?', href: '/blog/access-point-router', image: '/mock/blog/blog-2.svg' },
-  { title: 'ABS Plastik Nedir? Nerelerde Kullanılır?', href: '/blog/abs-plastik-nedir', image: '/mock/blog/blog-3.svg' },
-  { title: 'Akıllı Kumanda Nasıl Sıfırlanır?', href: '/blog/akilli-kumanda-sifirlama', image: '/mock/blog/blog-4.svg' },
+  { title: 'Adaptör Nedir? Adaptör Çeşitleri Nelerdir?', href: '/blog/adaptor-nedir', image: '/mock/products/cutout/adapter-white.svg', tone: 'turkuaz' as const },
+  { title: 'Access Point ve Router Arasındaki Farklar Nelerdir?', href: '/blog/access-point-router', image: '/mock/products/cutout/router-white.svg', tone: 'mor' as const },
+  { title: 'ABS Plastik Nedir? Nerelerde Kullanılır?', href: '/blog/abs-plastik-nedir', image: '/mock/products/cutout/nvr-silver.svg', tone: 'acik' as const },
+  { title: 'Akıllı Kumanda Nasıl Sıfırlanır?', href: '/blog/akilli-kumanda-sifirlama', image: '/mock/products/cutout/remote-white.svg', tone: 'turkuaz' as const },
 ];
 
 export const BRANDS = [

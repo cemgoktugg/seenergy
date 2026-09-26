@@ -109,18 +109,20 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
       fit: "cover",
     }, 2),
 
-    block("hero-side", { eyebrow: "Kampanya", title: "Süper Fırsat Ürünleri", href: "/kampanyalar", image: "/mock/campaigns/wide-2.svg" }, 0, "hero-side-1"),
-    block("hero-side", { eyebrow: "Kurumsal", title: "Toptan alım ve bayilik", href: "/toptan-satis", image: "/mock/campaigns/wide-3.svg" }, 1, "hero-side-2"),
+    // Campaign cards: a brand tone and a product (see vitrin-upgrade-campaign-cards.ts).
+    block("hero-side", { eyebrow: "Kampanya", title: "Süper Fırsat Ürünleri", href: "/kampanyalar", tone: "mor", product_image: "/mock/products/cutout/speaker-white.svg" }, 0, "hero-side-1"),
+    block("hero-side", { eyebrow: "Kurumsal", title: "Toptan alım ve bayilik", href: "/toptan-satis", tone: "turkuaz", product_image: "/mock/products/cutout/nvr-white.svg" }, 1, "hero-side-2"),
 
     block("banner", {
       title: "Türkiye'nin en geniş yedek parça stoğu",
       subtitle: "13.000+ televizyona uyumlu led bar çeşitleri",
       href: "/kategori/tv-yedek-parca",
-      image: "/mock/campaigns/wide-1.svg",
+      tone: "koyu",
+      product_image: "/mock/products/cutout/ledbar-white.svg",
     }, 0, "wide"),
-    block("banner", { eyebrow: "Kendi markalarımız", title: "Tescilli Markalarımız", href: "/markalar", image: "/mock/campaigns/half-1.svg" }, 1, "dual-1"),
-    block("banner", { eyebrow: "Yetkili satıcılık", title: "Resmi Yetkili Satıcısı Olduğumuz Markalar", href: "/markalar", image: "/mock/campaigns/half-2.svg" }, 2, "dual-2"),
-    block("banner", { title: "Süper Fırsat", subtitle: "Ürünleri", href: "/kampanyalar", image: "/mock/products/cutout/dish-white.svg" }, 3, "super-firsat-promo"),
+    block("banner", { eyebrow: "Kendi markalarımız", title: "Tescilli Markalarımız", href: "/markalar", tone: "acik", product_image: "/mock/products/cutout/receiver-white.svg" }, 1, "dual-1"),
+    block("banner", { eyebrow: "Yetkili satıcılık", title: "Resmi Yetkili Satıcısı Olduğumuz Markalar", href: "/markalar", tone: "turkuaz", product_image: "/mock/products/cutout/camera-white.svg" }, 2, "dual-2"),
+    block("banner", { title: "Süper Fırsat", subtitle: "Ürünleri", href: "/kampanyalar", tone: "mor", product_image: "/mock/products/cutout/dish-white.svg" }, 3, "super-firsat-promo"),
 
     ...[
       ["tekniva", "All in one bilgisayarlar ve monitörler"],
