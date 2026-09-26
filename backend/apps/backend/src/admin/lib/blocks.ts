@@ -146,9 +146,9 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
   "brand-band": {
     title: "Marka vitrinleri",
     where:
-      "Ana sayfada alt alta dizilen marka bölümleri (logo + 4 ürün). İlk dördünden sonra 'Neden SEENERGY' bandı gelir.",
+      "Ana sayfadaki 'Öne Çıkan Markalar' bölümü. Her kayıt bir sekmedir: logoya tıklanınca o markanın 4 ürünü gösterilir. Sekmeler buradaki sırayla dizilir.",
     repeatable: true,
-    itemName: "marka vitrini",
+    itemName: "marka",
     itemTitle: (d, i) => `${i + 1}. ${d.brand_handle || "marka seçilmedi"}`,
     fields: [
       { name: "brand_handle", label: "Marka", type: "brand", required: true },

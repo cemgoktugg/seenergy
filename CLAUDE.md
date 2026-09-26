@@ -148,12 +148,15 @@ and the page stops having a rhythm to retune.
 
 `Section` also picks the horizontal track: `main` (1320 content), `nav` (the
 wider 1400 chrome track the footer stack uses) and `bleed` (full width, for
-bands that paint edge to edge and bring their own inner container). The
-full-bleed `TechBand` sits **inside** the brand run, after the fourth showcase —
-that placement is load-bearing too: the seven brand bands measured one unbroken
-3783px stretch on a 541px pitch, and splitting it four/three is what breaks the
-monotony. The bands themselves stay structurally identical on purpose; see the
-note in `src/components/brand-section.tsx` before varying them.
+bands that paint edge to edge and bring their own inner container).
+
+The featured brands are ONE band with a tab per brand
+(`src/components/brand-showcase.tsx`, 639px at 1440). It replaced seven
+stacked brand bands that measured 3,787px — 38% of the page — with the
+technical band wedged into their middle to break the run up. Do not bring the
+per-brand bands back: the length was the problem, not the band design. The
+dark `TechBand` now simply sits between the light brand panel and the light
+product tabs.
 
 `/[...slug]` still answers for the navigation entries that genuinely are not
 built — blog, the corporate and legal pages — and says so
