@@ -145,6 +145,10 @@
   --color-danger-ink: rgb(186 28 58);
   --color-success: rgb(13 115 90);
   --color-success-ink: rgb(13 115 90);
+  /* Low stock ("Son 3 ürün"). Used only on the product card's image stage,
+     which stays white in both themes, so it has no dark counterpart.
+     8.4:1 on white. */
+  --color-warning: rgb(163 76 0);
   /* The blue gradient stop, so the promotional badge belongs to the identity
      instead of sitting between the teal and the indigo as a third blue.
      White on rgb(46 85 200) measures 5.9:1 — AA for the badge's 11px text. */

@@ -48,6 +48,7 @@ import {
   formatPrice,
   type Product,
 } from '@/data/catalog';
+import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { PRODUCT_TRUST, SITE } from '@/data/site';
 import { categorySpec, keySpecsOf, type CompatibilityItem } from '@/data/specs';
 import { loadCatalog, loadProducts } from '@/lib/medusa/catalog';
@@ -161,7 +162,7 @@ function PriceBlock({ product }: { product: Product }) {
         )}
       </div>
 
-      {product.instalment && (
+      {INSTALMENTS_AVAILABLE && product.instalment && (
         <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-(--card-radius) border border-highlight/40 bg-surface-instalment px-2.5 py-1.5 text-[11px] font-medium text-white">
           PEŞİN FİYATINA <span className="font-extrabold text-highlight">3 TAKSİT</span>
         </p>
@@ -302,7 +303,7 @@ function SpecTable({ product }: { product: Product }) {
         { label: 'Fiyat', value: formatPrice(product.price) },
         {
           label: 'Ödeme',
-          value: product.instalment ? 'Peşin fiyatına 3 taksit' : 'Tek çekim',
+          value: INSTALMENTS_AVAILABLE && product.instalment ? 'Peşin fiyatına 3 taksit' : 'Havale / EFT veya kapıda ödeme',
         },
         {
           label: 'Kargo',

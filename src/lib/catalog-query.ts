@@ -12,6 +12,7 @@
  */
 
 import { brandSlug, categoryMeta, type Product } from '@/data/catalog';
+import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 
 /**
  * Turkish-forgiving fold: lower-cases with the Turkish locale, then flattens
@@ -76,11 +77,14 @@ export const SORTS: { key: SortKey; label: string }[] = [
   { key: 'isim', label: 'İsim' },
 ];
 
-export const FEATURES = [
+/* "Taksit imkânı" is offered only when instalments can actually be paid —
+   filtering by a promise the checkout cannot keep would be worse than not
+   offering the filter. */
+export const FEATURES: readonly { key: 'kargo' | 'taksit' | 'indirim'; label: string }[] = [
   { key: 'kargo', label: 'Ücretsiz kargo' },
-  { key: 'taksit', label: 'Taksit imkânı' },
+  ...(INSTALMENTS_AVAILABLE ? [{ key: 'taksit' as const, label: 'Taksit imkânı' }] : []),
   { key: 'indirim', label: 'İndirimli ürünler' },
-] as const;
+];
 
 /** Fixed bands rather than computed ones: a bucket that moves as the result set
  *  changes is impossible to aim at twice. */

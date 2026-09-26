@@ -24,6 +24,7 @@ import { ArrowLeft, Scale, X } from 'lucide-react';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
 import { useCatalog } from '@/components/catalog-provider';
 import { categoryMeta, discountPercent, formatPrice } from '@/data/catalog';
+import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { keySpecsOf } from '@/data/specs';
 
 export default function ComparePage() {
@@ -79,7 +80,10 @@ export default function ComparePage() {
     },
     { label: 'Stok', value: (p) => (p.stock === 0 ? 'Tükendi' : `${p.stock} adet`) },
     { label: 'Kargo', value: (p) => (p.freeShipping ? 'Ücretsiz' : 'Standart') },
-    { label: 'Ödeme', value: (p) => (p.instalment ? '3 taksit' : 'Tek çekim') },
+    {
+      label: 'Ödeme',
+      value: (p) => (INSTALMENTS_AVAILABLE && p.instalment ? '3 taksit' : 'Havale / EFT, kapıda'),
+    },
   ];
 
   const specLabels = [

@@ -24,6 +24,16 @@ export const PAYMENT_OPTIONS = [
 
 export type PaymentOptionId = (typeof PAYMENT_OPTIONS)[number]['id'];
 
+/**
+ * Whether the site may promise instalments ("peşin fiyatına 3 taksit").
+ *
+ * Instalments need an online card provider, and there is none yet — so every
+ * instalment claim (product page, compare table, the listing filter) reads this
+ * and stays hidden. The per-product `instalment` flag is kept in Medusa, so
+ * turning a card provider on is this one line, not re-entering data.
+ */
+export const INSTALMENTS_AVAILABLE = false;
+
 export const paymentLabel = (id: unknown): string =>
   PAYMENT_OPTIONS.find((option) => option.id === id)?.label ?? 'Belirtilmedi';
 

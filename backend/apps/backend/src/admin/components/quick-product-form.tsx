@@ -245,7 +245,7 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
         <FieldShell label="Stok adedi" required htmlFor="qp-stock" hint="0 yazarsanız ürün 'Tükendi' olarak görünür.">
           <Input id="qp-stock" inputMode="numeric" value={form.stock} onChange={(e) => set("stock", e.target.value)} />
         </FieldShell>
-        <FieldShell label="Taksit">
+        <FieldShell label="Taksit" hint="Kartla ödeme açıldığında sitede görünür; şu an sitede gösterilmiyor.">
           <label className="txt-compact-small flex items-center gap-x-2 pt-1.5">
             <Switch checked={form.instalment} onCheckedChange={(v) => set("instalment", v)} />
             Taksit seçeneği göster
