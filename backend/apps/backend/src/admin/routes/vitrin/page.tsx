@@ -212,7 +212,7 @@ const VitrinPage = () => {
 
         <Band
           n={++n}
-          title="Öne Çıkan Markalar"
+          title="Marka vitrinleri"
           where={GROUPS["brand-band"].where}
           to="/vitrin/blok/brand-band"
           extra={<Badge size="2xsmall">{activeBrands.length} yayında</Badge>}

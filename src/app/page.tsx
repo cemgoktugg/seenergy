@@ -13,7 +13,7 @@
  * of globals.css rather than nineteen class lists.
  */
 
-import { BrandShowcase, type ShowcaseBrand } from '@/components/brand-showcase';
+import { BrandSection } from '@/components/brand-section';
 import { Hero } from '@/components/hero';
 import { HeroSide } from '@/components/hero-side';
 import { CategoryMosaic } from '@/components/category-mosaic';
@@ -34,7 +34,7 @@ import {
 } from '@/components/sections';
 import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
-import { loadVitrin } from '@/lib/medusa/vitrin';
+import { loadVitrin, type BrandBand } from '@/lib/medusa/vitrin';
 
 export default async function HomePage() {
   const [{ byId, byBrandSlug, brandFromSlug, mixed }, vitrin] = await Promise.all([
@@ -59,28 +59,33 @@ export default async function HomePage() {
   const banner = (key: keyof typeof vitrin.banners, fallback: NonNullable<(typeof vitrin.banners)['wide']>) =>
     vitrin.banners[key] ?? fallback;
 
+  /* Only bands whose brand still has products — a band with no products
+     would be a logo over an empty shelf. */
+  const brandBands = vitrin.brandBands.filter((band) => brandFromSlug(band.brandHandle));
+
   /**
-   * The featured brands (admin → Vitrin → Marka vitrinleri), one tab each.
-   * A brand with no products left is dropped: a tab over an empty shelf is a
-   * dead end. Hand-picked products win; otherwise the brand's first four.
+   * One brand band, rendered in two runs below.
+   *
+   * The seven showcases stay structurally identical on purpose — see
+   * BrandSection's own note: seven different layouts would read as seven
+   * competing headers rather than a rhythm. The monotony problem is the length
+   * of the unbroken run, not the sameness of the bands, so the technical band
+   * splits the run instead of the bands varying.
    */
-  const showcase: ShowcaseBrand[] = vitrin.brandBands.flatMap((band) => {
-    const name = brandFromSlug(band.brandHandle);
-    if (!name) return [];
-    const all = byBrandSlug(band.brandHandle);
+  const brandBand = (band: BrandBand) => {
     const chosen = band.productIds.map((id) => byId(id)).filter((p): p is Product => Boolean(p));
-    return [
-      {
-        handle: band.brandHandle,
-        name,
-        tagline: band.tagline,
-        logo: band.logo,
-        products: (chosen.length > 0 ? chosen : all).slice(0, 4),
-        modelCount: all.length,
-        fromPrice: all.length > 0 ? Math.min(...all.map((p) => p.price)) : null,
-      },
-    ];
-  });
+    return (
+      <Section key={band.brandHandle}>
+        <BrandSection
+          brand={brandFromSlug(band.brandHandle) ?? band.brandHandle}
+          tagline={band.tagline}
+          href={`/marka/${band.brandHandle}`}
+          logo={band.logo}
+          products={chosen.length > 0 ? chosen.slice(0, 4) : byBrandSlug(band.brandHandle).slice(0, 4)}
+        />
+      </Section>
+    );
+  };
 
   return (
     <>
@@ -174,18 +179,19 @@ export default async function HomePage() {
         />
       </Section>
 
-      {/* 08 — the featured brands, one band with a tab per brand.
-             It replaced seven stacked brand bands: one 541px band per brand,
-             3,787px together — 38% of the desktop page — which the technical
-             band below used to be wedged into the middle of, to break the run
-             up. One tabbed band shows the same products and lets the visitor
-             pick the brand. See brand-showcase.tsx. */}
-      <Section label="Öne çıkan markalar">
-        <BrandShowcase brands={showcase} />
-      </Section>
+      {/* 08 — brand showcases (admin → Vitrin → Marka vitrinleri).
+             These replace the two category bands that stood here (All In One
+             Bilgisayarlar / Oto Ses ve Görüntü): the client wants this stretch
+             of the homepage organised by brand, and Tekniva leads because the
+             all-in-one band was the model for the whole series. */}
+      {brandBands.slice(0, 4).map(brandBand)}
 
-      {/* 08b — full-bleed technical band: the dark band between the light
-             brand panel above and the light product tabs below.
+      {/* 08b — full-bleed technical band, placed INSIDE the brand run.
+             Measured: the seven showcases ran y=1793→5576 as one unbroken
+             3783px stretch on an even 541px pitch. Putting the band after all
+             seven left that stretch intact and only capped it; splitting it
+             four/three breaks the monotony where it actually occurs, into two
+             runs of roughly 1900px.
              Figures are the shop's to set (admin → Vitrin → Neden SEENERGY). */}
       <Section track="bleed">
         <TechBand
@@ -204,6 +210,9 @@ export default async function HomePage() {
           })}
         />
       </Section>
+
+      {/* 08c — the remaining showcases, after the break. */}
+      {brandBands.slice(4).map(brandBand)}
 
       {/* 12 — tabbed product block: 3 tabs + 5×3 grid.
              The largest single section on the reference homepage. */}

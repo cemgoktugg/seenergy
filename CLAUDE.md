@@ -155,13 +155,17 @@ Every band that has a heading opens with `<SectionHeading>`
 title, optional action/controls. There were four heading styles before; do
 not add a fifth.
 
-The featured brands are ONE band with a tab per brand
-(`src/components/brand-showcase.tsx`, 639px at 1440). It replaced seven
-stacked brand bands that measured 3,787px — 38% of the page — with the
-technical band wedged into their middle to break the run up. Do not bring the
-per-brand bands back: the length was the problem, not the band design. The
-dark `TechBand` now simply sits between the light brand panel and the light
-product tabs.
+The full-bleed `TechBand` sits **inside** the brand run, after the fourth
+showcase — that placement is load-bearing too: the seven brand bands measured
+one unbroken 3783px stretch on a 541px pitch, and splitting it four/three is
+what breaks the monotony. The bands themselves stay structurally identical on
+purpose; see the note in `src/components/brand-section.tsx` before varying
+them.
+
+**The client wants the brands stacked, one band per brand with its products.**
+A single tabbed "Öne Çıkan Markalar" band (much shorter) was built on
+2026-09-26 and reverted the same day at the client's request. Do not propose
+folding the brand bands into tabs again.
 
 `/[...slug]` still answers for the navigation entries that genuinely are not
 built — blog, the corporate and legal pages — and says so
