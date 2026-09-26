@@ -26,6 +26,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 import { ProductCard } from '@/components/product-card';
+import { SectionHeading } from '@/components/section-heading';
 import { formatPrice, type Product } from '@/data/catalog';
 
 export interface ShowcaseBrand {
@@ -74,13 +75,7 @@ export function BrandShowcase({ brands }: { brands: ShowcaseBrand[] }) {
 
       {/* --- header ------------------------------------------------------- */}
       <div className="px-3 pt-4 dt:px-5 dt:pt-5">
-        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary dt:text-[11px]">
-          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-brand" />
-          Marka vitrini
-        </p>
-        <h2 id={`${baseId}-title`} className="mt-1 text-[20px] font-extrabold tracking-tight text-text-primary dt:text-[24px]">
-          Öne Çıkan Markalar
-        </h2>
+        <SectionHeading id={`${baseId}-title`} eyebrow="Marka vitrini" title="Öne Çıkan Markalar" />
       </div>
 
       {/* --- brand tabs --------------------------------------------------- */}

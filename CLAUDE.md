@@ -150,6 +150,11 @@ and the page stops having a rhythm to retune.
 wider 1400 chrome track the footer stack uses) and `bleed` (full width, for
 bands that paint edge to edge and bring their own inner container).
 
+Every band that has a heading opens with `<SectionHeading>`
+(`src/components/section-heading.tsx`): gradient tick, uppercase eyebrow,
+title, optional action/controls. There were four heading styles before; do
+not add a fifth.
+
 The featured brands are ONE band with a tab per brand
 (`src/components/brand-showcase.tsx`, 639px at 1440). It replaced seven
 stacked brand bands that measured 3,787px — 38% of the page — with the

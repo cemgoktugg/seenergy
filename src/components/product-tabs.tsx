@@ -25,6 +25,7 @@
 import { useId, useState } from 'react';
 
 import { ProductCard } from '@/components/product-card';
+import { SectionHeading } from '@/components/section-heading';
 import type { Product } from '@/data/catalog';
 
 export type ProductTab = {
@@ -42,6 +43,11 @@ export function ProductTabs({ tabs }: { tabs: ProductTab[] }) {
 
   return (
     <section aria-label="Öne çıkan ürün listeleri">
+      {/* The block had no heading at all — three tab labels were the only
+          words over a twelve-card grid. */}
+      <div className="mb-3 dt:mb-5">
+        <SectionHeading eyebrow="Keşfet" title="Öne Çıkan Ürünler" />
+      </div>
       {/* --- tab strip --------------------------------------------------
           The reference strip is three full-width filled pills — grey when
           idle, amber when active. Restated as underlined text tabs at the

@@ -21,12 +21,12 @@ import { ProductSlider } from '@/components/product-slider';
 import { ProductTabs } from '@/components/product-tabs';
 import { RevealOnScroll } from '@/components/reveal-on-scroll';
 import { Section } from '@/components/section';
+import { SectionHeading } from '@/components/section-heading';
 import {
   BlogCards,
   BrandGrid,
   DualBanners,
   PromoProductRow,
-  SectionBar,
   SeoEditorial,
   TechBand,
   TrustRow,
@@ -247,7 +247,7 @@ export default async function HomePage() {
             className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-grad-1 via-grad-3 to-grad-4"
           />
           <div className="container-main">
-            <SectionBar title="Blog & Markalarımız" tone="dark" />
+            <SectionHeading eyebrow="Bilgi ve markalar" title="Blog & Markalarımız" tone="dark" />
             <div className="pt-2.5 dt:pt-3">
               <BlogCards tone="dark" />
             </div>

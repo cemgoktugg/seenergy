@@ -208,7 +208,7 @@ function HeaderActions() {
   /* The badge shows 0 until the cart has been read, on purpose: pages render
      statically, so the server HTML cannot know this visitor's cart, and a
      count in the first client pass would disagree with it. */
-  const { count: cartCount } = useCart();
+  const { count: cartCount, bump } = useCart();
 
   return (
     <div className="flex shrink-0 items-center gap-1 dt:gap-2.5">
@@ -245,7 +245,12 @@ function HeaderActions() {
         <ShoppingCart size={20} strokeWidth={1.9} aria-hidden />
         {/* Inset rather than hung outside the button: at 320 a negative offset
             pushed the badge past the viewport and the document scrolled 9px. */}
-        <span className="absolute right-0 top-0 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[10px] font-bold text-white">
+        {/* Keyed on `bump`: each successful add remounts the badge, which
+            replays the pulse — the header answering the click. */}
+        <span
+          key={bump}
+          className={`absolute right-0 top-0 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[10px] font-bold text-white ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
+        >
           {cartCount}
         </span>
       </Link>
@@ -258,7 +263,7 @@ export function SiteHeader({ promo }: { promo: string }) {
   /* The condensed bar carries its own cart badge. It reads the same store as
      the masthead's, so the two cannot disagree — a sticky bar still showing 0
      after something was added would be worse than having no badge there. */
-  const { count: cartCount } = useCart();
+  const { count: cartCount, bump } = useCart();
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [openGroup, setOpenGroup] = useState<string | null>(null);
@@ -367,7 +372,10 @@ export function SiteHeader({ promo }: { promo: string }) {
             className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-chrome-soft"
           >
             <ShoppingCart size={20} strokeWidth={1.9} aria-hidden />
-            <span className="absolute right-0 top-0 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[10px] font-bold text-white">
+            <span
+              key={bump}
+              className={`absolute right-0 top-0 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[10px] font-bold text-white ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
+            >
               {cartCount}
             </span>
           </Link>

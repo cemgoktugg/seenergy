@@ -194,7 +194,7 @@ export function ProductCard({ product }: { product: Product }) {
           <button
             type="button"
             disabled={soldOut}
-            onClick={() => void cart.add(product.variantId)}
+            onClick={() => void cart.add(product.variantId, 1, product.name)}
             aria-label={`${product.name} ürününü sepete ekle`}
             className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[13.5px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
           >

@@ -73,74 +73,6 @@ export function SectionBanner({
 }
 
 /**
- * Section header.
- *
- * The reference puts a solid amber bar across the full container with centred
- * white text, and that is what stood here. It was the most dated element left
- * on the page: a heavy filled band shouting a title. This is the same heading
- * at the same place in the flow, restated in the page's newer language — an
- * accent tick, a left-aligned bold title, a hairline rule — so it matches the
- * brand-showcase and slider headers instead of fighting them.
- *
- * A deliberate departure from the reference, at the client's request.
- */
-export function SectionBar({
-  title,
-  href,
-  tone = 'light',
-}: {
-  title: string;
-  href?: string;
-  /** `dark` is for the full-bleed chrome band, where the ink inverts. */
-  tone?: 'light' | 'dark';
-}) {
-  const dark = tone === 'dark';
-
-  return (
-    <div
-      className={`flex items-end justify-between gap-4 border-b pb-2.5 ${
-        dark ? 'border-chrome-line' : 'border-line'
-      }`}
-    >
-      <div className="flex min-w-0 items-center gap-2.5">
-        {/* On chrome the solid indigo tick disappears into the surface, so the
-            accent becomes the logo gradient there. */}
-        <span
-          aria-hidden
-          className={`h-5 w-1 shrink-0 rounded-full dt:h-6 ${
-            dark ? 'bg-linear-to-b from-grad-1 to-grad-4' : 'bg-brand'
-          }`}
-        />
-        <h2
-          className={`truncate text-[16px] font-extrabold tracking-tight dt:text-[20px] ${
-            dark ? 'text-white' : 'text-text-primary'
-          }`}
-        >
-          {title}
-        </h2>
-      </div>
-      {href && (
-        <Link
-          href={href}
-          className={`inline-flex shrink-0 items-center gap-1 text-[12px] font-semibold transition-colors duration-(--duration-fast) dt:text-[13px] ${
-            dark
-              ? 'text-white/70 hover:text-white'
-              : 'text-text-secondary hover:text-text-primary'
-          }`}
-        >
-          Tümü
-          <ArrowRight size={13} strokeWidth={2.25} aria-hidden />
-        </Link>
-      )}
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
-/* product layouts                                                     */
-/* ------------------------------------------------------------------ */
-
-/**
  * Desktop grid, mobile rail.
  * The reference switches to horizontally scrolling rails below `lg` with the
  * next card peeking — reproduced here with scroll-snap rather than a library.
@@ -591,8 +523,13 @@ export function BrandGrid() {
      (Above `return (`, not inside it — third time this session.) */
   return (
     <div className="brand-wall-plate group/wall overflow-hidden rounded-(--card-radius) border border-line bg-surface-card py-4">
+      {/* Each row fades out at both ends, so marks glide in and out of the
+          panel instead of being guillotined at its edge. */}
       {rows.map((row, index) => (
-        <div key={index} className="overflow-hidden">
+        <div
+          key={index}
+          className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)]"
+        >
           <ul
             className={`brand-track flex w-max items-center ${
               index === 0
@@ -608,7 +545,7 @@ export function BrandGrid() {
                 <li
                   key={`${duplicate ? 'dup-' : ''}${brand.href}`}
                   aria-hidden={duplicate || undefined}
-                  className={`grid h-[70px] w-[120px] shrink-0 place-items-center ${
+                  className={`grid h-[70px] w-[120px] shrink-0 place-items-center lg:h-[78px] lg:w-[150px] ${
                     duplicate ? 'brand-dup' : ''
                   }`}
                 >
@@ -639,7 +576,7 @@ export function BrandGrid() {
                          1.4.11 floor for graphical objects, and made the wall
                          look patchy. At 75% the range is 3.37:1..5.74:1, so
                          every mark clears the floor. */
-                      className="mx-auto h-9 w-auto opacity-75 grayscale transition duration-(--duration-base) hover:opacity-100 hover:grayscale-0 lg:h-10"
+                      className="mx-auto h-9 w-auto opacity-75 grayscale transition duration-(--duration-base) hover:opacity-100 hover:grayscale-0 lg:h-12"
                       loading="lazy"
                     />
                   </Link>

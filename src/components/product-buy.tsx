@@ -43,7 +43,7 @@ export function ProductBuy({ product }: { product: Product }) {
         : inCart > 0
           ? `Sepete Eklendi (${inCart})`
           : 'Sepete Ekle';
-  const addToCart = () => void cart.add(product.variantId);
+  const addToCart = () => void cart.add(product.variantId, 1, product.name);
 
   return (
     <>

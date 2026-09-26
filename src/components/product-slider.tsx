@@ -26,10 +26,10 @@
  */
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import Link from 'next/link';
-import { ArrowRight, ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 import { ProductCard } from '@/components/product-card';
+import { SectionHeading } from '@/components/section-heading';
 import type { Product } from '@/data/catalog';
 
 type Accent = 'violet' | 'teal';
@@ -45,19 +45,17 @@ type Accent = 'violet' | 'teal';
  */
 const ACCENTS: Record<
   Accent,
-  { rule: string; wash: string; dot: string; control: string; segment: string }
+  { rule: string; wash: string; control: string; segment: string }
 > = {
   violet: {
     rule: 'from-grad-3 to-grad-4',
     wash: 'from-brand-soft/70',
-    dot: 'bg-grad-3',
     control: 'enabled:hover:border-brand enabled:hover:bg-brand enabled:hover:text-white',
     segment: 'bg-grad-3',
   },
   teal: {
     rule: 'from-grad-1 to-grad-2',
     wash: 'from-grad-1/8',
-    dot: 'bg-grad-1',
     control: 'enabled:hover:border-grad-2 enabled:hover:bg-grad-2 enabled:hover:text-white',
     segment: 'bg-grad-2',
   },
@@ -138,24 +136,8 @@ export function ProductSlider({
       <div
         className={`flex items-center justify-between gap-3 bg-linear-to-b to-transparent px-3 pt-3 dt:px-4 dt:pt-4 ${a.wash}`}
       >
-        <div className="min-w-0">
-          <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
-            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${a.dot}`} aria-hidden />
-            <span className="truncate">{eyebrow}</span>
-          </p>
-          <h2 className="mt-1 truncate text-[16px] font-extrabold tracking-tight text-text-primary dt:text-[20px]">
-            {title}
-          </h2>
-        </div>
-
-        <div className="flex shrink-0 items-center gap-1.5">
-          <Link
-            href={href}
-            className="hidden items-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold text-text-secondary transition-colors duration-(--duration-fast) hover:text-text-primary sm:inline-flex"
-          >
-            Tümü
-            <ArrowRight size={13} strokeWidth={2.25} aria-hidden />
-          </Link>
+        <div className="min-w-0 flex-1">
+          <SectionHeading eyebrow={eyebrow} title={title} action={{ label: 'Tümü', href }}>
           <button
             type="button"
             onClick={() => goTo(page - 1)}
@@ -174,6 +156,7 @@ export function ProductSlider({
           >
             <ChevronRight size={17} strokeWidth={2.25} aria-hidden />
           </button>
+          </SectionHeading>
         </div>
       </div>
 
