@@ -820,24 +820,34 @@ html.reveal-ready [data-reveal]:not(.is-revealed) {
   }
 }
 
+/* Touch: no animation (a finger cannot pause it), and the two rows become
+   rows the visitor swipes instead. Wrapping all 45 marks into a static grid
+   was the previous answer, and measured 874px at 390 — the longest block on
+   the phone homepage after the product tabs, for a list of logos. Two
+   swipeable rows keep the wall at its desktop height, and the movement is
+   entirely the visitor's. */
 @media (hover: none) {
   .brand-track {
     animation: none !important;
     width: auto !important;
-    flex-wrap: wrap;
-    justify-content: center;
+    overflow-x: auto;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+  }
+
+  .brand-track::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* 104px, not the marquee's 120: at 120 exactly three marks filled a 390px
+     row and nothing hinted there was more. 3.4 per row shows the next edge. */
+  .brand-track > li {
+    width: 104px;
+    scroll-snap-align: start;
   }
 
   .brand-dup {
     display: none;
-  }
-
-  /* Four per row rather than three. The cells are a fixed 120px so the
-     marquee spacing is even; wrapped on a 374px phone that fits only three
-     and the wall ran 1154px — 9% of the page for a logo list. A quarter each
-     puts it near 840px without shrinking the marks. */
-  .brand-track > li {
-    width: 25%;
   }
 }
 

@@ -168,10 +168,10 @@ export function BrandShowcase({ brands }: { brands: ShowcaseBrand[] }) {
             </Link>
           </div>
 
-          {/* A swipeable rail on phones (two cards in view), a grid of four
-              from `lg`. `rail-rows-lg` switches the flow back to rows there —
+          {/* A swipeable rail on phones (two cards and the edge of a third, so
+              it reads as scrollable), a grid of four from `lg`. `rail-rows-lg` switches the flow back to rows there —
               see globals.css for why that cannot be a utility. */}
-          <div className="rail rail-rows-lg auto-cols-[calc(50%_-_5px)] gap-(--space-grid-gap) sm:auto-cols-[calc(33.333%_-_7px)] lg:grid-cols-4">
+          <div className="rail rail-rows-lg auto-cols-[44%] gap-(--space-grid-gap) sm:auto-cols-[30%] lg:grid-cols-4">
             {brand.products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

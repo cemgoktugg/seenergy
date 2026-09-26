@@ -501,7 +501,9 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
   const dark = tone === 'dark';
 
   return (
-    <div className="grid grid-cols-2 gap-2.5 lg:grid-cols-4 lg:gap-(--space-grid-gap)">
+    /* One swipeable row below `lg`: two-up, the cards were 175px wide with
+       three-line titles, and the 2×2 block was most of a 1,898px band. */
+    <div className="rail rail-rows-lg auto-cols-[72%] gap-2.5 sm:auto-cols-[44%] lg:grid-cols-4 lg:gap-(--space-grid-gap)">
       {BLOG_POSTS.map((post) => (
         <article
           key={post.href}
@@ -653,18 +655,19 @@ export function BrandGrid() {
 
 /**
  * Trust row.
- * Measured at 390: the reference stacks these one per row, not 2×2
- * (reference-analysis/mobile-390/Z-footer.png).
+ * 2×2 on a phone, icon above the text. The reference stacks these one per row
+ * (reference-analysis/mobile-390/Z-footer.png), which cost 364px for four
+ * short statements; 2×2 says the same in about half.
  */
 export function TrustRow({ items }: { items: TrustItem[] }) {
   return (
-    <ul className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4 lg:gap-5">
+    <ul className="grid grid-cols-2 gap-2.5 lg:grid-cols-4 lg:gap-5">
       {items.map((item) => {
         const Icon = TRUST_ICONS[item.icon] ?? BadgeCheck;
         return (
           <li
             key={item.title}
-            className="flex items-center gap-3 rounded-(--card-radius) border border-line bg-surface-card px-3 py-3 lg:px-5 lg:py-4"
+            className="flex flex-col items-start gap-2 rounded-(--card-radius) border border-line bg-surface-card p-3 sm:flex-row sm:items-center sm:gap-3 lg:px-5 lg:py-4"
           >
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-dark lg:h-12 lg:w-12">
               <Icon size={20} strokeWidth={1.9} aria-hidden />

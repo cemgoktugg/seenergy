@@ -101,7 +101,10 @@ export function ProductTabs({ tabs }: { tabs: ProductTab[] }) {
         </div>
 
         {/* --- panel ----------------------------------------------------
-            Four columns beside the rail, not five across the full width.
+            Four columns beside the rail from `dt`, a grid of four from `lg`.
+            Below `lg` it is ONE swipeable row: twelve cards two-up was six
+            rows, 2,330px of a 10,258px phone page. The column width shows a
+            third card's edge so the row reads as scrollable.
             `key` forces a fresh subtree per tab so the cards re-mount rather
             than reusing hover state from the previous list. */}
         <div
@@ -109,7 +112,7 @@ export function ProductTabs({ tabs }: { tabs: ProductTab[] }) {
           role="tabpanel"
           id={`${baseId}-panel-${current.id}`}
           aria-labelledby={`${baseId}-tab-${current.id}`}
-          className="grid grid-cols-2 gap-(--space-grid-gap) pt-(--space-grid-gap) sm:grid-cols-3 dt:grid-cols-4 dt:pt-0"
+          className="rail rail-rows-lg auto-cols-[44%] gap-(--space-grid-gap) pt-(--space-grid-gap) sm:auto-cols-[30%] lg:grid-cols-4 dt:pt-0"
         >
           {current.products.map((product) => (
             <ProductCard key={product.id} product={product} />
