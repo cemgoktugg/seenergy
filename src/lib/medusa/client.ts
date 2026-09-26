@@ -62,5 +62,17 @@ export async function medusa<T>(path: string, { body, query, token, headers, ...
     const detail = (await response.json().catch(() => null)) as { message?: string } | null;
     throw new MedusaError(detail?.message ?? `${path} → ${response.status}`, response.status);
   }
-  return (await response.json()) as T;
+
+  const text = await response.text();
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    // Named, not a bare "Unexpected end of JSON input": say which call got
+    // what, so a truncated body is traceable to its request.
+    throw new Error(
+      `Medusa ${init.method ?? 'GET'} ${url.pathname} returned unparseable JSON: ` +
+        `${text.length} chars, content-length ${response.headers.get('content-length') ?? 'n/a'}, ` +
+        `x-nextjs-cache ${response.headers.get('x-nextjs-cache') ?? 'n/a'}`,
+    );
+  }
 }

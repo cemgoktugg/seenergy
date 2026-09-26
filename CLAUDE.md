@@ -239,6 +239,16 @@ before an analysis exists — that is guessing with extra steps.
    suite went 13/13 with **zero flaky** twice, against the dev server's usual
    one. When a flaky appears, suspect the dev server before the page.
 
+   One dev-server flake had a real cause, fixed 2026-09-26: Tailwind's
+   automatic source detection watched the whole project root, so every video
+   and trace Playwright wrote into `artifacts/` recompiled the CSS, and each
+   recompile rewrote `.next/server/app-paths-manifest.json` while other pages
+   were reading it (Next reads it uncached, without retry, in dev) — a 500
+   with `SyntaxError: Unexpected end of JSON input`. `globals.css` now imports
+   Tailwind with `source('..')`, i.e. `src/` only. Keep it that way: all
+   storefront classes live under `src/`, and scanning `backend/` also pulled
+   the Medusa admin's classes into the storefront's CSS.
+
 5. **The user's code and the existing design modules are preserved.** Read
    before writing. Reuse existing components and tokens. Never revert, reset or
    stash the user's uncommitted work — if something needs undoing, undo only

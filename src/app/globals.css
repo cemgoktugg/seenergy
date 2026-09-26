@@ -1,4 +1,9 @@
-@import 'tailwindcss';
+/* Scan src/ only. Automatic detection watched the whole project root, so every
+   file Playwright wrote into artifacts/ (videos, traces) recompiled this CSS;
+   each recompile rewrote the dev server's manifests while pages were reading
+   them, and those renders failed with "Unexpected end of JSON input" (500).
+   Every class this site uses lives under src/. */
+@import 'tailwindcss' source('..');
 
 /*
   Design tokens reconstructed from measured reference geometry.
