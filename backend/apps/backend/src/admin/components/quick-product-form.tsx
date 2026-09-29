@@ -13,8 +13,9 @@ import {
   useVitrinOptions,
   type QuickProduct,
   type QuickProductInput,
+  type SpecGroup,
 } from "../lib/vitrin"
-import { FieldShell, GalleryField } from "./fields"
+import { FieldShell, GalleryField, SpecsField } from "./fields"
 
 /**
  * One form for a whole SEENERGY product — create and edit alike.
@@ -39,6 +40,7 @@ interface FormState {
   sale_price: string
   stock: string
   images: string[]
+  specs: SpecGroup[]
   badge: string
   instalment: boolean
   published: boolean
@@ -56,6 +58,7 @@ const fromProduct = (p?: QuickProduct): FormState => ({
   sale_price: p?.sale_price != null ? String(p.sale_price) : "",
   stock: p ? String(p.stock) : "",
   images: p?.images?.length ? p.images : p?.image ? [p.image] : [],
+  specs: p?.specs ?? [],
   badge: p?.badge ?? NO_BADGE,
   instalment: p?.instalment ?? true,
   published: p ? p.status === "published" : true,
@@ -132,6 +135,7 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
       sale_price: sale,
       stock,
       images: form.images,
+      specs: form.specs,
       badge: form.badge === NO_BADGE ? null : (form.badge as QuickProduct["badge"]),
       instalment: form.instalment,
       list_keys: form.list_keys,
@@ -264,7 +268,19 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
         </div>
       </Section>
 
-      <Section title="4. Vitrin">
+      <Section title="4. Teknik özellikler">
+        <div className="md:col-span-2">
+          <SpecsField
+            value={form.specs}
+            onChange={(v) => set("specs", v)}
+            storefront={storefront}
+            categoryHandle={options?.categories.find((c) => c.id === form.category_id)?.handle}
+            categoryName={options?.categories.find((c) => c.id === form.category_id)?.name}
+          />
+        </div>
+      </Section>
+
+      <Section title="5. Vitrin">
         <FieldShell label="Rozet" hint="Ürün kartının köşesindeki etiket.">
           <Select value={form.badge} onValueChange={(v) => set("badge", v)}>
             <Select.Trigger>

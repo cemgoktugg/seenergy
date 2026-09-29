@@ -1,9 +1,28 @@
-import { ArrowLeftMini, ArrowRightMini, CloudArrowUp, Plus, StarSolid, Trash, XMark } from "@medusajs/icons"
-import { Button, IconButton, Input, Label, Select, Text, Textarea, toast } from "@medusajs/ui"
+import {
+  ArrowDownMini,
+  ArrowLeftMini,
+  ArrowRightMini,
+  ArrowUpMini,
+  CloudArrowUp,
+  DocumentText,
+  Plus,
+  StarSolid,
+  Trash,
+  XMark,
+} from "@medusajs/icons"
+import { Button, IconButton, Input, Label, Select, Text, Textarea, toast, usePrompt } from "@medusajs/ui"
 import { useRef, useState } from "react"
 
 import { TRUST_ICONS, type FieldDef } from "../lib/blocks"
-import { errorText, mediaUrl, uploadImage, uploadImages, useVitrinOptions } from "../lib/vitrin"
+import {
+  errorText,
+  fetchSpecTemplate,
+  mediaUrl,
+  uploadImage,
+  uploadImages,
+  useVitrinOptions,
+  type SpecGroup,
+} from "../lib/vitrin"
 import { ProductListEditor } from "./product-list-editor"
 
 /**
@@ -300,6 +319,173 @@ export function GalleryField({
           e.target.value = ""
         }}
       />
+    </div>
+  )
+}
+
+const emptyRow = () => ({ label: "", value: "", note: "" })
+
+/**
+ * The product's own "Teknik Özellikler" sheet: groups of label / value rows,
+ * with an optional note under a value. Empty rows are simply not saved, so
+ * the editor never nags about half-filled lines.
+ *
+ * Most sheets should start from the category template rather than a blank
+ * page — the button fetches it from the storefront, which owns the templates.
+ * Leaving the sheet empty is also valid: the product page then shows the
+ * template and says it is the category's typical values.
+ */
+export function SpecsField({
+  value,
+  onChange,
+  storefront,
+  categoryHandle,
+  categoryName,
+}: {
+  value: SpecGroup[]
+  onChange: (value: SpecGroup[]) => void
+  storefront: string
+  /** Handle of the category chosen in the form, if any. */
+  categoryHandle?: string
+  categoryName?: string
+}) {
+  const prompt = usePrompt()
+  const [loading, setLoading] = useState(false)
+  const rowCount = value.reduce((total, group) => total + group.rows.length, 0)
+
+  const setGroup = (index: number, group: SpecGroup) => onChange(value.map((g, i) => (i === index ? group : g)))
+  const moveGroup = (from: number, to: number) => {
+    if (to < 0 || to >= value.length) return
+    const next = [...value]
+    const [item] = next.splice(from, 1)
+    next.splice(to, 0, item)
+    onChange(next)
+  }
+
+  const loadTemplate = async () => {
+    if (!categoryHandle) return toast.error("Önce ürünün kategorisini seçin.")
+    if (rowCount > 0) {
+      const confirmed = await prompt({
+        title: "Kategori şablonu yüklensin mi?",
+        description: "Bu ürün için girdiğiniz teknik özellikler, kategorinin şablonuyla değiştirilecek.",
+        confirmText: "Şablonu yükle",
+        cancelText: "Vazgeç",
+      })
+      if (!confirmed) return
+    }
+    setLoading(true)
+    try {
+      const groups = await fetchSpecTemplate(storefront, categoryHandle)
+      if (!groups.length) return toast.error("Bu kategori için şablon bulunamadı.")
+      onChange(groups.map((group) => ({ title: group.title, rows: group.rows.map((row) => ({ note: "", ...row })) })))
+      toast.success("Şablon yüklendi. Değerleri bu ürüne göre düzeltin.")
+    } catch (error) {
+      toast.error(errorText(error))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-y-4">
+      <div className="bg-ui-bg-subtle flex flex-wrap items-center justify-between gap-3 rounded-lg border px-4 py-3">
+        <Text size="small" className="text-ui-fg-subtle">
+          {value.length === 0
+            ? `Bu ürün için özel değer girilmedi. Ürün sayfasında ${categoryName ? `"${categoryName}"` : "kategorinin"} şablonu, "tipik değerler" notuyla gösterilir.`
+            : `${value.length} grup · ${rowCount} satır — ürün sayfasında bu değerler gösterilir.`}
+        </Text>
+        <div className="flex gap-2">
+          <Button type="button" size="small" variant="secondary" isLoading={loading} onClick={() => void loadTemplate()}>
+            <DocumentText />
+            {value.length ? "Şablonla değiştir" : "Kategori şablonunu yükle"}
+          </Button>
+          {value.length ? (
+            <Button type="button" size="small" variant="transparent" onClick={() => onChange([])}>
+              <Trash />
+              Tümünü temizle
+            </Button>
+          ) : null}
+        </div>
+      </div>
+
+      {value.map((group, gi) => (
+        <div key={gi} className="flex flex-col gap-y-2 rounded-lg border p-3">
+          <div className="flex items-center gap-2">
+            <Input
+              size="small"
+              placeholder="Grup adı, örn. Ekran"
+              value={group.title}
+              onChange={(e) => setGroup(gi, { ...group, title: e.target.value })}
+              className="font-medium"
+            />
+            <IconButton type="button" size="small" variant="transparent" disabled={gi === 0} onClick={() => moveGroup(gi, gi - 1)} aria-label="Grubu yukarı taşı">
+              <ArrowUpMini />
+            </IconButton>
+            <IconButton
+              type="button"
+              size="small"
+              variant="transparent"
+              disabled={gi === value.length - 1}
+              onClick={() => moveGroup(gi, gi + 1)}
+              aria-label="Grubu aşağı taşı"
+            >
+              <ArrowDownMini />
+            </IconButton>
+            <IconButton
+              type="button"
+              size="small"
+              variant="transparent"
+              onClick={() => onChange(value.filter((_, i) => i !== gi))}
+              aria-label="Grubu sil"
+            >
+              <Trash />
+            </IconButton>
+          </div>
+
+          <div className="text-ui-fg-muted hidden grid-cols-[1fr_1.4fr_1fr_28px] gap-2 px-1 md:grid">
+            <Text size="xsmall">Özellik</Text>
+            <Text size="xsmall">Değer</Text>
+            <Text size="xsmall">Not (isteğe bağlı)</Text>
+            <span />
+          </div>
+          {group.rows.map((row, ri) => {
+            const setRow = (patch: Partial<SpecGroup["rows"][number]>) =>
+              setGroup(gi, { ...group, rows: group.rows.map((r, i) => (i === ri ? { ...r, ...patch } : r)) })
+            return (
+              <div key={ri} className="grid grid-cols-1 gap-2 md:grid-cols-[1fr_1.4fr_1fr_28px]">
+                <Input size="small" placeholder="Özellik, örn. Çözünürlük" value={row.label} onChange={(e) => setRow({ label: e.target.value })} />
+                <Input size="small" placeholder="Değer, örn. 1920 × 1080 px" value={row.value} onChange={(e) => setRow({ value: e.target.value })} />
+                <Input size="small" placeholder="Not" value={row.note ?? ""} onChange={(e) => setRow({ note: e.target.value })} />
+                <IconButton
+                  type="button"
+                  size="small"
+                  variant="transparent"
+                  onClick={() => setGroup(gi, { ...group, rows: group.rows.filter((_, i) => i !== ri) })}
+                  aria-label="Satırı sil"
+                >
+                  <XMark />
+                </IconButton>
+              </div>
+            )
+          })}
+          <div>
+            <Button type="button" size="small" variant="transparent" onClick={() => setGroup(gi, { ...group, rows: [...group.rows, emptyRow()] })}>
+              <Plus />
+              Satır ekle
+            </Button>
+          </div>
+        </div>
+      ))}
+
+      <div className="flex flex-wrap items-center gap-3">
+        <Button type="button" size="small" variant="secondary" onClick={() => onChange([...value, { title: "", rows: [emptyRow()] }])}>
+          <Plus />
+          Grup ekle
+        </Button>
+        <Text size="xsmall" className="text-ui-fg-subtle">
+          Adı veya değeri boş satırlar kaydedilmez. "Genel" adlı grup, ürün sayfasında marka, ürün kodu ve kategoriyle birleşir.
+        </Text>
+      </div>
     </div>
   )
 }

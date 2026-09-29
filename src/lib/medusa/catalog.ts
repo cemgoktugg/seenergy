@@ -7,6 +7,7 @@ import {
   type Catalog,
   type Product,
 } from '@/data/catalog';
+import type { SpecGroup } from '@/data/specs';
 import { medusa } from '@/lib/medusa/client';
 
 /**
@@ -136,7 +137,6 @@ function toProduct(product: StoreProduct, index: number): Product | null {
     compareAtPrice: original > amount ? original : undefined,
     image: imagePath(product.thumbnail),
     images: galleryOf(product),
-    description: product.description?.trim() ?? '',
     // An untracked variant is always available; a tracked one reports its stock.
     stock: variant.manage_inventory === false ? 999 : Math.max(0, variant.inventory_quantity ?? 0),
     freeShipping: amount >= FREE_SHIPPING_FROM,
@@ -148,12 +148,18 @@ function toProduct(product: StoreProduct, index: number): Product | null {
   };
 }
 
-export const loadProducts = cache(async (): Promise<Product[]> => {
+/** The raw Store API response, shared by the catalogue and the details. */
+const loadStoreProducts = cache(async (): Promise<StoreProduct[]> => {
   const region = await getRegion();
   const { products } = await medusa<{ products: StoreProduct[] }>('/store/products', {
     query: { limit: 500, region_id: region.id, fields: FIELDS },
     next: { revalidate: REVALIDATE, tags: [CATALOG_TAG] },
   });
+  return products;
+});
+
+export const loadProducts = cache(async (): Promise<Product[]> => {
+  const products = await loadStoreProducts();
 
   // Seeded products keep their original seed order; products added later in
   // the admin follow, oldest first.
@@ -171,3 +177,50 @@ export const loadProducts = cache(async (): Promise<Product[]> => {
 
 /** The catalogue plus its lookups — `const { bySlug } = await loadCatalog()`. */
 export const loadCatalog = cache(async (): Promise<Catalog> => indexCatalog(await loadProducts()));
+
+/**
+ * What only the product page reads: the admin's description and the
+ * product's own specification groups. Kept out of `Product` on purpose —
+ * every card on a listing page serialises its Product to the client, and a
+ * long description or a 20-row spec sheet would ride along on all of them.
+ */
+export interface ProductDetails {
+  description: string;
+  /** Empty when the admin has not written any: the page falls back to the
+   *  category's template and says so. */
+  specs: SpecGroup[];
+}
+
+const str = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
+
+/**
+ * `metadata.specs` is written by the admin's product form, but metadata is
+ * free-form JSON anyone can edit in Medusa's own screens, so it is validated
+ * here rather than trusted: malformed groups and empty rows are dropped.
+ */
+export function specsFrom(value: unknown): SpecGroup[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((group) => {
+      const rows = Array.isArray(group?.rows) ? group.rows : [];
+      return {
+        title: str(group?.title),
+        rows: rows
+          .map((row: unknown) => {
+            const r = row as Record<string, unknown> | null;
+            const note = str(r?.note);
+            return { label: str(r?.label), value: str(r?.value), ...(note ? { note } : {}) };
+          })
+          .filter((row: { label: string; value: string }) => row.label && row.value),
+      };
+    })
+    .filter((group) => group.title && group.rows.length > 0);
+}
+
+export const loadProductDetails = cache(async (id: string): Promise<ProductDetails> => {
+  const product = (await loadStoreProducts()).find((item) => item.id === id);
+  return {
+    description: str(product?.description),
+    specs: specsFrom(product?.metadata?.specs),
+  };
+});

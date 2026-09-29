@@ -20,6 +20,11 @@
  * Still a real <table> per group, labelled by its heading, so the row/column
  * relationship survives for screen readers (ECDOS 10 §47).
  *
+ * Whose values: the product's own, when the admin has written them (product
+ * form → "Teknik özellikler", stored in metadata.specs). Otherwise the
+ * category's template — and then the page SAYS so, because a template row
+ * can contradict the product (a 27" all-in-one listed a 23,8" panel).
+ *
  * A server component: nothing here holds state.
  */
 
@@ -32,6 +37,7 @@ import {
   CircleCheck,
   CircuitBoard,
   ClipboardList,
+  Info,
   Gauge,
   HardDrive,
   Headphones,
@@ -53,7 +59,7 @@ import {
 import { SectionHeading } from '@/components/section-heading';
 import { brandSlug, categoryMeta, formatPrice, FREE_SHIPPING_FROM, type Product } from '@/data/catalog';
 import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
-import { categorySpec, type CompatibilityItem } from '@/data/specs';
+import { categorySpec, type CompatibilityItem, type SpecGroup } from '@/data/specs';
 
 /** Every group title the catalogue's categories use, and its mark. */
 const GROUP_ICONS: Record<string, LucideIcon> = {
@@ -85,25 +91,26 @@ type Row = {
 
 type Group = { title: string; rows: Row[] };
 
+const lower = (text: string) => text.trim().toLocaleLowerCase('tr');
+
 /**
- * The product's own facts first, then the category's groups. The category's
- * "Genel" group is merged into ours rather than added as a second "Genel".
+ * The catalogue facts first, then the spec groups — the product's own when it
+ * has any, the category's otherwise. A "Genel" group, wherever it sits, is
+ * merged into ours rather than shown as a second "Genel", and a row repeating
+ * one of our facts (an admin typing "Marka" by hand) is dropped.
  */
-function groupsOf(product: Product): Group[] {
+function groupsOf(product: Product, source: SpecGroup[]): Group[] {
   const category = categoryMeta(product.category);
-  const [first, ...rest] = categorySpec(product.category)?.groups ?? [];
+  const facts: Row[] = [
+    { label: 'Marka', value: product.brand, href: `/marka/${brandSlug(product.brand)}` },
+    { label: 'Ürün kodu', value: product.sku, mono: true },
+    { label: 'Kategori', value: category.label, href: category.href },
+  ];
+  const known = new Set(facts.map((fact) => lower(fact.label)));
+  const general = source.find((group) => lower(group.title) === 'genel');
   return [
-    {
-      title: 'Genel',
-      rows: [
-        { label: 'Marka', value: product.brand, href: `/marka/${brandSlug(product.brand)}` },
-        { label: 'Ürün kodu', value: product.sku, mono: true },
-        { label: 'Kategori', value: category.label, href: category.href },
-        ...(first?.title === 'Genel' ? first.rows : []),
-      ],
-    },
-    ...(first && first.title !== 'Genel' ? [first] : []),
-    ...rest,
+    { title: 'Genel', rows: [...facts, ...(general?.rows ?? []).filter((row) => !known.has(lower(row.label)))] },
+    ...source.filter((group) => group !== general),
   ];
 }
 
@@ -324,8 +331,9 @@ function SupportCard({ product }: { product: Product }) {
   );
 }
 
-export function ProductSpecs({ product }: { product: Product }) {
-  const groups = groupsOf(product);
+export function ProductSpecs({ product, specs }: { product: Product; specs: SpecGroup[] }) {
+  const own = specs.length > 0;
+  const groups = groupsOf(product, own ? specs : (categorySpec(product.category)?.groups ?? []));
   const compatibility = categorySpec(product.category)?.compatibility ?? [];
   const rowCount = groups.reduce((total, group) => total + group.rows.length, 0);
 
@@ -336,6 +344,17 @@ export function ProductSpecs({ product }: { product: Product }) {
           {groups.length} grup · {rowCount} özellik
         </span>
       </SectionHeading>
+
+      {!own && (
+        <p className="mt-3 flex items-start gap-2 rounded-(--card-radius) border border-line bg-surface-card px-3.5 py-2.5 text-[12.5px] leading-relaxed text-text-secondary">
+          <Info size={15} strokeWidth={2} aria-hidden className="mt-0.5 shrink-0 text-text-primary" />
+          <span>
+            Bu tablo, <span className="font-semibold text-text-primary">{categoryMeta(product.category).label}</span>{' '}
+            kategorisindeki ürünler için tipik değerleri gösterir. Bu ürüne ait kesin değerler için ürün kodunu
+            belirterek bize ulaşın.
+          </span>
+        </p>
+      )}
 
       <div className="mt-4 grid items-start gap-(--space-grid-gap) dt:mt-5 lg:grid-cols-[minmax(0,1fr)_340px] dt:grid-cols-[minmax(0,1fr)_380px]">
         <div>

@@ -55,7 +55,7 @@ import {
 import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { PRODUCT_TRUST, SITE } from '@/data/site';
 import { keySpecsOf } from '@/data/specs';
-import { loadCatalog, loadProducts } from '@/lib/medusa/catalog';
+import { loadCatalog, loadProductDetails, loadProducts } from '@/lib/medusa/catalog';
 
 const TRUST_ICONS = {
   invoice: ReceiptText,
@@ -251,6 +251,7 @@ export default async function ProductPage({
 
   const siblings = otherModelsOf(product);
   const alternatives = alternativesTo(product);
+  const details = await loadProductDetails(product.id);
   const category = categoryMeta(product.category);
 
   /* The CUTOUT, not the plated render, for the mock catalogue's own files. The
@@ -507,18 +508,18 @@ export default async function ProductPage({
       {/* --- description ------------------------------------------------
           The admin's own text, when there is any. Line breaks are kept, since
           that is how people write a product description into a textarea. */}
-      {product.description && (
+      {details.description && (
         <section className="container-main pt-6 dt:pt-8" aria-label="Ürün açıklaması">
           <SectionHeading eyebrow="Ürün detayları" title="Ürün Açıklaması" />
           <div className="mt-3 rounded-(--panel-radius) border border-line bg-surface-card px-4 py-4 shadow-e1 dt:px-6 dt:py-5">
             <p className="max-w-[75ch] whitespace-pre-line text-[14px] leading-relaxed text-text-primary dt:text-[15px]">
-              {product.description}
+              {details.description}
             </p>
           </div>
         </section>
       )}
 
-      <ProductSpecs product={product} />
+      <ProductSpecs product={product} specs={details.specs} />
 
       {/* --- same category, other brands -------------------------------
           Two, not one. `alternativesTo` returns same-category/other-brand

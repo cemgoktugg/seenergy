@@ -105,8 +105,9 @@ metadata.
 The homepage's content is edited in the Medusa admin, not in code: admin →
 **Vitrin** shows the homepage as a top-to-bottom map, and **Vitrin → Ürün
 Yönetimi** is a one-page product form (name, brand, category, price, sale
-price, stock, images — an ordered gallery, first is the main picture — badge,
-homepage lists) for people who should not need to
+price, stock, images — an ordered gallery, first is the main picture — the
+product's own technical specs (metadata.specs, started from the category
+template via GET /api/spec-template on the storefront), badge, homepage lists) for people who should not need to
 know what a variant or a price list is.
 
 ```

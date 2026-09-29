@@ -47,6 +47,17 @@ export interface QuickProductInput {
   instalment: boolean
   /** Vitrin lists this product should appear in. */
   list_keys: string[]
+  /**
+   * The product's own specification sheet. Absent = leave it as it is;
+   * empty = remove it, so the storefront falls back to the category template.
+   */
+  specs?: SpecGroup[] | null
+}
+
+/** One group of the product page's "Teknik Özellikler" table. */
+export interface SpecGroup {
+  title: string
+  rows: { label: string; value: string; note?: string }[]
 }
 
 export interface QuickProduct {
@@ -67,6 +78,8 @@ export interface QuickProduct {
   image: string | null
   /** Every picture, main first. */
   images: string[]
+  /** The product's own spec sheet; empty when it uses the category's. */
+  specs: SpecGroup[]
   badge: Badge | null
   instalment: boolean
   list_keys: string[]
@@ -150,6 +163,29 @@ function picturesIn(input: QuickProductInput): string[] {
   return [...new Set(list.map((url) => url.trim()).filter(Boolean))]
 }
 
+const text = (value: unknown) => (typeof value === "string" ? value.trim() : "")
+
+/**
+ * A spec sheet with the empty parts removed: rows need both a label and a
+ * value, groups need a title and at least one row. Used on the way in (a
+ * half-filled form) and on the way out (metadata is free-form JSON that can
+ * also be edited in Medusa's own product screen).
+ */
+export function cleanSpecs(value: unknown): SpecGroup[] {
+  if (!Array.isArray(value)) return []
+  return value
+    .map((group: any) => ({
+      title: text(group?.title),
+      rows: (Array.isArray(group?.rows) ? group.rows : [])
+        .map((row: any) => {
+          const note = text(row?.note)
+          return { label: text(row?.label), value: text(row?.value), ...(note ? { note } : {}) }
+        })
+        .filter((row: { label: string; value: string }) => row.label && row.value),
+    }))
+    .filter((group) => group.title && group.rows.length > 0)
+}
+
 function toQuick(
   product: any,
   sale: Map<string, { id: string; amount: number }>,
@@ -176,6 +212,7 @@ function toQuick(
     stock: levels.reduce((sum: number, level: any) => sum + Number(level.stocked_quantity ?? 0), 0),
     image: product.thumbnail ?? null,
     images: picturesOf(product),
+    specs: cleanSpecs(meta.specs),
     badge: BADGES.includes(meta.badge) ? meta.badge : null,
     instalment: meta.instalment === true,
     list_keys: lists.filter((l) => l.product_ids.includes(product.id)).map((l) => l.key),
@@ -330,6 +367,7 @@ export async function createQuickProduct(container: MedusaContainer, input: Quic
             brand: brand.title,
             instalment: input.instalment,
             ...(input.badge ? { badge: input.badge } : {}),
+            ...(cleanSpecs(input.specs).length ? { specs: cleanSpecs(input.specs) } : {}),
           },
           options: options[0] ? [{ id: options[0].id }] : [{ title: "Model", values: ["Standart"] }],
           variants: [
@@ -408,6 +446,10 @@ export async function updateQuickProduct(
           brand: brand.title,
           instalment: input.instalment,
           badge: input.badge ?? "",
+          // Replaced whole (metadata merges by key, and this is one key).
+          ...(input.specs !== undefined
+            ? { specs: cleanSpecs(input.specs).length ? cleanSpecs(input.specs) : "" }
+            : {}),
         },
       } as any,
     },

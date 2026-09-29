@@ -34,6 +34,23 @@ export type BlockGroup =
   | "tech-band"
   | "trust"
 
+/** One group of the product page's "Teknik Özellikler" table. */
+export interface SpecGroup {
+  title: string
+  rows: { label: string; value: string; note?: string }[]
+}
+
+/**
+ * The storefront's spec template for a category (its handle), to start a
+ * product's sheet from. Served by the storefront, which owns the templates.
+ */
+export async function fetchSpecTemplate(storefront: string, categoryHandle: string): Promise<SpecGroup[]> {
+  const response = await fetch(`${storefront.replace(/\/$/, "")}/api/spec-template?category=${encodeURIComponent(categoryHandle)}`)
+  if (!response.ok) throw new Error("Şablon alınamadı. Mağaza sunucusu çalışıyor mu?")
+  const body = (await response.json()) as { groups?: SpecGroup[] }
+  return body.groups ?? []
+}
+
 export interface QuickProduct {
   id: string
   variant_id: string
@@ -52,6 +69,8 @@ export interface QuickProduct {
   image: string | null
   /** Every picture, main first. */
   images: string[]
+  /** The product's own spec sheet; empty when it uses the category's. */
+  specs: SpecGroup[]
   badge: "yeni" | "super-firsat" | "cok-satan" | null
   instalment: boolean
   list_keys: string[]
@@ -71,6 +90,8 @@ export interface QuickProductInput {
   stock: number
   /** Every picture in display order; the first is the main one. */
   images: string[]
+  /** Empty = use the category template on the product page. */
+  specs: SpecGroup[]
   badge: QuickProduct["badge"]
   instalment: boolean
   list_keys: string[]

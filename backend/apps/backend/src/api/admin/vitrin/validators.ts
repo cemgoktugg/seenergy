@@ -51,6 +51,24 @@ export const QuickProductBody = z.object({
   sale_price: money.nullable().optional(),
   stock: z.coerce.number().int("Stok tam sayı olmalı.").min(0, "Stok negatif olamaz."),
   images: z.array(z.string()).max(20, "En fazla 20 görsel eklenebilir.").nullable().optional(),
+  specs: z
+    .array(
+      z.object({
+        title: z.string().max(80, "Grup adı en fazla 80 karakter olabilir."),
+        rows: z
+          .array(
+            z.object({
+              label: z.string().max(120, "Özellik adı en fazla 120 karakter olabilir."),
+              value: z.string().max(400, "Değer en fazla 400 karakter olabilir."),
+              note: z.string().max(400, "Not en fazla 400 karakter olabilir.").optional(),
+            })
+          )
+          .max(60, "Bir grupta en fazla 60 satır olabilir."),
+      })
+    )
+    .max(20, "En fazla 20 grup eklenebilir.")
+    .nullable()
+    .optional(),
   image: z.string().nullable().optional(),
   badge: z.enum(BADGES).nullable().optional(),
   instalment: z.boolean().default(false),
