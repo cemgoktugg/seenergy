@@ -81,6 +81,7 @@ export default async function HomePage() {
           tagline={band.tagline}
           href={`/marka/${band.brandHandle}`}
           logo={band.logo}
+          banner={band.banner || undefined}
           products={chosen.length > 0 ? chosen.slice(0, 4) : byBrandSlug(band.brandHandle).slice(0, 4)}
         />
       </Section>

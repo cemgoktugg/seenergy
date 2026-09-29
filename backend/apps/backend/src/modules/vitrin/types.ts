@@ -37,6 +37,8 @@ export interface BrandBandData {
   /** Collection (brand) handle — the band shows that brand's products. */
   brand_handle: string
   tagline: string
+  /** Optional brand artwork; when set it replaces the logo header. */
+  banner?: string
   logo: string
   /** Optional hand-picked products; empty means "the brand's first four". */
   product_ids: string[]

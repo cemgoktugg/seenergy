@@ -178,14 +178,20 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
   "brand-band": {
     title: "Marka vitrinleri",
     where:
-      "Ana sayfada alt alta dizilen marka bölümleri (logo + 4 ürün), buradaki sırayla. İlk dördünden sonra 'Neden SEENERGY' bandı gelir.",
+      "Ana sayfada alt alta dizilen marka bölümleri (marka bannerı veya logo + 4 ürün), buradaki sırayla. İlk dördünden sonra 'Neden SEENERGY' bandı gelir.",
     repeatable: true,
     itemName: "marka vitrini",
     itemTitle: (d, i) => `${i + 1}. ${d.brand_handle || "marka seçilmedi"}`,
     fields: [
       { name: "brand_handle", label: "Marka", type: "brand", required: true },
       { name: "tagline", label: "Kısa açıklama", type: "text", required: true },
-      { name: "logo", label: "Logo", type: "image", required: true },
+      {
+        name: "banner",
+        label: "Marka bannerı",
+        type: "image",
+        hint: "Önerilen boyut 1600 × 340 piksel. Yüklenirse bölümün başlığı bu görsel olur ve tıklanınca markanın sayfası açılır; logo ve kısa açıklama gösterilmez. Görsel kırpılmaz, olduğu gibi gösterilir.",
+      },
+      { name: "logo", label: "Logo", type: "image", hint: "Banner yüklenmemişse başlıkta gösterilir." },
       {
         name: "product_ids",
         label: "Gösterilecek ürünler",
@@ -193,7 +199,7 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
         hint: "Boş bırakırsanız markanın ilk 4 ürünü otomatik gösterilir.",
       },
     ],
-    newItem: () => ({ brand_handle: "", tagline: "", logo: "", product_ids: [] }),
+    newItem: () => ({ brand_handle: "", tagline: "", banner: "", logo: "", product_ids: [] }),
   },
   "tech-band": {
     title: "Neden SEENERGY bandı",

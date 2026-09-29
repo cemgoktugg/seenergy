@@ -49,6 +49,8 @@ export interface BrandBand {
   brandHandle: string;
   tagline: string;
   logo: string;
+  /** Brand artwork that replaces the logo header; empty = logo header. */
+  banner: string;
   productIds: string[];
 }
 
@@ -89,7 +91,7 @@ interface StoreVitrin {
     'hero-slide': Block<HeroSlide>[];
     'hero-side': Block<RawBanner>[];
     banner: Block<RawBanner>[];
-    'brand-band': Block<{ brand_handle: string; tagline: string; logo: string; product_ids?: string[] }>[];
+    'brand-band': Block<{ brand_handle: string; tagline: string; logo: string; banner?: string; product_ids?: string[] }>[];
     'tech-band': Block<{
       eyebrow: string;
       title: string;
@@ -135,6 +137,7 @@ const FALLBACK: Vitrin = {
     brandHandle: band.href.replace('/marka/', ''),
     tagline: band.tagline,
     logo: band.logo,
+    banner: '',
     productIds: [],
   })),
   techBand: null,
@@ -179,6 +182,7 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
         brandHandle: str(block.data.brand_handle),
         tagline: str(block.data.tagline),
         logo: str(block.data.logo),
+        banner: str(block.data.banner),
         productIds: Array.isArray(block.data.product_ids) ? block.data.product_ids : [],
       }))
       .filter((band) => band.brandHandle),

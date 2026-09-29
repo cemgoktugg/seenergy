@@ -133,7 +133,7 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
       ["voltra", "Oto ses, multimedya ve görüntü sistemleri"],
       ["kumandax", "Televizyon, uydu ve klima kumandaları"],
     ].map(([handle, tagline], i) =>
-      block("brand-band", { brand_handle: handle, tagline, logo: `/mock/brands/${handle}.svg`, product_ids: [] }, i)
+      block("brand-band", { brand_handle: handle, tagline, banner: "", logo: `/mock/brands/${handle}.svg`, product_ids: [] }, i)
     ),
 
     block("tech-band", {

@@ -90,24 +90,28 @@ function ListPreview({ list, storefront, count = 8 }: { list?: VitrinList; store
   )
 }
 
-function ImagePreview({ blocks, storefront, field = "image" }: { blocks: VitrinBlock[]; storefront: string; field?: string }) {
+/** `fields`: where the picture may be, first filled one wins. */
+function ImagePreview({ blocks, storefront, fields = ["image"] }: { blocks: VitrinBlock[]; storefront: string; fields?: string[] }) {
   return (
     <div className="flex flex-wrap gap-2">
-      {blocks.map((b) => (
-        <div
-          key={b.id}
-          className={`bg-ui-bg-subtle relative h-14 w-24 overflow-hidden rounded-md border ${b.is_active ? "" : "opacity-40"}`}
-          title={b.data.title}
-        >
-          {b.data.product_image || b.data[field] ? (
-            <img
-              src={mediaUrl(b.data.product_image || b.data[field], storefront)}
-              alt=""
-              className={`h-full w-full ${b.data.product_image ? "object-contain p-1" : "object-cover"}`}
-            />
-          ) : null}
-        </div>
-      ))}
+      {blocks.map((b) => {
+        const src: string | undefined = b.data.product_image || fields.map((f) => b.data[f]).find(Boolean)
+        return (
+          <div
+            key={b.id}
+            className={`bg-ui-bg-subtle relative h-14 w-24 overflow-hidden rounded-md border ${b.is_active ? "" : "opacity-40"}`}
+            title={b.data.title}
+          >
+            {src ? (
+              <img
+                src={mediaUrl(src, storefront)}
+                alt=""
+                className={`h-full w-full ${b.data.product_image ? "object-contain p-1" : "object-cover"}`}
+              />
+            ) : null}
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -217,7 +221,7 @@ const VitrinPage = () => {
           to="/vitrin/blok/brand-band"
           extra={<Badge size="2xsmall">{activeBrands.length} yayında</Badge>}
         >
-          <ImagePreview blocks={brandBands} storefront={storefront} field="logo" />
+          <ImagePreview blocks={brandBands} storefront={storefront} fields={["banner", "logo"]} />
         </Band>
 
         <Band n={++n} title={GROUPS["tech-band"].title} where={GROUPS["tech-band"].where} to="/vitrin/blok/tech-band">
