@@ -1,61 +1,39 @@
+/* eslint-disable @next/next/no-img-element */
 /**
- * The SEENERGY "S" mark.
+ * The SEENERGY logo — the client's own artwork, in three cuts.
  *
- * Drawn rather than embedded: the mark arrived as a raster image, and a
- * hand-built SVG stays crisp at 30px in the header and at 220px in the footer
- * or an OG image. Replace it the moment the original vector lands in
- * `public/brand/` — the lockup below is the only place that would change.
+ * Source: img/seenergy-logo-original.jpg, a 1600×800 silver lockup on white
+ * supplied on 2026-09-29. It replaced the S mark this file used to draw by
+ * hand. The cuts are lifted off the white ground into transparent WebP so the
+ * same files sit on the white header and on the near-black sticky bar. The
+ * letter counters are transparent too, so on dark chrome the bar shows through
+ * the R and the o's instead of white patches.
  *
- * Construction (viewBox 84 × 100):
- *   stroke        22 units — 22% of the height, matching the logo's weight
- *   upper hook    a semicircle bulging left, centreline (30,11) → (30,50)
- *   lower hook    a semicircle bulging right, centreline (54,50) → (54,89)
- *   counters      two 17-unit gaps, deliberately equal — the failure mode for
- *                 a squared S is closing up and reading as a blob at 30px
- *   chamfer       the signature detail: the top-right terminal is cut at 45°,
- *                 so the bar's top edge stops at x=62 while its underside runs
- *                 out to x=84. Built as a triangle sharing the gradient, since
- *                 a stroke cap cannot be angled.
+ *   public/brand/seenergy-logo.webp          full lockup with "Güvenlik
+ *                                            Teknolojileri A.Ş", 3.80 : 1
+ *   public/brand/seenergy-logo-compact.webp  S + EENERGY, tagline removed —
+ *                                            below ~40px tall the tagline is
+ *                                            noise, 3.93 : 1
+ *   public/brand/seenergy-mark.webp          the S alone, 0.84 : 1 — phone
+ *                                            header; also src/app/icon.png
  *
- * The gradient runs bottom-left → top-right so the teal sits under the hook
- * and the purple lands on the chamfer, as it does in the original.
+ * The images are decorative (`alt=""`): every place that shows one wraps it in
+ * a link that already carries the site name. When a vector original arrives,
+ * replace the three files and the icons — nothing else changes.
  */
 
-export function BrandMark({ className = '' }: { className?: string }) {
-  return (
-    <svg
-      viewBox="0 0 84 100"
-      className={className}
-      role="img"
-      aria-hidden
-      focusable="false"
-      fill="none"
-    >
-      <defs>
-        {/* Nearly horizontal on purpose. A steep diagonal pushed the teal into
-            the bottom-left corner and the mark read as blue-to-purple only;
-            the original carries teal across the whole lower hook. */}
-        <linearGradient
-          id="seenergy-mark"
-          x1="2"
-          y1="74"
-          x2="82"
-          y2="26"
-          gradientUnits="userSpaceOnUse"
-        >
-          <stop offset="0" stopColor="#12A5A5" />
-          <stop offset="0.38" stopColor="#2E55C8" />
-          <stop offset="0.7" stopColor="#4A2E9C" />
-          <stop offset="1" stopColor="#742D8E" />
-        </linearGradient>
-      </defs>
+type LogoProps = { className?: string };
 
-      <path
-        d="M62 11 H30 A19 19.5 0 0 0 30 50 H54 A19 19.5 0 0 1 54 89 H4"
-        stroke="url(#seenergy-mark)"
-        strokeWidth="22"
-      />
-      <path d="M62 0 L84 22 H62 Z" fill="url(#seenergy-mark)" />
-    </svg>
+export function BrandMark({ className = '' }: LogoProps) {
+  return <img src="/brand/seenergy-mark.webp" width={240} height={286} alt="" decoding="async" className={className} />;
+}
+
+export function BrandLogo({ className = '' }: LogoProps) {
+  return <img src="/brand/seenergy-logo.webp" width={960} height={253} alt="" decoding="async" className={className} />;
+}
+
+export function BrandLogoCompact({ className = '' }: LogoProps) {
+  return (
+    <img src="/brand/seenergy-logo-compact.webp" width={720} height={183} alt="" decoding="async" className={className} />
   );
 }

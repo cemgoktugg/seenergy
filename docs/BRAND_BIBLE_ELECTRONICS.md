@@ -52,6 +52,15 @@ every other value — calm, refined, modern, confident, minimal, premium — int
 >    `MERTER_REFERENCE_BLUEPRINT.md`, the map files — still describe
 >    merterelektronik.com's amber accurately and are **not** edited. A record of
 >    what the reference site is stays true regardless of what we build.
+>
+> **2026-09-29 — final logo.** The client then supplied the logo as it will be
+> used: a silver lockup, "SEENERGY / Güvenlik Teknolojileri A.Ş"
+> (`img/seenergy-logo-original.jpg`, cut to `public/brand/` — see
+> `src/components/brand-mark.tsx`). It replaced the hand-drawn gradient S in
+> the header, the sticky bar and the favicon. The gradient and indigo below
+> were derived from the earlier logo and are **kept for now**: the UI still
+> uses them, and retuning the palette to the silver mark is the client's call,
+> not a side effect of swapping a logo.
 
 Cool neutrals (ECDOS 05 §8: cool neutrals are the electronics temperature)
 carrying **one** chromatic identity, because the logo is itself a gradient and a

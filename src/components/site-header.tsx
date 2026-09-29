@@ -33,7 +33,7 @@ import {
   X,
 } from 'lucide-react';
 
-import { BrandMark } from '@/components/brand-mark';
+import { BrandLogo, BrandLogoCompact, BrandMark } from '@/components/brand-mark';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { useCart } from '@/components/cart-provider';
 import { PRIMARY_NAV, SITE, UTILITY_LINKS } from '@/data/site';
@@ -41,13 +41,8 @@ import { PRIMARY_NAV, SITE, UTILITY_LINKS } from '@/data/site';
 const UTILITY_ICONS = { info: Info, phone: Phone, truck: Truck, badge: BadgeIcon };
 
 /**
- * The lockup: the drawn S mark plus "EENERGY" set in the site's own Montserrat
- * at 800, which is what the logotype is. Setting the word as text rather than
- * shipping the whole lockup as an image keeps it sharp at every size and lets
- * it inherit the near-black ink token.
- *
- * The mark is taller than the cap height, as in the original, so the two are
- * baseline-aligned rather than centre-aligned.
+ * The lockup: the client's own logo (see brand-mark.tsx) — the full cut with
+ * its "Güvenlik Teknolojileri A.Ş" line from `sm` up, the S mark alone below.
  */
 function Logo({ className = '' }: { className?: string }) {
   return (
@@ -61,12 +56,14 @@ function Logo({ className = '' }: { className?: string }) {
          below was doing its job while the width quietly failed. A minimum width
          is used rather than another `before` inset because the box can simply
          be 44 wide here; the mark centres inside it. */
-      className={`relative flex min-w-11 items-end justify-center gap-[6px] before:absolute before:inset-x-0 before:-inset-y-[7px] before:content-[''] sm:min-w-0 sm:justify-start ${className}`}
+      className={`relative flex min-w-11 items-center justify-center before:absolute before:inset-x-0 before:-inset-y-[7px] before:content-[''] sm:min-w-0 sm:justify-start ${className}`}
       aria-label={SITE.name}
     >
-      <BrandMark className="h-[30px] w-auto shrink-0 dt:h-[46px]" />
+      <BrandMark className="h-[34px] w-auto shrink-0 sm:hidden" />
       {/* The wordmark is withdrawn below `sm`, leaving the S mark — the same
-          thing the condensed sticky bar does.
+          thing the condensed sticky bar does. (Measured when the wordmark was
+          still set as text; the rule carries over to the image lockup, which
+          is wider still.)
 
           Not a taste call. Measured at 390 the logo link is 110px wide and ends
           at x=230, while the "EENERGY" glyphs are 113px wide and end at x=264;
@@ -79,17 +76,7 @@ function Logo({ className = '' }: { className?: string }) {
           Worth noting for future header checks: comparing the LINK boxes shows
           a tidy 12px gap and reports no collision. The overflow is only visible
           if you measure the text box. */}
-      <span className="hidden items-start pb-[1px] sm:flex dt:pb-[3px]">
-        <span className="text-[23px] font-extrabold uppercase leading-[0.82] tracking-[-0.015em] text-text-primary dt:text-[37px]">
-          EENERGY
-        </span>
-        <span
-          aria-hidden
-          className="ml-[1px] text-[7px] font-semibold leading-none text-text-secondary dt:text-[10px]"
-        >
-          ®
-        </span>
-      </span>
+      <BrandLogo className="hidden h-[42px] w-auto shrink-0 sm:block dt:h-[56px]" />
     </Link>
   );
 }
@@ -353,12 +340,10 @@ export function SiteHeader({ promo }: { promo: string }) {
             href="/"
             aria-label={SITE.name}
             tabIndex={condensed ? 0 : -1}
-            className="flex shrink-0 items-end gap-[5px]"
+            className="flex shrink-0 items-center"
           >
-            <BrandMark className="h-6 w-auto dt:h-7" />
-            <span className="hidden text-[16px] font-extrabold uppercase leading-none tracking-[-0.015em] text-white sm:block dt:text-[20px]">
-              EENERGY
-            </span>
+            <BrandMark className="h-7 w-auto sm:hidden" />
+            <BrandLogoCompact className="hidden h-[26px] w-auto sm:block dt:h-[32px]" />
           </Link>
 
           <div className="min-w-0 flex-1">
