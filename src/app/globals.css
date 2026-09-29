@@ -34,24 +34,24 @@
   --breakpoint-2xl: 96rem; /* 1536 */
 
   /* --- brand: SEENERGY --------------------------------------------- */
-  /* The identity is a gradient plus a near-black, not a single hue: the mark
-     runs teal → blue → indigo → purple and the wordmark is near-black. So the
-     near-black is brand, not just "text".
+  /* The identity is metal: the logo (2026-09-29) is a silver lockup with a
+     black offset edge, so the palette is a steel ramp — silver, steel,
+     graphite, near-black — with no hue of its own. Colour on a page comes
+     from the products, the brand banners and the status colours, which is
+     what a monochrome frame is for.
 
-     The solid action colour is the INDIGO stop, and that is a contrast
-     decision rather than a taste one — white text measures
-       on indigo  rgb(74 46 156)   8.4:1   AA + AAA
-       on teal     rgb(18 165 165)  2.8:1   fails even AA large
-     so teal can carry graphics and rules, never white label text.
-
-     The old palette's two-orange split (action vs nav bar) maps onto an
-     indigo/near-black split: actions are indigo, the nav band is chrome. */
-  --color-brand: rgb(74 46 156); /* indigo stop — primary action */
+     The solid action colour is GRAPHITE, the ink of the logo's edge. White
+     text measures
+       on graphite  rgb(28 31 37)    16.5:1
+       on hover     rgb(64 71 82)     9.4:1   (a black button lifts on hover)
+     The previous identity (teal → indigo → purple, from the earlier logo) is
+     recorded in docs/BRAND_BIBLE_ELECTRONICS.md §2. */
+  --color-brand: rgb(28 31 37); /* graphite — primary action */
   --color-brand-nav: rgb(20 22 28); /* nav band — near-black chrome */
-  --color-brand-dark: rgb(58 36 128); /* pressed / hover on indigo */
-  --color-brand-soft: rgb(238 235 252); /* light indigo wash */
-  --color-brand-heading: rgb(14 124 134); /* teal, darkened to 4.6:1 on white */
-  --color-brand-hover: rgb(91 52 184); /* violet, for indigo text on white */
+  --color-brand-dark: rgb(64 71 82); /* hover / pressed on graphite */
+  --color-brand-soft: rgb(236 238 242); /* steel wash */
+  --color-brand-heading: rgb(64 71 82); /* steel, 9.4:1 on white */
+  --color-brand-hover: rgb(64 71 82); /* steel, for graphite text on white */
   --color-brand-ink: rgb(35 38 46); /* utility bar text */
 
   /* --- FIXED inks: for surfaces that stay light in both themes -------
@@ -64,28 +64,36 @@
      These two are deliberately NOT overridden in the dark block below. That is
      the whole point of them. */
   --color-ink-fixed: rgb(23 24 26);
-  --color-brand-fixed: rgb(74 46 156);
+  --color-brand-fixed: rgb(28 31 37);
 
   /* Brand as TEXT on the page surface, as opposed to --color-brand which is a
      fill carrying white label text. Same fill/ink split the semantic colours
      needed, and for the same reason: measured in dark mode, the fill indigo
      rgb(122 96 228) reads 4.53:1 under white text (passes as a fill) but only
      4.19:1 as text on the page ground (fails). One value cannot do both. */
-  --color-brand-text: rgb(74 46 156);
+  --color-brand-text: rgb(40 44 52);
 
-  /* The logo gradient, as four addressable stops. Allowed on structure —
-     caps, rails, marks, plates. Never behind body copy. */
-  --color-grad-1: rgb(18 165 165); /* teal    #12A5A5 */
-  --color-grad-2: rgb(46 85 200); /* blue    #2E55C8 */
-  --color-grad-3: rgb(74 46 156); /* indigo  #4A2E9C */
-  --color-grad-4: rgb(116 45 142); /* purple  #742D8E */
-  /* Campaign-card tones (src/components/campaign-card.tsx). White on the teal
-     stop itself measures 3.02:1 — under AA for body text — so the teal tone
-     starts from this deeper teal (6.69:1) and runs to the blue stop (6.46:1). */
-  --color-teal-deep: rgb(11 102 110);
+  /* The steel ramp, as four addressable stops, light to dark. The names are
+     the old gradient's, kept so every cap, rail and mark follows without an
+     edit. Allowed on structure — caps, rails, marks, plates.
+     grad-1 is SILVER and never carries white text (1.9:1); the rest do:
+     white on grad-2 5.5:1, grad-3 11.6:1, grad-4 17.8:1. */
+  --color-grad-1: rgb(184 190 199); /* silver   */
+  --color-grad-2: rgb(98 106 119); /* steel    */
+  --color-grad-3: rgb(52 57 66); /* graphite */
+  --color-grad-4: rgb(22 24 29); /* black    */
+  /* Brushed-silver campaign tone (campaign-card "gümüş", stored as
+     "turkuaz"). Dark ink on it: 10.7:1 at the darkest point. Fixed, not
+     themed — it is a metal plate in both themes. */
+  --color-silver-mid: rgb(196 201 209);
+  --color-silver-light: rgb(234 236 240);
   /* The light tone's surface. Fixed, not themed: its text is dark ink in both
      themes (15.2:1), so the surface must stay light in both. */
-  --color-wash-fixed: rgb(238 235 252);
+  --color-wash-fixed: rgb(238 240 243);
+  /* Focus ring. Mid steel, chosen to clear 3:1 against BOTH grounds a focus
+     can land on — 4.0:1 on white, 4.5:1 on the near-black chrome — which no
+     single brand ink does. */
+  --color-focus: rgb(120 128 140);
 
   /* Dark chrome: the header stack and the technical data bands. */
   --color-chrome: rgb(20 22 28);
@@ -160,10 +168,9 @@
      instead of sitting between the teal and the indigo as a third blue.
      White on rgb(46 85 200) measures 5.9:1 — AA for the badge's 11px text. */
   --color-info: rgb(46 85 200);
-  /* Was a literal gold. On a cool identity it was the only warm thing left on
-     the page, so the instalment strip's emphasis becomes the bright teal —
-     13.5:1 against the near-black strip it sits on. */
-  --color-highlight: rgb(53 224 208);
+  /* Emphasis on the near-black strips (instalment "3 TAKSİT"). Bright silver,
+     13.0:1 on the chrome it sits on. */
+  --color-highlight: rgb(214 219 226);
 
   /* --- typography --------------------------------------------------- */
   --font-sans: var(--font-montserrat), ui-sans-serif, system-ui, sans-serif;
@@ -277,6 +284,10 @@
   /* Panels that group cards (the paired product sliders under the hero) sit one
      step softer than the cards inside them, so the grouping reads first. */
   --panel-radius: 18px;
+  /* Where sticky page content stops: below the condensed header bar, which is
+     fixed, h-14 (56px) and on screen from scrollY 260 — plus 16px of air.
+     `top-4` alone parked the product page's rails 40px under that bar. */
+  --sticky-offset: 72px;
   --card-border: 1px solid rgb(240 240 240);
   /* Kept as an alias so nothing that still asks for it breaks, but it is no
      longer its own value: hover is simply the second step of the elevation
@@ -395,20 +406,19 @@
   --dk-line-strong: rgb(62 69 82);
   --dk-tab-idle: rgb(78 86 100);
 
-  /* The indigo lightens enough to read as an action on a dark ground while
-     staying dark enough to carry white label text. The soft wash inverts from
-     a pale tint to a deep one. The teal heading was darkened for white
-     backgrounds; on dark it has to go the other way. */
-  --dk-brand: rgb(122 96 228);
-  --dk-brand-dark: rgb(146 124 240);
-  --dk-brand-soft: rgb(38 33 62);
-  --dk-brand-heading: rgb(64 214 214);
-  --dk-brand-hover: rgb(160 138 246);
+  /* Graphite would vanish on a dark ground, so the action lifts to steel —
+     light enough to read as a button on the dark card (2.9:1 against it),
+     dark enough to keep white label text (6.0:1; hover 4.8:1). The wash
+     inverts to a deep one; headings and brand text go silver. */
+  --dk-brand: rgb(92 100 114);
+  --dk-brand-dark: rgb(106 115 130);
+  --dk-brand-soft: rgb(40 44 52);
+  --dk-brand-heading: rgb(196 203 213);
+  --dk-brand-hover: rgb(206 212 221);
   --dk-brand-ink: rgb(213 218 226);
-  /* Lighter than the fill above, because this one IS the text. Measured on
-     both grounds it has to sit on: 5.98:1 on the page rgb(14 16 20), 5.42:1 on
-     the card rgb(24 27 33). The fill's rgb(122 96 228) read 4.19:1 there. */
-  --dk-brand-text: rgb(150 126 245);
+  /* Lighter than the fill above, because this one IS the text: silver, above
+     10:1 on both the page rgb(14 16 20) and the card rgb(24 27 33). */
+  --dk-brand-text: rgb(196 203 213);
 
   /* Fills keep carrying white text, unchanged, because both sit on product
      media that is still light. The inks are text on the dark card and have to
@@ -722,7 +732,7 @@ body {
 
 /* A single focus treatment, applied through a token rather than per component. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
-  outline: 2px solid var(--color-brand-dark);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
   border-radius: 4px;
 }

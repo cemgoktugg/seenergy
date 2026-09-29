@@ -8,8 +8,10 @@
  * a template nobody had filled in. The card is now built from what the shop
  * actually has:
  *
- *   tone           a brand surface picked per card in the admin — koyu, mor,
- *                  turkuaz or açık — so a row of cards can alternate
+ *   tone           a brand surface picked per card in the admin — koyu,
+ *                  grafit, gümüş or açık — so a row of cards can alternate.
+ *                  Stored under the earlier palette's keys (koyu, mor,
+ *                  turkuaz, acik), so saved cards keep their tone
  *   product image  shown whole on a light plate, the same plate the product
  *                  cards and the hero stand products on. A cut-out and a
  *                  photo on white both look placed there (multiply drops the
@@ -18,9 +20,9 @@
  *   photo          optional. A real campaign photograph covers the card
  *                  under a left-weighted scrim, when the shop has one
  *
- * Contrast is by construction: every tone keeps white text at 6.4:1 or more
- * where the copy sits (the teal tone starts from --color-teal-deep for that
- * reason), and the light tone uses dark ink.
+ * Contrast is by construction: the two dark tones keep white text at 5.5:1 or
+ * more where the copy sits, and the two light ones (gümüş, açık) use dark ink
+ * at 10:1 or more.
  */
 
 import Link from 'next/link';
@@ -35,8 +37,10 @@ type Size = 'tile' | 'wide' | 'half';
    are built to. The stops stay the same in both themes. */
 export const TONE: Record<Tone, { surface: string; ink: 'light' | 'dark' }> = {
   koyu: { surface: 'bg-chrome', ink: 'light' },
-  mor: { surface: 'bg-linear-to-br from-grad-3 to-grad-4', ink: 'light' },
-  turkuaz: { surface: 'bg-linear-to-br from-teal-deep to-grad-2', ink: 'light' },
+  /* "Grafit": steel into graphite — distinct from koyu's flat chrome. */
+  mor: { surface: 'bg-linear-to-br from-grad-2 to-grad-3', ink: 'light' },
+  /* "Gümüş": a brushed plate, light through the middle like the logo's sheen. */
+  turkuaz: { surface: 'bg-linear-to-br from-silver-mid via-silver-light to-silver-mid', ink: 'dark' },
   acik: { surface: 'bg-linear-to-br from-wash-fixed to-white', ink: 'dark' },
 };
 

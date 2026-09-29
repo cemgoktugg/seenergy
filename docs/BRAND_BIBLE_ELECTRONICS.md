@@ -57,10 +57,19 @@ every other value — calm, refined, modern, confident, minimal, premium — int
 > used: a silver lockup, "SEENERGY / Güvenlik Teknolojileri A.Ş"
 > (`img/seenergy-logo-original.jpg`, cut to `public/brand/` — see
 > `src/components/brand-mark.tsx`). It replaced the hand-drawn gradient S in
-> the header, the sticky bar and the favicon. The gradient and indigo below
-> were derived from the earlier logo and are **kept for now**: the UI still
-> uses them, and retuning the palette to the silver mark is the client's call,
-> not a side effect of swapping a logo.
+> the header, the sticky bar and the favicon.
+>
+> **2026-09-29 — steel palette.** At the client's request the palette was then
+> retuned to the silver mark. The four gradient tokens keep their names and
+> become a steel ramp — `grad-1` silver `rgb(184 190 199)`, `grad-2` steel
+> `rgb(98 106 119)`, `grad-3` graphite `rgb(52 57 66)`, `grad-4` black
+> `rgb(22 24 29)` — and the action colour moves from indigo to graphite
+> `rgb(28 31 37)` (white 16.5:1; hover `rgb(64 71 82)`, 9.4:1). A separate
+> `--color-focus` `rgb(120 128 140)` clears 3:1 on white and on the chrome.
+> Campaign tones "mor" and "turkuaz" are shown in the admin as Grafit and
+> Gümüş; their stored keys did not change. Every value and its measured
+> contrast is in `src/app/globals.css`. **The teal / indigo / purple
+> description below is the previous identity**, kept as the record of it.
 
 Cool neutrals (ECDOS 05 §8: cool neutrals are the electronics temperature)
 carrying **one** chromatic identity, because the logo is itself a gradient and a

@@ -59,8 +59,9 @@ const tone: FieldDef = {
   type: "choice",
   options: [
     { value: "koyu", label: "Koyu" },
-    { value: "mor", label: "Mor" },
-    { value: "turkuaz", label: "Turkuaz" },
+    // Keys from the earlier palette, kept so saved cards keep their tone.
+    { value: "mor", label: "Grafit" },
+    { value: "turkuaz", label: "Gümüş" },
     { value: "acik", label: "Açık" },
   ],
   hint: "Kartın zemin rengi. Yan yana duran kartlara farklı tonlar vermek sayfayı canlandırır.",

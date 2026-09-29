@@ -15,9 +15,9 @@
  *     so it loads eagerly with `fetchPriority`. Every picture the admin
  *     uploaded is shown: ProductGallery gives them a stage, a thumbnail strip
  *     and a full-screen viewer.
- *   - Specifications render as a real `<table>` so the row/column relationship
- *     survives for screen readers (ECDOS 10 §47); mobile restyles the same
- *     markup rather than replacing it.
+ *   - Specifications render as real `<table>`s, one per group, so the
+ *     row/column relationship survives for screen readers (ECDOS 10 §47) —
+ *     see ProductSpecs.
  *   - The five trust statements come from `PRODUCT_TRUST`, marked in the data
  *     as configurable placeholders that assert nothing.
  *
@@ -26,7 +26,6 @@
  * what `otherModelsOf` resolves.
  */
 
-import { Fragment } from 'react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -42,6 +41,8 @@ import {
 import { ProductBuy } from '@/components/product-buy';
 import { ProductGallery } from '@/components/product-gallery';
 import { ProductRow } from '@/components/product-row';
+import { ProductSpecs } from '@/components/product-specs';
+import { SectionHeading } from '@/components/section-heading';
 import { ProductGrid } from '@/components/sections';
 import {
   brandSlug,
@@ -53,7 +54,7 @@ import {
 } from '@/data/catalog';
 import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { PRODUCT_TRUST, SITE } from '@/data/site';
-import { categorySpec, keySpecsOf, type CompatibilityItem } from '@/data/specs';
+import { keySpecsOf } from '@/data/specs';
 import { loadCatalog, loadProducts } from '@/lib/medusa/catalog';
 
 const TRUST_ICONS = {
@@ -236,154 +237,6 @@ function KeySpecs({ product }: { product: Product }) {
   );
 }
 
-/**
- * Compatibility gets its own block rather than a row buried in the spec table
- * (docs/COMMERCE_RULES §9): "will this fit what I already have" is the question
- * that blocks the purchase.
- */
-function Compatibility({ items }: { items: CompatibilityItem[] }) {
-  return (
-    <section
-      aria-label="Uyumluluk"
-      className="rounded-(--panel-radius) border border-line bg-surface-card shadow-e1 px-4 py-4 dt:px-5"
-    >
-      <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-text-secondary">
-        Uyumluluk
-      </p>
-      <p className="mt-1.5 text-[13px] leading-relaxed text-text-secondary">
-        Bu ürünün birlikte çalıştığı sistemler ve bağlantı tipleri.
-      </p>
-
-      <dl className="mt-4 space-y-3.5">
-        {items.map((item) => (
-          <div key={item.label}>
-            <dt className="text-[13px] font-semibold text-text-primary">{item.label}</dt>
-            {/* Keyed by position as well as value: the list is static and
-                unordered, and keying on the value alone made the component
-                fragile to a data collision — two entries that normalise to the
-                same string produced duplicate React keys. The data is fixed
-                separately; this stops the same class of defect being a render
-                bug rather than just a content one. */}
-            <dd className="mt-1.5 flex flex-wrap gap-1.5">
-              {item.values.map((value, index) => (
-                <span
-                  key={`${value}-${index}`}
-                  className="rounded-full border border-line-strong bg-surface-page px-2.5 py-1 font-mono text-[11px] text-text-secondary"
-                >
-                  {value}
-                </span>
-              ))}
-            </dd>
-            {item.note && (
-              <p className="mt-1.5 text-[11.5px] leading-relaxed text-text-secondary">
-                {item.note}
-              </p>
-            )}
-          </div>
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-/**
- * Specification table.
- *
- * Every row is a statement drawn from the catalogue's own fields — nothing here
- * is invented for the page. Grouped general → commercial, as a real table.
- */
-function SpecTable({ product }: { product: Product }) {
-  const category = categoryMeta(product.category);
-  const sheet = categorySpec(product.category);
-
-  /* Catalogue facts first, then the category's own groups, then the commercial
-     rows. The category's "Genel" group is merged into ours rather than added as
-     a second "Genel" heading. */
-  const [first, ...rest] = sheet?.groups ?? [];
-
-  const groups: { title: string; rows: { label: string; value: string; note?: string }[] }[] = [
-    {
-      title: 'Genel',
-      rows: [
-        { label: 'Marka', value: product.brand },
-        { label: 'Ürün kodu', value: product.sku },
-        { label: 'Kategori', value: category.label },
-        ...(first?.title === 'Genel' ? first.rows : []),
-      ],
-    },
-    ...(first && first.title !== 'Genel' ? [first] : []),
-    ...rest,
-    {
-      title: 'Ticari',
-      rows: [
-        { label: 'Fiyat', value: formatPrice(product.price) },
-        {
-          label: 'Ödeme',
-          value: INSTALMENTS_AVAILABLE && product.instalment ? 'Peşin fiyatına 3 taksit' : 'Havale / EFT veya kapıda ödeme',
-        },
-        {
-          label: 'Kargo',
-          value: product.freeShipping ? 'Ücretsiz kargo' : 'Standart kargo bedeli',
-        },
-        {
-          label: 'Stok',
-          value: product.stock === 0 ? 'Tükendi' : `${product.stock} adet`,
-        },
-      ],
-    },
-  ];
-
-  return (
-    <table className="w-full border-collapse text-left">
-      <caption className="sr-only">{product.name} teknik bilgileri</caption>
-      <tbody>
-        {/* The key belongs on the outermost element the map returns, which is
-            the fragment — not on the first row inside it. */}
-        {groups.map((group) => (
-          <Fragment key={group.title}>
-            <tr>
-              <th
-                colSpan={2}
-                scope="colgroup"
-                className="border-b border-line pb-2 pt-5 text-[11px] font-bold uppercase tracking-[0.12em] text-text-secondary"
-              >
-                {group.title}
-              </th>
-            </tr>
-            {group.rows.map((row) => (
-              <tr key={`${group.title}-${row.label}`} className="border-b border-line">
-                <th
-                  scope="row"
-                  className="w-[46%] py-2.5 align-top text-[13px] font-medium text-text-secondary"
-                >
-                  {row.label}
-                </th>
-                <td className="py-2.5 align-top font-mono text-[13px] tabular-nums text-text-primary">
-                  {row.value}
-                </td>
-              </tr>
-            ))}
-          </Fragment>
-        ))}
-      </tbody>
-    </table>
-  );
-}
-
-function SectionHead({ title, note }: { title: string; note?: string }) {
-  return (
-    <div className="flex flex-wrap items-end justify-between gap-3 border-b border-line pb-2.5">
-      <div className="flex min-w-0 items-center gap-2.5">
-        <span aria-hidden className="h-5 w-1 shrink-0 rounded-full bg-brand dt:h-6" />
-        <h2 className="truncate text-[16px] font-extrabold tracking-tight text-text-primary dt:text-[20px]">
-          {title}
-        </h2>
-      </div>
-      {note && <p className="text-[12px] text-text-secondary dt:text-[13px]">{note}</p>}
-    </div>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 
 export default async function ProductPage({
@@ -399,7 +252,6 @@ export default async function ProductPage({
   const siblings = otherModelsOf(product);
   const alternatives = alternativesTo(product);
   const category = categoryMeta(product.category);
-  const compatibility = categorySpec(product.category)?.compatibility ?? [];
 
   /* The CUTOUT, not the plated render, for the mock catalogue's own files. The
      flat files carry an opaque white plate that shows up as a white rectangle
@@ -483,7 +335,7 @@ export default async function ProductPage({
               reached. From `lg` the grid splits and the cell governs again.
               Keyed by product: client navigation between two products reuses
               this position, and the gallery's index must not carry over. */}
-          <div className="mx-auto w-full max-w-[520px] lg:max-w-none dt:sticky dt:top-4 dt:self-start">
+          <div className="mx-auto w-full max-w-[520px] lg:max-w-none dt:sticky dt:top-(--sticky-offset) dt:self-start">
             <ProductGallery
               key={product.id}
               images={gallery}
@@ -608,7 +460,7 @@ export default async function ProductPage({
           {siblings.length > 0 && (
             <aside
               aria-label={`${product.brand} diğer modeller`}
-              className="lg:col-span-2 dt:col-span-1 dt:sticky dt:top-4 dt:self-start"
+              className="lg:col-span-2 dt:col-span-1 dt:sticky dt:top-(--sticky-offset) dt:self-start"
             >
               <div className="overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e1">
                 <span
@@ -657,7 +509,7 @@ export default async function ProductPage({
           that is how people write a product description into a textarea. */}
       {product.description && (
         <section className="container-main pt-6 dt:pt-8" aria-label="Ürün açıklaması">
-          <SectionHead title="Ürün Açıklaması" />
+          <SectionHeading eyebrow="Ürün detayları" title="Ürün Açıklaması" />
           <div className="mt-3 rounded-(--panel-radius) border border-line bg-surface-card px-4 py-4 shadow-e1 dt:px-6 dt:py-5">
             <p className="max-w-[75ch] whitespace-pre-line text-[14px] leading-relaxed text-text-primary dt:text-[15px]">
               {product.description}
@@ -666,43 +518,7 @@ export default async function ProductPage({
         </section>
       )}
 
-      {/* --- specifications -------------------------------------------- */}
-      <section className="container-main pt-6 dt:pt-8" aria-label="Teknik bilgiler">
-        <SectionHead title="Teknik Bilgiler" note="Ürün ve kategori bilgileri" />
-        <div className="grid gap-(--space-grid-gap) pt-3 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)]">
-          <div className="rounded-(--panel-radius) border border-line bg-surface-card shadow-e1 px-4 py-4 dt:px-5">
-            <SpecTable product={product} />
-          </div>
-
-          <div className="flex flex-col gap-(--space-grid-gap)">
-          {compatibility.length > 0 && <Compatibility items={compatibility} />}
-
-          <aside className="rounded-(--panel-radius) border border-line bg-surface-card shadow-e1 px-4 py-4 dt:px-5">
-            <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-text-secondary">
-              Kategori
-            </p>
-            <Link
-              href={category.href}
-              className="mt-1.5 inline-flex items-center gap-1.5 text-[16px] font-extrabold tracking-tight text-text-primary transition-colors hover:text-brand-text"
-            >
-              {category.label}
-              <ChevronRight size={15} strokeWidth={2.25} aria-hidden />
-            </Link>
-            <p className="mt-4 text-[13px] leading-relaxed text-text-secondary">
-              Bu ürünün uyumluluğu, montajı veya alternatifleri hakkında emin
-              değilseniz teknik ekibimiz ürün kodu üzerinden yönlendirme yapar.
-            </p>
-            <Link
-              href="/iletisim"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-line-strong px-3.5 py-1.5 text-[12px] font-semibold text-text-primary transition-colors hover:border-brand hover:bg-brand hover:text-white"
-            >
-              Teknik destek
-              <ChevronRight size={13} strokeWidth={2.25} aria-hidden />
-            </Link>
-          </aside>
-          </div>
-        </div>
-      </section>
+      <ProductSpecs product={product} />
 
       {/* --- same category, other brands -------------------------------
           Two, not one. `alternativesTo` returns same-category/other-brand
@@ -717,7 +533,7 @@ export default async function ProductPage({
           broken. */}
       {alternatives.length > 1 && (
         <section className="container-main pt-6 pb-8 dt:pt-8" aria-label="Benzer ürünler">
-          <SectionHead title="Aynı Kategoride" note={category.label} />
+          <SectionHeading eyebrow={category.label} title="Aynı Kategoride" action={{ label: 'Tümü', href: category.href }} />
           <div className="pt-3">
             <ProductGrid products={alternatives.slice(0, 4)} columns={4} />
           </div>

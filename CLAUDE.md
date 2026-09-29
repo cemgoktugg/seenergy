@@ -13,7 +13,9 @@ Guidance for Claude Code working in this repository.
   near-black chrome). `BRAND_BIBLE_ELECTRONICS.md` §2 carries the supersession
   note and the new tokens. The logo itself is now the client's final silver
   lockup ("Güvenlik Teknolojileri A.Ş"), served from `public/brand/` through
-  `src/components/brand-mark.tsx`; the UI gradient was kept. The reference-measurement documents still describe
+  `src/components/brand-mark.tsx`, and the palette follows it: a steel ramp
+  (silver → graphite → black) with graphite actions. The `grad-*` token names
+  are the old gradient's, kept so every cap and rail followed without an edit. The reference-measurement documents still describe
   merterelektronik.com's amber accurately and are deliberately not rewritten.
 - Visual workbench — Playwright, deterministic screenshot capture, pixel diff,
   reporting and a quality gate (added by the reference-driven workflow below).
