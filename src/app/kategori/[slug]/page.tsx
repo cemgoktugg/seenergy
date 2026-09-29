@@ -1,10 +1,14 @@
 /**
- * Category listing — `/kategori/[slug]`.
+ * Category listing — `/kategori/[slug]`, for every category and subcategory in
+ * the tree (src/data/categories.ts).
  *
- * The navigation names far more categories than the mock catalogue carries, so
- * an unknown slug is answered honestly: it says the category is not in the
- * catalogue yet and offers the ones that are, rather than 404ing a link the
- * site's own menu just offered.
+ * A top-level category lists its subcategories' products too, and both levels
+ * carry the same row of subcategory links under the heading — "Tümü" plus each
+ * subcategory with its count — so the tree can be walked without the menu. A
+ * subcategory's eyebrow names its parent.
+ *
+ * An unknown slug is answered honestly: it says the category is not in the
+ * catalogue and offers the ones that are, rather than 404ing.
  *
  * The canonical drops every filter parameter (docs/INFORMATION_ARCHITECTURE §2).
  */
@@ -13,17 +17,15 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { CatalogShell } from '@/components/catalog-shell';
+import { CATEGORY_TREE, categoryHref } from '@/data/categories';
 import { CATEGORY_META, categoryMeta } from '@/data/catalog';
 import type { SearchParams } from '@/lib/catalog-query';
 import { loadCatalog } from '@/lib/medusa/catalog';
 
-const keyFor = (slug: string) =>
-  Object.keys(CATEGORY_META).find((key) => CATEGORY_META[key].href === `/kategori/${slug}`);
+const keyFor = (slug: string) => (slug in CATEGORY_META ? slug : undefined);
 
 export function generateStaticParams() {
-  return Object.values(CATEGORY_META).map((meta) => ({
-    slug: meta.href.replace('/kategori/', ''),
-  }));
+  return Object.keys(CATEGORY_META).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -35,6 +37,25 @@ export async function generateMetadata({
   const key = keyFor(slug);
   const title = key ? categoryMeta(key).label : 'Kategori';
   return { title, alternates: { canonical: `/kategori/${slug}` } };
+}
+
+function Chip({ href, label, count, active }: { href: string; label: string; count: number; active: boolean }) {
+  return (
+    <Link
+      href={href}
+      aria-current={active ? 'page' : undefined}
+      className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors duration-(--duration-fast) ${
+        active
+          ? 'border-brand bg-brand text-white'
+          : 'border-line-strong bg-surface-card text-text-primary hover:border-brand'
+      }`}
+    >
+      {label}
+      <span className={`text-[11px] font-medium tabular-nums ${active ? 'text-white/70' : 'text-text-secondary'}`}>
+        {count}
+      </span>
+    </Link>
+  );
 }
 
 export default async function CategoryPage({
@@ -55,20 +76,19 @@ export default async function CategoryPage({
             Katalog kapsamı
           </p>
           <h1 className="mt-3 text-[20px] font-extrabold tracking-tight text-text-primary dt:text-[24px]">
-            Bu kategori henüz kataloğa eklenmedi
+            Bu kategori kataloğumuzda yok
           </h1>
           <p className="mt-3 text-[14px] leading-relaxed text-text-secondary">
-            Menüde yer alıyor, ancak ürünleri bu sürümde listelenmiyor. Aşağıdaki
-            kategoriler şu an dolu:
+            Aradığınız bölüm aşağıdaki kategorilerden birinde olabilir:
           </p>
           <ul className="mt-6 flex flex-wrap justify-center gap-1.5">
-            {Object.entries(CATEGORY_META).map(([, meta]) => (
-              <li key={meta.href}>
+            {CATEGORY_TREE.map((node) => (
+              <li key={node.slug}>
                 <Link
-                  href={meta.href}
+                  href={categoryHref(node.slug)}
                   className="inline-flex rounded-full border border-line-strong px-3 py-1.5 text-[13px] font-medium text-text-primary transition-colors hover:border-brand hover:bg-brand hover:text-white"
                 >
-                  {meta.label}
+                  {node.label}
                 </Link>
               </li>
             ))}
@@ -82,17 +102,47 @@ export default async function CategoryPage({
   const { byCategory } = await loadCatalog();
   const scope = byCategory(key);
 
+  /* The subcategory row: this category's children, or — on a subcategory —
+     its siblings, with "Tümü" leading back to the parent. */
+  const parentKey = meta.parent ?? key;
+  const parent = categoryMeta(parentKey);
+  const lead =
+    parent.children.length > 0 ? (
+      <nav aria-label="Alt kategoriler" className="mt-4">
+        <ul className="flex flex-wrap gap-1.5">
+          <li>
+            <Chip href={parent.href} label="Tümü" count={byCategory(parentKey).length} active={key === parentKey} />
+          </li>
+          {parent.children.map((child) => (
+            <li key={child}>
+              <Chip
+                href={categoryMeta(child).href}
+                label={categoryMeta(child).label}
+                count={byCategory(child).length}
+                active={key === child}
+              />
+            </li>
+          ))}
+        </ul>
+      </nav>
+    ) : undefined;
+
   return (
     <CatalogShell
-      eyebrow="Kategori"
+      eyebrow={meta.parent ? parent.label : 'Kategori'}
       title={meta.label}
       /* Second sentence removed: it said "you can narrow by brand, price and
          stock" next to a 264px rail that lists exactly those three groups.
          Prose describing visible controls is filler. */
-      description={`${meta.label} kategorisindeki ${scope.length} ürün.`}
+      description={
+        scope.length
+          ? `${meta.label} kategorisindeki ${scope.length} ürün.`
+          : `${meta.label} kategorisine henüz ürün eklenmedi.`
+      }
       basePath={meta.href}
       scope={scope}
       params={query}
+      lead={lead}
     />
   );
 }

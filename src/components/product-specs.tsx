@@ -333,7 +333,11 @@ function SupportCard({ product }: { product: Product }) {
 
 export function ProductSpecs({ product, specs }: { product: Product; specs: SpecGroup[] }) {
   const own = specs.length > 0;
-  const groups = groupsOf(product, own ? specs : (categorySpec(product.category)?.groups ?? []));
+  const template = categorySpec(product.category)?.groups ?? [];
+  const groups = groupsOf(product, own ? specs : template);
+  /* The "typical values" note belongs to a template; a category without one
+     shows only the catalogue facts, which are this product's own. */
+  const typical = !own && template.length > 0;
   const compatibility = categorySpec(product.category)?.compatibility ?? [];
   const rowCount = groups.reduce((total, group) => total + group.rows.length, 0);
 
@@ -345,7 +349,7 @@ export function ProductSpecs({ product, specs }: { product: Product; specs: Spec
         </span>
       </SectionHeading>
 
-      {!own && (
+      {typical && (
         <p className="mt-3 flex items-start gap-2 rounded-(--card-radius) border border-line bg-surface-card px-3.5 py-2.5 text-[12.5px] leading-relaxed text-text-secondary">
           <Info size={15} strokeWidth={2} aria-hidden className="mt-0.5 shrink-0 text-text-primary" />
           <span>

@@ -12,79 +12,42 @@
  * Second, 60% of the homepage was product-card rows and 38% of it was seven
  * near-identical brand bands. Adding a ninth row of four equal cards would have
  * deepened exactly the monotony this is meant to break. So the layout is
- * deliberately uneven: one 2x2 feature cell carrying artwork, eleven compact
- * cells carrying nothing but a label. Five columns, three rows, fifteen slots,
- * twelve categories — the feature takes four and the remainder fit exactly.
+ * deliberately uneven: one 2x2 feature cell carrying artwork, the rest compact
+ * cells carrying an icon and a label.
+ *
+ * THE COUNT. The client's tree has fourteen top-level categories. Six columns
+ * by three rows is eighteen slots: the feature takes four, thirteen categories
+ * take thirteen, and the last slot is "Tüm Kategoriler" — the full tree with
+ * its subcategories, which is where someone goes when the board is not
+ * enough. It fits exactly; the earlier five-column board was cut for twelve.
  *
  * Below `dt` the spanning is dropped entirely: on a phone an asymmetric mosaic
  * is just an inconsistent list, so it becomes two even columns.
  *
- * Content is PRIMARY_NAV — the same twelve categories the navigation already
- * uses, with the same hrefs. Nothing here is a new claim or a new destination.
+ * Content is PRIMARY_NAV — the category tree the navigation already uses, with
+ * the same hrefs. Nothing here is a new claim or a new destination.
  *
  * A server component: links and one image.
  */
 
 import Link from 'next/link';
-import {
-  ArrowRight,
-  BatteryCharging,
-  Cable,
-  Car,
-  Cctv,
-  ChevronRight,
-  Cpu,
-  House,
-  Lightbulb,
-  RadioReceiver,
-  SatelliteDish,
-  Speaker,
-  Tv,
-  Wrench,
-} from 'lucide-react';
+import { ArrowRight, ChevronRight, LayoutGrid } from 'lucide-react';
 
+import { CATEGORY_ICONS } from '@/components/category-icons';
 import { PRIMARY_NAV } from '@/data/site';
-
-/**
- * One glyph per department.
- *
- * An ICON, deliberately, not artwork. The eleven compact cells were label +
- * chevron on white, which made the page's primary navigation read as a boxed
- * link list — but the note below about artwork still holds: a picture in every
- * cell turns the board back into the card row this module exists to avoid. An
- * icon is a scanning mark, not a picture. It costs no asset, no layout change
- * and no request, and it is what lets someone find "Kablo" by shape instead of
- * by reading twelve labels.
- *
- * Keyed by href, so a renamed label cannot silently unpair a category from its
- * glyph, and an unmapped category simply renders without one rather than
- * breaking. Lucide has no remote-control glyph; RadioReceiver is the closest
- * honest stand-in for "Kumanda" and is used rather than inventing a shape.
- */
-const CATEGORY_ICONS: Record<string, typeof Tv> = {
-  '/kategori/uydu-sistemleri': SatelliteDish,
-  '/kategori/tv-yedek-parca': Tv,
-  '/kategori/kumanda-cesitleri': RadioReceiver,
-  '/kategori/seslendirme-sistemleri': Speaker,
-  '/kategori/guvenlik-sistemleri': Cctv,
-  '/kategori/adaptor-aku-pil': BatteryCharging,
-  '/kategori/oto-ses-goruntu': Car,
-  '/kategori/oem-cevre-birimleri': Cpu,
-  '/kategori/led-aydinlatma': Lightbulb,
-  '/kategori/ev-yasam-teknoloji': House,
-  '/kategori/hirdavat-tamir': Wrench,
-  '/kategori/kablo-cesitleri': Cable,
-};
 
 /** The artwork for the one feature cell. A transparent cutout, so it sits on
  *  the gradient without bringing a plate of its own. */
 const FEATURE_ART = '/mock/products/cutout/dome-white.svg';
 
+const CELL =
+  'group/c flex min-h-11 items-center gap-2.5 rounded-(--panel-radius) border px-3.5 py-3 transition-colors duration-(--duration-fast) ease-in-out dt:px-4';
+
 export function CategoryMosaic() {
   const [feature, ...rest] = PRIMARY_NAV;
 
   return (
-    <div className="grid grid-cols-2 gap-(--space-grid-gap) dt:auto-rows-[96px] dt:grid-cols-5">
+    <div className="grid grid-cols-2 gap-(--space-grid-gap) dt:auto-rows-[96px] dt:grid-cols-6">
       {/* Feature cell: two columns by two rows from `dt`, the only cell with
           artwork and the only one on brand colour. */}
       <Link
@@ -109,6 +72,11 @@ export function CategoryMosaic() {
           <span className="block max-w-[74%] text-[16px] font-extrabold leading-[1.12] tracking-tight text-white dt:text-[20px]">
             {feature.label}
           </span>
+          {feature.children && (
+            <span className="mt-1 block max-w-[60%] text-[11px] leading-snug text-white/70 dt:text-[12px]">
+              {feature.children.map((child) => child.label).join(' · ')}
+            </span>
+          )}
           <span className="mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold text-white/85 transition-colors duration-(--duration-fast) group-hover/f:text-white dt:mt-2.5 dt:text-[12px]">
             İncele
             <ArrowRight
@@ -121,22 +89,19 @@ export function CategoryMosaic() {
         </span>
       </Link>
 
-      {/* The remaining eleven: an icon and a label. Still no artwork — a
-          department board is read, not browsed, and a picture in every cell
-          would turn it back into the card row this module exists to break. The
-          glyph is the middle ground: it gives each cell a shape to aim at
-          without giving it a subject. */}
+      {/* The other thirteen: an icon and a label, and a subcategory count
+          where there are subcategories — the board says the tree goes deeper
+          before anyone opens the menu. */}
       {rest.map((item) => {
         const Icon = CATEGORY_ICONS[item.href];
         return (
           <Link
             key={item.href}
             href={item.href}
-            /* `min-h-11`, because padding alone measured 42px and these eleven
-               cells are the page's primary navigation — the one place a 2px
-               shortfall is least acceptable. From `dt` the 96px auto-row governs
-               and the minimum never binds. */
-            className="group/c flex min-h-11 items-center gap-2.5 rounded-(--panel-radius) border border-line bg-surface-card shadow-e1 px-3.5 py-3 transition-colors duration-(--duration-fast) ease-in-out hover:border-brand hover:bg-brand-soft dt:px-4"
+            /* `min-h-11`, because padding alone measured 42px and these cells
+               are the page's primary navigation — the one place a 2px shortfall
+               is least acceptable. From `dt` the 96px auto-row governs. */
+            className={`${CELL} border-line bg-surface-card shadow-e1 hover:border-brand hover:bg-brand-soft`}
           >
             {Icon && (
               <span
@@ -146,8 +111,15 @@ export function CategoryMosaic() {
                 <Icon size={16} strokeWidth={1.9} />
               </span>
             )}
-            <span className="min-w-0 text-[13px] font-semibold leading-[1.25] text-text-primary dt:text-[14px]">
-              {item.label}
+            <span className="min-w-0">
+              <span className="block text-[13px] font-semibold leading-[1.25] text-text-primary dt:text-[14px]">
+                {item.label}
+              </span>
+              {item.children && (
+                <span className="mt-0.5 block text-[11px] text-text-secondary">
+                  {item.children.length} alt kategori
+                </span>
+              )}
             </span>
             <ChevronRight
               size={15}
@@ -158,6 +130,25 @@ export function CategoryMosaic() {
           </Link>
         );
       })}
+
+      {/* The eighteenth slot: the whole tree. */}
+      <Link href="/kategori" className={`${CELL} border-dashed border-line-strong bg-surface-page hover:border-brand hover:bg-brand-soft`}>
+        <span
+          aria-hidden
+          className="grid h-8 w-8 shrink-0 place-items-center rounded-md bg-brand text-white"
+        >
+          <LayoutGrid size={16} strokeWidth={1.9} />
+        </span>
+        <span className="min-w-0 text-[13px] font-bold leading-[1.25] text-text-primary dt:text-[14px]">
+          Tüm Kategoriler
+        </span>
+        <ChevronRight
+          size={15}
+          strokeWidth={2.25}
+          aria-hidden
+          className="ml-auto shrink-0 text-text-secondary transition-transform duration-(--duration-base) ease-out group-hover/c:translate-x-0.5"
+        />
+      </Link>
     </div>
   );
 }

@@ -10,6 +10,8 @@
  * Rating fields are explicitly mock and are never emitted as structured data.
  */
 
+import { ALL_CATEGORIES, categoryHref } from '@/data/categories';
+
 export interface Product {
   id: string;
   /** The one variant every catalogue product has — what a cart line points at. */
@@ -49,32 +51,48 @@ const slugify = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '');
 
+export interface CategoryMeta {
+  label: string;
+  href: string;
+  /** The parent category's key, for a subcategory. */
+  parent?: string;
+  /** Subcategory keys, in the client's order. */
+  children: string[];
+  /** The spec template key (src/data/specs.ts), inherited by subcategories. */
+  spec?: string;
+}
+
 /**
- * Category keys carry a Turkish label and a route, so a breadcrumb and a spec
- * row never have to re-derive either from the key. The route slug is also the
- * Medusa category handle — that is how a Medusa category maps back to a key.
+ * Every category by key, derived from the one tree in src/data/categories.ts.
+ * A key IS the route slug and the Medusa category handle, so a breadcrumb, a
+ * spec lookup and a Medusa category all meet on the same string.
  */
-export const CATEGORY_META: Record<string, { label: string; href: string }> = {
-  uydu: { label: 'Uydu Sistemleri', href: '/kategori/uydu-sistemleri' },
-  kumanda: { label: 'Kumanda Çeşitleri', href: '/kategori/kumanda-cesitleri' },
-  ses: { label: 'Seslendirme Sistemleri', href: '/kategori/seslendirme-sistemleri' },
-  guvenlik: { label: 'Güvenlik Sistemleri', href: '/kategori/guvenlik-sistemleri' },
-  led: { label: 'Led ve Aydınlatma', href: '/kategori/led-aydinlatma' },
-  adaptor: { label: 'Adaptör, Akü, Pil', href: '/kategori/adaptor-aku-pil' },
-  oto: { label: 'Oto Ses ve Görüntü', href: '/kategori/oto-ses-goruntu' },
-  oem: { label: 'Oem ve Çevre Birimleri', href: '/kategori/oem-cevre-birimleri' },
-  olcum: { label: 'Ölçü Aletleri', href: '/kategori/olcu-aletleri' },
-  kablo: { label: 'Kablo Çeşitleri', href: '/kategori/kablo-cesitleri' },
-  bilgisayar: { label: 'Bilgisayar ve Monitör', href: '/kategori/bilgisayar' },
-  hirdavat: { label: 'Hırdavat ve Tamir Malzemeleri', href: '/kategori/hirdavat-tamir' },
-};
+export const CATEGORY_META: Record<string, CategoryMeta> = Object.fromEntries(
+  ALL_CATEGORIES.map((node) => [
+    node.slug,
+    {
+      label: node.label,
+      href: categoryHref(node.slug),
+      parent: node.parent,
+      children: (node.children ?? []).map((child) => child.slug),
+      spec: node.spec,
+    },
+  ]),
+);
 
-export const categoryMeta = (category: string) =>
-  CATEGORY_META[category] ?? { label: 'Tüm Ürünler', href: '/kategori' };
+/** A product the tree has no place for (key '') lands on the full index. */
+export const categoryMeta = (category: string): CategoryMeta =>
+  CATEGORY_META[category] ?? { label: 'Tüm Kategoriler', href: '/kategori', children: [] };
 
-/** Medusa category handle → catalogue key. */
+/** Medusa category handle → catalogue key: the same string, when it is ours. */
 export const categoryKeyFromHandle = (handle: string): string | undefined =>
-  Object.entries(CATEGORY_META).find(([, meta]) => meta.href === `/kategori/${handle}`)?.[0];
+  handle in CATEGORY_META ? handle : undefined;
+
+/** A category and its subcategories — what a category page lists. */
+export const categoryAndChildren = (category: string): string[] => [
+  category,
+  ...(CATEGORY_META[category]?.children ?? []),
+];
 
 /**
  * One brand → one slug, everywhere. The product slugifier is reused rather than
@@ -112,8 +130,11 @@ export function indexCatalog(products: Product[]) {
     const list = products.filter((product) => product.brand === brand);
     return count === undefined ? list : list.slice(0, count);
   };
-  const byCategory = (category: string): Product[] =>
-    products.filter((product) => product.category === category);
+  /* A top-level category lists its subcategories' products as well. */
+  const byCategory = (category: string): Product[] => {
+    const keys = new Set(categoryAndChildren(category));
+    return products.filter((product) => keys.has(product.category));
+  };
 
   return {
     products,

@@ -35,7 +35,9 @@ These routes are real, not placeholders:
 /urun/[slug]          product detail — image gallery (stage, thumbnail strip,
                       full-screen viewer), buy box, spec table, compatibility,
                       and the brand's other models in a sticky right-hand rail
-/kategori/[slug]      category listing over the 12 catalogue categories
+/kategori             all categories — the tree with its subcategories
+/kategori/[slug]      category listing, for every category and subcategory;
+                      a parent lists its subcategories' products too
 /marka/[slug]         brand listing — the same shell, a brand's products
 /arama                search results — the same shell, a query's matches
 /sepet                Medusa cart — quantities, KDV-inclusive totals
@@ -43,6 +45,16 @@ These routes are real, not placeholders:
 /siparis/[id]         order confirmation (guest-readable by the order id)
 /hesabim              sign in / register; signed in: profile and orders
 ```
+
+**Categories come from one tree: `src/data/categories.ts`** — the client's own
+(2026-09-29): 14 top-level categories, CCTV / Network / Uydu with
+subcategories. The nav bar, mega panel, drawer, homepage board, footer,
+/kategori, category pages, breadcrumbs and spec-template lookup all derive from
+it. A slug is the route AND the Medusa category handle; the Medusa side is
+created by `backend/.../migration-scripts/security-category-tree.ts`, which
+also moved the fitting products and set the previous 12 categories INACTIVE
+(not deleted). Products that fit nowhere stay published without a category.
+Change a slug in both places or neither.
 
 The listing shell filters entirely through the URL (`?marka=…&fiyat=…&stok=…&ozellik=…&siralama=…`).
 Every filter is a link and no filter state lives in a client component, so a

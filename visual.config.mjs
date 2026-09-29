@@ -72,9 +72,10 @@ export const ROUTES = [
     name: 'category',
     title: 'Kategori / listeleme',
     referencePath: '/guvenlik-sistemleri',
-    // Now a real listing: `/kategori/[slug]` resolves this slug to the
-    // catalogue's `guvenlik` category and renders the filter shell over it.
-    localPath: '/kategori/guvenlik-sistemleri',
+    // The client's tree (2026-09-29) replaced `guvenlik-sistemleri`; its
+    // counterpart is CCTV, a top-level category with subcategories, so this
+    // route also exercises the subcategory row.
+    localPath: '/kategori/cctv-guvenlik-sistemleri',
     localReady: true,
     priority: 2,
   },

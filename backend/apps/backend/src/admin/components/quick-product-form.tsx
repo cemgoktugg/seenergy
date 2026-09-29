@@ -215,7 +215,7 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
             <Select.Content>
               {(options?.categories ?? []).map((c) => (
                 <Select.Item key={c.id} value={c.id}>
-                  {c.name}
+                  {c.label}
                 </Select.Item>
               ))}
             </Select.Content>

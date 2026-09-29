@@ -123,7 +123,8 @@ export function useVitrinOptions() {
     queryFn: () =>
       sdk.client.fetch<{
         brands: { id: string; title: string; handle: string }[]
-        categories: { id: string; name: string; handle: string }[]
+        /** Active only; `label` names the parent of a subcategory. */
+        categories: { id: string; name: string; handle: string; label: string }[]
       }>("/admin/vitrin/options"),
     staleTime: 60_000,
   })

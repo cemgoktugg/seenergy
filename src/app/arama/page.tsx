@@ -69,7 +69,9 @@ export default async function SearchPage({
             Kategoriler
           </p>
           <ul className="mt-3 flex flex-wrap gap-1.5">
-            {Object.values(CATEGORY_META).map((meta) => (
+            {Object.values(CATEGORY_META)
+              .filter((meta) => !meta.parent)
+              .map((meta) => (
               <li key={meta.href}>
                 <Link
                   href={meta.href}
@@ -119,6 +121,7 @@ export default async function SearchPage({
           </p>
           <ul className="mt-6 flex flex-wrap justify-center gap-1.5">
             {Object.values(CATEGORY_META)
+              .filter((meta) => !meta.parent)
               .slice(0, 6)
               .map((meta) => (
                 <li key={meta.href}>

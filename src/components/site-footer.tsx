@@ -143,20 +143,12 @@ export function SiteFooter() {
           </h2>
           <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-6">
             {POPULAR_CATEGORIES.map((category) => (
-              <li key={category}>
+              <li key={category.href}>
                 <Link
-                  href={`/kategori/${category
-                    .toLowerCase()
-                    .replaceAll('ı', 'i')
-                    .replaceAll('ğ', 'g')
-                    .replaceAll('ü', 'u')
-                    .replaceAll('ş', 's')
-                    .replaceAll('ö', 'o')
-                    .replaceAll('ç', 'c')
-                    .replace(/[^a-z0-9]+/g, '-')}`}
+                  href={category.href}
                   className="text-[12px] text-text-secondary transition-colors hover:text-brand-dark lg:text-[13px]"
                 >
-                  {category}
+                  {category.label}
                 </Link>
               </li>
             ))}

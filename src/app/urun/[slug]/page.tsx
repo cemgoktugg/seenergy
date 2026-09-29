@@ -97,8 +97,10 @@ export async function generateMetadata({
 /** One trail, read by both the visible breadcrumb and the BreadcrumbList. */
 function trailFor(product: Product) {
   const category = categoryMeta(product.category);
+  const parent = category.parent ? categoryMeta(category.parent) : undefined;
   return [
     { label: 'Ana sayfa', href: '/' },
+    ...(parent ? [{ label: parent.label, href: parent.href }] : []),
     { label: category.label, href: category.href },
     { label: product.brand, href: `/marka/${brandSlug(product.brand)}` },
   ];

@@ -81,7 +81,7 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
       description: "Kameradan diafona, tüm akıllı ev çözümleri tek çatıda.",
       chips: ["Kamera ve diafon", "Akıllı priz ve röle", "Kurulum desteği"],
       cta: "Alışverişe Başla",
-      href: "/kategori/akilli-ev",
+      href: "/kategori/cctv-guvenlik-sistemleri",
       image: "/mock/hero/hero-1.svg",
       // Wide campaign art: fills the stage (a product shot would use "contain").
       fit: "cover",

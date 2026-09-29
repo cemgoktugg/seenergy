@@ -23,6 +23,7 @@ import Link from 'next/link';
 import {
   Badge as BadgeIcon,
   ChevronDown,
+  ChevronRight,
   Info,
   Menu,
   Phone,
@@ -508,14 +509,15 @@ export function SiteHeader({ promo }: { promo: string }) {
               return (
                 <li
                   key={item.href}
-                  // `flex-auto` (flex: 1 1 auto), not `flex-1` (1 1 0%): the
-                  // reference's 12 items are content-proportional, measuring
-                  // 92–164px across the 1400 track, and that uneven sizing is
-                  // what makes the longer labels wrap to two lines.
+                  // `flex-auto` (flex: 1 1 auto), not `flex-1` (1 1 0%):
+                  // items are content-proportional, so the fourteen labels
+                  // share the 1400 track by length and the longer ones wrap
+                  // to two lines. The bar shows each category's SHORT label;
+                  // the full name is in the panel, the page and aria-label.
                   className="flex-auto"
                   onMouseEnter={() => {
                     cancelClose();
-                    setOpenMega(item.groups ? item.href : null);
+                    setOpenMega(item.children ? item.href : null);
                   }}
                 >
                   {/* The dividers are gone and the open state no longer flips
@@ -525,7 +527,8 @@ export function SiteHeader({ promo }: { promo: string }) {
                       gradient hairline below. */}
                   <Link
                     href={item.href}
-                    onFocus={() => setOpenMega(item.groups ? item.href : null)}
+                    onFocus={() => setOpenMega(item.children ? item.href : null)}
+                    aria-label={item.short !== item.label ? item.label : undefined}
                     /* `rounded-t-(--card-radius)` is the detail that ties the two pieces
                        together: the mega panel below carries `rounded-b-(--card-radius)`,
                        so an open trigger and its panel now read as one shape
@@ -536,7 +539,7 @@ export function SiteHeader({ promo }: { promo: string }) {
                       open ? 'bg-chrome-soft text-white' : 'text-white/80 hover:bg-chrome-soft hover:text-white'
                     }`}
                   >
-                    {item.label}
+                    {item.short}
                     <span
                       aria-hidden
                       className={`absolute inset-x-2.5 bottom-0 h-[3px] rounded-t-full bg-linear-to-r from-grad-1 to-grad-4 transition-opacity duration-(--duration-fast) group-hover:opacity-100 ${
@@ -554,7 +557,7 @@ export function SiteHeader({ promo }: { promo: string }) {
             immediately under the 175px header. One panel element for all
             triggers, so it cannot be clipped by a list item's bounds. */}
         {PRIMARY_NAV.map((item) => {
-          if (!item.groups || openMega !== item.href) return null;
+          if (!item.children || openMega !== item.href) return null;
           return (
             <div
               key={item.href}
@@ -575,43 +578,40 @@ export function SiteHeader({ promo }: { promo: string }) {
                     aria-hidden
                     className="block h-[3px] w-full bg-linear-to-r from-grad-1 via-grad-3 to-grad-4"
                   />
-                  <div className="px-5 py-6">
-                  {/* The measured pitch was exactly 220px with no gutter
-                      (columns at x=170/390/610/830/1050). Reproduced faithfully,
-                      it left the panel's right ~260px empty: 5 × 220 = 1100
-                      inside 1360px of usable width, which reads as a dead block
-                      rather than a deliberate margin.
-                      Five equal fractions fill the panel instead. This is a
-                      departure from the measured reference, taken because the
-                      client asked for the header to be modernised — and the
-                      alternative, inventing a promo block to fill the gap, would
-                      put content there that the site does not actually have. */}
-                  <ul className="grid [grid-template-columns:repeat(5,minmax(0,1fr))]">
-                    {item.groups.map((group) => (
-                      <li key={group.href}>
-                        {/* Measured: heading 15px/500 rgb(255,146,0);
-                            links 13px/400 rgb(83,83,83) at a 24px pitch. */}
-                        <Link
-                          href={group.href}
-                          className="block text-[16px] font-medium leading-[15px] text-brand-heading hover:underline"
-                        >
-                          {group.title}
-                        </Link>
-                        <ul className="mt-3">
-                          {group.links.map((child) => (
-                            <li key={child.href}>
-                              <Link
-                                href={child.href}
-                                className="block py-[2.5px] text-[13px] leading-[19px] text-[rgb(83,83,83)] transition-colors duration-(--duration-fast) ease-in-out hover:text-brand-dark"
-                              >
-                                {child.label}
-                              </Link>
-                            </li>
-                          ))}
-                        </ul>
-                      </li>
-                    ))}
-                  </ul>
+                  {/* The category on the left, its subcategories as cards on
+                      the right. It replaced five columns of sub-links per
+                      category that were invented to fill a measured panel and
+                      mostly led nowhere; the panel now opens only for the
+                      three categories that really have subcategories. */}
+                  <div className="flex items-start gap-8 px-6 py-5">
+                    <div className="w-[240px] shrink-0">
+                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+                        Kategori
+                      </p>
+                      <p className="mt-1 text-[18px] font-extrabold leading-tight tracking-tight text-text-primary">
+                        {item.label}
+                      </p>
+                      <Link
+                        href={item.href}
+                        className="mt-3 inline-flex items-center gap-1 rounded-full border border-line-strong px-3.5 py-1.5 text-[12px] font-semibold text-text-primary transition-colors duration-(--duration-fast) hover:border-brand hover:bg-brand hover:text-white"
+                      >
+                        Tüm ürünler
+                        <ChevronRight size={14} strokeWidth={2.25} aria-hidden />
+                      </Link>
+                    </div>
+                    <ul className="grid flex-1 gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(190px,1fr))]">
+                      {item.children.map((child) => (
+                        <li key={child.href}>
+                          <Link
+                            href={child.href}
+                            className="flex items-center justify-between gap-2 rounded-(--card-radius) border border-line bg-surface-page px-4 py-3.5 text-[14px] font-semibold text-text-primary transition-colors duration-(--duration-fast) hover:border-brand hover:bg-brand hover:text-white"
+                          >
+                            {child.label}
+                            <ChevronRight size={15} strokeWidth={2.25} aria-hidden className="shrink-0 opacity-60" />
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
                   </div>
                 </div>
               </div>
@@ -683,7 +683,7 @@ export function SiteHeader({ promo }: { promo: string }) {
                       >
                         {item.label}
                       </Link>
-                      {item.groups && (
+                      {item.children && (
                         <button
                           type="button"
                           aria-label={`${item.label} alt kategorileri`}
@@ -701,32 +701,18 @@ export function SiteHeader({ promo }: { promo: string }) {
                         </button>
                       )}
                     </div>
-                    {/* The drawer shows the same group structure as the desktop
-                        mega panel: a group heading, then its links. */}
-                    {item.groups && openGroup === item.href && (
-                      <ul className="bg-surface-page pb-2">
-                        {item.groups.map((group) => (
-                          <li key={group.href}>
+                    {/* Subcategories, same as the desktop mega panel. */}
+                    {item.children && openGroup === item.href && (
+                      <ul className="bg-surface-page py-1.5">
+                        {item.children.map((child) => (
+                          <li key={child.href}>
                             <Link
-                              href={group.href}
+                              href={child.href}
                               onClick={() => setDrawerOpen(false)}
-                              className="block px-7 pb-1 pt-3 text-[13px] font-semibold text-brand-heading"
+                              className="block px-7 py-2.5 text-[13.5px] font-medium text-text-secondary transition-colors hover:text-text-primary"
                             >
-                              {group.title}
+                              {child.label}
                             </Link>
-                            <ul>
-                              {group.links.map((child) => (
-                                <li key={child.href}>
-                                  <Link
-                                    href={child.href}
-                                    onClick={() => setDrawerOpen(false)}
-                                    className="block px-9 py-2 text-[13px] text-text-secondary"
-                                  >
-                                    {child.label}
-                                  </Link>
-                                </li>
-                              ))}
-                            </ul>
                           </li>
                         ))}
                       </ul>

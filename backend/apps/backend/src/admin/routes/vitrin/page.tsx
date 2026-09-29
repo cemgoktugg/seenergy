@@ -188,7 +188,7 @@ const VitrinPage = () => {
         <Band
           n={++n}
           title="Kategoriler"
-          where="Slaytın altındaki kategori panosu. Kategoriler Medusa'nın kendi 'Ürünler → Kategoriler' ekranından yönetilir."
+          where="Slaytın altındaki kategori panosu ve menü: 14 ana kategori ve alt kategorileri. Ürünlerin hangi kategoride olduğunu buradan, her ürünün formundan seçersiniz; kategori ağacının kendisi (yeni kategori eklemek, ad değiştirmek) sitenin kodunda tanımlıdır, bu yüzden o değişiklik için geliştiriciye başvurun."
           to="/categories"
           external
         />

@@ -17,7 +17,7 @@
  * Ratings and reviews appear nowhere, by rule.
  */
 
-import type { Product } from '@/data/catalog';
+import { CATEGORY_META, type Product } from '@/data/catalog';
 
 export interface SpecRow {
   label: string;
@@ -120,7 +120,7 @@ export function keySpecsOf(product: Product, max = 4): SpecRow[] {
   }
 
   if (out.length < 3) {
-    const general = CATEGORY_SPECS[product.category]?.groups.find(
+    const general = categorySpec(product.category)?.groups.find(
       (group) => group.title === 'Genel',
     );
     for (const row of general?.rows ?? []) {
@@ -676,5 +676,12 @@ export const CATEGORY_SPECS: Record<string, CategorySpec> = {
   },
 };
 
-export const categorySpec = (category: string): CategorySpec | undefined =>
-  CATEGORY_SPECS[category];
+/**
+ * A category's template, through the tree: CATEGORY_SPECS is keyed by
+ * template ("guvenlik", "uydu"…), and a category — or a subcategory, by
+ * inheritance — names the template it uses. None named, no template.
+ */
+export const categorySpec = (category: string): CategorySpec | undefined => {
+  const template = CATEGORY_META[category]?.spec;
+  return template ? CATEGORY_SPECS[template] : undefined;
+};
