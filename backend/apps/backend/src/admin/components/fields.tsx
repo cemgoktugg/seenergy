@@ -1,9 +1,9 @@
-import { CloudArrowUp, Plus, Trash, XMark } from "@medusajs/icons"
+import { ArrowLeftMini, ArrowRightMini, CloudArrowUp, Plus, StarSolid, Trash, XMark } from "@medusajs/icons"
 import { Button, IconButton, Input, Label, Select, Text, Textarea, toast } from "@medusajs/ui"
 import { useRef, useState } from "react"
 
 import { TRUST_ICONS, type FieldDef } from "../lib/blocks"
-import { errorText, mediaUrl, uploadImage, useVitrinOptions } from "../lib/vitrin"
+import { errorText, mediaUrl, uploadImage, uploadImages, useVitrinOptions } from "../lib/vitrin"
 import { ProductListEditor } from "./product-list-editor"
 
 /**
@@ -118,6 +118,188 @@ export function ImageField({
           }}
         />
       </div>
+    </div>
+  )
+}
+
+/**
+ * A product's pictures, in the order the site shows them. The first is the
+ * main picture — the one on cards, in the cart and first in the product page's
+ * gallery. Several files can be chosen or dropped at once.
+ */
+export function GalleryField({
+  value,
+  onChange,
+  storefront,
+  max = 20,
+}: {
+  value: string[]
+  onChange: (value: string[]) => void
+  storefront: string
+  max?: number
+}) {
+  const input = useRef<HTMLInputElement>(null)
+  const [busy, setBusy] = useState(false)
+  const [link, setLink] = useState("")
+
+  const upload = async (list: FileList | File[] | null | undefined) => {
+    const files = Array.from(list ?? [])
+    if (!files.length) return
+    const images = files.filter((file) => file.type.startsWith("image/"))
+    if (images.length < files.length) toast.error("Yalnızca görsel dosyaları yüklenebilir.")
+    const fitting = images.filter((file) => file.size <= 5 * 1024 * 1024)
+    if (fitting.length < images.length) toast.error("5 MB'tan büyük görseller atlandı.")
+    const room = max - value.length
+    if (fitting.length > room) toast.error(`En fazla ${max} görsel eklenebilir.`)
+    const batch = fitting.slice(0, Math.max(0, room))
+    if (!batch.length) return
+    setBusy(true)
+    try {
+      onChange([...value, ...(await uploadImages(batch))])
+      toast.success(batch.length === 1 ? "Görsel yüklendi" : `${batch.length} görsel yüklendi`)
+    } catch (error) {
+      toast.error(errorText(error))
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  const move = (from: number, to: number) => {
+    if (to < 0 || to >= value.length) return
+    const next = [...value]
+    const [item] = next.splice(from, 1)
+    next.splice(to, 0, item)
+    onChange(next)
+  }
+
+  const addLink = () => {
+    const url = link.trim()
+    if (!url) return
+    if (value.includes(url)) return toast.error("Bu görsel zaten ekli.")
+    onChange([...value, url])
+    setLink("")
+  }
+
+  return (
+    <div
+      className="flex flex-col gap-y-3"
+      onDragOver={(e) => e.preventDefault()}
+      onDrop={(e) => {
+        e.preventDefault()
+        void upload(e.dataTransfer.files)
+      }}
+    >
+      <div className="flex flex-wrap gap-3">
+        {value.map((url, index) => (
+          <div key={`${url}-${index}`} className="flex w-32 flex-col gap-y-1.5">
+            <div
+              className={`bg-ui-bg-subtle relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-lg border ${
+                index === 0 ? "border-ui-border-interactive border-2" : ""
+              }`}
+            >
+              <img src={mediaUrl(url, storefront)} alt="" className="h-full w-full object-contain p-1" />
+              {index === 0 ? (
+                <span className="bg-ui-bg-interactive txt-compact-xsmall-plus absolute left-1.5 top-1.5 rounded px-1.5 py-0.5 text-white">
+                  Ana görsel
+                </span>
+              ) : null}
+            </div>
+            <div className="flex items-center justify-between">
+              <div className="flex">
+                <IconButton
+                  type="button"
+                  size="small"
+                  variant="transparent"
+                  disabled={index === 0}
+                  onClick={() => move(index, index - 1)}
+                  aria-label="Sola taşı"
+                >
+                  <ArrowLeftMini />
+                </IconButton>
+                <IconButton
+                  type="button"
+                  size="small"
+                  variant="transparent"
+                  disabled={index === value.length - 1}
+                  onClick={() => move(index, index + 1)}
+                  aria-label="Sağa taşı"
+                >
+                  <ArrowRightMini />
+                </IconButton>
+              </div>
+              <div className="flex">
+                {index > 0 ? (
+                  <IconButton
+                    type="button"
+                    size="small"
+                    variant="transparent"
+                    onClick={() => move(index, 0)}
+                    aria-label="Ana görsel yap"
+                    title="Ana görsel yap"
+                  >
+                    <StarSolid />
+                  </IconButton>
+                ) : null}
+                <IconButton
+                  type="button"
+                  size="small"
+                  variant="transparent"
+                  onClick={() => onChange(value.filter((_, i) => i !== index))}
+                  aria-label="Kaldır"
+                  title="Kaldır"
+                >
+                  <Trash />
+                </IconButton>
+              </div>
+            </div>
+          </div>
+        ))}
+
+        {value.length < max ? (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={() => input.current?.click()}
+            className="bg-ui-bg-subtle hover:bg-ui-bg-subtle-hover text-ui-fg-subtle flex h-32 w-32 flex-col items-center justify-center gap-y-1.5 rounded-lg border border-dashed transition-colors disabled:opacity-60"
+          >
+            <CloudArrowUp />
+            <Text size="xsmall" className="px-2 text-center">
+              {busy ? "Yükleniyor…" : "Görsel ekle veya sürükleyin"}
+            </Text>
+          </button>
+        ) : null}
+      </div>
+
+      <div className="flex max-w-xl gap-x-2">
+        <Input
+          size="small"
+          placeholder="veya görsel bağlantısı yapıştırın"
+          value={link}
+          onChange={(e) => setLink(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault()
+              addLink()
+            }
+          }}
+        />
+        <Button type="button" size="small" variant="secondary" onClick={addLink} disabled={!link.trim()}>
+          <Plus />
+          Ekle
+        </Button>
+      </div>
+
+      <input
+        ref={input}
+        type="file"
+        accept="image/*"
+        multiple
+        className="hidden"
+        onChange={(e) => {
+          void upload(e.target.files)
+          e.target.value = ""
+        }}
+      />
     </div>
   )
 }

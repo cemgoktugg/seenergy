@@ -21,7 +21,12 @@ export interface Product {
   category: string;
   price: number;
   compareAtPrice?: number;
+  /** The main picture — what cards, rows and the cart show. */
   image: string;
+  /** Every picture, in the order the admin set, main first. Never empty. */
+  images: string[];
+  /** The admin's free-text description; empty when none was written. */
+  description: string;
   stock: number;
   freeShipping: boolean;
   instalment: boolean;

@@ -50,6 +50,7 @@ export const QuickProductBody = z.object({
   price: money,
   sale_price: money.nullable().optional(),
   stock: z.coerce.number().int("Stok tam sayı olmalı.").min(0, "Stok negatif olamaz."),
+  images: z.array(z.string()).max(20, "En fazla 20 görsel eklenebilir.").nullable().optional(),
   image: z.string().nullable().optional(),
   badge: z.enum(BADGES).nullable().optional(),
   instalment: z.boolean().default(false),

@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 /**
  * Product detail page — `/urun/[slug]`, the route the catalogue has linked to
  * all along (docs/INFORMATION_ARCHITECTURE §2).
@@ -13,7 +12,9 @@
  *     (docs/COMMERCE_RULES §5).
  *   - Product media has a fixed ratio, a neutral bed and `object-fit: contain`
  *     — "the product page contains, the listing fills". It is the LCP element,
- *     so it loads eagerly with `fetchPriority`.
+ *     so it loads eagerly with `fetchPriority`. Every picture the admin
+ *     uploaded is shown: ProductGallery gives them a stage, a thumbnail strip
+ *     and a full-screen viewer.
  *   - Specifications render as a real `<table>` so the row/column relationship
  *     survives for screen readers (ECDOS 10 §47); mobile restyles the same
  *     markup rather than replacing it.
@@ -39,6 +40,7 @@ import {
 } from 'lucide-react';
 
 import { ProductBuy } from '@/components/product-buy';
+import { ProductGallery } from '@/components/product-gallery';
 import { ProductRow } from '@/components/product-row';
 import { ProductGrid } from '@/components/sections';
 import {
@@ -46,6 +48,7 @@ import {
   categoryMeta,
   discountPercent,
   formatPrice,
+  FREE_SHIPPING_FROM,
   type Product,
 } from '@/data/catalog';
 import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
@@ -133,7 +136,7 @@ function PriceBlock({ product }: { product: Product }) {
   const discount = discountPercent(product);
 
   return (
-    <div className="mt-4">
+    <div>
       <p className="sr-only">
         {formatPrice(product.price)}
         {product.compareAtPrice
@@ -174,7 +177,7 @@ function PriceBlock({ product }: { product: Product }) {
 function StockLine({ product }: { product: Product }) {
   if (product.stock === 0) {
     return (
-      <p className="mt-3 inline-flex items-center gap-2 text-[13px] font-semibold text-danger-ink">
+      <p className="inline-flex items-center gap-2 text-[13px] font-semibold text-danger-ink">
         <span aria-hidden className="h-2 w-2 rounded-full bg-danger" />
         Şu anda stokta yok
       </p>
@@ -184,7 +187,7 @@ function StockLine({ product }: { product: Product }) {
   const low = product.stock <= 5;
   return (
     <p
-      className={`mt-3 inline-flex items-center gap-2 text-[13px] font-semibold ${
+      className={`inline-flex items-center gap-2 text-[13px] font-semibold ${
         low ? 'text-danger-ink' : 'text-success-ink'
       }`}
     >
@@ -193,6 +196,19 @@ function StockLine({ product }: { product: Product }) {
         className={`h-2 w-2 rounded-full ${low ? 'bg-danger' : 'bg-success'}`}
       />
       {low ? `Son ${product.stock} adet` : `Stokta · ${product.stock} adet`}
+    </p>
+  );
+}
+
+/** What shipping costs this visitor, stated before they reach the cart. */
+function ShippingLine({ product }: { product: Product }) {
+  if (product.stock === 0) return null;
+  return (
+    <p className="inline-flex items-center gap-2 text-[13px] font-medium text-text-secondary">
+      <Truck size={15} strokeWidth={2} aria-hidden className="text-text-primary" />
+      {product.freeShipping
+        ? 'Ücretsiz kargo'
+        : `${formatPrice(FREE_SHIPPING_FROM)} üzeri siparişlerde ücretsiz kargo`}
     </p>
   );
 }
@@ -207,7 +223,7 @@ function KeySpecs({ product }: { product: Product }) {
   if (specs.length === 0) return null;
 
   return (
-    <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 rounded-(--card-radius) border border-line bg-surface-page px-3 py-3">
+    <dl className="grid grid-cols-2 gap-x-4 gap-y-2.5 rounded-(--card-radius) border border-line bg-surface-page px-3 py-3">
       {specs.map((spec) => (
         <div key={spec.label} className="min-w-0">
           <dt className="truncate text-[11px] text-text-secondary">{spec.label}</dt>
@@ -385,6 +401,15 @@ export default async function ProductPage({
   const category = categoryMeta(product.category);
   const compatibility = categorySpec(product.category)?.compatibility ?? [];
 
+  /* The CUTOUT, not the plated render, for the mock catalogue's own files. The
+     flat files carry an opaque white plate that shows up as a white rectangle
+     on the stage's tinted bed; the cutouts are transparent. The two
+     directories mirror each other exactly (72 files, same names), so the path
+     derives rather than needing a second field. Uploaded photos pass through. */
+  const gallery = product.images.map((src) =>
+    src.startsWith('/mock/products/') ? src.replace('/mock/products/', '/mock/products/cutout/') : src,
+  );
+
   return (
     /* Bottom padding clears the mobile sticky buy bar. */
     <div className="pb-24 dt:pb-0">
@@ -444,78 +469,42 @@ export default async function ProductPage({
 
       {/* --- buy area --------------------------------------------------- */}
       <section className="container-main pt-3 dt:pt-4" aria-label="Ürün bilgileri">
-        {/* Three columns from `dt` up: media, buy block, and the brand's other
-            models beside them. Below `dt` the grid collapses and the rail falls
-            underneath, which is the same DOM in a different flow — the rail is
-            never rendered twice. */}
-        <div className="grid gap-(--space-grid-gap) lg:grid-cols-2 dt:grid-cols-[minmax(0,4fr)_minmax(0,5fr)_320px]">
-          {/* Media. Fixed ratio, neutral bed, contained — and the LCP element,
-              so it is not lazy. */}
-          {/* `flex flex-col` so the frame below can take the height this panel
-              is given. A very slight bed gradient rather than flat white: the
-              product renders are drawn on a white plate, so on a white panel
-              the device had nothing to sit against. */}
-          {/* `max-w-[460px]` only while the page is a single column. A square
-              frame across the full width measured 686x686 at 768 — a product
-              render taking most of a tablet screen before the price is
-              reached. From `lg` the grid splits and the cell governs again. */}
-          <div className="relative mx-auto flex w-full max-w-[460px] flex-col overflow-hidden rounded-(--panel-radius) border border-line bg-linear-to-b from-surface-card to-surface-page shadow-e1 lg:max-w-none">
-            <span
-              aria-hidden
-              className="block h-[3px] w-full bg-linear-to-r from-grad-1 via-grad-3 to-grad-4"
+        {/* Three columns from `dt` up: gallery, buy block, and the brand's
+            other models beside them. Below `dt` the grid collapses and the rail
+            falls underneath — the same DOM in a different flow, never rendered
+            twice.
+            Gallery and buy block split EVENLY. They were 4fr : 5fr when the
+            media was one fixed picture; a gallery with a thumbnail strip is the
+            reason to look at this page and gets the width to be one. */}
+        <div className="grid gap-(--space-grid-gap) lg:grid-cols-2 dt:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_320px]">
+          {/* `max-w-[520px]` only while the page is a single column: a square
+              stage across the full width measured 686x686 at 768 — a product
+              picture taking most of a tablet screen before the price is
+              reached. From `lg` the grid splits and the cell governs again.
+              Keyed by product: client navigation between two products reuses
+              this position, and the gallery's index must not carry over. */}
+          <div className="mx-auto w-full max-w-[520px] lg:max-w-none dt:sticky dt:top-4 dt:self-start">
+            <ProductGallery
+              key={product.id}
+              images={gallery}
+              alt={product.name}
+              badges={
+                product.stock > 0 && (product.badge === 'super-firsat' || product.freeShipping) ? (
+                  <>
+                    {product.badge === 'super-firsat' && (
+                      <span className="w-fit rounded-full bg-info px-2.5 py-1 text-[11px] font-medium text-white">
+                        Süper Fırsat
+                      </span>
+                    )}
+                    {product.freeShipping && (
+                      <span className="w-fit rounded-full bg-success px-2.5 py-1 text-[11px] font-medium text-white">
+                        Ücretsiz Kargo
+                      </span>
+                    )}
+                  </>
+                ) : undefined
+              }
             />
-            {/* Measured: the panel stretches to the row height (601px at 1440)
-                while this frame stayed locked to the 4:3 reservation (320px),
-                so the product image — the most important picture on a product
-                page — was drawn at 238x238 and filled 22% of its own panel,
-                with ~280px of empty white beneath it.
-                From `dt` the frame takes the panel's height instead, which
-                roughly doubles the render to ~347px and lands near 51% fill.
-                Below `dt` the frame is SQUARE, not the 4:3 `--ratio-product`.
-                Two reasons. The renders are square, so a 4:3 box letterboxed
-                them and drew the product at 232px inside a 374px column. And
-                making the panel a flex container had already broken the 4:3
-                by accident — a flex item's `min-height: auto` let the content
-                override the aspect ratio, which silently replaced a documented
-                reservation with whatever the image happened to be. `min-h-0`
-                stops that, and `aspect-square` states the reservation the page
-                actually wants instead of inheriting one by accident.
-                `--ratio-product` still governs listing cards, where a 4:3 media
-                block is what was measured. */}
-            <div className="flex aspect-square min-h-0 items-center justify-center p-6 dt:aspect-auto dt:flex-1 dt:p-8">
-              {/* The CUTOUT, not the plated render. The flat files carry an
-                  opaque white plate; invisible on a white panel, but the moment
-                  this bed gained its gradient the plate showed up as a white
-                  rectangle floating in the tint. The cutout is transparent, so
-                  the product sits on the bed instead of on a card.
-                  The two directories mirror each other exactly — 72 files, 72
-                  cutouts, same filenames, verified — so the path derives
-                  rather than needing a second field in the catalogue. Their
-                  viewBoxes are also cropped to the drawing (see
-                  scripts/mock/normalize-cutouts.mjs), which is why the device
-                  now fills the frame rather than floating inside its canvas. */}
-              <img
-                src={product.image.replace('/products/', '/products/cutout/')}
-                alt={product.name}
-                width={600}
-                height={600}
-                loading="eager"
-                fetchPriority="high"
-                className="h-full w-full object-contain"
-              />
-            </div>
-            <div className="absolute left-4 top-6 flex flex-col gap-1.5">
-              {product.badge === 'super-firsat' && product.stock > 0 && (
-                <span className="w-fit rounded-full bg-info px-2.5 py-1 text-[11px] font-medium text-white">
-                  Süper Fırsat
-                </span>
-              )}
-              {product.freeShipping && product.stock > 0 && (
-                <span className="w-fit rounded-full bg-success px-2.5 py-1 text-[11px] font-medium text-white">
-                  Ücretsiz Kargo
-                </span>
-              )}
-            </div>
           </div>
 
           {/* Info */}
@@ -523,24 +512,44 @@ export default async function ProductPage({
             <div className="flex flex-wrap items-center gap-2">
               <Link
                 href={`/marka/${brandSlug(product.brand)}`}
-                className="text-[13px] font-bold text-brand-text transition-colors hover:text-brand-dark"
+                className="inline-flex items-center rounded-full bg-brand-soft px-3 py-1 text-[12px] font-bold text-brand-text transition-colors duration-(--duration-fast) hover:bg-brand hover:text-white"
               >
                 {product.brand}
               </Link>
-              <span aria-hidden className="h-3 w-px bg-line-strong" />
-              <span className="inline-flex items-center rounded-md border border-line bg-surface-page px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.06em] text-text-secondary">
+              <span className="inline-flex items-center rounded-md border border-line bg-surface-card px-2 py-[3px] font-mono text-[11px] uppercase tracking-[0.06em] text-text-secondary">
                 {product.sku}
               </span>
+              <Link
+                href={category.href}
+                className="text-[12px] font-medium text-text-secondary transition-colors hover:text-text-primary"
+              >
+                {category.label}
+              </Link>
             </div>
 
-            <h1 className="mt-2 text-[20px] font-extrabold leading-[1.22] tracking-tight text-text-primary dt:text-[28px]">
+            <h1 className="mt-3 text-[22px] font-extrabold leading-[1.2] tracking-tight text-text-primary text-balance dt:text-[30px]">
               {product.name}
             </h1>
 
-            <PriceBlock product={product} />
-            <StockLine product={product} />
-            <KeySpecs product={product} />
-            <ProductBuy product={product} />
+            {/* The buy box. Price, availability, the headline specs and the
+                buttons are one decision, so they sit on one card: the column
+                itself is on the page ground, and a price floating on grey
+                read as a caption rather than the thing to act on.
+                The specs stay BEFORE the button (docs/PRODUCT_MODEL §2.3):
+                they answer "will this work for me", which comes first. */}
+            <div className="mt-4 rounded-(--panel-radius) border border-line bg-surface-card p-4 shadow-e1 dt:mt-5 dt:p-6">
+              <PriceBlock product={product} />
+              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 border-t border-line pt-3">
+                <StockLine product={product} />
+                <ShippingLine product={product} />
+              </div>
+              {keySpecsOf(product).length > 0 && (
+                <div className="mt-4">
+                  <KeySpecs product={product} />
+                </div>
+              )}
+              <ProductBuy product={product} />
+            </div>
 
             <p className="mt-3 text-[12px] text-text-secondary">
               Proje ve toptan alımlar için{' '}
@@ -642,6 +651,20 @@ export default async function ProductPage({
           )}
         </div>
       </section>
+
+      {/* --- description ------------------------------------------------
+          The admin's own text, when there is any. Line breaks are kept, since
+          that is how people write a product description into a textarea. */}
+      {product.description && (
+        <section className="container-main pt-6 dt:pt-8" aria-label="Ürün açıklaması">
+          <SectionHead title="Ürün Açıklaması" />
+          <div className="mt-3 rounded-(--panel-radius) border border-line bg-surface-card px-4 py-4 shadow-e1 dt:px-6 dt:py-5">
+            <p className="max-w-[75ch] whitespace-pre-line text-[14px] leading-relaxed text-text-primary dt:text-[15px]">
+              {product.description}
+            </p>
+          </div>
+        </section>
+      )}
 
       {/* --- specifications -------------------------------------------- */}
       <section className="container-main pt-6 dt:pt-8" aria-label="Teknik bilgiler">

@@ -34,7 +34,9 @@ interface StoreProduct {
   id: string;
   handle: string;
   title: string;
+  description: string | null;
   thumbnail: string | null;
+  images: { url: string; rank?: number | null }[] | null;
   created_at: string;
   metadata: Record<string, unknown> | null;
   collection: { title: string } | null;
@@ -64,7 +66,9 @@ const FIELDS = [
   'id',
   'handle',
   'title',
+  'description',
   'thumbnail',
+  '*images',
   'created_at',
   'metadata',
   '*collection',
@@ -87,6 +91,19 @@ function imagePath(thumbnail: string | null): string {
   } catch {
     return thumbnail;
   }
+}
+
+/**
+ * Every picture, main first. The thumbnail leads — it is what the admin marked
+ * as the main image — followed by the rest of the gallery in the admin's order,
+ * without repeating it.
+ */
+function galleryOf(product: StoreProduct): string[] {
+  const ordered = [...(product.images ?? [])]
+    .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+    .map((image) => imagePath(image.url));
+  const main = imagePath(product.thumbnail ?? product.images?.[0]?.url ?? null);
+  return [main, ...ordered.filter((url) => url !== main)];
 }
 
 const BADGES = new Set(['super-firsat', 'yeni', 'cok-satan']);
@@ -118,6 +135,8 @@ function toProduct(product: StoreProduct, index: number): Product | null {
     price: amount,
     compareAtPrice: original > amount ? original : undefined,
     image: imagePath(product.thumbnail),
+    images: galleryOf(product),
+    description: product.description?.trim() ?? '',
     // An untracked variant is always available; a tracked one reports its stock.
     stock: variant.manage_inventory === false ? 999 : Math.max(0, variant.inventory_quantity ?? 0),
     freeShipping: amount >= FREE_SHIPPING_FROM,

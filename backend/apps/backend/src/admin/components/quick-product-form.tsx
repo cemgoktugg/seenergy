@@ -14,7 +14,7 @@ import {
   type QuickProduct,
   type QuickProductInput,
 } from "../lib/vitrin"
-import { FieldShell, ImageField } from "./fields"
+import { FieldShell, GalleryField } from "./fields"
 
 /**
  * One form for a whole SEENERGY product — create and edit alike.
@@ -38,7 +38,7 @@ interface FormState {
   price: string
   sale_price: string
   stock: string
-  image: string
+  images: string[]
   badge: string
   instalment: boolean
   published: boolean
@@ -55,7 +55,7 @@ const fromProduct = (p?: QuickProduct): FormState => ({
   price: p?.price != null ? String(p.price) : "",
   sale_price: p?.sale_price != null ? String(p.sale_price) : "",
   stock: p ? String(p.stock) : "",
-  image: p?.image ?? "",
+  images: p?.images?.length ? p.images : p?.image ? [p.image] : [],
   badge: p?.badge ?? NO_BADGE,
   instalment: p?.instalment ?? true,
   published: p ? p.status === "published" : true,
@@ -131,7 +131,7 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
       price: price!,
       sale_price: sale,
       stock,
-      image: form.image || null,
+      images: form.images,
       badge: form.badge === NO_BADGE ? null : (form.badge as QuickProduct["badge"]),
       instalment: form.instalment,
       list_keys: form.list_keys,
@@ -253,10 +253,13 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
         </FieldShell>
       </Section>
 
-      <Section title="3. Görsel">
+      <Section title="3. Görseller">
         <div className="md:col-span-2">
-          <FieldShell label="Ürün görseli" hint="Beyaz veya şeffaf arka planlı, kare görsel en iyi sonucu verir.">
-            <ImageField value={form.image} onChange={(v) => set("image", v)} storefront={storefront} />
+          <FieldShell
+            label="Ürün görselleri"
+            hint="İlk görsel ana görseldir: ürün kartlarında ve sepette o görünür. Ürün sayfasında hepsi, bu sırayla, küçük resimli bir galeride gösterilir. Birden çok dosyayı aynı anda seçebilir veya sürükleyebilirsiniz. Beyaz veya şeffaf arka planlı, kare görseller en iyi sonucu verir."
+          >
+            <GalleryField value={form.images} onChange={(v) => set("images", v)} storefront={storefront} />
           </FieldShell>
         </div>
       </Section>

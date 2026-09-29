@@ -50,6 +50,8 @@ export interface QuickProduct {
   sale_price: number | null
   stock: number
   image: string | null
+  /** Every picture, main first. */
+  images: string[]
   badge: "yeni" | "super-firsat" | "cok-satan" | null
   instalment: boolean
   list_keys: string[]
@@ -67,7 +69,8 @@ export interface QuickProductInput {
   price: number
   sale_price: number | null
   stock: number
-  image: string | null
+  /** Every picture in display order; the first is the main one. */
+  images: string[]
   badge: QuickProduct["badge"]
   instalment: boolean
   list_keys: string[]
@@ -191,6 +194,12 @@ export function useSaveQuickProduct() {
       ),
     onSuccess: invalidate,
   })
+}
+
+/** Upload several files in one request; returns their public URLs in order. */
+export async function uploadImages(files: File[]): Promise<string[]> {
+  const { files: uploaded } = await sdk.admin.upload.create({ files })
+  return uploaded.map((file) => file.url)
 }
 
 /** Upload one file through Medusa's file module; returns its public URL. */

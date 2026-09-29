@@ -30,8 +30,9 @@ These routes are real, not placeholders:
 
 ```
 /                     homepage
-/urun/[slug]          product detail — spec table, compatibility, and the
-                      brand's other models in a sticky right-hand rail
+/urun/[slug]          product detail — image gallery (stage, thumbnail strip,
+                      full-screen viewer), buy box, spec table, compatibility,
+                      and the brand's other models in a sticky right-hand rail
 /kategori/[slug]      category listing over the 12 catalogue categories
 /marka/[slug]         brand listing — the same shell, a brand's products
 /arama                search results — the same shell, a query's matches
@@ -102,7 +103,8 @@ metadata.
 The homepage's content is edited in the Medusa admin, not in code: admin →
 **Vitrin** shows the homepage as a top-to-bottom map, and **Vitrin → Ürün
 Yönetimi** is a one-page product form (name, brand, category, price, sale
-price, stock, image, badge, homepage lists) for people who should not need to
+price, stock, images — an ordered gallery, first is the main picture — badge,
+homepage lists) for people who should not need to
 know what a variant or a price list is.
 
 ```

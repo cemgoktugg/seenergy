@@ -39,6 +39,9 @@ export interface QuickProductInput {
   price: number
   sale_price?: number | null
   stock: number
+  /** Every picture, in display order; the first is the main one. */
+  images?: string[] | null
+  /** Older single-picture form; used only when `images` is absent. */
   image?: string | null
   badge?: Badge | null
   instalment: boolean
@@ -62,6 +65,8 @@ export interface QuickProduct {
   sale_price: number | null
   stock: number
   image: string | null
+  /** Every picture, main first. */
+  images: string[]
   badge: Badge | null
   instalment: boolean
   list_keys: string[]
@@ -91,6 +96,8 @@ const FIELDS = [
   "description",
   "status",
   "thumbnail",
+  "images.url",
+  "images.rank",
   "metadata",
   "updated_at",
   "collection.id",
@@ -128,6 +135,21 @@ async function saleListPrices(query: Query) {
   }
 }
 
+/** A product's pictures in display order: the thumbnail (the main one) first. */
+function picturesOf(product: any): string[] {
+  const ordered = [...(product.images ?? [])]
+    .sort((a: any, b: any) => (a.rank ?? 0) - (b.rank ?? 0))
+    .map((image: any) => image.url as string)
+  const main = product.thumbnail ?? ordered[0]
+  return main ? [main, ...ordered.filter((url) => url !== main)] : []
+}
+
+/** The pictures a save asks for, trimmed and without repeats. */
+function picturesIn(input: QuickProductInput): string[] {
+  const list = input.images ?? (input.image ? [input.image] : [])
+  return [...new Set(list.map((url) => url.trim()).filter(Boolean))]
+}
+
 function toQuick(
   product: any,
   sale: Map<string, { id: string; amount: number }>,
@@ -153,6 +175,7 @@ function toQuick(
     sale_price: base ? sale.get(base.price_set_id)?.amount ?? null : null,
     stock: levels.reduce((sum: number, level: any) => sum + Number(level.stocked_quantity ?? 0), 0),
     image: product.thumbnail ?? null,
+    images: picturesOf(product),
     badge: BADGES.includes(meta.badge) ? meta.badge : null,
     instalment: meta.instalment === true,
     list_keys: lists.filter((l) => l.product_ids.includes(product.id)).map((l) => l.key),
@@ -301,8 +324,8 @@ export async function createQuickProduct(container: MedusaContainer, input: Quic
           category_ids: [input.category_id],
           collection_id: brand.id,
           shipping_profile_id: profiles[0].id,
-          thumbnail: input.image || undefined,
-          images: input.image ? [{ url: input.image }] : [],
+          thumbnail: picturesIn(input)[0],
+          images: picturesIn(input).map((url) => ({ url })),
           metadata: {
             brand: brand.title,
             instalment: input.instalment,
@@ -363,6 +386,7 @@ export async function updateQuickProduct(
   if (!current) throw new MedusaError(MedusaError.Types.NOT_FOUND, "Ürün bulunamadı.")
   const variant = current.variants?.[0]
   const base = (variant?.prices ?? []).find((p: any) => p.currency_code === "try")
+  const pictures = picturesIn(input)
 
   await updateProductsWorkflow(container).run({
     input: {
@@ -373,8 +397,12 @@ export async function updateQuickProduct(
         status: input.status === "draft" ? ProductStatus.DRAFT : ProductStatus.PUBLISHED,
         collection_id: brand.id,
         category_ids: [input.category_id],
-        thumbnail: input.image || null,
-        ...(input.image && input.image !== current.thumbnail ? { images: [{ url: input.image }] } : {}),
+        thumbnail: pictures[0] ?? null,
+        // The form owns the whole gallery now, so a changed list replaces it;
+        // an unchanged one is left alone rather than re-created.
+        ...(JSON.stringify(pictures) !== JSON.stringify(picturesOf(current))
+          ? { images: pictures.map((url) => ({ url })) }
+          : {}),
         // Medusa merges metadata; an empty string removes a key.
         metadata: {
           brand: brand.title,
