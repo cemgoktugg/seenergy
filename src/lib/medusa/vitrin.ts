@@ -130,7 +130,11 @@ const toBanner = (data: RawBanner): Banner => ({
 const FALLBACK: Vitrin = {
   announcement: SITE.promo,
   // The shipped artwork is wide campaign art, drawn to fill the stage.
-  slides: HERO_SLIDES.map((slide) => ({ ...slide, chips: [...slide.chips], fit: 'cover' as const })),
+  slides: HERO_SLIDES.map((slide) => ({
+    ...slide,
+    chips: [...slide.chips],
+    fit: slide.fit === 'contain' ? ('contain' as const) : ('cover' as const),
+  })),
   heroSide: HERO_SIDE.map((item) => ({ ...item })),
   banners: {},
   brandBands: BRAND_SECTIONS.map((band) => ({

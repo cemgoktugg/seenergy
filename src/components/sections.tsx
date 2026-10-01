@@ -634,10 +634,10 @@ export function SeoEditorial() {
           consequence of that fix rather than a separate opinion —
           26/14 = 1.86x and 17/14 = 1.21x read as heading, subheading, body. */}
       <h1 className="text-[20px] font-bold tracking-tight text-text-primary lg:text-[24px]">
-        Türkiye&apos;nin En Geniş Elektronik Ürün Yelpazesi
+        Güvenlik Teknolojileri Tedariki
       </h1>
       <h2 className="mt-1.5 text-[16px] font-medium text-text-secondary lg:text-[16px]">
-        Toptan ve perakende elektronik tedarik
+        Toptan ve perakende güvenlik sistemleri
       </h2>
       {/* Measured at 1440: these two paragraphs ran the full 1320px container at
           11.5px, centred — 184 characters on a single line against a 60–75
@@ -652,11 +652,12 @@ export function SeoEditorial() {
           The block stays centred; only its measure is bounded. */}
       <p className="mx-auto mt-4 max-w-[60ch] text-[13px] leading-[1.7] text-text-secondary lg:text-[14px]">
         <strong className="font-semibold text-text-primary">
-          Ev teknolojileri, güvenlik sistemleri, ses sistemleri ve daha fazlası…
+          CCTV, network, alarm ve geçiş kontrol sistemleri…
         </strong>{' '}
-        Uydu sistemlerinden güvenlik kameralarına, televizyon yedek parçadan oto ses
-        sistemlerine kadar geniş bir ürün yelpazesini tek katalogda topluyoruz. Hem son
-        kullanıcıya hem de kurumsal alıcıya aynı stok derinliğiyle hizmet veriyoruz.
+        CCTV ve kayıt sistemlerinden network ürünlerine, alarm, yangın algılama ve geçiş
+        kontrolünden uydu ve seslendirme sistemlerine kadar güvenlik altyapısının ürünlerini
+        tek katalogda topluyoruz. Hem son kullanıcıya hem de kurumsal alıcıya aynı stok
+        derinliğiyle hizmet veriyoruz.
       </p>
       <p className="mx-auto mt-3 max-w-[60ch] text-[13px] leading-[1.7] text-text-secondary lg:text-[14px]">
         Teknik ekibimiz ürün seçiminde uyumluluk ve kurulum konularında destek sağlar.

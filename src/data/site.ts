@@ -8,7 +8,8 @@ import { ALL_CATEGORIES, CATEGORY_TREE, categoryHref } from '@/data/categories';
 export const SITE = {
   name: 'SEENERGY',
   shortName: 'SEENERGY',
-  tagline: 'Elektronik ve Teknoloji Tedariki',
+  /* The logo's own line: "SEENERGY Güvenlik Teknolojileri A.Ş". */
+  tagline: 'Güvenlik Teknolojileri',
   promo: '1000 TL ÜZERİ ÜCRETSİZ KARGO',
 } as const;
 
@@ -123,13 +124,14 @@ export const HERO_SIDE = [
 
 export const HERO_SLIDES = [
   {
-    eyebrow: 'Akıllı ev ve güvenlik',
-    title: 'Akıllı Ev Sistemleri',
-    description: 'Kameradan diafona, tüm akıllı ev çözümleri tek çatıda.',
-    chips: ['Kamera ve diafon', 'Akıllı priz ve röle', 'Kurulum desteği'],
-    cta: 'Alışverişe Başla',
-    href: '/kategori/cctv-guvenlik-sistemleri',
-    image: '/mock/hero/hero-1.svg',
+    eyebrow: "SEENERGY Güvenlik Teknolojileri",
+    title: "Güvenlik Teknolojileri",
+    description: "CCTV, kayıt, network, alarm ve geçiş kontrol ürünleri tek çatıda.",
+    chips: ["CCTV ve kayıt", "Network ve PoE", "Alarm ve geçiş kontrol"],
+    cta: "Kategorileri Gör",
+    href: "/kategori",
+    image: "/brand/seenergy-logo-hero.webp",
+    fit: "contain",
   },
   {
     eyebrow: 'Seslendirme sistemleri',
@@ -139,15 +141,17 @@ export const HERO_SLIDES = [
     cta: 'Ürünleri İncele',
     href: '/kategori/seslendirme-sistemleri',
     image: '/mock/hero/hero-2.svg',
+    fit: 'cover',
   },
   {
-    eyebrow: 'Televizyon yedek parça',
-    title: 'Tv Yedek Parça',
-    description: '13.000+ televizyon modeline uyumlu led bar ve panel stoğu.',
-    chips: ['13.000+ model', 'Led bar ve panel', 'Uyumluluk desteği'],
-    cta: 'Stoğu Görüntüle',
-    href: '/kategori/tv-yedek-parca',
-    image: '/mock/hero/hero-3.svg',
+    eyebrow: "Network ürünleri",
+    title: "Network ve PoE Çözümleri",
+    description: "IP kamera sistemleri için PoE switch, ethernet switch, access point ve router.",
+    chips: ["PoE Switch", "Ethernet Switch", "Access Point / Router"],
+    cta: "Ürünleri İncele",
+    href: "/kategori/network-urunleri",
+    image: "/mock/products/cutout/router-white.svg",
+    fit: "contain",
   },
 ];
 

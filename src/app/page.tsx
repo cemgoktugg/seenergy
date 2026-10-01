@@ -143,11 +143,12 @@ export default async function HomePage() {
       <Section>
         {(() => {
           const wide = banner('wide', {
-            title: "Türkiye'nin en geniş yedek parça stoğu",
-            subtitle: '13.000+ televizyona uyumlu led bar çeşitleri',
-            href: '/kategori/tv-yedek-parca',
+            eyebrow: "CCTV güvenlik sistemleri",
+            title: "AHD ve IP kamera sistemleri",
+            subtitle: "Kamera, kayıt cihazı ve aksesuarlar; projeler için kurumsal teklif.",
+            href: "/kategori/cctv-guvenlik-sistemleri",
             tone: 'koyu',
-            productImage: '/mock/products/cutout/ledbar-white.svg',
+            productImage: "/mock/products/cutout/dome-white.svg",
           });
           return <WideBanner banner={wide} />;
         })()}
@@ -198,9 +199,9 @@ export default async function HomePage() {
         <TechBand
           {...(vitrin.techBand ?? {
             eyebrow: 'Neden SEENERGY',
-            title: 'Elektronikte tedarik, tek adresten',
+            title: "Güvenlik altyapısında tedarik, tek adresten",
             description:
-              'Uydu ve güvenlik sistemlerinden televizyon yedek parçaya, oto ses sistemlerinden devre elemanlarına kadar geniş bir katalog; hem son kullanıcıya hem kurumsal alıcıya aynı stok derinliğiyle.',
+              "CCTV ve kayıt sistemlerinden network, alarm, yangın algılama ve geçiş kontrolüne, uydu ve seslendirme sistemlerine kadar güvenlik altyapısının ürünleri; hem son kullanıcıya hem kurumsal alıcıya aynı stok derinliğiyle.",
             stats: [
               { value: '12.000+', label: 'Katalogdaki ürün çeşidi' },
               { value: '45+', label: 'Yetkili satıcısı olduğumuz marka' },

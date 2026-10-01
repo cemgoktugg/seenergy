@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     template: `%s | ${SITE.name}`,
   },
   description:
-    'Uydu sistemleri, güvenlik kameraları, ses sistemleri, televizyon yedek parça, adaptör ve kablo çeşitlerinde toptan ve perakende elektronik tedarik.',
+    'CCTV, kayıt ve depolama, network, alarm, yangın algılama, geçiş kontrol, uydu ve seslendirme sistemlerinde toptan ve perakende güvenlik teknolojileri tedariki.',
   robots: { index: false, follow: false },
 };
 

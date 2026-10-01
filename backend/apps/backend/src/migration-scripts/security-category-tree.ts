@@ -224,5 +224,25 @@ export default async function security_category_tree({ container }: { container:
       }))
     );
   }
+  /* 5. ranks, written directly. Medusa's rank update shifts siblings, which
+        keeps any duplicate ranks it already holds — after the steps above the
+        roots read 0,1,1,1,2… and the admin listed İnterkom before Geçiş
+        Kontrol. One UPDATE gives every root its place in the client's order,
+        retired categories after it, so the admin lists what the site shows. */
+  const pg = container.resolve(ContainerRegistrationKeys.PG_CONNECTION) as {
+    raw: (sql: string, bindings: unknown[]) => Promise<unknown>;
+  };
+  const order = [...TREE.map((node) => node.handle), ...RETIRED];
+  for (const [rank, handle] of order.entries()) {
+    await pg.raw(
+      "update product_category set rank = ? where handle = ? and parent_category_id is null and deleted_at is null",
+      [rank, handle]
+    );
+  }
+  for (const parent of TREE) {
+    for (const [rank, child] of (parent.children ?? []).entries()) {
+      await pg.raw("update product_category set rank = ? where handle = ? and deleted_at is null", [rank, child.handle]);
+    }
+  }
   logger.info("SEENERGY: category tree done.");
 }

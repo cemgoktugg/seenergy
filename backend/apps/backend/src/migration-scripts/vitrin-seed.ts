@@ -76,15 +76,14 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
     block("announcement", { text: "1000 TL ÜZERİ ÜCRETSİZ KARGO" }),
 
     block("hero-slide", {
-      eyebrow: "Akıllı ev ve güvenlik",
-      title: "Akıllı Ev Sistemleri",
-      description: "Kameradan diafona, tüm akıllı ev çözümleri tek çatıda.",
-      chips: ["Kamera ve diafon", "Akıllı priz ve röle", "Kurulum desteği"],
-      cta: "Alışverişe Başla",
-      href: "/kategori/cctv-guvenlik-sistemleri",
-      image: "/mock/hero/hero-1.svg",
-      // Wide campaign art: fills the stage (a product shot would use "contain").
-      fit: "cover",
+      eyebrow: "SEENERGY Güvenlik Teknolojileri",
+      title: "Güvenlik Teknolojileri",
+      description: "CCTV, kayıt, network, alarm ve geçiş kontrol ürünleri tek çatıda.",
+      chips: ["CCTV ve kayıt", "Network ve PoE", "Alarm ve geçiş kontrol"],
+      cta: "Kategorileri Gör",
+      href: "/kategori",
+      image: "/brand/seenergy-logo-hero.webp",
+      fit: "contain",
     }, 0),
     block("hero-slide", {
       eyebrow: "Seslendirme sistemleri",
@@ -98,15 +97,14 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
       fit: "cover",
     }, 1),
     block("hero-slide", {
-      eyebrow: "Televizyon yedek parça",
-      title: "Tv Yedek Parça",
-      description: "13.000+ televizyon modeline uyumlu led bar ve panel stoğu.",
-      chips: ["13.000+ model", "Led bar ve panel", "Uyumluluk desteği"],
-      cta: "Stoğu Görüntüle",
-      href: "/kategori/tv-yedek-parca",
-      image: "/mock/hero/hero-3.svg",
-      // Wide campaign art: fills the stage (a product shot would use "contain").
-      fit: "cover",
+      eyebrow: "Network ürünleri",
+      title: "Network ve PoE Çözümleri",
+      description: "IP kamera sistemleri için PoE switch, ethernet switch, access point ve router.",
+      chips: ["PoE Switch", "Ethernet Switch", "Access Point / Router"],
+      cta: "Ürünleri İncele",
+      href: "/kategori/network-urunleri",
+      image: "/mock/products/cutout/router-white.svg",
+      fit: "contain",
     }, 2),
 
     // Campaign cards: a brand tone and a product (see vitrin-upgrade-campaign-cards.ts).
@@ -114,11 +112,12 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
     block("hero-side", { eyebrow: "Kurumsal", title: "Toptan alım ve bayilik", href: "/toptan-satis", tone: "turkuaz", product_image: "/mock/products/cutout/nvr-white.svg" }, 1, "hero-side-2"),
 
     block("banner", {
-      title: "Türkiye'nin en geniş yedek parça stoğu",
-      subtitle: "13.000+ televizyona uyumlu led bar çeşitleri",
-      href: "/kategori/tv-yedek-parca",
+      eyebrow: "CCTV güvenlik sistemleri",
+      title: "AHD ve IP kamera sistemleri",
+      subtitle: "Kamera, kayıt cihazı ve aksesuarlar; projeler için kurumsal teklif.",
+      href: "/kategori/cctv-guvenlik-sistemleri",
       tone: "koyu",
-      product_image: "/mock/products/cutout/ledbar-white.svg",
+      product_image: "/mock/products/cutout/dome-white.svg",
     }, 0, "wide"),
     block("banner", { eyebrow: "Kendi markalarımız", title: "Tescilli Markalarımız", href: "/markalar", tone: "acik", product_image: "/mock/products/cutout/receiver-white.svg" }, 1, "dual-1"),
     block("banner", { eyebrow: "Yetkili satıcılık", title: "Resmi Yetkili Satıcısı Olduğumuz Markalar", href: "/markalar", tone: "turkuaz", product_image: "/mock/products/cutout/camera-white.svg" }, 2, "dual-2"),
@@ -138,9 +137,9 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
 
     block("tech-band", {
       eyebrow: "Neden SEENERGY",
-      title: "Elektronikte tedarik, tek adresten",
+      title: "Güvenlik altyapısında tedarik, tek adresten",
       description:
-        "Uydu ve güvenlik sistemlerinden televizyon yedek parçaya, oto ses sistemlerinden devre elemanlarına kadar geniş bir katalog; hem son kullanıcıya hem kurumsal alıcıya aynı stok derinliğiyle.",
+        "CCTV ve kayıt sistemlerinden network, alarm, yangın algılama ve geçiş kontrolüne, uydu ve seslendirme sistemlerine kadar güvenlik altyapısının ürünleri; hem son kullanıcıya hem kurumsal alıcıya aynı stok derinliğiyle.",
       stats: [
         { value: "12.000+", label: "Katalogdaki ürün çeşidi" },
         { value: "45+", label: "Yetkili satıcısı olduğumuz marka" },
