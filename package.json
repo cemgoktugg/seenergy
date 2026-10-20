@@ -10,7 +10,7 @@
     "backend:migrate": "npm --prefix backend/apps/backend exec medusa db:migrate",
     "build": "next build",
     "start": "next start -p 3100",
-    "lint": "eslint .",
+    "lint": "eslint . --cache --cache-location node_modules/.cache/eslint/",
     "typecheck": "tsc --noEmit",
     "mock:assets": "node scripts/mock/generate-assets.mjs && node scripts/mock/normalize-cutouts.mjs",
     "mock:normalize": "node scripts/mock/normalize-cutouts.mjs",
