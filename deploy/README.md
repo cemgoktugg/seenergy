@@ -1,107 +1,137 @@
-# Sunucuya taşıma (Veridyen)
+# Sunucuya taşıma — Dokploy (Veridyen)
 
-Projeyi canlı sunucuya kurmak için gereken her şey bu depoda. Tek istisna,
-şifreler ve gizli anahtarlar: onlar bilerek GitHub'da değil, sunucuda ayrıca
-girilir (aşağıda, 3. ve 5. adım).
+Diğer Medusa mağazası (`testerestore`) ile aynı yapı: bir Dokploy projesinde
+PostgreSQL, Redis ve uygulamalar. Fark: burada iki uygulama var — Medusa
+backend + admin ve Next.js mağaza.
+
+| Servis | Dokploy türü | Kaynak |
+|---|---|---|
+| `seenergy-postgres` | Database → PostgreSQL | `deploy/seenergy.sql` buraya yüklenir |
+| `seenergy-redis` | Database → Redis | — |
+| `seenergy-backend` | Application | GitHub, `backend/Dockerfile`, port **9000** |
+| `seenergy-store` | Application | GitHub, `Dockerfile`, port **3100** |
+
+İki Dockerfile da yerelde Docker ile derlendi ve bu düzenin birebir provası
+yapıldı (Postgres'e geri yüklenmiş döküm + Redis + backend + mağaza): bütün
+sayfalar 200, admin paneli açılıyor, yüklenen görseller sunuluyor.
 
 ## Bu klasörde
 
 | Dosya | Ne |
 |---|---|
-| `seenergy.sql` | Veritabanının temiz kopyası: 60 ürün, kategori ağacı (14 ana + 12 alt; eski 10 kategori pasif), fiyatlar, stok, Vitrin içeriği (slaytlar, bannerlar, marka bantları), teknik özellikler, mağaza anahtarı |
-| `rewrite-urls.sql` | Veritabanındaki yerel adresleri (`localhost:3100`, `localhost:9000`) canlı alan adlarıyla değiştirir |
+| `seenergy.sql` | Veritabanının temiz kopyası: 60 ürün, kategori ağacı (14 ana + 12 alt; eski 10 kategori pasif), fiyatlar, stok, Vitrin içeriği, teknik özellikler, mağaza anahtarı. **Yok:** admin kullanıcısı, müşteriler, siparişler, sepetler (test verisi ve kişisel veriydi). PostgreSQL 14+ |
+| `rewrite-urls.sql` | Veritabanındaki `localhost:3100` / `localhost:9000` adreslerini canlı alan adlarıyla değiştirir |
 
-Admin'den yüklenen görseller: `backend/apps/backend/static/`
+Admin'den yüklenen görseller: `backend/apps/backend/static/` (imaja kopyalanır).
 
-**`seenergy.sql` içinde OLMAYANLAR** (bilerek): admin kullanıcısı, müşteri
-hesapları, siparişler, sepetler, ödemeler. Bunlar geliştirme sırasındaki test
-verisiydi ve kişisel veri içeriyordu. Admin kullanıcısı sunucuda tek komutla
-oluşturulur (4. adım).
+## Önce: alan adları
 
-Döküm PostgreSQL 18 ile alındı, PostgreSQL 14 ve üzerinde kurulur.
+DNS'te iki kayıt (A kaydı → sunucu IP'si, `185.149.102.122`):
 
-## Gerekenler
+- `www.ORNEK.com.tr` → mağaza
+- `api.ORNEK.com.tr` → backend ve admin (`/app`)
 
-- Node.js 20.19+ veya 22.12+
-- PostgreSQL 14+
-- nginx (alan adlarını uygulamalara yönlendirmek ve SSL için), pm2 (uygulamaları
-  ayakta tutmak için)
-- İki alan adı: mağaza (ör. `www.ornek.com.tr`) ve backend/admin
-  (ör. `api.ornek.com.tr`)
+Aşağıda `ORNEK.com.tr` yerine gerçek alan adını yazın.
 
-## Adımlar
+## 1. PostgreSQL
 
-**1. Kodu al**
+Create Service → Database → **PostgreSQL**, ad `seenergy-postgres`,
+veritabanı `seenergy`. Oluşunca:
+
+- **Internal Connection URL**'i not edin (backend bunu kullanacak).
+- Veriyi yüklemek için geçici olarak bir **External Port** açın, ardından
+  dökümü ve adres düzeltmesini yükleyin:
 
 ```
-git clone https://github.com/cemgoktugg/seenergy.git
-cd seenergy
+psql "postgresql://KULLANICI:SIFRE@185.149.102.122:DIS_PORT/seenergy" -f deploy/seenergy.sql
+psql "postgresql://KULLANICI:SIFRE@185.149.102.122:DIS_PORT/seenergy" \
+  -v store=https://www.ORNEK.com.tr -v api=https://api.ORNEK.com.tr -f deploy/rewrite-urls.sql
 ```
 
-**2. Veritabanı**
+Yükleme bitince external port'u kapatın.
+
+## 2. Redis
+
+Create Service → Database → **Redis**, ad `seenergy-redis`. **Internal
+Connection URL**'i not edin.
+
+## 3. Backend — `seenergy-backend`
+
+Create Service → **Application**.
+
+- **Provider:** GitHub → depo `cemgoktugg/seenergy`, dal `main`
+- **Build Type:** Dockerfile — Docker File `backend/Dockerfile`, Docker Context Path `backend`
+- **Environment:**
 
 ```
-createdb seenergy
-psql seenergy -f deploy/seenergy.sql
-psql seenergy -v store=https://www.ornek.com.tr -v api=https://api.ornek.com.tr -f deploy/rewrite-urls.sql
+DATABASE_URL=<Postgres Internal Connection URL>?sslmode=disable
+REDIS_URL=<Redis Internal Connection URL>
+JWT_SECRET=<uzun rastgele dize>
+COOKIE_SECRET=<uzun rastgele dize>
+AUTH_MFA_ENCRYPTION_KEY=<uzun rastgele dize>
+STORE_CORS=https://www.ORNEK.com.tr
+ADMIN_CORS=https://api.ORNEK.com.tr
+AUTH_CORS=https://www.ORNEK.com.tr,https://api.ORNEK.com.tr
+MEDUSA_BACKEND_URL=https://api.ORNEK.com.tr
+STOREFRONT_URL=https://www.ORNEK.com.tr
+STOREFRONT_REVALIDATE_SECRET=<uzun rastgele dize — mağazadaki REVALIDATE_SECRET ile AYNI>
 ```
 
-Adreslerin sonunda `/` olmasın.
+> **`?sslmode=disable` şart.** Medusa, adresi `localhost` olmayan her
+> veritabanına SSL ile bağlanmaya çalışır; Dokploy'un iç PostgreSQL'i SSL
+> kullanmaz ve bağlantı 10 saniyede zaman aşımına düşer. Provada aynen
+> görüldü, bu ekle düzeldi.
 
-**3. Backend ayarları** — `backend/apps/backend/.env.template` dosyasını
-`backend/apps/backend/.env` olarak kopyalayıp doldurun:
+- **Domains:** host `api.ORNEK.com.tr`, container port **9000**, HTTPS açık (Let's Encrypt)
+- **Advanced → Volumes:** volume mount, mount path **`/server/static`** —
+  admin'den yüklenen görseller burada durur; volume olmazsa her deploy'da
+  silinir.
+- **Deploy.** Açılış ~20 saniye. Kontrol: `https://api.ORNEK.com.tr/health` → `OK`.
 
-| Anahtar | Değer |
-|---|---|
-| `DATABASE_URL` | sunucudaki PostgreSQL bağlantısı |
-| `JWT_SECRET`, `COOKIE_SECRET` | her biri uzun, rastgele bir dize |
-| `AUTH_MFA_ENCRYPTION_KEY` | uzun, rastgele bir dize; admin'de iki adımlı doğrulama için (boşsa o özellik kullanılamaz) |
-| `STORE_CORS` | `https://www.ornek.com.tr` |
-| `ADMIN_CORS` | `https://api.ornek.com.tr` |
-| `AUTH_CORS` | `https://www.ornek.com.tr,https://api.ornek.com.tr` |
-| `MEDUSA_BACKEND_URL` | `https://api.ornek.com.tr` — yüklenen görseller bu adresle kaydedilir |
-| `STOREFRONT_URL` | `https://www.ornek.com.tr` |
-| `STOREFRONT_REVALIDATE_SECRET` | rastgele bir dize; mağazadaki `REVALIDATE_SECRET` ile **aynı** |
-
-**4. Backend'i kur ve başlat**
+Admin kullanıcısı (bir kez) — uygulamanın terminalinde (`/server` klasörü):
 
 ```
-cd backend && npm ci
-cd apps/backend
-npx medusa db:migrate
-npx medusa user -e admin@ornek.com.tr -p <güçlü-şifre>
-npm run build
+npx medusa user -e admin@ORNEK.com.tr -p <güçlü-şifre>
 ```
 
-`npm run build` çıktısı `.medusa/server` klasörüne gider. Oradan
-çalıştırılırken `.env` dosyası ve `static/` (yüklenen görseller) o klasörde de
-bulunmalı. **`static/` klasörünü build dışında kalıcı bir yerde tutup
-`.medusa/server/static` olarak bağlayın (sembolik bağlantı)**; yoksa her
-yeniden derlemede admin'den yüklenmiş görseller silinir.
+Admin paneli: `https://api.ORNEK.com.tr/app`
 
-Admin paneli: `https://api.ornek.com.tr/app`
+## 4. Mağaza — `seenergy-store`
 
-**5. Mağaza ayarları** — depo kökünde `.env.production.local`:
+**Backend çalışır durumdayken** oluşturun: mağaza derlenirken ürün, kategori
+ve marka sayfaları backend'den alınarak önceden oluşturulur.
 
-| Anahtar | Değer |
-|---|---|
-| `MEDUSA_BACKEND_URL` | `https://api.ornek.com.tr` |
-| `MEDUSA_PUBLISHABLE_KEY` | veritabanındaki anahtar: `select token from api_key where type = 'publishable';` |
-| `REVALIDATE_SECRET` | backend'deki `STOREFRONT_REVALIDATE_SECRET` ile aynı |
-| `BANK_NAME`, `BANK_HOLDER`, `BANK_IBAN` | havale/EFT bilgileri (isteğe bağlı, bkz. `.env.example`) |
+Create Service → **Application**.
 
-**6. Mağazayı derle ve başlat** — derleme sırasında backend **çalışıyor
-olmalı**, çünkü ürün sayfaları derlenirken ürün listesi backend'den alınır:
+- **Provider:** GitHub → aynı depo, dal `main`
+- **Build Type:** Dockerfile — Docker File `Dockerfile`, Docker Context Path `.`
+- **Build-time Arguments:**
 
 ```
-npm ci
-npm run build
-npm run start        # 3100 portunda
+MEDUSA_BACKEND_URL=https://api.ORNEK.com.tr
+MEDUSA_PUBLISHABLE_KEY=<anahtar>
 ```
 
-**7. nginx ve SSL** — `www.` → `localhost:3100`, `api.` → `localhost:9000`;
-SSL için Let's Encrypt. İki uygulamayı da pm2 ile başlatın ki sunucu yeniden
-açılınca kendiliğinden kalksınlar.
+- **Environment:** aynı ikisi, ek olarak:
+
+```
+REVALIDATE_SECRET=<backend'deki STOREFRONT_REVALIDATE_SECRET ile aynı>
+BANK_NAME=…
+BANK_HOLDER=…
+BANK_IBAN=…
+```
+
+Anahtar veritabanında: `select token from api_key where type = 'publishable';`
+
+- **Domains:** host `www.ORNEK.com.tr`, container port **3100**, HTTPS açık
+- **Deploy.**
+
+## Sonra
+
+- Ürün kaydedilince mağaza anında güncellenir (`STOREFRONT_URL` +
+  revalidate anahtarı). Kategori ağacı kodda tanımlı; değişince mağaza
+  yeniden deploy edilir.
+- Sunucuda her iki Node derlemesi ~1 GB bellek ister; aynı anda başlatmayın.
 
 ## Siteyi herkese açmadan önce
 

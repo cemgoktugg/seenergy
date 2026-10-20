@@ -2,9 +2,35 @@ import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
+/**
+ * Redis, when the environment provides it (the live server: a Redis service
+ * beside Postgres, as the other store on the same Dokploy runs). Medusa then
+ * keeps sessions, cache, events, workflows and locks there, so they survive a
+ * restart and a deploy. Without REDIS_URL — local development — every one of
+ * them stays on Medusa's in-memory default, exactly as before.
+ */
+const redisUrl = process.env.REDIS_URL
+
+const redisModules = redisUrl
+  ? [
+      { resolve: '@medusajs/medusa/cache-redis', options: { redisUrl } },
+      { resolve: '@medusajs/medusa/event-bus-redis', options: { redisUrl } },
+      { resolve: '@medusajs/medusa/workflow-engine-redis', options: { redis: { redisUrl } } },
+      {
+        resolve: '@medusajs/medusa/locking',
+        options: {
+          providers: [
+            { resolve: '@medusajs/medusa/locking-redis', id: 'locking-redis', is_default: true, options: { redisUrl } },
+          ],
+        },
+      },
+    ]
+  : []
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
+    ...(redisUrl ? { redisUrl } : {}),
     http: {
       storeCors: process.env.STORE_CORS!,
       adminCors: process.env.ADMIN_CORS!,
@@ -35,5 +61,6 @@ module.exports = defineConfig({
         ],
       },
     },
+    ...redisModules,
   ],
 })

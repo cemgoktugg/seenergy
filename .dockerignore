@@ -1,0 +1,16 @@
+# The storefront image needs the Next.js app only. The backend builds from its
+# own context (backend/Dockerfile); the rest is tooling, data or reference
+# material that has no place in a running store.
+.git
+node_modules
+.next
+.env
+.env.*
+!.env.example
+backend
+deploy
+img
+reference
+reference-analysis
+artifacts
+*.log
