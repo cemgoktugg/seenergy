@@ -26,12 +26,17 @@ Admin'den yüklenen görseller: `backend/apps/backend/static/` (imaja kopyalanı
 
 ## Önce: alan adları
 
-DNS'te iki kayıt (A kaydı → sunucu IP'si, `185.149.102.122`):
+| Adres | Ne | DNS (A → `185.149.102.122`) |
+|---|---|---|
+| `ecommercore.com` | mağaza | hazır |
+| `www.ecommercore.com` | mağaza → `ecommercore.com`'a yönlenir | hazır |
+| `api.ecommercore.com` | backend ve admin (`/app`) | hazır |
 
-- `www.ORNEK.com.tr` → mağaza
-- `api.ORNEK.com.tr` → backend ve admin (`/app`)
-
-Aşağıda `ORNEK.com.tr` yerine gerçek alan adını yazın.
+> `ecommercore.com` ve `www` bugün (2026-10-20) Dokploy'da **testerestore.com'a
+> 301 yönlendiriliyor**. Mağazaya bağlamadan önce o yönlendirme kaldırılmalı
+> (testerestore uygulamasının Domains sekmesi ya da Traefik File System);
+> aynı alan adı iki yerde tanımlı kalırsa Traefik hangisini seçeceğini
+> garanti etmez. testerestore.com bundan etkilenmez.
 
 ## 1. PostgreSQL
 
@@ -45,7 +50,7 @@ veritabanı `seenergy`. Oluşunca:
 ```
 psql "postgresql://KULLANICI:SIFRE@185.149.102.122:DIS_PORT/seenergy" -f deploy/seenergy.sql
 psql "postgresql://KULLANICI:SIFRE@185.149.102.122:DIS_PORT/seenergy" \
-  -v store=https://www.ORNEK.com.tr -v api=https://api.ORNEK.com.tr -f deploy/rewrite-urls.sql
+  -v store=https://ecommercore.com -v api=https://api.ecommercore.com -f deploy/rewrite-urls.sql
 ```
 
 Yükleme bitince external port'u kapatın.
@@ -69,11 +74,11 @@ REDIS_URL=<Redis Internal Connection URL>
 JWT_SECRET=<uzun rastgele dize>
 COOKIE_SECRET=<uzun rastgele dize>
 AUTH_MFA_ENCRYPTION_KEY=<uzun rastgele dize>
-STORE_CORS=https://www.ORNEK.com.tr
-ADMIN_CORS=https://api.ORNEK.com.tr
-AUTH_CORS=https://www.ORNEK.com.tr,https://api.ORNEK.com.tr
-MEDUSA_BACKEND_URL=https://api.ORNEK.com.tr
-STOREFRONT_URL=https://www.ORNEK.com.tr
+STORE_CORS=https://ecommercore.com,https://www.ecommercore.com
+ADMIN_CORS=https://api.ecommercore.com
+AUTH_CORS=https://ecommercore.com,https://www.ecommercore.com,https://api.ecommercore.com
+MEDUSA_BACKEND_URL=https://api.ecommercore.com
+STOREFRONT_URL=https://ecommercore.com
 STOREFRONT_REVALIDATE_SECRET=<uzun rastgele dize — mağazadaki REVALIDATE_SECRET ile AYNI>
 ```
 
@@ -82,19 +87,19 @@ STOREFRONT_REVALIDATE_SECRET=<uzun rastgele dize — mağazadaki REVALIDATE_SECR
 > kullanmaz ve bağlantı 10 saniyede zaman aşımına düşer. Provada aynen
 > görüldü, bu ekle düzeldi.
 
-- **Domains:** host `api.ORNEK.com.tr`, container port **9000**, HTTPS açık (Let's Encrypt)
+- **Domains:** host `api.ecommercore.com`, container port **9000**, HTTPS açık (Let's Encrypt)
 - **Advanced → Volumes:** volume mount, mount path **`/server/static`** —
   admin'den yüklenen görseller burada durur; volume olmazsa her deploy'da
   silinir.
-- **Deploy.** Açılış ~20 saniye. Kontrol: `https://api.ORNEK.com.tr/health` → `OK`.
+- **Deploy.** Açılış ~20 saniye. Kontrol: `https://api.ecommercore.com/health` → `OK`.
 
 Admin kullanıcısı (bir kez) — uygulamanın terminalinde (`/server` klasörü):
 
 ```
-npx medusa user -e admin@ORNEK.com.tr -p <güçlü-şifre>
+npx medusa user -e <admin-e-postası> -p <güçlü-şifre>
 ```
 
-Admin paneli: `https://api.ORNEK.com.tr/app`
+Admin paneli: `https://api.ecommercore.com/app`
 
 ## 4. Mağaza — `seenergy-store`
 
@@ -108,8 +113,8 @@ Create Service → **Application**.
 - **Build-time Arguments:**
 
 ```
-MEDUSA_BACKEND_URL=https://api.ORNEK.com.tr
-MEDUSA_PUBLISHABLE_KEY=<anahtar>
+MEDUSA_BACKEND_URL=https://api.ecommercore.com
+MEDUSA_PUBLISHABLE_KEY=pk_11ce8aef229a358bc58bce50360456b85790a7113cfe2e62a0e4ca6a8c0c1e33
 ```
 
 - **Environment:** aynı ikisi, ek olarak:
@@ -121,9 +126,10 @@ BANK_HOLDER=…
 BANK_IBAN=…
 ```
 
-Anahtar veritabanında: `select token from api_key where type = 'publishable';`
+Anahtar (herkese açık türden, gizli değil) veritabanında da var: `select token from api_key where type = 'publishable';`
 
-- **Domains:** host `www.ORNEK.com.tr`, container port **3100**, HTTPS açık
+- **Domains:** iki kayıt, ikisi de container port **3100**, HTTPS açık: `ecommercore.com` ve `www.ecommercore.com`
+- **Advanced → Redirects:** "www'dan www'suz adrese" yönlendirmesi, adres tek kalsın
 - **Deploy.**
 
 ## Sonra
