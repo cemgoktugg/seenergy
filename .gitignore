@@ -45,4 +45,6 @@ reference-analysis/
 .medusa/
 .turbo/
 backend/apps/backend/uploads/
-backend/apps/backend/static/
+# static/ is NOT ignored: it holds the pictures uploaded in the admin (Medusa's
+# local file provider), which are site content the server needs — committed
+# for the move to the Veridyen server along with deploy/seenergy.sql.
