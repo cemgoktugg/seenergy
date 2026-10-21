@@ -38,5 +38,7 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/.next ./.next
 COPY --from=build /app/public ./public
 COPY --from=build /app/next.config.ts ./
+COPY docker/store-start.sh ./store-start.sh
 EXPOSE 3100
-CMD ["npm", "run", "start"]
+# next start, then one cache refresh once it answers (see the script).
+CMD ["sh", "/app/store-start.sh"]
