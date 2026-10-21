@@ -23,7 +23,7 @@ services:
       SEED_STORE_URL: ${STOREFRONT_URL:-https://${DOMAIN}}
       SEED_API_URL: ${MEDUSA_BACKEND_URL:-https://${API_DOMAIN}}
     volumes:
-      - pgdata2:/var/lib/postgresql/data
+      - pgdata:/var/lib/postgresql/data
       - ./deploy/initdb:/docker-entrypoint-initdb.d:ro
       - ./deploy:/seed:ro
     networks:
@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      - redisdata2:/data
+      - redisdata:/data
     networks:
       - internal
     healthcheck:
@@ -47,6 +47,29 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  # Every deploy: point stored addresses at the current domains (localhost and
+  # earlier domains → DOMAIN / API_DOMAIN). Replaces only; runs, then exits.
+  db-urls:
+    image: postgres:16-alpine
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      STORE_URL: ${STOREFRONT_URL:-https://${DOMAIN}}
+      API_URL: ${MEDUSA_BACKEND_URL:-https://${API_DOMAIN}}
+    volumes:
+      - ./deploy:/seed:ro
+    networks:
+      - internal
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - psql -v ON_ERROR_STOP=1 -v store="$$STORE_URL" -v api="$$API_URL" -f /seed/sync-urls.sql
 
   backend:
     build:
@@ -58,6 +81,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
+      db-urls:
+        condition: service_completed_successfully
     environment:
       # ?sslmode=disable: Medusa forces SSL on any database host that is not
       # localhost, and this Postgres has none.
@@ -175,14 +200,13 @@ services:
           sleep 86400
         done
 
-# pgdata2 / redisdata2: renamed when the store moved from onlinehesap.net
-# (whose DNS never resolved) to ecommercore.com.tr. A new, empty volume makes
-# deploy/initdb restore the data again with the new addresses — the same way
-# the other store on this server moved to pgdata3. The old volumes can be
-# removed in Dokploy once the new ones are confirmed.
+# The data volumes keep their first names on purpose: the live database is
+# in use (content is edited in the admin), and a renamed volume would start
+# empty and restore the seed over it. Domain moves are handled by the
+# db-urls step instead.
 volumes:
-  pgdata2:
-  redisdata2:
+  pgdata:
+  redisdata:
   backend_static:
   db_backups:
 

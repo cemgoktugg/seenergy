@@ -71,6 +71,12 @@ Kontrol: `https://api.ecommercore.com.tr/health` → `OK`, admin
 
 ## Güncellemeler
 
+Her deploy'da, backend başlamadan önce `db-urls` adımı veritabanındaki eski
+adresleri (localhost, onlinehesap.net) güncel `DOMAIN` / `API_DOMAIN`'e çevirir
+(`deploy/sync-urls.sql`); yalnızca değiştirir, hiçbir şey silmez. Alan adı bir
+daha değişirse eski adı o dosyadaki listeye eklemek yeterli — veritabanı
+volume'ünün adı **değiştirilmez**, değişirse canlı veri yerine döküm yüklenir.
+
 GitHub'a gönderilen değişiklik → Dokploy'da **Deploy** (ya da otomatik deploy
 açıksa kendiliğinden). Veritabanı, yüklenen görseller ve yedekler volume'lerde
 kalır. Kategori ağacı kodda tanımlı; değişince yeniden deploy yeterli.
@@ -80,6 +86,7 @@ kalır. Kategori ağacı kodda tanımlı; değişince yeniden deploy yeterli.
 | Dosya | Ne |
 |---|---|
 | `seenergy.sql` | Veritabanının temiz kopyası: 60 ürün, kategori ağacı, fiyatlar, stok, Vitrin içeriği, teknik özellikler. **Yok:** admin, müşteriler, siparişler, sepetler (test verisi ve kişisel veriydi). `psql` 14.19 / 15.14 / 16.10 / 17.6 ve sonrası gerekir (döküm `\restrict` kullanıyor); compose'daki Postgres 16 bunu karşılar |
+| `sync-urls.sql` | Her deploy'da eski adresleri güncel alan adına çevirir |
 | `rewrite-urls.sql` | Veritabanındaki `localhost` adreslerini canlı adreslerle değiştirir (initdb bunu çalıştırır) |
 | `initdb/01-restore.sh` | İlk kurulumda yükleme + adres düzeltme |
 | `compose.env.example` | Environment değişkenlerinin listesi |
