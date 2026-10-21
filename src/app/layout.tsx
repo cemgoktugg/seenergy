@@ -3,6 +3,7 @@ import { Montserrat } from 'next/font/google';
 
 import { CartProvider } from '@/components/cart-provider';
 import { StoreProvider } from '@/components/cart-store';
+import { CompareBar } from '@/components/compare-bar';
 import { SiteHeader, type MenuModels } from '@/components/site-header';
 import { NewsletterBar, SiteFooter } from '@/components/site-footer';
 import { PRIMARY_NAV, SITE } from '@/data/site';
@@ -110,6 +111,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <main id="icerik">{children}</main>
             <NewsletterBar />
             <SiteFooter />
+            <CompareBar />
           </StoreProvider>
         </CartProvider>
       </body>

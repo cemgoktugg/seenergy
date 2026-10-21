@@ -37,10 +37,10 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart, MessageSquareQuote, ShoppingCart } from 'lucide-react';
+import { Heart, MessageSquareQuote, Scale, ShoppingCart } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
-import { useStore } from '@/components/cart-store';
+import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
 import { discountPercent, formatPrice, PRICE_ON_REQUEST, priceLabel, type Product } from '@/data/catalog';
 
 /** Below this many units the card says so. It is the real Medusa stock. */
@@ -77,10 +77,14 @@ export function ProductCard({ product }: { product: Product }) {
   /* Shared store, not local state: a favourite added from a listing used to be
      forgotten the moment you navigated, and the header badge never saw a cart
      addition made from a card. */
-  const { has, toggle, ready } = useStore();
+  const { has, toggle, ready, count } = useStore();
   const cart = useCart();
   const added = cart.quantityOf(product.variantId) > 0;
   const favourite = ready && has('favourites', product.id);
+  const comparing = ready && has('compare', product.id);
+  /* The store refuses a fifth product; the control says so instead of
+     silently doing nothing. */
+  const compareFull = ready && !comparing && count('compare') >= COMPARE_LIMIT;
   // Derived, never authored, so it cannot disagree with the prices beside it.
   const discount = discountPercent(product);
   const badge = product.badge && !soldOut ? BADGES[product.badge] : null;
@@ -126,6 +130,26 @@ export function ProductCard({ product }: { product: Product }) {
           }`}
         >
           <Heart size={17} strokeWidth={1.8} fill={favourite ? 'currentColor' : 'none'} aria-hidden />
+        </button>
+
+        {/* Compare — the VoltEdge pattern: one tap here, and the floating
+            compare bar rises with the product in it. */}
+        <button
+          type="button"
+          aria-pressed={comparing}
+          disabled={compareFull}
+          onClick={() => toggle('compare', product.id)}
+          aria-label={
+            comparing
+              ? `${product.name} ürününü karşılaştırmadan çıkar`
+              : `${product.name} ürününü karşılaştırmaya ekle`
+          }
+          title={compareFull ? `En çok ${COMPARE_LIMIT} ürün karşılaştırılabilir` : comparing ? 'Karşılaştırmadan çıkar' : 'Karşılaştır'}
+          className={`absolute right-2 top-[50px] grid h-[34px] w-[34px] place-items-center rounded-full shadow-e1 ring-1 ring-black/5 backdrop-blur transition-colors duration-(--duration-fast) before:absolute before:-inset-[5px] before:content-[''] disabled:cursor-not-allowed disabled:opacity-40 ${
+            comparing ? 'bg-brand text-white' : 'bg-white/90 text-ink-fixed/70 hover:text-ink-fixed'
+          }`}
+        >
+          <Scale size={16} strokeWidth={1.9} aria-hidden />
         </button>
 
         {soldOut ? (
