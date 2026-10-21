@@ -1,4 +1,5 @@
 'use client';
+/* eslint-disable @next/next/no-img-element */
 
 /**
  * Three-row commercial header — the reference's defining structure.
@@ -41,11 +42,11 @@ import { PRIMARY_NAV, SITE, UTILITY_LINKS } from '@/data/site';
 
 const UTILITY_ICONS = { info: Info, phone: Phone, truck: Truck, badge: BadgeIcon };
 
-/** A model link in the mega panel, keyed by its subcategory's href. */
-export type MenuModels = Record<string, { label: string; href: string }[]>;
+/** A model in the mega panel, keyed by its subcategory's href. */
+export type MenuModels = Record<string, { label: string; detail: string; image: string; href: string }[]>;
 
-/** Models listed per column before it hands over to "Tümünü gör". */
-const MENU_MODEL_LIMIT = 12;
+/** Models listed per column before it hands over to "+n model daha". */
+const MENU_MODEL_LIMIT = 7;
 
 /**
  * The lockup: the client's own logo (see brand-mark.tsx) — the full cut with
@@ -537,6 +538,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
                       gradient hairline below. */}
                   <Link
                     href={item.href}
+                    onClick={() => setOpenMega(null)}
                     onFocus={() => setOpenMega(item.children ? item.href : null)}
                     aria-label={item.short !== item.label ? item.label : undefined}
                     /* `rounded-t-(--card-radius)` is the detail that ties the two pieces
@@ -563,97 +565,113 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
           </ul>
         </div>
 
-        {/* Mega panel: measured 1400 wide, aligned to the nav track, sitting
-            immediately under the 175px header. One panel element for all
-            triggers, so it cannot be clipped by a list item's bounds. */}
+        {/* Mega panel. One panel element for all triggers, so it cannot be
+            clipped by a list item's bounds.
+
+            It used to stay open after a model was clicked: client navigation
+            keeps the header mounted and the pointer was still over the panel,
+            so nothing ever told it to close. Every link in it now closes it
+            on click, and moving onto the dimmed page behind it closes it too. */}
         {PRIMARY_NAV.map((item) => {
           if (!item.children || openMega !== item.href) return null;
+          const total = item.children.reduce((sum, child) => sum + (menuModels[child.href]?.length ?? 0), 0);
+          const close = () => setOpenMega(null);
           return (
-            <div
-              key={item.href}
-              className="absolute inset-x-0 top-full z-50"
-              onMouseEnter={cancelClose}
-              onMouseLeave={scheduleClose}
-            >
-              <div className="container-header">
-                {/* e3, not a hand-written `0 3px 6px rgba(0,0,0,0.16)`. The
-                    mega panel floats over the page, which is exactly what the
-                    overlay step is for, and the ad-hoc value was one of the
-                    three hardcoded shadows that existed before the scale. */}
-                <div className="overflow-hidden rounded-b-(--card-radius) bg-surface-card shadow-e3">
-                  {/* Hairline in the logo gradient: it carries the dark
-                      trigger's underline down into the white panel so the two
-                      read as one surface. */}
-                  <span
-                    aria-hidden
-                    className="block h-[3px] w-full bg-linear-to-r from-grad-1 via-grad-3 to-grad-4"
-                  />
-                  {/* The category on the left; on the right one column per
-                      subcategory, headed by the subcategory and listing its
-                      models underneath — the client's own layout ("AHD Sistem"
-                      opens onto SE-1080LD, SE-1080MD…). The models come from
-                      the catalogue, so one added in the admin joins its column
-                      without a code change. A subcategory with nothing in it
-                      yet keeps its column and says so, rather than vanishing. */}
-                  <div className="flex items-start gap-8 px-6 py-5">
-                    <div className="w-[220px] shrink-0">
-                      <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
-                        Kategori
-                      </p>
-                      <p className="mt-1 text-[18px] font-extrabold leading-tight tracking-tight text-text-primary">
-                        {item.label}
+            <div key={item.href}>
+              {/* The page dims under an open panel: it separates the menu from
+                  the busy page behind it. */}
+              <div
+                aria-hidden
+                onMouseEnter={close}
+                className="absolute inset-x-0 top-full h-dvh bg-chrome/35 backdrop-blur-[2px] animate-[drawer-fade_160ms_ease-out_both]"
+              />
+              <div
+                className="absolute inset-x-0 top-full z-50 animate-[mega-in_200ms_var(--ease-out)_both]"
+                onMouseEnter={cancelClose}
+                onMouseLeave={scheduleClose}
+              >
+                <div className="container-header pt-2">
+                  <div className="flex overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e3">
+                    {/* The category, on the dark chrome the header is made of. */}
+                    <div className="relative flex w-[250px] shrink-0 flex-col overflow-hidden bg-chrome p-6 text-white">
+                      <span
+                        aria-hidden
+                        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-grad-1/25 blur-3xl"
+                      />
+                      <p className="relative text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">Kategori</p>
+                      <p className="relative mt-1.5 text-[20px] font-extrabold leading-tight tracking-tight">{item.label}</p>
+                      <p className="relative mt-2 text-[12.5px] text-white/65">
+                        {item.children.length} alt kategori · {total} ürün
                       </p>
                       <Link
                         href={item.href}
-                        className="mt-3 inline-flex items-center gap-1 rounded-full border border-line-strong px-3.5 py-1.5 text-[12px] font-semibold text-text-primary transition-colors duration-(--duration-fast) hover:border-brand hover:bg-brand hover:text-white"
+                        onClick={close}
+                        className="relative mt-auto inline-flex w-fit items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[12.5px] font-bold text-chrome transition-transform duration-(--duration-fast) hover:translate-x-0.5"
                       >
                         Tüm ürünler
-                        <ChevronRight size={14} strokeWidth={2.25} aria-hidden />
+                        <ChevronRight size={14} strokeWidth={2.5} aria-hidden />
                       </Link>
                     </div>
-                    <ul className="grid flex-1 gap-x-6 gap-y-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
+
+                    {/* One column per subcategory, its models underneath — the
+                        client's own layout ("AHD Sistem" opens onto SE-1080LD,
+                        SE-1080MD…). Built from the catalogue, so a model added
+                        in the admin joins its column on its own. */}
+                    <ul className="grid flex-1 gap-x-5 gap-y-6 p-6 [grid-template-columns:repeat(auto-fill,minmax(220px,1fr))]">
                       {item.children.map((child) => {
                         const models = menuModels[child.href] ?? [];
                         return (
                           <li key={child.href} className="min-w-0">
                             <Link
                               href={child.href}
-                              className="group/sub flex items-center justify-between gap-2 border-b border-line pb-2 text-[14px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:text-brand-dark"
+                              onClick={close}
+                              className="group/sub flex items-center gap-2 pb-2.5 text-[14px] font-extrabold tracking-tight text-text-primary"
                             >
-                              <span className="truncate">{child.label}</span>
-                              <ChevronRight
-                                size={15}
-                                strokeWidth={2.25}
+                              <span
                                 aria-hidden
-                                className="shrink-0 opacity-50 transition-transform duration-(--duration-fast) group-hover/sub:translate-x-0.5 group-hover/sub:opacity-100"
+                                className="h-[3px] w-4 shrink-0 rounded-full bg-linear-to-r from-grad-1 to-grad-4 transition-[width] duration-(--duration-fast) group-hover/sub:w-6"
                               />
+                              <span className="truncate">{child.label}</span>
+                              <span className="ml-auto shrink-0 rounded-full bg-surface-page px-2 py-0.5 text-[11px] font-bold tabular-nums text-text-secondary">
+                                {models.length}
+                              </span>
                             </Link>
                             {models.length > 0 ? (
-                              <ul className="mt-2 space-y-0.5">
+                              <ul className="space-y-0.5">
                                 {models.slice(0, MENU_MODEL_LIMIT).map((model) => (
                                   <li key={model.href}>
                                     <Link
                                       href={model.href}
-                                      className="block truncate rounded-md px-1.5 py-1 -mx-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-(--duration-fast) hover:bg-surface-page hover:text-text-primary"
+                                      onClick={close}
+                                      className="group/model -mx-2 flex items-center gap-3 rounded-(--card-radius) px-2 py-1.5 transition-colors duration-(--duration-fast) hover:bg-surface-page"
                                     >
-                                      {model.label}
+                                      <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-(--card-radius) border border-line bg-surface-card p-1 transition-colors duration-(--duration-fast) group-hover/model:border-line-strong">
+                                        <img src={model.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
+                                      </span>
+                                      <span className="min-w-0">
+                                        <span className="block truncate text-[13px] font-bold text-text-primary">{model.label}</span>
+                                        <span className="block truncate text-[11.5px] text-text-secondary">{model.detail}</span>
+                                      </span>
                                     </Link>
                                   </li>
                                 ))}
                                 {models.length > MENU_MODEL_LIMIT && (
-                                  <li>
+                                  <li className="pt-1">
                                     <Link
                                       href={child.href}
-                                      className="mt-1 inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-dark hover:underline"
+                                      onClick={close}
+                                      className="inline-flex items-center gap-1 text-[12.5px] font-bold text-text-primary underline decoration-line-strong underline-offset-4 hover:decoration-text-primary"
                                     >
-                                      Tümünü gör ({models.length})
-                                      <ChevronRight size={13} strokeWidth={2.25} aria-hidden />
+                                      +{models.length - MENU_MODEL_LIMIT} model daha
+                                      <ChevronRight size={13} strokeWidth={2.5} aria-hidden />
                                     </Link>
                                   </li>
                                 )}
                               </ul>
                             ) : (
-                              <p className="mt-2 text-[12.5px] text-text-secondary">Ürünler yakında</p>
+                              <p className="rounded-(--card-radius) border border-dashed border-line px-3 py-3 text-[12px] text-text-secondary">
+                                Bu alt kategoriye ürünler yakında eklenecek.
+                              </p>
                             )}
                           </li>
                         );

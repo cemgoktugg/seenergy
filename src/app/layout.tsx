@@ -3,7 +3,7 @@ import { Montserrat } from 'next/font/google';
 
 import { CartProvider } from '@/components/cart-provider';
 import { StoreProvider } from '@/components/cart-store';
-import { SiteHeader } from '@/components/site-header';
+import { SiteHeader, type MenuModels } from '@/components/site-header';
 import { NewsletterBar, SiteFooter } from '@/components/site-footer';
 import { PRIMARY_NAV, SITE } from '@/data/site';
 import { loadCatalog } from '@/lib/medusa/catalog';
@@ -59,7 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
      menu on its own. The brand prefix is dropped: the column already says
      where you are, and "SEENERGY SE-1080LD" ×9 is noise. */
   const { byCategory } = await loadCatalog();
-  const menuModels: Record<string, { label: string; href: string }[]> = {};
+  const menuModels: MenuModels = {};
   for (const item of PRIMARY_NAV) {
     for (const child of item.children ?? []) {
       const key = child.href.replace('/kategori/', '');
@@ -70,18 +70,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         ...products.filter((product) => product.brand === SITE.name),
         ...products.filter((product) => product.brand !== SITE.name),
       ];
-      menuModels[child.href] = ordered.map((product) => ({
+      menuModels[child.href] = ordered.map((product) => {
         /* The house range by its model code — the client's own menu lists
-           codes, and "SE-1080LD 2MP AHD IR Dome Kamera" would not fit a
-           column. Other brands by name, without the brand. */
-        label:
-          product.brand === SITE.name && product.sku
-            ? product.sku
-            : product.name.startsWith(`${product.brand} `)
-              ? product.name.slice(product.brand.length + 1)
-              : product.name,
-        href: `/urun/${product.slug}`,
-      }));
+           codes — with the rest of the title as a second line
+           ("2MP AHD IR Dome Kamera"). Other brands by name, brand below. */
+        const bare = product.name.startsWith(`${product.brand} `)
+          ? product.name.slice(product.brand.length + 1)
+          : product.name;
+        const own = product.brand === SITE.name && product.sku && bare.startsWith(product.sku);
+        return {
+          label: own ? product.sku : bare,
+          detail: own ? bare.slice(product.sku.length).trim() : product.brand,
+          image: product.image,
+          href: `/urun/${product.slug}`,
+        };
+      });
     }
   }
 
