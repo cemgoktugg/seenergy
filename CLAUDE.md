@@ -32,9 +32,10 @@ These routes are real, not placeholders:
 
 ```
 /                     homepage
-/urun/[slug]          product detail — image gallery (stage, thumbnail strip,
-                      full-screen viewer), buy box, spec table, compatibility,
-                      and the brand's other models in a sticky right-hand rail
+/urun/[slug]          product detail — hero (gallery + sales-first buy card:
+                      quantity, Sepete Ekle, Hemen Al; quote/compare secondary),
+                      sticky section bar, description + highlights, spec
+                      table, the brand's other models, similar products
 /kategori             all categories — the tree with its subcategories
 /kategori/[slug]      category listing, for every category and subcategory;
                       a parent lists its subcategories' products too
