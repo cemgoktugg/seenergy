@@ -109,6 +109,8 @@ services:
         condition: service_healthy
     environment:
       MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-https://${API_DOMAIN}}
+      # Server-side API calls stay on the internal network (src/lib/medusa/client.ts).
+      MEDUSA_INTERNAL_URL: http://backend:9000
       MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY}
       REVALIDATE_SECRET: ${REVALIDATE_SECRET}
       BANK_NAME: ${BANK_NAME:-}
