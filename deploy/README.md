@@ -1,4 +1,4 @@
-# Sunucuya kurulum — Dokploy (Veridyen), onlinehesap.net
+# Sunucuya kurulum — Dokploy (Veridyen), ecommercore.com.tr
 
 Diğer Medusa mağazası (testerestore) ile aynı yöntem: Dokploy'da tek bir
 **Compose** servisi, kaynak bu GitHub deposu. `docker-compose.yml` içinde beş
@@ -8,28 +8,22 @@ servis var:
 |---|---|---|
 | `postgres` | PostgreSQL 16 | kapalı (iç ağ) |
 | `redis` | Redis 7 | kapalı (iç ağ) |
-| `backend` | Medusa + admin | `https://api.onlinehesap.net` (admin: `/app`) |
-| `store` | Next.js mağaza | `https://onlinehesap.net` (www → buraya yönlenir) |
+| `backend` | Medusa + admin | `https://api.ecommercore.com.tr` (admin: `/app`) |
+| `store` | Next.js mağaza | `https://ecommercore.com.tr` (www → buraya yönlenir) |
 | `db-backup` | günlük veritabanı + görsel yedeği | kapalı |
 
 Bu düzen yerelde Docker ile iki kez baştan sona denendi (boş volume'lerle ilk
 kurulum ve ardından bir güncelleme): veri kendiliğinden yüklendi, admin
 oluştu, bütün sayfalar açıldı, yedek alındı, ikinci deploy veriyi korudu.
 
-## 1. DNS (Türk Ticaret paneli)
+## 1. DNS
 
-`onlinehesap.net`'in ad sunucuları Türk Ticaret'te, ama **DNS bölgesi henüz
-açık değil** (2026-10-21'de her sorgu "Server failed"). Panelde alan adının DNS
-yönetimini açıp üç A kaydı ekleyin:
+`ecommercore.com.tr` (Türk Ticaret): `@`, `www` ve `api` →
+`185.149.102.122` — 2026-10-21'de Google ve Cloudflare üzerinden doğrulandı.
 
-| Ad | Tür | Değer |
-|---|---|---|
-| `@` (onlinehesap.net) | A | `185.149.102.122` |
-| `www` | A | `185.149.102.122` |
-| `api` | A | `185.149.102.122` |
-
-Kayıtlar yayılmadan HTTPS sertifikası alınamaz; önce bu adım.
-Alan adının süresi **2026-12-20**'de doluyor.
+> İlk deneme `ecommercore.com.tr` ile yapıldı; o alan adının ad sunucuları her
+> sorguyu reddetti ("lame delegation") ve site hiç açılmadı. Yeni bir alan
+> adında **önce DNS'in gerçekten çözüldüğünü doğrulayın**, sonra deploy edin.
 
 ## 2. Depoya erişim (depo gizli)
 
@@ -66,14 +60,14 @@ aynı adres iki kez tanımlanır.
 **Deploy.** İlk kurulumda:
 
 - Postgres volume'ü boş olduğu için `deploy/initdb` `seenergy.sql`'i yükler ve
-  adresleri `onlinehesap.net`'e çevirir (bir kez; sonraki deploy'lar dokunmaz).
+  adresleri `ecommercore.com.tr`'e çevirir (bir kez; sonraki deploy'lar dokunmaz).
 - Mağaza imajı, backend henüz yokken derlenir; ilk dakika anasayfa boş
   görünebilir, backend açılınca kendiliğinden dolar.
 - Backend `ADMIN_EMAIL` / `ADMIN_PASSWORD` ile admin kullanıcısını oluşturur.
   Girişi yaptıktan sonra Environment'tan `ADMIN_PASSWORD`'ü silin.
 
-Kontrol: `https://api.onlinehesap.net/health` → `OK`, admin
-`https://api.onlinehesap.net/app`, mağaza `https://onlinehesap.net`.
+Kontrol: `https://api.ecommercore.com.tr/health` → `OK`, admin
+`https://api.ecommercore.com.tr/app`, mağaza `https://ecommercore.com.tr`.
 
 ## Güncellemeler
 

@@ -23,7 +23,7 @@ services:
       SEED_STORE_URL: ${STOREFRONT_URL:-https://${DOMAIN}}
       SEED_API_URL: ${MEDUSA_BACKEND_URL:-https://${API_DOMAIN}}
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - pgdata2:/var/lib/postgresql/data
       - ./deploy/initdb:/docker-entrypoint-initdb.d:ro
       - ./deploy:/seed:ro
     networks:
@@ -39,7 +39,7 @@ services:
     restart: unless-stopped
     command: ["redis-server", "--appendonly", "yes"]
     volumes:
-      - redisdata:/data
+      - redisdata2:/data
     networks:
       - internal
     healthcheck:
@@ -175,9 +175,14 @@ services:
           sleep 86400
         done
 
+# pgdata2 / redisdata2: renamed when the store moved from onlinehesap.net
+# (whose DNS never resolved) to ecommercore.com.tr. A new, empty volume makes
+# deploy/initdb restore the data again with the new addresses — the same way
+# the other store on this server moved to pgdata3. The old volumes can be
+# removed in Dokploy once the new ones are confirmed.
 volumes:
-  pgdata:
-  redisdata:
+  pgdata2:
+  redisdata2:
   backend_static:
   db_backups:
 
