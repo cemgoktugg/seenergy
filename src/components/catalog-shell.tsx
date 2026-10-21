@@ -233,7 +233,10 @@ export async function CatalogShell({
    * Stock reads "Tümü stokta" when it can, because a positive is worth more
    * than "6 / 6".
    */
-  const inStockCount = scope.filter((product) => product.stock > 0).length;
+  // Stock is counted over what can be bought now; price-on-request models
+  // report theirs in the quote.
+  const sellable = scope.filter((product) => product.price != null);
+  const inStockCount = sellable.filter((product) => product.stock > 0).length;
   const brandCount = new Set(scope.map((product) => product.brand)).size;
   // Price-on-request products have no price to put in a range.
   const prices = scope.flatMap((product) => (product.price == null ? [] : [product.price]));
@@ -251,13 +254,17 @@ export async function CatalogShell({
             ]
           : []),
         ...(brandCount > 1 ? [{ label: 'Marka', value: String(brandCount) }] : []),
-        {
-          label: 'Stok',
-          value:
-            inStockCount === scope.length
-              ? 'Tümü stokta'
-              : `${inStockCount} / ${scope.length} stokta`,
-        },
+        ...(sellable.length
+          ? [
+              {
+                label: 'Stok',
+                value:
+                  inStockCount === sellable.length
+                    ? 'Tümü stokta'
+                    : `${inStockCount} / ${sellable.length} stokta`,
+              },
+            ]
+          : [{ label: 'Fiyat', value: 'Teklif ile' }]),
       ]
     : [];
 

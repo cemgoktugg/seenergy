@@ -71,7 +71,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         ...products.filter((product) => product.brand !== SITE.name),
       ];
       menuModels[child.href] = ordered.map((product) => ({
-        label: product.name.startsWith(`${product.brand} `) ? product.name.slice(product.brand.length + 1) : product.name,
+        /* The house range by its model code — the client's own menu lists
+           codes, and "SE-1080LD 2MP AHD IR Dome Kamera" would not fit a
+           column. Other brands by name, without the brand. */
+        label:
+          product.brand === SITE.name && product.sku
+            ? product.sku
+            : product.name.startsWith(`${product.brand} `)
+              ? product.name.slice(product.brand.length + 1)
+              : product.name,
         href: `/urun/${product.slug}`,
       }));
     }

@@ -68,8 +68,12 @@ function displayName(product: Product): string {
 }
 
 export function ProductCard({ product }: { product: Product }) {
-  const soldOut = product.stock <= 0;
-  const lowStock = !soldOut && product.stock <= LOW_STOCK;
+  /* Stock speaks only for a product that can be bought now. A price-on-request
+     model reports its stock in the quote, so its 0 is not "Tükendi" — that
+     greyed out the client's whole CCTV range. */
+  const sellable = product.price != null;
+  const soldOut = sellable && product.stock <= 0;
+  const lowStock = sellable && !soldOut && product.stock <= LOW_STOCK;
   /* Shared store, not local state: a favourite added from a listing used to be
      forgotten the moment you navigated, and the header badge never saw a cart
      addition made from a card. */

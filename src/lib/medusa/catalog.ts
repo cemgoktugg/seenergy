@@ -203,6 +203,8 @@ export interface ProductDetails {
   /** Empty when the admin has not written any: the page falls back to the
    *  category's template and says so. */
   specs: SpecGroup[];
+  /** The manufacturer's datasheet (PDF), when one was uploaded. */
+  datasheet: string | null;
 }
 
 const str = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
@@ -236,5 +238,6 @@ export const loadProductDetails = cache(async (id: string): Promise<ProductDetai
   return {
     description: str(product?.description),
     specs: specsFrom(product?.metadata?.specs),
+    datasheet: str(product?.metadata?.datasheet_url) || null,
   };
 });

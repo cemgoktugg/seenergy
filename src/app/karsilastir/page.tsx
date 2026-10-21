@@ -78,7 +78,10 @@ export default function ComparePage() {
         return percent && percent > 0 ? `%${percent}` : '—';
       },
     },
-    { label: 'Stok', value: (p) => (p.stock === 0 ? 'Tükendi' : `${p.stock} adet`) },
+    {
+      label: 'Stok',
+      value: (p) => (p.price == null ? 'Teklifte bildirilir' : p.stock === 0 ? 'Tükendi' : `${p.stock} adet`),
+    },
     { label: 'Kargo', value: (p) => (p.freeShipping ? 'Ücretsiz' : 'Standart') },
     {
       label: 'Ödeme',

@@ -149,6 +149,16 @@ mapping in `src/lib/medusa/vitrin.ts`. The instant refresh needs the same
 secret in `STOREFRONT_REVALIDATE_SECRET` (backend) and `REVALIDATE_SECRET`
 (storefront).
 
+**The client's CCTV range** (25 SEENERGY models) comes from their own
+datasheets: titles, descriptions and specs in
+`backend/apps/backend/src/seed/cctv-content.ts`, photos and compressed PDFs in
+`backend/apps/backend/seed-assets/cctv/` (the originals, ~450 MB, sit in the
+gitignored `src/CCTV/`). Migration `seenergy-cctv-sheets` uploads them through
+the file module — fill-only, it never overwrites an admin edit. The PDF link is
+`metadata.datasheet_url`. These models have no price yet: `Product.price` is
+`null`, which the storefront shows as "Fiyat için teklif isteyin" with a
+"Teklif İste" link instead of add-to-cart, and stock is then not reported.
+
 Not built yet: online card payment (iyzico/PayTR), transactional e-mail (no
 notification provider — nothing is e-mailed automatically), password reset
 (needs e-mail), the legal pages checkout links to.

@@ -27,6 +27,10 @@ ENV NODE_ENV=production
 COPY --from=build /repo/apps/backend/.medusa/server ./
 COPY --from=build /repo/node_modules ./node_modules
 COPY apps/backend/static ./static
+# Source files a migration script uploads through the file module (the CCTV
+# range's photos and datasheets) — not served from here; see
+# src/migration-scripts/seenergy-cctv-sheets.ts.
+COPY apps/backend/seed-assets ./seed-assets
 COPY docker-start.sh ./docker-start.sh
 EXPOSE 9000
 # Migrations, the admin login when ADMIN_EMAIL/ADMIN_PASSWORD are set, then

@@ -105,7 +105,13 @@ const NAME_PATTERNS: {
  * category sheet's "Genel" rows, which are category-true statements written for
  * exactly this purpose.
  */
-export function keySpecsOf(product: Product, max = 4): SpecRow[] {
+export function keySpecsOf(product: Product, max = 4, own: SpecGroup[] = []): SpecRow[] {
+  /* The product's own sheet, when it has one, says it best: its "Genel"
+     group is written to lead with the headline values (the CCTV range's
+     datasheets: type, resolution, lens, night range). */
+  const general = own.find((group) => group.title.trim().toLocaleLowerCase('tr') === 'genel');
+  if (general && general.rows.length > 0) return general.rows.slice(0, max);
+
   const out: SpecRow[] = [];
   const used = new Set<string>();
 

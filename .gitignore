@@ -48,3 +48,7 @@ backend/apps/backend/uploads/
 # static/ is NOT ignored: it holds the pictures uploaded in the admin (Medusa's
 # local file provider), which are site content the server needs — committed
 # for the move to the Veridyen server along with deploy/seenergy.sql.
+
+# The client's CCTV source folder (images, datasheets, .ai files — ~450 MB).
+# Its web-ready output is generated elsewhere; the originals stay local.
+/src/CCTV/

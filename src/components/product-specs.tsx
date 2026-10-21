@@ -33,6 +33,8 @@ import {
   BatteryCharging,
   Binary,
   Cable,
+  Camera,
+  MessageSquareQuote,
   ChevronRight,
   CircleCheck,
   CircuitBoard,
@@ -48,6 +50,7 @@ import {
   RadioTower,
   Ruler,
   SatelliteDish,
+  ScanEye,
   Truck,
   Volume2,
   Wallet,
@@ -77,6 +80,8 @@ const GROUP_ICONS: Record<string, LucideIcon> = {
   Bağlantı: Cable,
   'Ağ ve kablosuz': Wifi,
   Aydınlatma: Lightbulb,
+  Görüntü: Camera,
+  'Akıllı özellikler': ScanEye,
 };
 
 type Row = {
@@ -235,7 +240,13 @@ function CompatibilityCard({ items }: { items: CompatibilityItem[] }) {
 
 /** Payment, shipping and stock, stated once — they used to be table rows. */
 function OrderCard({ product }: { product: Product }) {
-  const rows = [
+  /* Price-on-request: no cart, so no shipping threshold, instalments or a
+     stock count of 0 to report — what the buyer needs is how to get a price. */
+  const rows = product.price == null ? [
+    { icon: MessageSquareQuote, label: 'Fiyat', value: 'Teklif ile belirlenir' },
+    { icon: Wallet, label: 'Ödeme', value: 'Havale / EFT' },
+    { icon: PackageCheck, label: 'Stok ve teslim', value: 'Teklifte bildirilir' },
+  ] : [
     {
       icon: Truck,
       label: 'Kargo',
@@ -338,7 +349,9 @@ export function ProductSpecs({ product, specs }: { product: Product; specs: Spec
   /* The "typical values" note belongs to a template; a category without one
      shows only the catalogue facts, which are this product's own. */
   const typical = !own && template.length > 0;
-  const compatibility = categorySpec(product.category)?.compatibility ?? [];
+  /* The template's compatibility list is the template's too: on a product
+     with its own sheet it would put "ONVIF Profile S" under an AHD camera. */
+  const compatibility = own ? [] : (categorySpec(product.category)?.compatibility ?? []);
   const rowCount = groups.reduce((total, group) => total + group.rows.length, 0);
 
   return (

@@ -31,7 +31,10 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
   BadgeCheck,
+  Check,
   ChevronRight,
+  Download,
+  FileText,
   Headphones,
   ReceiptText,
   RefreshCcw,
@@ -55,7 +58,7 @@ import {
 } from '@/data/catalog';
 import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { PRODUCT_TRUST, SITE } from '@/data/site';
-import { keySpecsOf } from '@/data/specs';
+import { keySpecsOf, type SpecGroup } from '@/data/specs';
 import { loadCatalog, loadProductDetails, loadProducts } from '@/lib/medusa/catalog';
 
 const TRUST_ICONS = {
@@ -84,11 +87,65 @@ export async function generateMetadata({
   const { bySlug } = await loadCatalog();
   const product = bySlug(slug);
   if (!product) return { title: 'Ürün bulunamadı' };
+  const { description } = await loadProductDetails(product.id);
+  const picture = absoluteUrl(product.image);
 
   return {
     title: product.name,
-    description: `${product.brand} ${product.name} — ${categoryMeta(product.category).label} kategorisinde ${SITE.name} güvencesiyle.`,
+    description:
+      summaryOf(description) ||
+      `${product.brand} ${product.name} — ${categoryMeta(product.category).label} kategorisinde ${SITE.name} güvencesiyle.`,
+    ...(picture ? { openGraph: { images: [picture] } } : {}),
   };
+}
+
+/** The description's first paragraph, cut for a meta description (~160). */
+function summaryOf(description: string): string {
+  const first = description.split(/\n\s*\n/)[0]?.replace(/\s+/g, ' ').trim() ?? '';
+  if (first.length <= 160) return first;
+  return `${first.slice(0, 157).replace(/\s+\S*$/, '')}…`;
+}
+
+/** Uploaded pictures carry an absolute URL; the mock files do not. */
+const absoluteUrl = (src: string): string | null => (/^https?:\/\//.test(src) ? src : null);
+
+/**
+ * The admin's description: paragraphs, and a block whose every line starts
+ * with "•" or "-" becomes a list — the shape a product write-up usually
+ * takes (an intro, then the highlights).
+ */
+function Description({ text }: { text: string }) {
+  const blocks = text.split(/\n\s*\n/).map((block) => block.trim()).filter(Boolean);
+  return (
+    <div className="max-w-[80ch] space-y-3.5 text-[14px] leading-relaxed text-text-primary dt:text-[15px]">
+      {blocks.map((block, index) => {
+        const lines = block.split('\n').map((line) => line.trim()).filter(Boolean);
+        const bullets = lines.every((line) => /^[•\-–]\s*/.test(line));
+        if (!bullets) {
+          return (
+            <p key={index} className="whitespace-pre-line">
+              {block}
+            </p>
+          );
+        }
+        return (
+          <ul key={index} className="grid gap-x-6 gap-y-2 pt-1 sm:grid-cols-2">
+            {lines.map((line) => (
+              <li key={line} className="flex items-start gap-2.5">
+                <span
+                  aria-hidden
+                  className="mt-[3px] grid h-[18px] w-[18px] shrink-0 place-items-center rounded-full bg-chrome text-white"
+                >
+                  <Check size={11} strokeWidth={3} />
+                </span>
+                <span>{line.replace(/^[•\-–]\s*/, '')}</span>
+              </li>
+            ))}
+          </ul>
+        );
+      })}
+    </div>
+  );
 }
 
 /* ------------------------------------------------------------------ */
@@ -237,8 +294,8 @@ function ShippingLine({ product }: { product: Product }) {
  * the buy button, not after it (docs/PRODUCT_MODEL §2.3). Every one is read out
  * of the product's own name, so nothing here is authored per product.
  */
-function KeySpecs({ product }: { product: Product }) {
-  const specs = keySpecsOf(product);
+function KeySpecs({ product, own }: { product: Product; own: SpecGroup[] }) {
+  const specs = keySpecsOf(product, 4, own);
   if (specs.length === 0) return null;
 
   return (
@@ -320,6 +377,8 @@ export default async function ProductPage({
                 sku: product.sku,
                 category: category.label,
                 brand: { '@type': 'Brand', name: product.brand },
+                ...(details.description && { description: summaryOf(details.description) }),
+                ...(absoluteUrl(product.image) && { image: product.images.map(absoluteUrl).filter(Boolean) }),
                 /* No offer without a price: structured data must not state
                    one the page does not. */
                 ...(product.price != null && {
@@ -421,13 +480,44 @@ export default async function ProductPage({
                   <ShippingLine product={product} />
                 </div>
               )}
-              {keySpecsOf(product).length > 0 && (
+              {keySpecsOf(product, 4, details.specs).length > 0 && (
                 <div className="mt-4">
-                  <KeySpecs product={product} />
+                  <KeySpecs product={product} own={details.specs} />
                 </div>
               )}
               <ProductBuy product={product} />
             </div>
+
+            {/* The manufacturer's datasheet. Installers and project buyers
+                ask for it before anything else, and it is the one document
+                that settles a spec question without a phone call. */}
+            {details.datasheet && (
+              <a
+                href={details.datasheet}
+                target="_blank"
+                rel="noopener"
+                className="group mt-3 flex items-center gap-3 rounded-(--panel-radius) border border-line bg-surface-card px-4 py-3 shadow-e1 transition-colors duration-(--duration-fast) hover:border-text-primary"
+              >
+                <span
+                  aria-hidden
+                  className="grid h-10 w-10 shrink-0 place-items-center rounded-(--card-radius) bg-[rgb(195,19,28)]/10 text-[rgb(195,19,28)]"
+                >
+                  <FileText size={19} strokeWidth={2} />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block text-[14px] font-bold text-text-primary">Teknik föy (PDF)</span>
+                  <span className="block truncate text-[12px] text-text-secondary">
+                    {product.sku} · üretici teknik özellik belgesi
+                  </span>
+                </span>
+                <Download
+                  size={18}
+                  strokeWidth={2.25}
+                  aria-hidden
+                  className="shrink-0 text-text-secondary transition-transform duration-(--duration-fast) group-hover:translate-y-0.5 group-hover:text-text-primary"
+                />
+              </a>
+            )}
 
             <p className="mt-3 text-[12px] text-text-secondary">
               Proje ve toptan alımlar için{' '}
@@ -537,9 +627,7 @@ export default async function ProductPage({
         <section className="container-main pt-6 dt:pt-8" aria-label="Ürün açıklaması">
           <SectionHeading eyebrow="Ürün detayları" title="Ürün Açıklaması" />
           <div className="mt-3 rounded-(--panel-radius) border border-line bg-surface-card px-4 py-4 shadow-e1 dt:px-6 dt:py-5">
-            <p className="max-w-[75ch] whitespace-pre-line text-[14px] leading-relaxed text-text-primary dt:text-[15px]">
-              {details.description}
-            </p>
+            <Description text={details.description} />
           </div>
         </section>
       )}
