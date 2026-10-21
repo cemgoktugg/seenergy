@@ -49,6 +49,7 @@ import {
   categoryMeta,
   discountPercent,
   formatPrice,
+  PRICE_ON_REQUEST,
   FREE_SHIPPING_FROM,
   type Product,
 } from '@/data/catalog';
@@ -137,6 +138,21 @@ function Breadcrumb({ product }: { product: Product }) {
  */
 function PriceBlock({ product }: { product: Product }) {
   const discount = discountPercent(product);
+
+  /* No price yet: the block says how to get one instead of printing a 0. */
+  if (product.price == null) {
+    return (
+      <div>
+        <p className="text-[20px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[24px]">
+          {PRICE_ON_REQUEST}
+        </p>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-text-secondary">
+          Güncel fiyat ve stok bilgisi için ürün kodunu (<span className="font-mono">{product.sku}</span>) belirterek
+          bize ulaşın; proje ve adetli alımlarda kurumsal teklif hazırlanır.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -304,15 +320,19 @@ export default async function ProductPage({
                 sku: product.sku,
                 category: category.label,
                 brand: { '@type': 'Brand', name: product.brand },
-                offers: {
-                  '@type': 'Offer',
-                  price: product.price,
-                  priceCurrency: 'TRY',
-                  availability:
-                    product.stock > 0
-                      ? 'https://schema.org/InStock'
-                      : 'https://schema.org/OutOfStock',
-                },
+                /* No offer without a price: structured data must not state
+                   one the page does not. */
+                ...(product.price != null && {
+                  offers: {
+                    '@type': 'Offer',
+                    price: product.price,
+                    priceCurrency: 'TRY',
+                    availability:
+                      product.stock > 0
+                        ? 'https://schema.org/InStock'
+                        : 'https://schema.org/OutOfStock',
+                  },
+                }),
               },
             ],
           }),
@@ -394,10 +414,13 @@ export default async function ProductPage({
                 they answer "will this work for me", which comes first. */}
             <div className="mt-4 rounded-(--panel-radius) border border-line bg-surface-card p-4 shadow-e1 dt:mt-5 dt:p-6">
               <PriceBlock product={product} />
-              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 border-t border-line pt-3">
-                <StockLine product={product} />
-                <ShippingLine product={product} />
-              </div>
+              {/* Stock and shipping belong to a product that can be bought now. */}
+              {product.price != null && (
+                <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5 border-t border-line pt-3">
+                  <StockLine product={product} />
+                  <ShippingLine product={product} />
+                </div>
+              )}
               {keySpecsOf(product).length > 0 && (
                 <div className="mt-4">
                   <KeySpecs product={product} />

@@ -139,8 +139,9 @@ export function applyFilters(products: Product[], filters: CatalogFilters): Prod
     if (filters.brands.length && !filters.brands.includes(brandSlug(product.brand))) {
       return false;
     }
-    if (filters.min !== undefined && product.price < filters.min) return false;
-    if (filters.max !== undefined && product.price > filters.max) return false;
+    // A price range is a filter on prices: price-on-request products leave it.
+    if (filters.min !== undefined && (product.price == null || product.price < filters.min)) return false;
+    if (filters.max !== undefined && (product.price == null || product.price > filters.max)) return false;
     if (filters.inStock && product.stock === 0) return false;
 
     for (const feature of filters.features) {
@@ -152,10 +153,11 @@ export function applyFilters(products: Product[], filters: CatalogFilters): Prod
   });
 
   switch (filters.sort) {
+    // Price-on-request products sort after every priced one, either way.
     case 'fiyat-artan':
-      return [...matched].sort((a, b) => a.price - b.price);
+      return [...matched].sort((a, b) => (a.price ?? Infinity) - (b.price ?? Infinity));
     case 'fiyat-azalan':
-      return [...matched].sort((a, b) => b.price - a.price);
+      return [...matched].sort((a, b) => (b.price ?? -Infinity) - (a.price ?? -Infinity));
     case 'isim':
       return [...matched].sort((a, b) => a.name.localeCompare(b.name, 'tr'));
     default:
@@ -192,7 +194,9 @@ export function facetsOf(scope: Product[], filters: CatalogFilters) {
       ...band,
       count: withoutBand.filter(
         (product) =>
-          product.price >= band.min && (band.max === 0 || product.price <= band.max),
+          product.price != null &&
+          product.price >= band.min &&
+          (band.max === 0 || product.price <= band.max),
       ).length,
     })),
     inStock: withoutFeatures.filter((product) => product.stock > 0).length,

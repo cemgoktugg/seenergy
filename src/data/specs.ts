@@ -119,7 +119,12 @@ export function keySpecsOf(product: Product, max = 4): SpecRow[] {
     out.push({ label: pattern.label, value: pattern.format(match) });
   }
 
-  if (out.length < 3) {
+  /* No top-up for a product still on price-on-request: that is a model whose
+     data has not been entered yet (the client's CCTV range arrived as model
+     codes only), and the buy box would state the category's guess — "8 kanal
+     IP kamera ve NVR kiti" on an AHD camera — as this product's fact. The
+     full sheet further down still shows the template, labelled as typical. */
+  if (out.length < 3 && product.price != null) {
     const general = categorySpec(product.category)?.groups.find(
       (group) => group.title === 'Genel',
     );

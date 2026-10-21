@@ -117,10 +117,9 @@ const legacyIndex = (product: StoreProduct): number => {
 
 function toProduct(product: StoreProduct, index: number): Product | null {
   const variant = product.variants[0];
-  const amount = variant?.calculated_price?.calculated_amount;
-  // No price in this region means it cannot be sold here — leave it out.
-  if (!variant || amount == null) return null;
-
+  if (!variant) return null;
+  // No price yet: kept, and shown as price-on-request (see Product.price).
+  const amount = variant.calculated_price?.calculated_amount ?? null;
   const original = variant.calculated_price?.original_amount ?? amount;
   const meta = product.metadata ?? {};
   const badge = typeof meta.badge === 'string' && BADGES.has(meta.badge) ? meta.badge : undefined;
@@ -134,12 +133,12 @@ function toProduct(product: StoreProduct, index: number): Product | null {
     sku: variant.sku ?? '',
     category: categoryKeyFromHandle(product.categories?.[0]?.handle ?? '') ?? '',
     price: amount,
-    compareAtPrice: original > amount ? original : undefined,
+    compareAtPrice: amount != null && original != null && original > amount ? original : undefined,
     image: imagePath(product.thumbnail),
     images: galleryOf(product),
     // An untracked variant is always available; a tracked one reports its stock.
     stock: variant.manage_inventory === false ? 999 : Math.max(0, variant.inventory_quantity ?? 0),
-    freeShipping: amount >= FREE_SHIPPING_FROM,
+    freeShipping: amount != null && amount >= FREE_SHIPPING_FROM,
     instalment: meta.instalment === true,
     badge: badge as Product['badge'],
     // Deterministic pseudo-values, clearly labelled as mock.

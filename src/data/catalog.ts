@@ -21,7 +21,12 @@ export interface Product {
   name: string;
   sku: string;
   category: string;
-  price: number;
+  /**
+   * null = no price yet: the product is shown as "Fiyat için teklif isteyin"
+   * and cannot be added to the cart (a published model whose price the shop
+   * has not entered — the client's CCTV range went live this way).
+   */
+  price: number | null;
   compareAtPrice?: number;
   /** The main picture — what cards, rows and the cart show. */
   image: string;
@@ -106,9 +111,16 @@ export const brandSlug = (brand: string): string => slugify(brand);
  * it can never disagree with the two prices printed beside it.
  */
 export const discountPercent = (product: Product): number | null =>
-  product.compareAtPrice
+  product.compareAtPrice && product.price != null
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : null;
+
+/** What a price-on-request product says where a price would be. */
+export const PRICE_ON_REQUEST = 'Fiyat için teklif isteyin';
+
+/** A price for display, or the price-on-request line when there is none. */
+export const priceLabel = (price: number | null): string =>
+  price == null ? PRICE_ON_REQUEST : formatPrice(price);
 
 export const formatPrice = (value: number): string =>
   new Intl.NumberFormat('tr-TR', {

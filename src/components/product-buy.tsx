@@ -12,11 +12,12 @@
  * it is part of the page rather than an enhancement.
  */
 
-import { Heart, Scale, ShoppingCart } from 'lucide-react';
+import Link from 'next/link';
+import { Heart, MessageSquareQuote, Scale, ShoppingCart } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
-import { formatPrice, type Product } from '@/data/catalog';
+import { priceLabel, type Product } from '@/data/catalog';
 
 export function ProductBuy({ product }: { product: Product }) {
   /* The cart is Medusa's, shared through CartProvider: the header badge, the
@@ -29,6 +30,8 @@ export function ProductBuy({ product }: { product: Product }) {
   /* The limit is enforced in the store; surfacing it here stops the control
      from looking broken when a fifth product silently refuses to be added. */
   const compareFull = ready && !comparing && count('compare') >= COMPARE_LIMIT;
+  /* No price yet: the product is quoted, not sold — no cart controls. */
+  const onRequest = product.price == null;
   const soldOut = product.stock === 0;
   /* Stock is enforced by Medusa; stopping at the known level here just saves
      the visitor a round trip to an error. */
@@ -48,15 +51,22 @@ export function ProductBuy({ product }: { product: Product }) {
   return (
     <>
       <div className="mt-5 flex items-stretch gap-2.5">
-        <button
-          type="button"
-          disabled={soldOut || atStock || cart.busy}
-          onClick={addToCart}
-          className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[16px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary dt:h-14 dt:text-[16px]"
-        >
-          <ShoppingCart size={19} strokeWidth={2} aria-hidden />
-          {label}
-        </button>
+        {onRequest ? (
+          <Link href="/iletisim" className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[16px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark dt:h-14 dt:text-[16px]">
+            <MessageSquareQuote size={19} strokeWidth={2} aria-hidden />
+            Teklif İste
+          </Link>
+        ) : (
+          <button
+            type="button"
+            disabled={soldOut || atStock || cart.busy}
+            onClick={addToCart}
+            className="flex h-12 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[16px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary dt:h-14 dt:text-[16px]"
+          >
+            <ShoppingCart size={19} strokeWidth={2} aria-hidden />
+            {label}
+          </button>
+        )}
 
         <button
           type="button"
@@ -102,19 +112,26 @@ export function ProductBuy({ product }: { product: Product }) {
         <div className="flex items-center gap-3">
           <div className="min-w-0">
             <p className="truncate text-[11px] text-text-secondary">{product.brand}</p>
-            <p className="text-[16px] font-extrabold leading-tight tabular-nums text-text-primary">
-              {formatPrice(product.price)}
+            <p className={`font-extrabold leading-tight tabular-nums text-text-primary ${onRequest ? 'text-[13px]' : 'text-[16px]'}`}>
+              {priceLabel(product.price)}
             </p>
           </div>
-          <button
-            type="button"
-            disabled={soldOut || atStock || cart.busy}
-            onClick={addToCart}
-            className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
-          >
-            <ShoppingCart size={17} strokeWidth={2} aria-hidden />
-            {label}
-          </button>
+          {onRequest ? (
+            <Link href="/iletisim" className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark">
+              <MessageSquareQuote size={17} strokeWidth={2} aria-hidden />
+              Teklif İste
+            </Link>
+          ) : (
+            <button
+              type="button"
+              disabled={soldOut || atStock || cart.busy}
+              onClick={addToCart}
+              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
+            >
+              <ShoppingCart size={17} strokeWidth={2} aria-hidden />
+              {label}
+            </button>
+          )}
         </div>
       </div>
     </>

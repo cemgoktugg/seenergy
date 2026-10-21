@@ -41,6 +41,12 @@ import { PRIMARY_NAV, SITE, UTILITY_LINKS } from '@/data/site';
 
 const UTILITY_ICONS = { info: Info, phone: Phone, truck: Truck, badge: BadgeIcon };
 
+/** A model link in the mega panel, keyed by its subcategory's href. */
+export type MenuModels = Record<string, { label: string; href: string }[]>;
+
+/** Models listed per column before it hands over to "Tümünü gör". */
+const MENU_MODEL_LIMIT = 12;
+
 /**
  * The lockup: the client's own logo (see brand-mark.tsx) — the full cut with
  * its "Güvenlik Teknolojileri A.Ş" line from `sm` up, the S mark alone below.
@@ -246,8 +252,12 @@ function HeaderActions() {
   );
 }
 
-/** `promo` is the announcement bar text (admin → Vitrin → Duyuru çubuğu). */
-export function SiteHeader({ promo }: { promo: string }) {
+/**
+ * `promo` is the announcement bar text (admin → Vitrin → Duyuru çubuğu).
+ * `menuModels` is each subcategory's products, built by the layout from the
+ * catalogue — the mega panel lists them under their subcategory.
+ */
+export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuModels?: MenuModels }) {
   /* The condensed bar carries its own cart badge. It reads the same store as
      the masthead's, so the two cannot disagree — a sticky bar still showing 0
      after something was added would be worse than having no badge there. */
@@ -578,13 +588,15 @@ export function SiteHeader({ promo }: { promo: string }) {
                     aria-hidden
                     className="block h-[3px] w-full bg-linear-to-r from-grad-1 via-grad-3 to-grad-4"
                   />
-                  {/* The category on the left, its subcategories as cards on
-                      the right. It replaced five columns of sub-links per
-                      category that were invented to fill a measured panel and
-                      mostly led nowhere; the panel now opens only for the
-                      three categories that really have subcategories. */}
+                  {/* The category on the left; on the right one column per
+                      subcategory, headed by the subcategory and listing its
+                      models underneath — the client's own layout ("AHD Sistem"
+                      opens onto SE-1080LD, SE-1080MD…). The models come from
+                      the catalogue, so one added in the admin joins its column
+                      without a code change. A subcategory with nothing in it
+                      yet keeps its column and says so, rather than vanishing. */}
                   <div className="flex items-start gap-8 px-6 py-5">
-                    <div className="w-[240px] shrink-0">
+                    <div className="w-[220px] shrink-0">
                       <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary">
                         Kategori
                       </p>
@@ -599,18 +611,53 @@ export function SiteHeader({ promo }: { promo: string }) {
                         <ChevronRight size={14} strokeWidth={2.25} aria-hidden />
                       </Link>
                     </div>
-                    <ul className="grid flex-1 gap-2.5 [grid-template-columns:repeat(auto-fill,minmax(190px,1fr))]">
-                      {item.children.map((child) => (
-                        <li key={child.href}>
-                          <Link
-                            href={child.href}
-                            className="flex items-center justify-between gap-2 rounded-(--card-radius) border border-line bg-surface-page px-4 py-3.5 text-[14px] font-semibold text-text-primary transition-colors duration-(--duration-fast) hover:border-brand hover:bg-brand hover:text-white"
-                          >
-                            {child.label}
-                            <ChevronRight size={15} strokeWidth={2.25} aria-hidden className="shrink-0 opacity-60" />
-                          </Link>
-                        </li>
-                      ))}
+                    <ul className="grid flex-1 gap-x-6 gap-y-5 [grid-template-columns:repeat(auto-fill,minmax(180px,1fr))]">
+                      {item.children.map((child) => {
+                        const models = menuModels[child.href] ?? [];
+                        return (
+                          <li key={child.href} className="min-w-0">
+                            <Link
+                              href={child.href}
+                              className="group/sub flex items-center justify-between gap-2 border-b border-line pb-2 text-[14px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:text-brand-dark"
+                            >
+                              <span className="truncate">{child.label}</span>
+                              <ChevronRight
+                                size={15}
+                                strokeWidth={2.25}
+                                aria-hidden
+                                className="shrink-0 opacity-50 transition-transform duration-(--duration-fast) group-hover/sub:translate-x-0.5 group-hover/sub:opacity-100"
+                              />
+                            </Link>
+                            {models.length > 0 ? (
+                              <ul className="mt-2 space-y-0.5">
+                                {models.slice(0, MENU_MODEL_LIMIT).map((model) => (
+                                  <li key={model.href}>
+                                    <Link
+                                      href={model.href}
+                                      className="block truncate rounded-md px-1.5 py-1 -mx-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-(--duration-fast) hover:bg-surface-page hover:text-text-primary"
+                                    >
+                                      {model.label}
+                                    </Link>
+                                  </li>
+                                ))}
+                                {models.length > MENU_MODEL_LIMIT && (
+                                  <li>
+                                    <Link
+                                      href={child.href}
+                                      className="mt-1 inline-flex items-center gap-1 text-[12.5px] font-semibold text-brand-dark hover:underline"
+                                    >
+                                      Tümünü gör ({models.length})
+                                      <ChevronRight size={13} strokeWidth={2.25} aria-hidden />
+                                    </Link>
+                                  </li>
+                                )}
+                              </ul>
+                            ) : (
+                              <p className="mt-2 text-[12.5px] text-text-secondary">Ürünler yakında</p>
+                            )}
+                          </li>
+                        );
+                      })}
                     </ul>
                   </div>
                 </div>

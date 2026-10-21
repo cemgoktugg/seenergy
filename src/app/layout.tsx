@@ -5,7 +5,8 @@ import { CartProvider } from '@/components/cart-provider';
 import { StoreProvider } from '@/components/cart-store';
 import { SiteHeader } from '@/components/site-header';
 import { NewsletterBar, SiteFooter } from '@/components/site-footer';
-import { SITE } from '@/data/site';
+import { PRIMARY_NAV, SITE } from '@/data/site';
+import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
 
 import './globals.css';
@@ -51,6 +52,31 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Cached under the `vitrin` tag, so every page stays static.
   const { announcement } = await loadVitrin();
 
+  /* The mega panel lists each subcategory's models (the client asked for
+     "AHD Sistem" to open onto SE-1080LD, SE-1080MD…). Built here, on the
+     server, from the catalogue — cached under `catalog` — and handed to the
+     client header as plain links. A model added in the admin appears in the
+     menu on its own. The brand prefix is dropped: the column already says
+     where you are, and "SEENERGY SE-1080LD" ×9 is noise. */
+  const { byCategory } = await loadCatalog();
+  const menuModels: Record<string, { label: string; href: string }[]> = {};
+  for (const item of PRIMARY_NAV) {
+    for (const child of item.children ?? []) {
+      const key = child.href.replace('/kategori/', '');
+      // The house brand's own range leads its columns: that is the list the
+      // client gave for this menu; other brands' products follow.
+      const products = byCategory(key);
+      const ordered = [
+        ...products.filter((product) => product.brand === SITE.name),
+        ...products.filter((product) => product.brand !== SITE.name),
+      ];
+      menuModels[child.href] = ordered.map((product) => ({
+        label: product.name.startsWith(`${product.brand} `) ? product.name.slice(product.brand.length + 1) : product.name,
+        href: `/urun/${product.slug}`,
+      }));
+    }
+  }
+
   return (
     <html lang="tr" className={montserrat.variable} suppressHydrationWarning>
       <head>
@@ -69,7 +95,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             pages do. */}
         <CartProvider>
           <StoreProvider>
-            <SiteHeader promo={announcement} />
+            <SiteHeader promo={announcement} menuModels={menuModels} />
             <main id="icerik">{children}</main>
             <NewsletterBar />
             <SiteFooter />

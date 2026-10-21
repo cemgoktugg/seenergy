@@ -37,11 +37,11 @@
 'use client';
 
 import Link from 'next/link';
-import { Heart, ShoppingCart } from 'lucide-react';
+import { Heart, MessageSquareQuote, ShoppingCart } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
 import { useStore } from '@/components/cart-store';
-import { discountPercent, formatPrice, type Product } from '@/data/catalog';
+import { discountPercent, formatPrice, PRICE_ON_REQUEST, priceLabel, type Product } from '@/data/catalog';
 
 /** Below this many units the card says so. It is the real Medusa stock. */
 const LOW_STOCK = 5;
@@ -158,7 +158,7 @@ export function ProductCard({ product }: { product: Product }) {
           {/* One sentence for assistive tech; the visual parts are hidden from
               it so the price is heard once, complete. */}
           <p className="sr-only">
-            {formatPrice(product.price)}
+            {priceLabel(product.price)}
             {product.compareAtPrice ? `, önceki fiyat ${formatPrice(product.compareAtPrice)}` : ''}
             {discount !== null && discount > 0 ? `, %${discount} indirim` : ''}
           </p>
@@ -172,9 +172,13 @@ export function ProductCard({ product }: { product: Product }) {
           {/* Tabular figures: prices sit in grids four and five across, and
               proportional digits make those columns visibly ragged. */}
           <div aria-hidden className="flex h-[26px] items-center gap-2">
-            <p className="text-[17px] font-extrabold leading-none tracking-[-0.01em] tabular-nums text-text-primary sm:text-[19px] dt:text-[20px]">
-              {formatPrice(product.price)}
-            </p>
+            {product.price == null ? (
+              <p className="text-[13px] font-bold leading-tight text-text-primary sm:text-[14px]">{PRICE_ON_REQUEST}</p>
+            ) : (
+              <p className="text-[17px] font-extrabold leading-none tracking-[-0.01em] tabular-nums text-text-primary sm:text-[19px] dt:text-[20px]">
+                {formatPrice(product.price)}
+              </p>
+            )}
             {discount !== null && discount > 0 && (
               <span className="shrink-0 rounded-full bg-danger/10 px-1.5 py-[3px] text-[11px] font-bold leading-none tabular-nums text-danger-ink">
                 %{discount}
@@ -191,16 +195,28 @@ export function ProductCard({ product }: { product: Product }) {
             flow under the price, and every card grows by the same amount.
             Focus-within keeps it reachable by keyboard in both. */}
         <div className="card-cta pointer-events-none absolute inset-x-0 bottom-[calc(100%+8px)] translate-y-2 px-4 opacity-0 transition-[opacity,transform] duration-(--duration-base) ease-(--ease-out) group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
-          <button
-            type="button"
-            disabled={soldOut}
-            onClick={() => void cart.add(product.variantId, 1, product.name)}
-            aria-label={`${product.name} ürününü sepete ekle`}
-            className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[13.5px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
-          >
-            <ShoppingCart size={16} strokeWidth={2} aria-hidden />
-            {soldOut ? 'Tükendi' : added ? 'Sepete Eklendi' : 'Sepete Ekle'}
-          </button>
+          {/* No price: nothing to put in a cart — the action is a quote. */}
+          {product.price == null ? (
+            <Link
+              href="/iletisim"
+              aria-label={`${product.name} için teklif isteyin`}
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[13.5px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark"
+            >
+              <MessageSquareQuote size={16} strokeWidth={2} aria-hidden />
+              Teklif İste
+            </Link>
+          ) : (
+            <button
+              type="button"
+              disabled={soldOut}
+              onClick={() => void cart.add(product.variantId, 1, product.name)}
+              aria-label={`${product.name} ürününü sepete ekle`}
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[13.5px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
+            >
+              <ShoppingCart size={16} strokeWidth={2} aria-hidden />
+              {soldOut ? 'Tükendi' : added ? 'Sepete Eklendi' : 'Sepete Ekle'}
+            </button>
+          )}
         </div>
       </div>
     </article>

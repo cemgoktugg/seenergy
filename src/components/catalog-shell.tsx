@@ -235,16 +235,21 @@ export async function CatalogShell({
    */
   const inStockCount = scope.filter((product) => product.stock > 0).length;
   const brandCount = new Set(scope.map((product) => product.brand)).size;
-  const prices = scope.map((product) => product.price);
+  // Price-on-request products have no price to put in a range.
+  const prices = scope.flatMap((product) => (product.price == null ? [] : [product.price]));
   const scopeStats = scope.length
     ? [
-        {
-          label: 'Fiyat aralığı',
-          value:
-            Math.min(...prices) === Math.max(...prices)
-              ? formatPrice(prices[0])
-              : `${formatPrice(Math.min(...prices))} – ${formatPrice(Math.max(...prices))}`,
-        },
+        ...(prices.length
+          ? [
+              {
+                label: 'Fiyat aralığı',
+                value:
+                  Math.min(...prices) === Math.max(...prices)
+                    ? formatPrice(prices[0])
+                    : `${formatPrice(Math.min(...prices))} – ${formatPrice(Math.max(...prices))}`,
+              },
+            ]
+          : []),
         ...(brandCount > 1 ? [{ label: 'Marka', value: String(brandCount) }] : []),
         {
           label: 'Stok',

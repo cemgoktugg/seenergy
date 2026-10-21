@@ -11,7 +11,7 @@
 
 import Link from 'next/link';
 
-import { formatPrice, type Product } from '@/data/catalog';
+import { priceLabel, type Product } from '@/data/catalog';
 
 export function ProductRow({ product }: { product: Product }) {
   return (
@@ -37,8 +37,8 @@ export function ProductRow({ product }: { product: Product }) {
         <span className="line-clamp-2 text-[13px] leading-[1.35] text-text-primary transition-colors group-hover:text-brand-text">
           {product.name}
         </span>
-        <span className="mt-0.5 block text-[14px] font-extrabold tabular-nums text-text-primary">
-          {formatPrice(product.price)}
+        <span className={`mt-0.5 block font-extrabold tabular-nums text-text-primary ${product.price == null ? 'text-[12px]' : 'text-[14px]'}`}>
+          {priceLabel(product.price)}
         </span>
       </span>
     </Link>

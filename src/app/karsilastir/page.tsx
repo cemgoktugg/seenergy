@@ -23,7 +23,7 @@ import { ArrowLeft, Scale, X } from 'lucide-react';
 
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
 import { useCatalog } from '@/components/catalog-provider';
-import { categoryMeta, discountPercent, formatPrice } from '@/data/catalog';
+import { categoryMeta, discountPercent, priceLabel } from '@/data/catalog';
 import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { keySpecsOf } from '@/data/specs';
 
@@ -70,7 +70,7 @@ export default function ComparePage() {
     { label: 'Marka', value: (p) => p.brand },
     { label: 'Ürün kodu', value: (p) => p.sku },
     { label: 'Kategori', value: (p) => categoryMeta(p.category).label },
-    { label: 'Fiyat', value: (p) => formatPrice(p.price) },
+    { label: 'Fiyat', value: (p) => priceLabel(p.price) },
     {
       label: 'İndirim',
       value: (p) => {
