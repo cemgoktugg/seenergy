@@ -27,7 +27,8 @@ ENV NODE_ENV=production
 COPY --from=build /repo/apps/backend/.medusa/server ./
 COPY --from=build /repo/node_modules ./node_modules
 COPY apps/backend/static ./static
+COPY docker-start.sh ./docker-start.sh
 EXPOSE 9000
-# Pending migrations first (none, on a database restored from
-# deploy/seenergy.sql), then the server.
-CMD ["sh", "-c", "npx medusa db:migrate && npx medusa start"]
+# Migrations, the admin login when ADMIN_EMAIL/ADMIN_PASSWORD are set, then
+# the server.
+CMD ["sh", "/server/docker-start.sh"]

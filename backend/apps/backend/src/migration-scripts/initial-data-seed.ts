@@ -57,6 +57,16 @@ export default async function initial_data_seed({
     ModuleRegistrationName.FULFILLMENT
   );
 
+  // Only ever on an EMPTY database. A database restored from
+  // deploy/seenergy.sql already has all of this; re-running it there (as a
+  // built backend once did, under the script's .js name) created a second
+  // sales channel, API key and store before failing on the region.
+  const { data: regions } = await query.graph({ entity: "region", fields: ["id"] });
+  if (regions.length > 0) {
+    logger.info("SEENERGY: the database already holds a region — initial seed skipped.");
+    return;
+  }
+
   logger.info("SEENERGY: store, sales channel and publishable key...");
   const {
     result: [salesChannel],

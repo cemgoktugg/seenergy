@@ -150,12 +150,27 @@ function toProduct(product: StoreProduct, index: number): Product | null {
 
 /** The raw Store API response, shared by the catalogue and the details. */
 const loadStoreProducts = cache(async (): Promise<StoreProduct[]> => {
-  const region = await getRegion();
-  const { products } = await medusa<{ products: StoreProduct[] }>('/store/products', {
-    query: { limit: 500, region_id: region.id, fields: FIELDS },
-    next: { revalidate: REVALIDATE, tags: [CATALOG_TAG] },
-  });
-  return products;
+  try {
+    const region = await getRegion();
+    const { products } = await medusa<{ products: StoreProduct[] }>('/store/products', {
+      query: { limit: 500, region_id: region.id, fields: FIELDS },
+      next: { revalidate: REVALIDATE, tags: [CATALOG_TAG] },
+    });
+    return products;
+  } catch (error) {
+    /* Docker Compose builds every image before it starts any container, so
+       on a first deploy the storefront image is built while the backend is
+       not running yet. Only then (the Dockerfile sets SEENERGY_IMAGE_BUILD
+       for that one step) the pages prerender without the catalogue: no
+       product page is pre-generated, and the rest revalidate within
+       REVALIDATE seconds once the backend answers. Anywhere else a failure
+       stays a failure — a live page must not quietly show an empty shop. */
+    if (process.env.SEENERGY_IMAGE_BUILD === '1') {
+      console.warn('[seenergy] Medusa unreachable during the image build; prerendering without the catalogue.');
+      return [];
+    }
+    throw error;
+  }
 });
 
 export const loadProducts = cache(async (): Promise<Product[]> => {

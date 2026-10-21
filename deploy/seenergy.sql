@@ -11293,3 +11293,17 @@ ALTER TABLE ONLY public.store_locale
 
 \unrestrict m7gIReFQMB1ifjiGOdeZG1pSH0ajfJYSYktejyO5UtzX9TrqGTtZErI2nd3tVWu
 
+
+--
+-- SEENERGY: migration scripts ran from their .ts sources in development and
+-- are recorded under those names. A built backend runs the same scripts as
+-- .js, finds no record of them and runs them again — measured in the Docker
+-- rehearsal: initial-data-seed.js re-ran, created a second sales channel,
+-- API key and store, then failed, and would have repeated that on every
+-- start. Recording the .js names as done makes the restored data final.
+--
+INSERT INTO public.script_migrations (script_name, created_at, finished_at)
+SELECT regexp_replace(script_name, '\.ts$', '.js'), now(), now()
+FROM public.script_migrations
+WHERE script_name LIKE '%.ts'
+ON CONFLICT (script_name) DO NOTHING;

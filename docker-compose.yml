@@ -1,0 +1,185 @@
+# SEENERGY on Dokploy — a "Compose" service from this repository (Git
+# provider, branch main, Compose Path ./docker-compose.yml).
+#
+# The same shape as the team's other Medusa store on this server: Postgres and
+# Redis on an internal network, the backend and the storefront published
+# through Dokploy's Traefik by labels, and a daily backup.
+#
+# Everything is set in Dokploy → Environment (see deploy/compose.env.example):
+# DOMAIN, API_DOMAIN, the Postgres credentials, the secrets, the admin login.
+#
+# First deploy: the Postgres volume is empty, so deploy/initdb restores
+# deploy/seenergy.sql and points its addresses at https://${DOMAIN} and
+# https://${API_DOMAIN}. Later deploys keep the data.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      SEED_STORE_URL: ${STOREFRONT_URL:-https://${DOMAIN}}
+      SEED_API_URL: ${MEDUSA_BACKEND_URL:-https://${API_DOMAIN}}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./deploy/initdb:/docker-entrypoint-initdb.d:ro
+      - ./deploy:/seed:ro
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # ?sslmode=disable: Medusa forces SSL on any database host that is not
+      # localhost, and this Postgres has none.
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}?sslmode=disable
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: ${JWT_SECRET}
+      COOKIE_SECRET: ${COOKIE_SECRET}
+      AUTH_MFA_ENCRYPTION_KEY: ${AUTH_MFA_ENCRYPTION_KEY}
+      STORE_CORS: https://${DOMAIN},https://www.${DOMAIN}
+      ADMIN_CORS: https://${API_DOMAIN}
+      AUTH_CORS: https://${DOMAIN},https://www.${DOMAIN},https://${API_DOMAIN}
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-https://${API_DOMAIN}}
+      STOREFRONT_URL: ${STOREFRONT_URL:-https://${DOMAIN}}
+      STOREFRONT_REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+      ADMIN_EMAIL: ${ADMIN_EMAIL:-}
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+    volumes:
+      - backend_static:/server/static
+    networks:
+      - internal
+      - dokploy-network
+    healthcheck:
+      test: ["CMD-SHELL", "node -e \"fetch('http://localhost:9000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
+      interval: 15s
+      timeout: 5s
+      start_period: 120s
+      retries: 10
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.http.routers.seenergy-api.rule=Host(`${API_DOMAIN}`)"
+      - "traefik.http.routers.seenergy-api.entrypoints=websecure"
+      - "traefik.http.routers.seenergy-api.tls.certResolver=letsencrypt"
+      - "traefik.http.services.seenergy-api.loadbalancer.server.port=9000"
+      - "traefik.http.routers.seenergy-api-http.rule=Host(`${API_DOMAIN}`)"
+      - "traefik.http.routers.seenergy-api-http.entrypoints=web"
+      - "traefik.http.routers.seenergy-api-http.middlewares=seenergy-to-https"
+
+  store:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-https://${API_DOMAIN}}
+        MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY}
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    environment:
+      MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-https://${API_DOMAIN}}
+      MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY}
+      REVALIDATE_SECRET: ${REVALIDATE_SECRET}
+      BANK_NAME: ${BANK_NAME:-}
+      BANK_HOLDER: ${BANK_HOLDER:-}
+      BANK_IBAN: ${BANK_IBAN:-}
+    networks:
+      - internal
+      - dokploy-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.docker.network=dokploy-network"
+      - "traefik.http.routers.seenergy-web.rule=Host(`${DOMAIN}`)"
+      - "traefik.http.routers.seenergy-web.entrypoints=websecure"
+      - "traefik.http.routers.seenergy-web.tls.certResolver=letsencrypt"
+      - "traefik.http.services.seenergy-web.loadbalancer.server.port=3100"
+      - "traefik.http.middlewares.seenergy-to-https.redirectscheme.scheme=https"
+      - "traefik.http.middlewares.seenergy-to-https.redirectscheme.permanent=true"
+      - "traefik.http.routers.seenergy-web-http.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.seenergy-web-http.entrypoints=web"
+      - "traefik.http.routers.seenergy-web-http.middlewares=seenergy-to-https"
+      - "traefik.http.middlewares.seenergy-www-to-apex.redirectregex.regex=^https?://www\\.(.+)"
+      - "traefik.http.middlewares.seenergy-www-to-apex.redirectregex.replacement=https://$${1}"
+      - "traefik.http.middlewares.seenergy-www-to-apex.redirectregex.permanent=true"
+      - "traefik.http.routers.seenergy-www.rule=Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.seenergy-www.entrypoints=websecure"
+      - "traefik.http.routers.seenergy-www.tls.certResolver=letsencrypt"
+      - "traefik.http.routers.seenergy-www.middlewares=seenergy-www-to-apex"
+
+  # Daily: the database and the uploaded pictures, kept 14 / 3 days.
+  db-backup:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      PGHOST: postgres
+      PGUSER: ${POSTGRES_USER}
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+    volumes:
+      - db_backups:/backups
+      - backend_static:/static:ro
+    networks:
+      - internal
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          TS=$$(date +%Y-%m-%d_%H%M)
+          if pg_dump -Fc -f /backups/db_$$TS.dump.tmp; then
+            mv /backups/db_$$TS.dump.tmp /backups/db_$$TS.dump
+            echo "[yedek] db_$$TS.dump tamam ($$(du -h /backups/db_$$TS.dump | cut -f1))"
+          else
+            rm -f /backups/db_$$TS.dump.tmp
+            echo "[yedek] HATA: veritabanı yedeği alınamadı"
+          fi
+          tar -czf /backups/static_$$TS.tar.gz -C /static . && echo "[yedek] static_$$TS.tar.gz tamam"
+          find /backups -name 'db_*.dump' -mtime +$$BACKUP_KEEP_DAYS -delete
+          find /backups -name 'static_*.tar.gz' -mtime +3 -delete
+          sleep 86400
+        done
+
+volumes:
+  pgdata:
+  redisdata:
+  backend_static:
+  db_backups:
+
+networks:
+  internal:
+  dokploy-network:
+    external: true
