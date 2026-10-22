@@ -31,6 +31,7 @@ export type BlockGroup =
   | "hero-side"
   | "banner"
   | "brand-band"
+  | "brand-board"
   | "tech-band"
   | "trust"
 

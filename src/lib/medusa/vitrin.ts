@@ -70,12 +70,25 @@ export interface TrustItem {
   icon: TrustIcon;
 }
 
+export interface BrandBoardItem {
+  brandHandle: string;
+  logo: string;
+}
+
+/** The board's first content, as the migration seeds it (vitrin-upgrade-brand-board). */
+const BRAND_BOARD: BrandBoardItem[] = ['dahua', 'hikvision', 'neutron', 'unv'].map((handle) => ({
+  brandHandle: handle,
+  logo: `/brand-logos/${handle}.webp`,
+}));
+
 export interface Vitrin {
   announcement: string;
   slides: HeroSlide[];
   heroSide: Banner[];
   banners: Partial<Record<'wide' | 'dual-1' | 'dual-2' | 'super-firsat-promo', Banner>>;
   brandBands: BrandBand[];
+  /** The four squares under the hero (admin → Vitrin → Marka panosu). */
+  brandBoard: BrandBoardItem[];
   techBand: TechBandContent | null;
   trust: TrustItem[];
   /** List key → product ids, in the order the shop set. */
@@ -92,6 +105,7 @@ interface StoreVitrin {
     'hero-side': Block<RawBanner>[];
     banner: Block<RawBanner>[];
     'brand-band': Block<{ brand_handle: string; tagline: string; logo: string; banner?: string; product_ids?: string[] }>[];
+    'brand-board': Block<{ brand_handle: string; logo: string }>[];
     'tech-band': Block<{
       eyebrow: string;
       title: string;
@@ -144,6 +158,7 @@ const FALLBACK: Vitrin = {
     banner: '',
     productIds: [],
   })),
+  brandBoard: BRAND_BOARD,
   techBand: null,
   trust: TRUST_ITEMS.map((item) => ({ ...item })),
   lists: {},
@@ -190,6 +205,10 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
         productIds: Array.isArray(block.data.product_ids) ? block.data.product_ids : [],
       }))
       .filter((band) => band.brandHandle),
+    brandBoard: (b['brand-board'] ?? [])
+      .map((block) => ({ brandHandle: str(block.data.brand_handle), logo: str(block.data.logo) }))
+      .filter((item) => item.brandHandle)
+      .slice(0, 4),
     techBand: tech
       ? {
           eyebrow: str(tech.eyebrow),

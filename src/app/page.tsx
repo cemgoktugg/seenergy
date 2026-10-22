@@ -15,7 +15,7 @@
 
 import { BrandSection } from '@/components/brand-section';
 import { Hero } from '@/components/hero';
-import { CategoryMosaic } from '@/components/category-mosaic';
+import { BrandBoard, type BrandBoardEntry } from '@/components/brand-board';
 import { ProductSlider } from '@/components/product-slider';
 import { ProductTabs } from '@/components/product-tabs';
 import { RevealOnScroll } from '@/components/reveal-on-scroll';
@@ -54,6 +54,33 @@ export default async function HomePage() {
       .filter((product): product is Product => Boolean(product))
       .slice(0, count);
   };
+
+  /* The brand board's squares (admin → Vitrin → Marka panosu), each with the
+     brand's models from the catalogue — listed the way the mega menu lists
+     them: the model code, then the rest of the title. A brand with no
+     products yet has no name in the catalogue, so its handle stands in
+     ("unv" → "UNV", "dahua" → "Dahua"). */
+  const brandBoard: BrandBoardEntry[] = vitrin.brandBoard.map(({ brandHandle, logo }) => {
+    const products = byBrandSlug(brandHandle);
+    const name =
+      brandFromSlug(brandHandle) ??
+      (brandHandle.length <= 3 ? brandHandle.toUpperCase() : brandHandle.charAt(0).toUpperCase() + brandHandle.slice(1));
+    return {
+      name,
+      href: `/marka/${brandHandle}`,
+      logo,
+      models: products.map((product) => {
+        const bare = product.name.startsWith(`${product.brand} `) ? product.name.slice(product.brand.length + 1) : product.name;
+        const coded = product.sku && bare.startsWith(product.sku);
+        return {
+          label: coded ? product.sku : bare,
+          detail: coded ? bare.slice(product.sku.length).trim() : product.brand,
+          image: product.image,
+          href: `/urun/${product.slug}`,
+        };
+      }),
+    };
+  });
 
   const banner = (key: keyof typeof vitrin.banners, fallback: NonNullable<(typeof vitrin.banners)['wide']>) =>
     vitrin.banners[key] ?? fallback;
@@ -103,15 +130,15 @@ export default async function HomePage() {
         </Section>
       ) : null}
 
-      {/* 04b — the department board.
-             Category discovery used to sit at y=7337, i.e. 73% down the page,
-             behind ~6.000px of product rows — the first question a technical
-             buyer asks, answered last. It is now the first thing under the
-             hero. Deliberately NOT another row of four equal cards: 60% of
-             this page was already card rows. See CategoryMosaic. */}
-      <Section label="Kategoriler">
-        <CategoryMosaic />
-      </Section>
+      {/* 04b — the brand board: four squares, one per brand, its models on
+             hover. It replaced the category board on 2026-10-22 at the
+             client's request ("no categories here") — categories stay in the
+             mega menu and on /kategori. See BrandBoard. */}
+      {brandBoard.length > 0 ? (
+        <Section label="Markalar">
+          <BrandBoard items={brandBoard} />
+        </Section>
+      ) : null}
 
       {/* 05 — paired product sliders.
              The reference puts a 4-tile campaign strip here; the client asked

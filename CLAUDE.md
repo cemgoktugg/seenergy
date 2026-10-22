@@ -142,6 +142,14 @@ src/app/api/revalidate/route.ts             admin saves flush the `catalog` /
                                             `vitrin` cache tags immediately
 ```
 
+**Marka panosu** (`brand-board` group, 2026-10-22): the four squares under
+the hero — Dahua, Hikvision, Neutron, UNV, logos cut from the client's brand
+banners into `public/brand-logos/` — each listing its brand's models on
+hover (`src/components/brand-board.tsx`). It replaced the category board at
+the client's request: no categories there; they live in the mega menu and on
+/kategori. Seeded by `vitrin-upgrade-brand-board.ts`, which also creates the
+four brands as collections.
+
 Lists: `haftanin`, `yeni`, `cok-satan`, `super-firsat`. "Haftanın Ürünleri"
 feeds BOTH the slider (first 8) and the tab (first 12) — one list, one place
 to maintain it; same for `yeni`. Do not split them back into separate picks.

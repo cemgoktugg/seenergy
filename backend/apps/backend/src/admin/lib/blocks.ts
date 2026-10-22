@@ -176,6 +176,31 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       backgroundPhoto,
     ],
   },
+  "brand-board": {
+    title: "Marka panosu",
+    where:
+      "Ana slaytın hemen altındaki dört kare. Her karede bir markanın logosu durur; üzerine gelince o markanın modelleri listelenir. Buradaki sırayla ilk dört marka gösterilir.",
+    repeatable: true,
+    itemName: "marka",
+    itemTitle: (d, i) => `${i + 1}. ${d.brand_handle || "marka seçilmedi"}`,
+    fields: [
+      {
+        name: "brand_handle",
+        label: "Marka",
+        type: "brand",
+        required: true,
+        hint: "Karenin üzerine gelince bu markanın ürünleri listelenir. Ürünlerin markasını Ürün Yönetimi'nden seçersiniz.",
+      },
+      {
+        name: "logo",
+        label: "Logo",
+        type: "image",
+        required: true,
+        hint: "Şeffaf (PNG/WebP) veya beyaz arka planlı logo. Karenin ortasında gösterilir.",
+      },
+    ],
+    newItem: () => ({ brand_handle: "", logo: "" }),
+  },
   "brand-band": {
     title: "Marka vitrinleri",
     where:

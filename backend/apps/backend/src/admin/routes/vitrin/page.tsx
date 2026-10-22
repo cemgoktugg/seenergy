@@ -106,7 +106,7 @@ function ImagePreview({ blocks, storefront, fields = ["image"] }: { blocks: Vitr
               <img
                 src={mediaUrl(src, storefront)}
                 alt=""
-                className={`h-full w-full ${b.data.product_image ? "object-contain p-1" : "object-cover"}`}
+                className={`h-full w-full ${b.data.product_image || fields.includes("logo") ? "object-contain p-1" : "object-cover"}`}
               />
             ) : null}
           </div>
@@ -182,13 +182,17 @@ const VitrinPage = () => {
         </Band>
 
         {/* "Slayt yanı kartlar" left the homepage on 2026-10-22 (the slider
-            went full width at the client's request), so it left this map
-            too. Its blocks stay in the database, untouched. */}
+            took its width at the client's request), so it left this map too.
+            Its blocks stay in the database, untouched. */}
+
+        <Band n={++n} title={GROUPS["brand-board"].title} where={GROUPS["brand-board"].where} to="/vitrin/blok/brand-board">
+          <ImagePreview blocks={group("brand-board").slice(0, 4)} storefront={storefront} fields={["logo"]} />
+        </Band>
 
         <Band
           n={++n}
           title="Kategoriler"
-          where="Slaytın altındaki kategori panosu ve menü: 14 ana kategori ve alt kategorileri. Ürünlerin hangi kategoride olduğunu buradan, her ürünün formundan seçersiniz; kategori ağacının kendisi (yeni kategori eklemek, ad değiştirmek) sitenin kodunda tanımlıdır, bu yüzden o değişiklik için geliştiriciye başvurun."
+          where="Üst menü ve kategori sayfaları: 14 ana kategori ve alt kategorileri. Ürünlerin hangi kategoride olduğunu buradan, her ürünün formundan seçersiniz; kategori ağacının kendisi (yeni kategori eklemek, ad değiştirmek) sitenin kodunda tanımlıdır, bu yüzden o değişiklik için geliştiriciye başvurun."
           to="/categories"
           external
         />

@@ -11,6 +11,7 @@ export type BlockGroup =
   | "hero-side"
   | "banner"
   | "brand-band"
+  | "brand-board"
   | "tech-band"
   | "trust"
 
@@ -42,6 +43,13 @@ export interface BrandBandData {
   logo: string
   /** Optional hand-picked products; empty means "the brand's first four". */
   product_ids: string[]
+}
+
+/** One square of the brand board under the hero (the first four are shown). */
+export interface BrandBoardData {
+  /** Collection (brand) handle — hovering the square lists its models. */
+  brand_handle: string
+  logo: string
 }
 
 export interface TechBandData {
