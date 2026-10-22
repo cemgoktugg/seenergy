@@ -185,6 +185,15 @@ const VitrinPage = () => {
             took its width at the client's request), so it left this map too.
             Its blocks stay in the database, untouched. */}
 
+        <Band
+          n={++n}
+          title="Marka panosu başlığı"
+          where="Marka panosunun üstündeki koyu başlık şeridi: üst etiket, başlık, açıklama, buton bağlantısı ve sağdaki ürün görseli. Bannerlar içinde 'Marka panosu başlığı' olarak düzenlenir."
+          to="/vitrin/blok/banner"
+        >
+          <ImagePreview blocks={banner("wide")} storefront={storefront} />
+        </Band>
+
         <Band n={++n} title={GROUPS["brand-board"].title} where={GROUPS["brand-board"].where} to="/vitrin/blok/brand-board">
           <ImagePreview blocks={group("brand-board").slice(0, 4)} storefront={storefront} fields={["logo"]} />
         </Band>
@@ -197,7 +206,7 @@ const VitrinPage = () => {
           external
         />
 
-        <Band n={++n} title="Haftanın Ürünleri ve Yeni Gelenler" where="Kategorilerin altındaki yan yana iki ürün rafı." to="/vitrin/liste/haftanin">
+        <Band n={++n} title="Haftanın Ürünleri ve Yeni Gelenler" where="Marka panosunun altındaki yan yana iki ürün rafı." to="/vitrin/liste/haftanin">
           <div className="grid gap-4 md:grid-cols-2">
             <div className="flex flex-col gap-y-2">
               <ListLink list={list("haftanin")} label="Haftanın Ürünleri" />
@@ -208,10 +217,6 @@ const VitrinPage = () => {
               <ListPreview list={list("yeni")} storefront={storefront} />
             </div>
           </div>
-        </Band>
-
-        <Band n={++n} title="Geniş banner" where="Ürün raflarının altındaki tam genişlik kampanya görseli." to="/vitrin/blok/banner">
-          <ImagePreview blocks={banner("wide")} storefront={storefront} />
         </Band>
 
         <Band n={++n} title="Süper Fırsat Ürünleri" where={LIST_PLACES["super-firsat"]} to="/vitrin/liste/super-firsat">

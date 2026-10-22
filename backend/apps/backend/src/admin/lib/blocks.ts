@@ -84,7 +84,7 @@ const backgroundPhoto: FieldDef = {
 const SLOT_NAMES: Record<string, string> = {
   "hero-side-1": "Sağ üst kart",
   "hero-side-2": "Sağ alt kart",
-  wide: "Geniş banner (ürün raflarının altında)",
+  wide: "Marka panosu başlığı (dört marka karesinin üstündeki şerit)",
   "dual-1": "Çift banner — sol (koyu bölüm)",
   "dual-2": "Çift banner — sağ (koyu bölüm)",
   "super-firsat-promo": "Süper Fırsat kartı (mor kart)",

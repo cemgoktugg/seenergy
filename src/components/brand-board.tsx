@@ -14,11 +14,19 @@
  * catalogue — a product filed under the brand in the admin appears on its own.
  * A brand with no products yet says so instead of showing an empty panel.
  *
+ * Headed by a dark strip (2026-10-22, the client's call): the wide campaign
+ * banner that stood further down the page — eyebrow, title, subtitle, link,
+ * product picture — moved here as the board's title, in one frame with the
+ * squares. Its content is still admin → Vitrin → Bannerlar → "Marka panosu
+ * başlığı" (the `wide` slot).
+ *
  * A server component: the hover is CSS (`group-hover`, `focus-within`).
  */
 
 import Link from 'next/link';
 import { ArrowRight, ChevronRight } from 'lucide-react';
+
+import type { Banner } from '@/lib/medusa/vitrin';
 
 export interface BrandBoardModel {
   label: string;
@@ -37,9 +45,67 @@ export interface BrandBoardEntry {
 /** Models listed in the panel before "Tüm modeller" takes over. */
 const LIMIT = 4;
 
-export function BrandBoard({ items }: { items: BrandBoardEntry[] }) {
+/** The board's title strip — the former wide banner. */
+function BoardHeader({ header }: { header: Banner }) {
   return (
-    <ul className="grid grid-cols-2 gap-(--space-grid-gap) dt:grid-cols-4">
+    <div className="relative flex flex-wrap items-center gap-x-6 gap-y-4 overflow-hidden bg-chrome px-5 py-5 text-white sm:flex-nowrap sm:px-7 sm:py-6 dt:px-8">
+      {header.image ? (
+        <>
+          <img src={header.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+          <span aria-hidden className="absolute inset-0 bg-linear-to-r from-chrome/92 via-chrome/70 to-chrome/20" />
+        </>
+      ) : (
+        <>
+          <span aria-hidden className="pointer-events-none absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-grad-1/25 blur-3xl" />
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.045)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.045)_1px,transparent_1px)] bg-[size:40px_40px] [mask-image:linear-gradient(to_right,transparent,black_35%,black_65%,transparent)]"
+          />
+        </>
+      )}
+
+      <div className="relative min-w-0 flex-1">
+        {header.eyebrow ? (
+          <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/65 dt:text-[11px]">
+            <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
+            {header.eyebrow}
+          </p>
+        ) : null}
+        <h2 className="mt-1.5 text-[21px] font-extrabold leading-tight tracking-tight sm:text-[24px] dt:text-[30px]">
+          {header.title}
+        </h2>
+        {header.subtitle ? (
+          <p className="mt-1.5 max-w-[60ch] text-[13px] leading-relaxed text-white/70 dt:text-[14.5px]">{header.subtitle}</p>
+        ) : null}
+      </div>
+
+      <Link
+        href={header.href}
+        className="group/cta relative inline-flex shrink-0 items-center gap-2 rounded-full bg-white px-5 py-2.5 text-[13.5px] font-bold text-ink-fixed shadow-lg shadow-black/30 transition-colors duration-(--duration-fast) hover:bg-brand hover:text-white"
+      >
+        İncele
+        <ArrowRight
+          size={15}
+          strokeWidth={2.5}
+          aria-hidden
+          className="transition-transform duration-(--duration-base) ease-out group-hover/cta:translate-x-1"
+        />
+      </Link>
+
+      {header.productImage && !header.image ? (
+        <span className="relative hidden h-[96px] w-[180px] shrink-0 items-center justify-center overflow-hidden rounded-(--card-radius) bg-linear-to-br from-white to-wash-fixed p-2.5 md:flex dt:h-[108px] dt:w-[220px]">
+          <img src={header.productImage} alt="" loading="lazy" className="max-h-full max-w-full object-contain" />
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+export function BrandBoard({ items, header }: { items: BrandBoardEntry[]; header?: Banner }) {
+  return (
+    <div className="overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e1">
+      {header ? <BoardHeader header={header} /> : null}
+      <ul className="grid grid-cols-2 gap-2.5 p-2.5 sm:gap-(--space-grid-gap) sm:p-(--space-grid-gap) dt:grid-cols-4">
       {items.map((item) => (
         <li
           key={item.href}
@@ -124,6 +190,7 @@ export function BrandBoard({ items }: { items: BrandBoardEntry[] }) {
           </div>
         </li>
       ))}
-    </ul>
+      </ul>
+    </div>
   );
 }

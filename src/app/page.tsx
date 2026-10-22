@@ -29,7 +29,6 @@ import {
   SeoEditorial,
   TechBand,
   TrustRow,
-  WideBanner,
 } from '@/components/sections';
 import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
@@ -136,7 +135,19 @@ export default async function HomePage() {
              mega menu and on /kategori. See BrandBoard. */}
       {brandBoard.length > 0 ? (
         <Section label="Markalar">
-          <BrandBoard items={brandBoard} />
+          {/* Its title strip is the wide campaign banner, moved up from below
+              the product rails at the client's request (2026-10-22). */}
+          <BrandBoard
+            items={brandBoard}
+            header={banner('wide', {
+              eyebrow: 'CCTV güvenlik sistemleri',
+              title: 'AHD ve IP kamera sistemleri',
+              subtitle: 'Kamera, kayıt cihazı ve aksesuarlar; projeler için kurumsal teklif.',
+              href: '/kategori/cctv-guvenlik-sistemleri',
+              tone: 'koyu',
+              productImage: '/mock/products/cutout/dome-white.svg',
+            })}
+          />
         </Section>
       ) : null}
 
@@ -161,21 +172,6 @@ export default async function HomePage() {
             accent="teal"
           />
         </div>
-      </Section>
-
-      {/* 06 — wide campaign banner */}
-      <Section>
-        {(() => {
-          const wide = banner('wide', {
-            eyebrow: "CCTV güvenlik sistemleri",
-            title: "AHD ve IP kamera sistemleri",
-            subtitle: "Kamera, kayıt cihazı ve aksesuarlar; projeler için kurumsal teklif.",
-            href: "/kategori/cctv-guvenlik-sistemleri",
-            tone: 'koyu',
-            productImage: "/mock/products/cutout/dome-white.svg",
-          });
-          return <WideBanner banner={wide} />;
-        })()}
       </Section>
 
       {/* 07 — promo tile + 4 products */}

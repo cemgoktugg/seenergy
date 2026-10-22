@@ -304,10 +304,6 @@ export function CategoryTiles({ tiles }: { tiles: CategoryTile[] }) {
  * (see campaign-card.tsx for the template and why the sound-wave artwork went).
  * Kept as named exports so the homepage reads as a list of bands.
  */
-export function WideBanner({ banner }: { banner: Banner }) {
-  return <CampaignCard size="wide" {...banner} />;
-}
-
 export function DualBanners({ items }: { items: Banner[] }) {
   return (
     <div className="grid grid-cols-1 gap-(--space-grid-gap) sm:grid-cols-2">

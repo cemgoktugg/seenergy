@@ -148,7 +148,9 @@ banners into `public/brand-logos/` — each listing its brand's models on
 hover (`src/components/brand-board.tsx`). It replaced the category board at
 the client's request: no categories there; they live in the mega menu and on
 /kategori. Seeded by `vitrin-upgrade-brand-board.ts`, which also creates the
-four brands as collections.
+four brands as collections. Its dark title strip is the former wide
+campaign banner (the `wide` banner slot, renamed "Marka panosu başlığı" in the
+admin), moved up from under the product rails on the same day.
 
 Lists: `haftanin`, `yeni`, `cok-satan`, `super-firsat`. "Haftanın Ürünleri"
 feeds BOTH the slider (first 8) and the tab (first 12) — one list, one place
