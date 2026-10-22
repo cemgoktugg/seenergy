@@ -140,7 +140,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                     className={
                       cover
                         ? `object-cover ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`
-                        : `object-contain p-6 mix-blend-multiply sm:p-10 dt:px-16 dt:py-12 ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
+                        : `object-contain p-6 mix-blend-multiply sm:py-10 sm:pl-24 sm:pr-8 dt:py-12 dt:pl-40 dt:pr-14 ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
                     }
                   />
                   {/* The seam: the dark panel fades into the stage instead of

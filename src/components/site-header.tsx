@@ -49,8 +49,9 @@ export type MenuModels = Record<string, { label: string; detail: string; image: 
 const MENU_MODEL_LIMIT = 7;
 
 /**
- * The lockup: the client's own logo (see brand-mark.tsx) — the full cut with
- * its "Güvenlik Teknolojileri A.Ş" line from `sm` up, the S mark alone below.
+ * The lockup: the client's own logo (see brand-mark.tsx) — the SEENERGY®
+ * wordmark from `sm` up, the S mark alone below. Theme-following: black on
+ * the light header, white under the dark theme.
  */
 function Logo({ className = '' }: { className?: string }) {
   return (
@@ -84,7 +85,7 @@ function Logo({ className = '' }: { className?: string }) {
           Worth noting for future header checks: comparing the LINK boxes shows
           a tidy 12px gap and reports no collision. The overflow is only visible
           if you measure the text box. */}
-      <BrandLogo className="hidden h-[42px] w-auto shrink-0 sm:block dt:h-[56px]" />
+      <BrandLogo className="hidden h-[30px] w-auto shrink-0 sm:block dt:h-[40px]" />
     </Link>
   );
 }
@@ -354,8 +355,8 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
             tabIndex={condensed ? 0 : -1}
             className="flex shrink-0 items-center"
           >
-            <BrandMark className="h-7 w-auto sm:hidden" />
-            <BrandLogoCompact className="hidden h-[26px] w-auto sm:block dt:h-[32px]" />
+            <BrandMark tone="light" className="h-7 w-auto sm:hidden" />
+            <BrandLogoCompact tone="light" className="hidden h-[22px] w-auto sm:block dt:h-[26px]" />
           </Link>
 
           <div className="min-w-0 flex-1">

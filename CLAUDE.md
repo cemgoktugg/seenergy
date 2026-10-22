@@ -11,9 +11,11 @@ Guidance for Claude Code working in this repository.
   The storefront was originally named VOLTA; the client supplied a real logo and
   the build was rebranded to SEENERGY (teal → indigo → purple gradient over
   near-black chrome). `BRAND_BIBLE_ELECTRONICS.md` §2 carries the supersession
-  note and the new tokens. The logo itself is now the client's final silver
-  lockup ("Güvenlik Teknolojileri A.Ş"), served from `public/brand/` through
-  `src/components/brand-mark.tsx`, and the palette follows it: a steel ramp
+  note and the new tokens. The logo is the client's black "SEENERGY®"
+  wordmark (img/logo.jpeg, 2026-10-22; it replaced a silver lockup with a
+  "Güvenlik Teknolojileri A.Ş" line), served from `public/brand/` through
+  `src/components/brand-mark.tsx` — black on light surfaces, white on dark
+  ones (`tone`). The palette came from the earlier silver logo: a steel ramp
   (silver → graphite → black) with graphite actions. The `grad-*` token names
   are the old gradient's, kept so every cap and rail followed without an edit. The reference-measurement documents still describe
   merterelektronik.com's amber accurately and are deliberately not rewritten.

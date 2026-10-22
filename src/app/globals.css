@@ -987,3 +987,14 @@ html {
     transform: translateY(0);
   }
 }
+
+/* The logo artwork is black (src/components/brand-mark.tsx): under the dark
+   theme a theme-following logo turns white. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .logo-auto {
+    filter: invert(1);
+  }
+}
+:root[data-theme='dark'] .logo-auto {
+  filter: invert(1);
+}
