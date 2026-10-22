@@ -1,13 +1,13 @@
 'use client';
 
 /**
- * Hero slider — full width (2026-10-22, at the client's request: the slide
- * spans the viewport and the two campaign tiles that stood beside it are gone).
+ * Hero slider — the width of the content container, on its own since
+ * 2026-10-22 (the two campaign tiles beside it were removed at the client's
+ * request; an edge-to-edge version was tried and taken back the same day).
  *
  * A split slide: a dark copy panel and a light image stage. From `sm` the
- * stage takes the right ~54% of the viewport out to its edge and the copy
- * sits inside the content container, so its left edge lines up with every
- * band below; on a phone the stage stacks above the copy.
+ * stage takes the right ~54% of the panel and fades into the copy; on a
+ * phone the stage stacks above the copy.
  *
  * WHY SPLIT
  *
@@ -87,7 +87,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
     <section
       aria-roledescription="carousel"
       aria-label="Öne çıkan kampanyalar"
-      className="relative overflow-hidden bg-chrome"
+      className="relative overflow-hidden rounded-(--panel-radius) bg-chrome shadow-e1"
       // Pause on pointer and focus so autoplay cannot pull a slide out from
       // under someone reading or tabbing through it.
       onMouseEnter={() => setHovered(true)}
@@ -103,7 +103,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
 
       {/* Fixed heights, so every slide in the track is the same size whatever
           its copy: stacked on a phone, split from `sm`. */}
-      <div className="h-[380px] sm:h-[340px] md:h-[380px] dt:h-[480px]">
+      <div className="h-[380px] sm:h-[320px] md:h-[360px] dt:h-[440px]">
         {/* A carousel advance is page-level motion: 800ms, ease-in-out. */}
         <div
           className="flex h-full w-full transition-transform duration-[800ms] ease-in-out"
@@ -152,14 +152,14 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                 </div>
 
                 {/* --- copy ------------------------------------------------- */}
-                <div className="container-main relative flex h-full flex-col justify-end pb-16 pt-[200px] sm:justify-center sm:pb-16 sm:pt-0 dt:pb-20">
+                <div className="relative flex h-full flex-col justify-end px-4 pb-16 pt-[200px] sm:justify-center sm:px-8 sm:pb-16 sm:pt-0 dt:px-12 dt:pb-20">
                   {/* Brand light behind the copy, so the panel is not flat black. */}
                   <span
                     aria-hidden
                     className="pointer-events-none absolute -bottom-24 -left-10 h-72 w-72 rounded-full bg-grad-1/20 blur-3xl"
                   />
 
-                  <div className="relative px-2 sm:max-w-[44%] sm:px-0">
+                  <div className="relative sm:max-w-[44%]">
                     {slide.eyebrow ? (
                       <p
                         className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/65 dt:text-[11px] ${active ? RISE : ''}`}
@@ -173,7 +173,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                     {/* As authored, not uppercased: a sentence-case headline
                         reads faster, and the shop's own capitalisation stays. */}
                     <h2
-                      className={`mt-2 line-clamp-2 text-[22px] font-extrabold leading-[1.08] tracking-[-0.02em] text-white sm:line-clamp-3 sm:text-[28px] md:text-[34px] dt:mt-3 dt:text-[46px] ${active ? RISE : ''}`}
+                      className={`mt-2 line-clamp-2 text-[22px] font-extrabold leading-[1.08] tracking-[-0.02em] text-white sm:line-clamp-3 sm:text-[28px] md:text-[34px] dt:mt-3 dt:text-[42px] ${active ? RISE : ''}`}
                       style={{ animationDelay: '110ms' }}
                     >
                       {slide.title}
@@ -231,12 +231,12 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
       </div>
 
       {/* --- control row ------------------------------------------------
-          Under the copy, on the dark panel, aligned to the content container,
-          where white controls read and cover no part of the picture. */}
+          Under the copy, on the dark panel, where white controls read and
+          cover no part of the picture. */}
       {slides.length > 1 ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-3.5 z-10 sm:bottom-5 dt:bottom-7">
-          <div className="container-main">
-            <div className="pointer-events-auto flex w-fit items-center gap-3 px-2 sm:px-0">
+        <div className="pointer-events-none absolute inset-x-0 bottom-3.5 z-10 px-4 sm:bottom-5 sm:px-8 dt:bottom-7 dt:px-12">
+          <div>
+            <div className="pointer-events-auto flex w-fit items-center gap-3">
               <button type="button" onClick={() => go(index - 1)} aria-label="Önceki kampanya" className={`${control} hidden md:grid`}>
                 <ChevronLeft size={16} strokeWidth={2.25} aria-hidden />
               </button>

@@ -89,15 +89,18 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* 04 — hero band, edge to edge. The client asked for a full-width
-             slider (2026-10-22): the two campaign tiles beside it ("Süper
-             Fırsat Ürünleri", "Toptan alım ve bayilik") are gone and the
-             slide spans the viewport, its copy aligned to the content
-             container. Flush under the header — no top offset. */}
+      {/* 04 — hero band. `first`: nothing precedes it, so it keeps the tight
+             offset instead of being pushed down the fold.
+
+             The slider alone, across the content container (2026-10-22, the
+             client's call): the two campaign tiles beside it ("Süper Fırsat
+             Ürünleri", "Toptan alım ve bayilik") are gone. An edge-to-edge
+             version was tried the same day and taken back — the client
+             wanted it aligned with the bands below, not the viewport. */}
       {vitrin.slides.length > 0 ? (
-        <section aria-label="Kampanyalar">
+        <Section first label="Kampanyalar">
           <Hero slides={vitrin.slides} />
-        </section>
+        </Section>
       ) : null}
 
       {/* 04b — the department board.
