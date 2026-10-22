@@ -15,7 +15,6 @@
 
 import { BrandSection } from '@/components/brand-section';
 import { Hero } from '@/components/hero';
-import { HeroSide } from '@/components/hero-side';
 import { CategoryMosaic } from '@/components/category-mosaic';
 import { ProductSlider } from '@/components/product-slider';
 import { ProductTabs } from '@/components/product-tabs';
@@ -90,21 +89,16 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* 04 — hero band. `first`: nothing precedes it, so it keeps the tight
-             offset instead of being pushed down the fold.
-
-             One 1320×423 slide became a 62/38 split: the slider keeps the
-             left, two campaign tiles stack on the right. The BAND HEIGHT IS
-             UNCHANGED at the measured 423 — the row sets it and both columns
-             fill it, so the first screen gains two destinations without the
-             fold moving. Below `dt` it collapses to the slide with the two
-             tiles as a short pair beneath it. */}
-      <Section first>
-        <div className="grid gap-(--space-grid-gap) dt:h-[423px] dt:grid-cols-[minmax(0,62fr)_minmax(0,38fr)]">
-          {vitrin.slides.length > 0 ? <Hero slides={vitrin.slides} /> : null}
-          <HeroSide items={vitrin.heroSide} />
-        </div>
-      </Section>
+      {/* 04 — hero band, edge to edge. The client asked for a full-width
+             slider (2026-10-22): the two campaign tiles beside it ("Süper
+             Fırsat Ürünleri", "Toptan alım ve bayilik") are gone and the
+             slide spans the viewport, its copy aligned to the content
+             container. Flush under the header — no top offset. */}
+      {vitrin.slides.length > 0 ? (
+        <section aria-label="Kampanyalar">
+          <Hero slides={vitrin.slides} />
+        </section>
+      ) : null}
 
       {/* 04b — the department board.
              Category discovery used to sit at y=7337, i.e. 73% down the page,

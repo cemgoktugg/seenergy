@@ -181,9 +181,9 @@ const VitrinPage = () => {
           <ImagePreview blocks={group("hero-slide")} storefront={storefront} />
         </Band>
 
-        <Band n={++n} title="Slayt yanı kartlar" where={GROUPS["hero-side"].where} to="/vitrin/blok/hero-side">
-          <ImagePreview blocks={group("hero-side")} storefront={storefront} />
-        </Band>
+        {/* "Slayt yanı kartlar" left the homepage on 2026-10-22 (the slider
+            went full width at the client's request), so it left this map
+            too. Its blocks stay in the database, untouched. */}
 
         <Band
           n={++n}

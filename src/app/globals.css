@@ -102,6 +102,13 @@
 
   /* --- surfaces ---------------------------------------------------- */
   --color-surface-page: rgb(246 246 246); /* measured body background */
+  /* The page ground itself (2026-10-22, the client's call): white, with a
+     faint dot grid and a sparse tile of technical line icons over it. Kept
+     apart from --color-surface-page, which components still use as a quiet
+     fill (chips, table bands, thumbnails). */
+  --page-ground: #ffffff;
+  --page-dot: rgb(20 22 28 / 0.09);
+  --page-pattern: url('/patterns/tech-light.svg');
   --color-surface-card: rgb(255 255 255);
   --color-surface-utility: rgb(241 241 241); /* utility bar */
   --color-surface-instalment: rgb(20 22 28); /* instalment strip — same chrome as the nav band */
@@ -444,6 +451,9 @@
     color-scheme: dark;
 
     --color-surface-page: var(--dk-surface-page);
+    --page-ground: var(--dk-surface-page);
+    --page-dot: rgb(255 255 255 / 0.06);
+    --page-pattern: url('/patterns/tech-dark.svg');
     --color-surface-card: var(--dk-surface-card);
     --color-surface-utility: var(--dk-surface-utility);
     --color-surface-instalment: var(--dk-surface-instalment);
@@ -481,6 +491,9 @@
   color-scheme: dark;
 
   --color-surface-page: var(--dk-surface-page);
+  --page-ground: var(--dk-surface-page);
+  --page-dot: rgb(255 255 255 / 0.06);
+  --page-pattern: url('/patterns/tech-dark.svg');
   --color-surface-card: var(--dk-surface-card);
   --color-surface-utility: var(--dk-surface-utility);
   --color-surface-instalment: var(--dk-surface-instalment);
@@ -624,7 +637,9 @@ html {
 }
 
 body {
-  background: var(--color-surface-page);
+  background-color: var(--page-ground);
+  background-image: var(--page-pattern), radial-gradient(var(--page-dot) 1px, transparent 1.5px);
+  background-size: 560px 560px, 24px 24px;
   color: var(--color-text-primary);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
