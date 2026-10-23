@@ -30,11 +30,30 @@ import { ProductCard } from '@/components/product-card';
 import { SectionHeading } from '@/components/section-heading';
 import type { Product } from '@/data/catalog';
 
-type Accent = 'violet' | 'teal';
+/**
+ * The two panels take light tones of the brand banners right above them
+ * (2026-10-23, the client's call): the red of Dahua / Hikvision and the blue
+ * of UNV / Neutron. A wash fading down the panel, a tinted border, a thin bar
+ * and a soft glow in the brand colour; the white cards stand out on it. The
+ * page-control hover and the active progress segment follow the same colour.
+ */
+type Accent = 'red' | 'blue';
 
-const ACCENTS: Record<Accent, string> = {
-  violet: 'bg-grad-3',
-  teal: 'bg-grad-2',
+const ACCENTS: Record<Accent, { panel: string; bar: string; glow: string; control: string; segment: string }> = {
+  red: {
+    panel: 'border-[rgb(225_37_27/0.22)] bg-linear-to-b from-[rgb(225_37_27/0.08)] via-[rgb(225_37_27/0.025)] to-surface-card',
+    bar: 'from-[rgb(225_37_27/0.9)] via-[rgb(225_37_27/0.35)] to-transparent',
+    glow: 'bg-[rgb(225_37_27/0.16)]',
+    control: 'enabled:hover:bg-[#e1251b] enabled:hover:text-white',
+    segment: 'bg-[#e1251b]',
+  },
+  blue: {
+    panel: 'border-[rgb(0_104_183/0.22)] bg-linear-to-b from-[rgb(0_104_183/0.08)] via-[rgb(0_104_183/0.025)] to-surface-card',
+    bar: 'from-[rgb(0_104_183/0.9)] via-[rgb(0_104_183/0.35)] to-transparent',
+    glow: 'bg-[rgb(0_104_183/0.16)]',
+    control: 'enabled:hover:bg-[#0068b7] enabled:hover:text-white',
+    segment: 'bg-[#0068b7]',
+  },
 };
 
 const prefersReducedMotion = () =>
@@ -46,7 +65,7 @@ export function ProductSlider({
   eyebrow,
   href,
   products,
-  accent = 'violet',
+  accent = 'red',
 }: {
   title: string;
   eyebrow: string;
@@ -57,7 +76,8 @@ export function ProductSlider({
   const trackRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const [pages, setPages] = useState(1);
-  const segment = ACCENTS[accent];
+  const tone = ACCENTS[accent];
+  const segment = tone.segment;
 
   /* One page is one track width, so the page count follows from the scroll
      extent. Measured on mount, on resize and on every scroll — the cards are
@@ -97,16 +117,18 @@ export function ProductSlider({
   );
 
   const controlBase =
-    'grid h-11 w-11 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) enabled:hover:bg-brand enabled:hover:text-white disabled:cursor-not-allowed disabled:opacity-25 dt:h-8 dt:w-8';
+    `grid h-11 w-11 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ${tone.control} disabled:cursor-not-allowed disabled:opacity-25 dt:h-8 dt:w-8`;
 
   return (
     <section
       aria-roledescription="carousel"
       aria-label={title}
-      className="flex h-full min-w-0 flex-col overflow-hidden rounded-[20px] border border-line-strong/70 bg-surface-page"
+      className={`relative flex h-full min-w-0 flex-col overflow-hidden rounded-[20px] border ${tone.panel}`}
     >
+      <span aria-hidden className={`pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-linear-to-r ${tone.bar}`} />
+      <span aria-hidden className={`pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full blur-3xl ${tone.glow}`} />
       {/* --- header ------------------------------------------------------ */}
-      <div className="px-3 pt-3 dt:px-4 dt:pt-3.5">
+      <div className="relative px-3 pt-3 dt:px-4 dt:pt-3.5">
         <SectionHeading compact eyebrow={eyebrow} title={title} action={{ label: 'Tümü', href }}>
           <div className="flex shrink-0 items-center rounded-full border border-line-strong/70 bg-surface-card p-0.5">
             <button
@@ -137,7 +159,7 @@ export function ProductSlider({
           the next card peeks, which is the same affordance the mobile rails
           elsewhere on the page use. Vertical padding gives the hover shadow room
           inside the scroll container, which would otherwise clip it. */}
-      <div className="mt-1.5 px-3 dt:px-4">
+      <div className="relative mt-1.5 px-3 dt:px-4">
         <div
           ref={trackRef}
           tabIndex={0}
