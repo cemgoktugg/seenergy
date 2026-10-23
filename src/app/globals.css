@@ -1038,11 +1038,12 @@ html {
    CCTV look — a dot matrix fading out from the top (the page ground's own
    dots, set tighter, like an LED display; a square grid was tried and did not
    fit the concept), and a slow scan line like a camera monitor's, behind the
-   cards. Colours derive from the text token, so both follow the theme. Still
-   under reduced motion. */
+   cards. Ink is --tech-ink when a panel sets one (the dark monitor panels set
+   white), else the text token, so it follows the theme. Still under reduced
+   motion. */
 .tech-grid {
   background-image: radial-gradient(
-    color-mix(in srgb, var(--color-text-primary) 14%, transparent) 1px,
+    color-mix(in srgb, var(--tech-ink, var(--color-text-primary)) 14%, transparent) 1px,
     transparent 1.6px
   );
   background-size: 16px 16px;
@@ -1053,7 +1054,7 @@ html {
   background: linear-gradient(
     to bottom,
     transparent,
-    color-mix(in srgb, var(--color-text-primary) 9%, transparent) 50%,
+    color-mix(in srgb, var(--tech-ink, var(--color-text-primary)) 9%, transparent) 50%,
     transparent
   );
   animation: tech-scan 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;

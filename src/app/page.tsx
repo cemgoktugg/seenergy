@@ -112,12 +112,14 @@ export default async function HomePage() {
           <ProductSlider
             eyebrow="Bu hafta öne çıkanlar"
             title="Haftanın Ürünleri"
+            channel="01"
             href="/kampanyalar/haftanin-urunleri"
             products={pick('haftanin', 8, 2)}
           />
           <ProductSlider
             eyebrow="Rafa yeni girenler"
             title="Yeni Gelenler"
+            channel="02"
             href="/yeni-gelenler"
             products={pick('yeni', 8, 11)}
           />
