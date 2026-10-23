@@ -15,13 +15,12 @@ export interface BrandBoardEntry {
  * The client's four brand banners (img/1-4.jpeg), two by two.
  *
  * ALIGNMENT. The client wants the two rows to line up column for column, so
- * all four frames share one ratio, 3.3 : 1. The banners themselves run 2.95
- * to 3.42 : 1, so that costs a sliver — placed where it costs nothing: the
- * picture is anchored left (`object-left`), because every banner's lettering
- * starts close to its left edge while the right side ends in empty ground
- * after the products. At 3.3 : 1 Dahua loses nothing, Hikvision 16px and UNV
- * 56px of that right-hand ground (of 1600), Neutron 28px top and bottom (of
- * 542) — no logo, word or product is touched. (A justified layout that showed
+ * all four frames share one ratio, 3 : 1. The banners (replaced 2026-10-23)
+ * run 2.72 to 3.00 : 1 with their products in the middle and the ground
+ * running to every edge, so the picture is centred: 2 and 3 fit exactly,
+ * Neutron (4) loses ~4px top and bottom (of 542) and Dahua (1) 28px top and
+ * bottom (of 589) — no logo, word or product is touched. When a banner is
+ * replaced, check its ratio against this. (A justified layout that showed
  * every banner whole was tried and taken back: its columns did not line up.)
  *
  * MOTION. Each frame carries a light in the brand's colour that runs round
@@ -43,13 +42,13 @@ export function BrandBoard({ items }: { items: BrandBoardEntry[] }) {
             className="brand-frame group relative block rounded-xl p-[2px] shadow-e1 transition-[transform,box-shadow] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-0.5 hover:shadow-e3 focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 sm:rounded-[18px] dt:rounded-[22px]"
           >
             <span className="relative block overflow-hidden rounded-[10px] bg-surface-card sm:rounded-[16px] dt:rounded-[20px]">
-              <span className="relative block aspect-[33/10] overflow-hidden">
+              <span className="relative block aspect-[3/1] overflow-hidden">
                 <Image
                   src={item.image}
                   alt={`${item.name} güvenlik sistemleri`}
                   fill
                   sizes="(min-width: 1600px) 740px, 50vw"
-                  className="object-cover object-left transition-[filter] duration-(--duration-base) group-hover:brightness-[1.04]"
+                  className="object-cover object-center transition-[filter] duration-(--duration-base) group-hover:brightness-[1.04]"
                 />
                 {/* The hover shine: a soft band crossing the banner once. */}
                 <span
