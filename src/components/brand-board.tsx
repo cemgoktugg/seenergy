@@ -15,19 +15,14 @@
  * A brand with no products yet keeps its logo visible and says "Modeller
  * yakında". Model lists scroll inside the more compact cards when needed.
  *
- * Headed by a dark strip (2026-10-22, the client's call): the wide campaign
- * banner that stood further down the page — eyebrow, title, subtitle, link,
- * product picture — moved here as the board's title, in one frame with the
- * squares. Its content is still admin → Vitrin → Bannerlar → "Marka panosu
- * başlığı" (the `wide` slot).
+ * The cards stand alone; the former dark campaign header was removed at the
+ * client's request.
  *
  * A server component: the hover is CSS (`group-hover`, `focus-within`).
  */
 
 import Link from 'next/link';
 import { ArrowRight, ArrowUpRight } from 'lucide-react';
-
-import type { Banner } from '@/lib/medusa/vitrin';
 
 export interface BrandBoardModel {
   label: string;
@@ -46,69 +41,9 @@ export interface BrandBoardEntry {
 /** Models listed in the panel before "Tüm modeller" takes over. */
 const LIMIT = 4;
 
-/** The board's title strip — the former wide banner. */
-function BoardHeader({ header }: { header: Banner }) {
-  return (
-    <div className="relative isolate flex flex-wrap items-center gap-x-6 gap-y-5 overflow-hidden bg-chrome px-5 py-6 text-white sm:flex-nowrap sm:px-7 dt:gap-x-8 dt:px-8">
-      {header.image ? (
-        <>
-          <img src={header.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
-          <span aria-hidden className="absolute inset-0 bg-linear-to-r from-chrome/92 via-chrome/70 to-chrome/20" />
-        </>
-      ) : (
-        <>
-          <span aria-hidden className="pointer-events-none absolute inset-0 bg-linear-to-r from-chrome via-chrome to-chrome-soft" />
-          <span aria-hidden className="pointer-events-none absolute -right-12 -top-36 h-96 w-96 rounded-full bg-grad-1/15 blur-3xl" />
-          <span
-            aria-hidden
-            className="pointer-events-none absolute -right-24 top-1/2 h-[420px] w-[420px] -translate-y-1/2 rounded-full border border-white/6"
-          />
-          <span aria-hidden className="pointer-events-none absolute -right-10 top-1/2 h-[308px] w-[308px] -translate-y-1/2 rounded-full border border-white/8" />
-        </>
-      )}
-
-      <div className="relative min-w-0 basis-full sm:flex-1 sm:basis-auto">
-        {header.eyebrow ? (
-          <p className="flex items-center gap-2.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/65 dt:text-[10.5px]">
-            <span aria-hidden className="h-1.5 w-1.5 shrink-0 rounded-full bg-silver-mid ring-4 ring-white/5" />
-            {header.eyebrow}
-          </p>
-        ) : null}
-        <h2 className="mt-2.5 text-[22px] font-bold leading-[1.2] tracking-[-0.025em] sm:text-[25px] dt:text-[29px]">
-          {header.title}
-        </h2>
-        {header.subtitle ? (
-          <p className="mt-2 max-w-[60ch] text-[12.5px] leading-relaxed text-white/65 dt:text-[14px]">{header.subtitle}</p>
-        ) : null}
-      </div>
-
-      <Link
-        href={header.href}
-        className="group/cta relative inline-flex min-h-11 shrink-0 items-center gap-4 rounded-xl border border-white/20 bg-white/8 px-4 text-[13px] font-semibold text-white backdrop-blur-sm transition-colors duration-(--duration-fast) hover:border-white/40 hover:bg-white hover:text-ink-fixed"
-      >
-        İncele
-        <ArrowRight
-          size={15}
-          strokeWidth={1.8}
-          aria-hidden
-          className="transition-transform duration-(--duration-base) ease-out group-hover/cta:translate-x-1"
-        />
-      </Link>
-
-      {header.productImage && !header.image ? (
-        <span aria-hidden className="relative hidden h-[112px] w-[160px] shrink-0 items-center justify-center md:flex dt:w-[196px]">
-          <span className="absolute h-32 w-32 rounded-full bg-white/5 ring-1 ring-white/10" />
-          <img src={header.productImage} alt="" loading="lazy" className="relative h-full w-full object-contain px-5 drop-shadow-[0_12px_12px_rgb(0_0_0/0.25)]" />
-        </span>
-      ) : null}
-    </div>
-  );
-}
-
-export function BrandBoard({ items, header }: { items: BrandBoardEntry[]; header?: Banner }) {
+export function BrandBoard({ items }: { items: BrandBoardEntry[] }) {
   return (
     <div className="overflow-hidden rounded-[22px] border border-line-strong/70 bg-surface-page">
-      {header ? <BoardHeader header={header} /> : null}
       <ul className="grid grid-cols-2 gap-2.5 p-3 sm:gap-3.5 sm:p-4 lg:grid-cols-4 dt:gap-4 dt:p-5">
       {items.map((item) => (
         <li

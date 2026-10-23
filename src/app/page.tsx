@@ -129,25 +129,13 @@ export default async function HomePage() {
         </Section>
       ) : null}
 
-      {/* 04b — the brand board: four squares, one per brand, its models on
+      {/* 04b — the brand board: four cards, one per brand, its models on
              hover. It replaced the category board on 2026-10-22 at the
              client's request ("no categories here") — categories stay in the
              mega menu and on /kategori. See BrandBoard. */}
       {brandBoard.length > 0 ? (
         <Section label="Markalar">
-          {/* Its title strip is the wide campaign banner, moved up from below
-              the product rails at the client's request (2026-10-22). */}
-          <BrandBoard
-            items={brandBoard}
-            header={banner('wide', {
-              eyebrow: 'CCTV güvenlik sistemleri',
-              title: 'AHD ve IP kamera sistemleri',
-              subtitle: 'Kamera, kayıt cihazı ve aksesuarlar; projeler için kurumsal teklif.',
-              href: '/kategori/cctv-guvenlik-sistemleri',
-              tone: 'koyu',
-              productImage: '/mock/products/cutout/dome-white.svg',
-            })}
-          />
+          <BrandBoard items={brandBoard} />
         </Section>
       ) : null}
 
