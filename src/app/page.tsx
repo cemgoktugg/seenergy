@@ -106,8 +106,7 @@ export default async function HomePage() {
              for two compact product rails instead, so this band sells product
              rather than categories. The tile strip still appears at band 13. */}
       {/* `compact`: tied to the brand banners above — the client asked for
-          less air between them (2026-10-23), and the panels take those
-          banners' red and blue. */}
+          less air between them (2026-10-23). */}
       <Section label="Haftanın ürünleri ve yeni gelenler" compact>
         <div className="grid grid-cols-1 gap-(--space-grid-gap) lg:grid-cols-2">
           <ProductSlider
@@ -115,14 +114,12 @@ export default async function HomePage() {
             title="Haftanın Ürünleri"
             href="/kampanyalar/haftanin-urunleri"
             products={pick('haftanin', 8, 2)}
-            accent="red"
           />
           <ProductSlider
             eyebrow="Rafa yeni girenler"
             title="Yeni Gelenler"
             href="/yeni-gelenler"
             products={pick('yeni', 8, 11)}
-            accent="blue"
           />
         </div>
       </Section>

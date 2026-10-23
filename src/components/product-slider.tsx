@@ -31,30 +31,14 @@ import { SectionHeading } from '@/components/section-heading';
 import type { Product } from '@/data/catalog';
 
 /**
- * The two panels take light tones of the brand banners right above them
- * (2026-10-23, the client's call): the red of Dahua / Hikvision and the blue
- * of UNV / Neutron. A wash fading down the panel, a tinted border, a thin bar
- * and a soft glow in the brand colour; the white cards stand out on it. The
- * page-control hover and the active progress segment follow the same colour.
+ * One look for both panels (2026-10-23: the client found a red and a blue
+ * panel disjointed, and asked for something that says "electronics and
+ * security technology"). The CCTV monitor is the motif: viewfinder corner
+ * marks, a faint engineering grid, a slow scan line behind the cards, and a
+ * status LED with a monospaced product count beside the heading. All in the
+ * site's steel palette; the white cards carry the colour.
  */
-type Accent = 'red' | 'blue';
-
-const ACCENTS: Record<Accent, { panel: string; bar: string; glow: string; control: string; segment: string }> = {
-  red: {
-    panel: 'border-[rgb(225_37_27/0.22)] bg-linear-to-b from-[rgb(225_37_27/0.08)] via-[rgb(225_37_27/0.025)] to-surface-card',
-    bar: 'from-[rgb(225_37_27/0.9)] via-[rgb(225_37_27/0.35)] to-transparent',
-    glow: 'bg-[rgb(225_37_27/0.16)]',
-    control: 'enabled:hover:bg-[#e1251b] enabled:hover:text-white',
-    segment: 'bg-[#e1251b]',
-  },
-  blue: {
-    panel: 'border-[rgb(0_104_183/0.22)] bg-linear-to-b from-[rgb(0_104_183/0.08)] via-[rgb(0_104_183/0.025)] to-surface-card',
-    bar: 'from-[rgb(0_104_183/0.9)] via-[rgb(0_104_183/0.35)] to-transparent',
-    glow: 'bg-[rgb(0_104_183/0.16)]',
-    control: 'enabled:hover:bg-[#0068b7] enabled:hover:text-white',
-    segment: 'bg-[#0068b7]',
-  },
-};
+const CORNER = 'pointer-events-none absolute h-3.5 w-3.5 border-text-primary/30';
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' &&
@@ -65,19 +49,16 @@ export function ProductSlider({
   eyebrow,
   href,
   products,
-  accent = 'red',
 }: {
   title: string;
   eyebrow: string;
   href: string;
   products: Product[];
-  accent?: Accent;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const [pages, setPages] = useState(1);
-  const tone = ACCENTS[accent];
-  const segment = tone.segment;
+
 
   /* One page is one track width, so the page count follows from the scroll
      extent. Measured on mount, on resize and on every scroll — the cards are
@@ -117,19 +98,33 @@ export function ProductSlider({
   );
 
   const controlBase =
-    `grid h-11 w-11 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ${tone.control} disabled:cursor-not-allowed disabled:opacity-25 dt:h-8 dt:w-8`;
+    'grid h-11 w-11 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) enabled:hover:bg-brand enabled:hover:text-white disabled:cursor-not-allowed disabled:opacity-25 dt:h-8 dt:w-8';
 
   return (
     <section
       aria-roledescription="carousel"
       aria-label={title}
-      className={`relative flex h-full min-w-0 flex-col overflow-hidden rounded-[20px] border ${tone.panel}`}
+      className="relative isolate flex h-full min-w-0 flex-col overflow-hidden rounded-[20px] border border-line-strong/70 bg-surface-card"
     >
-      <span aria-hidden className={`pointer-events-none absolute inset-x-0 top-0 h-[3px] bg-linear-to-r ${tone.bar}`} />
-      <span aria-hidden className={`pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full blur-3xl ${tone.glow}`} />
+      {/* Behind everything: the grid and the scan line. */}
+      <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 -z-10" />
+      <span aria-hidden className="tech-scan pointer-events-none absolute inset-x-0 top-0 -z-10 h-24" />
+      {/* Viewfinder corners. */}
+      <span aria-hidden className={`${CORNER} left-1.5 top-1.5 rounded-tl-md border-l-2 border-t-2`} />
+      <span aria-hidden className={`${CORNER} right-1.5 top-1.5 rounded-tr-md border-r-2 border-t-2`} />
+      <span aria-hidden className={`${CORNER} bottom-1.5 left-1.5 rounded-bl-md border-b-2 border-l-2`} />
+      <span aria-hidden className={`${CORNER} bottom-1.5 right-1.5 rounded-br-md border-b-2 border-r-2`} />
       {/* --- header ------------------------------------------------------ */}
-      <div className="relative px-3 pt-3 dt:px-4 dt:pt-3.5">
+      <div className="relative px-4 pt-4 dt:px-5">
         <SectionHeading compact eyebrow={eyebrow} title={title} action={{ label: 'Tümü', href }}>
+          {/* Status LED and a monospaced count, the way a device reports. */}
+          <span className="hidden items-center gap-1.5 rounded-full border border-line-strong/70 bg-surface-card px-2.5 py-1 font-mono text-[10.5px] font-semibold uppercase tracking-[0.08em] text-text-secondary xl:inline-flex">
+            <span aria-hidden className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-success opacity-60 motion-reduce:hidden" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-success" />
+            </span>
+            {String(products.length).padStart(2, '0')} ürün
+          </span>
           <div className="flex shrink-0 items-center rounded-full border border-line-strong/70 bg-surface-card p-0.5">
             <button
               type="button"
@@ -159,7 +154,7 @@ export function ProductSlider({
           the next card peeks, which is the same affordance the mobile rails
           elsewhere on the page use. Vertical padding gives the hover shadow room
           inside the scroll container, which would otherwise clip it. */}
-      <div className="relative mt-1.5 px-3 dt:px-4">
+      <div className="relative mt-1.5 px-4 dt:px-5">
         <div
           ref={trackRef}
           tabIndex={0}
@@ -181,7 +176,7 @@ export function ProductSlider({
           in a single page — at which point `flex-1` stretched the lone segment
           into a 710px bar that looked like a progress indicator for nothing. */}
       {pages > 1 && (
-        <div className="mt-auto flex items-center justify-between gap-4 px-3 pb-3 pt-1 dt:px-4">
+        <div className="mt-auto flex items-center justify-between gap-4 px-4 pb-4 pt-1 dt:px-5">
           <div className="flex min-w-0 flex-1 items-center gap-1 dt:flex-none">
             {Array.from({ length: pages }, (_, i) => (
               <button
@@ -194,7 +189,7 @@ export function ProductSlider({
                    hit areas vertically. Desktop keeps the compact indicator. */
                 className={`relative h-1 rounded-full transition-all duration-(--duration-base) ease-out before:absolute before:inset-x-0 before:-bottom-3 before:-top-7 before:content-[''] dt:flex-none dt:before:-inset-y-2.5 ${
                   i === page
-                    ? `flex-1 dt:w-6 ${segment}`
+                    ? 'flex-1 bg-text-primary dt:w-6'
                     : 'flex-1 bg-line-strong hover:bg-text-secondary dt:w-3'
                 }`}
               />
