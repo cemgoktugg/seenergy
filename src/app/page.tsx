@@ -30,14 +30,13 @@ import {
 import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
-/* 4.55:1 cuts of the supplied banners (*.jpeg, 2.95-3.42 : 1): each banner
-   whole in the middle, its outermost column carried straight out to the
-   sides — no blur, no fade (the client's call) — so the frame fills with
-   nothing cropped. */
-import dahuaBanner from '../../public/brand-banners/dahua-wide.webp';
-import hikvisionBanner from '../../public/brand-banners/hikvision-wide.webp';
-import unvBanner from '../../public/brand-banners/unv-wide.webp';
-import neutronBanner from '../../public/brand-banners/neutron-wide.webp';
+/* The client's banners exactly as supplied (img/1-4.jpeg, 2026-10-23) — no
+   cut, no padding, no extension. BrandBoard sizes each frame to its own
+   banner, so nothing is cropped and no white bars appear. */
+import dahuaBanner from '../../img/1.jpeg';
+import hikvisionBanner from '../../img/2.jpeg';
+import unvBanner from '../../img/3.jpeg';
+import neutronBanner from '../../img/4.jpeg';
 
 /** The client's img/1–4 banners, in reading order. */
 const BRAND_BANNERS = [
