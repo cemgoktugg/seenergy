@@ -16,7 +16,6 @@
 import { Hero } from '@/components/hero';
 import { BrandBoard, type BrandBoardEntry } from '@/components/brand-board';
 import { ProductSlider } from '@/components/product-slider';
-import { ProductTabs } from '@/components/product-tabs';
 import { RevealOnScroll } from '@/components/reveal-on-scroll';
 import { Section } from '@/components/section';
 import { SectionHeading } from '@/components/section-heading';
@@ -24,6 +23,7 @@ import {
   BlogCards,
   BrandGrid,
   DualBanners,
+  ProductGrid,
   SeoEditorial,
   TrustRow,
 } from '@/components/sections';
@@ -126,21 +126,18 @@ export default async function HomePage() {
         </div>
       </Section>
 
-      {/* 12 — tabbed product block: 3 tabs + 5×3 grid.
-             The largest single section on the reference homepage. */}
-      <Section>
-        <ProductTabs
-          tabs={[
-            /* 12, not 15: the grid is four columns beside the vertical tab
-               rail now, so twelve fills exactly three rows. Fifteen would
-               leave a ragged final row of three. */
-            /* The same Vitrin lists as the sliders above: the shop keeps
-               "Haftanın Ürünleri" in one place, not two. */
-            { id: 'haftanin', label: 'Haftanın Ürünleri', products: pick('haftanin', 12, 2) },
-            { id: 'yeni', label: 'Yeni Ürünler', products: pick('yeni', 12, 11) },
-            { id: 'cok-satan', label: 'Çok Satanlar', products: pick('cok-satan', 12, 23) },
-          ]}
-        />
+      {/* 12 — Keşfet · Öne Çıkanlar: one 4 × 4 grid (2026-10-24). It was a
+             tabbed block (Haftanın Ürünleri / Yeni Ürünler / Çok Satanlar);
+             the client wanted no tabs and no such labels here, only the
+             featured products. Its own Vitrin list, "one-cikan" (first 16),
+             edited in admin → Vitrin → Öne Çıkanlar; until the list exists a
+             deterministic mix stands in. On a phone the band scrolls like the
+             other homepage rails. */}
+      <Section label="Öne çıkan ürünler">
+        <SectionHeading eyebrow="Keşfet" title="Öne Çıkanlar" />
+        <div className="pt-3 dt:pt-4">
+          <ProductGrid products={pick('one-cikan', 16, 4)} columns={4} />
+        </div>
       </Section>
 
       {/* 13 — the second campaign-tile strip stood here. Removed when category

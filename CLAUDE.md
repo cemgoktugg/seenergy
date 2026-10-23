@@ -152,9 +152,13 @@ four brands as collections. Its dark title strip is the former wide
 campaign banner (the `wide` banner slot, renamed "Marka panosu başlığı" in the
 admin), moved up from under the product rails on the same day.
 
-Lists: `haftanin`, `yeni`, `cok-satan`, `super-firsat`. "Haftanın Ürünleri"
-feeds BOTH the slider (first 8) and the tab (first 12) — one list, one place
-to maintain it; same for `yeni`. Do not split them back into separate picks.
+Lists: `haftanin`, `yeni`, `one-cikan`, `super-firsat` (and `cok-satan`, kept
+but no longer on the homepage). `haftanin` and `yeni` feed the two product
+rails (first 8). `one-cikan` feeds "Keşfet · Öne Çıkanlar", a 4 × 4 grid
+(first 16) — on 2026-10-24 the client had its three tabs (Haftanın Ürünleri /
+Yeni Ürünler / Çok Satanlar) removed: no tabs or such labels there, only the
+featured products. Created by `vitrin-upgrade-featured-list.ts` from what the
+tabs showed.
 
 When adding an editable homepage field: add it to the block's `fields` in
 `src/admin/lib/blocks.ts` (the form renders from it), to the seed, and to the

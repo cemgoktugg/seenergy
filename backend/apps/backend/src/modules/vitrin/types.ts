@@ -72,5 +72,5 @@ export interface AnnouncementData {
 }
 
 /** The lists the storefront knows how to place. */
-export const LIST_KEYS = ["haftanin", "yeni", "cok-satan", "super-firsat"] as const
+export const LIST_KEYS = ["haftanin", "yeni", "cok-satan", "super-firsat", "one-cikan"] as const
 export type ListKey = (typeof LIST_KEYS)[number]

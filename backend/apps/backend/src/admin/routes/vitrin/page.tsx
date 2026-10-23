@@ -239,17 +239,8 @@ const VitrinPage = () => {
           </Text>
         </Band>
 
-        <Band
-          n={++n}
-          title="Sekmeli ürün bölümü"
-          where="Haftanın Ürünleri / Yeni Ürünler / Çok Satanlar sekmeleri. İlk iki sekme yukarıdaki raflarla aynı listeleri kullanır."
-          to="/vitrin/liste/cok-satan"
-        >
-          <div className="flex flex-wrap gap-x-4 gap-y-1">
-            <ListLink list={list("haftanin")} label="Haftanın Ürünleri" />
-            <ListLink list={list("yeni")} label="Yeni Ürünler" />
-            <ListLink list={list("cok-satan")} label="Çok Satanlar" />
-          </div>
+        <Band n={++n} title="Öne Çıkanlar" where={LIST_PLACES["one-cikan"]} to="/vitrin/liste/one-cikan">
+          <ListPreview list={list("one-cikan")} storefront={storefront} count={16} />
         </Band>
 
         <Band n={++n} title="Blog ve markalar" where="Sayfa sonuna doğru koyu bölümdeki iki büyük banner." to="/vitrin/blok/banner">

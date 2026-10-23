@@ -267,9 +267,10 @@ export const TRUST_ICONS: { value: string; label: string }[] = [
 
 /** Lists: where each one appears on the site. */
 export const LIST_PLACES: Record<string, string> = {
-  haftanin: "Üstteki 'Haftanın Ürünleri' rafı (ilk 8) ve alttaki sekmeli bölüm (ilk 12).",
-  yeni: "'Yeni Gelenler' rafı (ilk 8) ve sekmeli bölümdeki 'Yeni Ürünler' (ilk 12).",
-  "cok-satan": "Sekmeli bölümdeki 'Çok Satanlar' (ilk 12).",
+  haftanin: "Marka bannerlarının altındaki 'Haftanın Ürünleri' rafı (ilk 8).",
+  yeni: "Marka bannerlarının altındaki 'Yeni Gelenler' rafı (ilk 8).",
+  "one-cikan": "'Keşfet · Öne Çıkanlar' bölümü: 4 × 4 ızgara (ilk 16).",
+  "cok-satan": "Şu an ana sayfada gösterilmiyor (sekmeli bölüm kaldırıldı).",
   "super-firsat": "Mor 'Süper Fırsat' kartının yanındaki 4 ürün.",
 }
 
@@ -278,4 +279,5 @@ export const LIST_LIMITS: Record<string, number> = {
   yeni: 12,
   "cok-satan": 12,
   "super-firsat": 4,
+  "one-cikan": 16,
 }
