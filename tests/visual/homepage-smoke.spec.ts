@@ -85,7 +85,10 @@ test.describe('homepage', () => {
   test('product card keeps the measured proportions', async ({ page }) => {
     await gotoStable(page, '/');
 
-    const card = page.locator('article').filter({ hasText: 'Sepete Ekle' }).first();
+    // The paired carousels use compact cards; reference proportions apply to
+    // the standard cards in the product grids.
+    const card = page.locator('article:not([aria-roledescription="carousel"] article)')
+      .filter({ hasText: 'Sepete Ekle' }).first();
     const box = await card.boundingBox();
     expect(box).not.toBeNull();
     // Reference cards measure 248-315 wide and 357 tall.

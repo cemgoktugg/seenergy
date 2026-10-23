@@ -7,12 +7,10 @@
  * rather than a measured reproduction: it is built from this project's tokens
  * and the existing ProductCard, not from reference geometry.
  *
- * Design notes:
- *   - The panel reads as one object: a 3px accent gradient capping a bordered
- *     white card, a muted eyebrow above a tight heading, ghost arrow controls
- *     that fill with the accent on hover, and a segmented progress pill row.
- *   - Two accents keep the pair distinguishable at a glance without inventing
- *     colours: `warm` is the brand orange, `cool` the info blue / deep navy.
+ * A quiet inset surface, compact cards and a shared navigation capsule keep
+ * the pair about 15% shorter than the original 486.5px desktop panels. Image
+ * stages and spacing absorb the reduction; product names and prices retain
+ * their normal type sizes. Other ProductCard usages keep their usual density.
  *
  * Mechanics: native scroll + scroll-snap (the existing `.rail` utility), not a
  * transformed track. It keeps touch drag, trackpad swipe and keyboard arrow
@@ -34,31 +32,9 @@ import type { Product } from '@/data/catalog';
 
 type Accent = 'violet' | 'teal';
 
-/**
- * Every accent value resolves to a theme token — no literal colours here.
- *
- * The two accents are the two ends of the SEENERGY gradient, so the pair reads
- * as one identity rather than two decisions. Fills that carry white text use
- * the indigo and blue stops (8.4:1 and 5.9:1); the teal stop is only ever
- * graphics — a rule, a dot, a progress segment — because white on teal is
- * 2.8:1 and would fail as a label.
- */
-const ACCENTS: Record<
-  Accent,
-  { rule: string; wash: string; control: string; segment: string }
-> = {
-  violet: {
-    rule: 'from-grad-3 to-grad-4',
-    wash: 'from-brand-soft/70',
-    control: 'enabled:hover:border-brand enabled:hover:bg-brand enabled:hover:text-white',
-    segment: 'bg-grad-3',
-  },
-  teal: {
-    rule: 'from-grad-1 to-grad-2',
-    wash: 'from-grad-1/8',
-    control: 'enabled:hover:border-grad-2 enabled:hover:bg-grad-2 enabled:hover:text-white',
-    segment: 'bg-grad-2',
-  },
+const ACCENTS: Record<Accent, string> = {
+  violet: 'bg-grad-3',
+  teal: 'bg-grad-2',
 };
 
 const prefersReducedMotion = () =>
@@ -81,7 +57,7 @@ export function ProductSlider({
   const trackRef = useRef<HTMLDivElement>(null);
   const [page, setPage] = useState(0);
   const [pages, setPages] = useState(1);
-  const a = ACCENTS[accent];
+  const segment = ACCENTS[accent];
 
   /* One page is one track width, so the page count follows from the scroll
      extent. Measured on mount, on resize and on every scroll — the cards are
@@ -121,60 +97,56 @@ export function ProductSlider({
   );
 
   const controlBase =
-    'grid h-8 w-8 place-items-center rounded-full border border-line-strong bg-surface-card text-text-secondary transition-colors duration-(--duration-fast) ease-in-out disabled:cursor-not-allowed disabled:opacity-30 dt:h-9 dt:w-9';
+    'grid h-11 w-11 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) enabled:hover:bg-brand enabled:hover:text-white disabled:cursor-not-allowed disabled:opacity-25 dt:h-8 dt:w-8';
 
   return (
     <section
       aria-roledescription="carousel"
       aria-label={title}
-      className="flex h-full flex-col overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e1"
+      className="flex h-full min-w-0 flex-col overflow-hidden rounded-[20px] border border-line-strong/70 bg-surface-page"
     >
-      {/* Accent cap — the one saturated element, 3px tall. */}
-      <span aria-hidden className={`block h-[3px] w-full bg-linear-to-r ${a.rule}`} />
-
       {/* --- header ------------------------------------------------------ */}
-      <div
-        className={`flex items-center justify-between gap-3 bg-linear-to-b to-transparent px-3 pt-3 dt:px-4 dt:pt-4 ${a.wash}`}
-      >
-        <div className="min-w-0 flex-1">
-          <SectionHeading eyebrow={eyebrow} title={title} action={{ label: 'Tümü', href }}>
-          <button
-            type="button"
-            onClick={() => goTo(page - 1)}
-            disabled={page === 0}
-            aria-label={`${title}: önceki ürünler`}
-            className={`${controlBase} ${a.control}`}
-          >
-            <ChevronLeft size={17} strokeWidth={2.25} aria-hidden />
-          </button>
-          <button
-            type="button"
-            onClick={() => goTo(page + 1)}
-            disabled={page >= pages - 1}
-            aria-label={`${title}: sonraki ürünler`}
-            className={`${controlBase} ${a.control}`}
-          >
-            <ChevronRight size={17} strokeWidth={2.25} aria-hidden />
-          </button>
-          </SectionHeading>
-        </div>
+      <div className="px-3 pt-3 dt:px-4 dt:pt-3.5">
+        <SectionHeading compact eyebrow={eyebrow} title={title} action={{ label: 'Tümü', href }}>
+          <div className="flex shrink-0 items-center rounded-full border border-line-strong/70 bg-surface-card p-0.5">
+            <button
+              type="button"
+              onClick={() => goTo(page - 1)}
+              disabled={page === 0}
+              aria-label={`${title}: önceki ürünler`}
+              className={controlBase}
+            >
+              <ChevronLeft size={16} strokeWidth={1.8} aria-hidden />
+            </button>
+            <span aria-hidden className="mx-0.5 h-3 w-px bg-line-strong" />
+            <button
+              type="button"
+              onClick={() => goTo(page + 1)}
+              disabled={page >= pages - 1}
+              aria-label={`${title}: sonraki ürünler`}
+              className={controlBase}
+            >
+              <ChevronRight size={16} strokeWidth={1.8} aria-hidden />
+            </button>
+          </div>
+        </SectionHeading>
       </div>
 
       {/* --- track -------------------------------------------------------
           Two cards per view once the pair goes side by side; 1.5 on mobile so
           the next card peeks, which is the same affordance the mobile rails
-          elsewhere on the page use. `py-2` gives the cards' hover shadow room
+          elsewhere on the page use. Vertical padding gives the hover shadow room
           inside the scroll container, which would otherwise clip it. */}
-      <div className="mt-2 px-3 dt:px-4">
+      <div className="mt-1.5 px-3 dt:px-4">
         <div
           ref={trackRef}
           tabIndex={0}
           role="group"
           aria-label={`${title} listesi`}
-          className="rail auto-cols-[68%] gap-2.5 py-2 sm:auto-cols-[46%] lg:auto-cols-[calc(50%_-_5px)]"
+          className="rail auto-cols-[68%] gap-2.5 py-1.5 sm:auto-cols-[46%] lg:auto-cols-[calc(50%_-_5px)]"
         >
           {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard key={product.id} product={product} compact />
           ))}
         </div>
       </div>
@@ -187,34 +159,30 @@ export function ProductSlider({
           in a single page — at which point `flex-1` stretched the lone segment
           into a 710px bar that looked like a progress indicator for nothing. */}
       {pages > 1 && (
-        <div className="mt-auto flex items-center gap-2 px-3 pb-3 pt-1 dt:gap-1 dt:px-4 dt:pb-4">
-        {Array.from({ length: pages }, (_, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => goTo(i)}
-            aria-label={`${title}: ${i + 1}. ürün grubu`}
-            aria-current={i === page}
-            /* These hit-tested 10×6 and 24×6 against a 44px floor — the same
-               failure the hero dots had, in the same shape of control.
-               Below `dt` the bar therefore carries the target: `flex-1` rather
-               than a fixed 44px, because these are narrow paired panels with up
-               to 6 pages, where fixed widths would overflow the panel. Equal
-               shares always fit and clear 44 whenever the panel has the room.
-               `before` supplies the height, and it is deliberately
-               ASYMMETRIC: a symmetric -inset-y-5 hit-tested at 38px, because
-               the panel's own `overflow-hidden` cuts the extension off at the
-               12px bottom padding. Downward there are only those 12px to take,
-               so the rest is taken upward — 6 + 28 + 12 = 46.
-               From `dt` up a pointer is driving and the compact
-               active-stretches look returns. */
-            className={`relative h-1.5 rounded-full transition-all duration-(--duration-base) ease-out before:absolute before:inset-x-0 before:-bottom-3 before:-top-7 before:content-[''] dt:flex-none ${
-              i === page
-                ? `flex-1 dt:w-6 ${a.segment}`
-                : 'flex-1 bg-line-strong hover:bg-text-secondary dt:w-2.5'
-            }`}
-            />
-          ))}
+        <div className="mt-auto flex items-center justify-between gap-4 px-3 pb-3 pt-1 dt:px-4">
+          <div className="flex min-w-0 flex-1 items-center gap-1 dt:flex-none">
+            {Array.from({ length: pages }, (_, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => goTo(i)}
+                aria-label={`${title}: ${i + 1}. ürün grubu`}
+                aria-current={i === page}
+                /* On touch the segments share the full row and extend their
+                   hit areas vertically. Desktop keeps the compact indicator. */
+                className={`relative h-1 rounded-full transition-all duration-(--duration-base) ease-out before:absolute before:inset-x-0 before:-bottom-3 before:-top-7 before:content-[''] dt:flex-none dt:before:-inset-y-2.5 ${
+                  i === page
+                    ? `flex-1 dt:w-6 ${segment}`
+                    : 'flex-1 bg-line-strong hover:bg-text-secondary dt:w-3'
+                }`}
+              />
+            ))}
+          </div>
+          <span aria-hidden className="hidden shrink-0 text-[10px] font-medium leading-[10px] tabular-nums tracking-[0.08em] text-text-secondary dt:block">
+            <span className="text-text-primary">{String(page + 1).padStart(2, '0')}</span>
+            <span className="mx-1.5 opacity-50">/</span>
+            {String(pages).padStart(2, '0')}
+          </span>
         </div>
       )}
     </section>

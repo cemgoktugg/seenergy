@@ -67,7 +67,7 @@ function displayName(product: Product): string {
     : product.name;
 }
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
   /* Stock speaks only for a product that can be bought now. A price-on-request
      model reports its stock in the quote, so its 0 is not "Tükendi" — that
      greyed out the client's whole CCTV range. */
@@ -91,11 +91,17 @@ export function ProductCard({ product }: { product: Product }) {
   const href = `/urun/${product.slug}`;
 
   return (
-    <article className="group relative flex h-full flex-col overflow-hidden rounded-(--card-radius) border border-line bg-surface-card shadow-e1 transition-[box-shadow,border-color] duration-(--duration-base) hover:border-line-strong hover:shadow-e2">
+    <article className={`group relative flex h-full flex-col overflow-hidden border bg-surface-card transition-[box-shadow,border-color] duration-(--duration-base) ${
+      compact
+        ? 'rounded-[14px] border-line-strong/60 hover:border-line-strong hover:shadow-e1'
+        : 'rounded-(--card-radius) border-line shadow-e1 hover:border-line-strong hover:shadow-e2'
+    }`}>
       {/* --- image stage ------------------------------------------------ */}
       <div className="relative m-2 mb-0 overflow-hidden rounded-[calc(var(--card-radius)-4px)] bg-white">
         <Link href={href} className="block" aria-label={product.name}>
-          <div className="flex h-[172px] items-center justify-center p-3 sm:h-[188px] dt:h-[220px] dt:p-4">
+          <div className={`flex items-center justify-center p-3 ${
+            compact ? 'h-[132px] sm:h-[148px] dt:h-[175px]' : 'h-[172px] sm:h-[188px] dt:h-[220px] dt:p-4'
+          }`}>
             <img
               src={product.image}
               alt={product.name}
@@ -168,7 +174,7 @@ export function ProductCard({ product }: { product: Product }) {
       {/* Fixed height so that every card in a row puts its price on the same
           line, whatever the name length or whether there is a discount.
           12 + brand 14 + 4 + name 36 + 10 + old price 16 + price 26 + 12. */}
-      <div className="card-detail relative flex h-[130px] flex-col px-3 pt-3">
+      <div className={`card-detail relative flex flex-col px-3 ${compact ? 'h-[122px] pt-2.5' : 'h-[130px] pt-3'}`}>
         {/* Not uppercased: under lang="tr" CSS capitalises i as İ, turning
             Tekniva into "TEKNİVA" — right for Turkish words, wrong for a
             brand's own spelling. */}
@@ -182,7 +188,7 @@ export function ProductCard({ product }: { product: Product }) {
           </Link>
         </h3>
 
-        <div className="mt-2.5">
+        <div className={compact ? 'mt-2' : 'mt-2.5'}>
           {/* One sentence for assistive tech; the visual parts are hidden from
               it so the price is heard once, complete. */}
           <p className="sr-only">
