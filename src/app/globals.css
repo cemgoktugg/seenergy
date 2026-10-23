@@ -1000,3 +1000,36 @@ html {
 :root[data-theme='dark'] .logo-auto {
   filter: invert(1);
 }
+
+/* Brand banner frames (src/components/brand-board.tsx): a light in the
+   brand's colour (--frame-accent, set per card) runs round the 2px border
+   over a quiet base line. The angle is a registered property so it can be
+   animated; the frame stays a plain line under reduced motion. */
+@property --frame-angle {
+  syntax: '<angle>';
+  inherits: false;
+  initial-value: 0deg;
+}
+.brand-frame {
+  background:
+    conic-gradient(
+      from var(--frame-angle),
+      transparent 0deg 230deg,
+      color-mix(in srgb, var(--frame-accent) 30%, transparent) 275deg,
+      var(--frame-accent) 320deg,
+      #ffffff 338deg,
+      transparent 360deg
+    ),
+    linear-gradient(var(--color-line-strong), var(--color-line-strong));
+  animation: frame-spin 6s linear infinite;
+}
+@keyframes frame-spin {
+  to {
+    --frame-angle: 360deg;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-frame {
+    animation: none;
+  }
+}

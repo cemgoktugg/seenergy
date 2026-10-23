@@ -30,9 +30,8 @@ import {
 import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
-/* The client's banners exactly as supplied (img/1-4.jpeg, 2026-10-23) — no
-   cut, no padding, no extension. BrandBoard sizes each frame to its own
-   banner, so nothing is cropped and no white bars appear. */
+/* The client's banners as supplied (img/1-4.jpeg, 2026-10-23) — no cut files,
+   no padding, no extension; BrandBoard frames them (see its note). */
 import dahuaBanner from '../../img/1.jpeg';
 import hikvisionBanner from '../../img/2.jpeg';
 import unvBanner from '../../img/3.jpeg';
@@ -40,10 +39,10 @@ import neutronBanner from '../../img/4.jpeg';
 
 /** The client's img/1–4 banners, in reading order. */
 const BRAND_BANNERS = [
-  { handle: 'dahua', name: 'Dahua', image: dahuaBanner },
-  { handle: 'hikvision', name: 'Hikvision', image: hikvisionBanner },
-  { handle: 'unv', name: 'UNV', image: unvBanner },
-  { handle: 'neutron', name: 'Neutron', image: neutronBanner },
+  { handle: 'dahua', name: 'Dahua', image: dahuaBanner, accent: '#e60012' },
+  { handle: 'hikvision', name: 'Hikvision', image: hikvisionBanner, accent: '#e1251b' },
+  { handle: 'unv', name: 'UNV', image: unvBanner, accent: '#0068b7' },
+  { handle: 'neutron', name: 'Neutron', image: neutronBanner, accent: '#1b8fe0' },
 ];
 
 export default async function HomePage() {
@@ -69,10 +68,11 @@ export default async function HomePage() {
   // Keep the admin's brand visibility; the supplied artwork sets image order.
   const brandBoard: BrandBoardEntry[] = BRAND_BANNERS
     .filter(({ handle }) => vitrin.brandBoard.some((item) => item.brandHandle === handle))
-    .map(({ handle, name, image }) => ({
+    .map(({ handle, name, image, accent }) => ({
       name: brandFromSlug(handle) ?? name,
       href: `/marka/${handle}`,
       image,
+      accent,
     }));
 
   const banner = (key: keyof typeof vitrin.banners, fallback: NonNullable<(typeof vitrin.banners)['wide']>) =>
