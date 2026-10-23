@@ -31,8 +31,16 @@ import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
 
+/** The client's img/1–4 banners, in reading order. */
+const BRAND_BANNERS = [
+  { handle: 'dahua', name: 'Dahua', image: '/brand-banners/dahua.jpeg' },
+  { handle: 'hikvision', name: 'Hikvision', image: '/brand-banners/hikvision.jpeg' },
+  { handle: 'unv', name: 'UNV', image: '/brand-banners/unv.jpeg' },
+  { handle: 'neutron', name: 'Neutron', image: '/brand-banners/neutron.jpeg' },
+];
+
 export default async function HomePage() {
-  const [{ byId, byBrandSlug, brandFromSlug, mixed }, vitrin] = await Promise.all([
+  const [{ byId, brandFromSlug, mixed }, vitrin] = await Promise.all([
     loadCatalog(),
     loadVitrin(),
   ]);
@@ -51,32 +59,14 @@ export default async function HomePage() {
       .slice(0, count);
   };
 
-  /* The brand board's squares (admin → Vitrin → Marka panosu), each with the
-     brand's models from the catalogue — listed the way the mega menu lists
-     them: the model code, then the rest of the title. A brand with no
-     products yet has no name in the catalogue, so its handle stands in
-     ("unv" → "UNV", "dahua" → "Dahua"). */
-  const brandBoard: BrandBoardEntry[] = vitrin.brandBoard.map(({ brandHandle, logo }) => {
-    const products = byBrandSlug(brandHandle);
-    const name =
-      brandFromSlug(brandHandle) ??
-      (brandHandle.length <= 3 ? brandHandle.toUpperCase() : brandHandle.charAt(0).toUpperCase() + brandHandle.slice(1));
-    return {
-      name,
-      href: `/marka/${brandHandle}`,
-      logo,
-      models: products.map((product) => {
-        const bare = product.name.startsWith(`${product.brand} `) ? product.name.slice(product.brand.length + 1) : product.name;
-        const coded = product.sku && bare.startsWith(product.sku);
-        return {
-          label: coded ? product.sku : bare,
-          detail: coded ? bare.slice(product.sku.length).trim() : product.brand,
-          image: product.image,
-          href: `/urun/${product.slug}`,
-        };
-      }),
-    };
-  });
+  // Keep the admin's brand visibility; the supplied artwork sets image order.
+  const brandBoard: BrandBoardEntry[] = BRAND_BANNERS
+    .filter(({ handle }) => vitrin.brandBoard.some((item) => item.brandHandle === handle))
+    .map(({ handle, name, image }) => ({
+      name: brandFromSlug(handle) ?? name,
+      href: `/marka/${handle}`,
+      image,
+    }));
 
   const banner = (key: keyof typeof vitrin.banners, fallback: NonNullable<(typeof vitrin.banners)['wide']>) =>
     vitrin.banners[key] ?? fallback;
@@ -97,10 +87,7 @@ export default async function HomePage() {
         </Section>
       ) : null}
 
-      {/* 04b — the brand board: four cards, one per brand, its models on
-             hover. It replaced the category board on 2026-10-22 at the
-             client's request ("no categories here") — categories stay in the
-             mega menu and on /kategori. See BrandBoard. */}
+      {/* 04b — four clickable brand banners, in a two-by-two grid. */}
       {brandBoard.length > 0 ? (
         <Section label="Markalar">
           <BrandBoard items={brandBoard} />
