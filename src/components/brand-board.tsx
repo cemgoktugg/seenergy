@@ -8,9 +8,9 @@ export interface BrandBoardEntry {
   image: StaticImageData;
 }
 
-/** One frame ratio, 5:1, aligns all four cards — and it is the banners' own
- * ratio (public/brand-banners/*-wide.webp), so the picture fills the frame
- * edge to edge with nothing cropped. The action stays below it on mobile and
+/** One frame ratio, 4.55:1, aligns all four cards — and it is the banners' own
+ * ratio (public/brand-banners/*-wide.webp, 2184 × 480), so the picture fills
+ * the frame edge to edge with nothing cropped. The action stays below it on mobile and
  * at bottom left on desktop. */
 export function BrandBoard({ items }: { items: BrandBoardEntry[] }) {
   return (
@@ -22,7 +22,7 @@ export function BrandBoard({ items }: { items: BrandBoardEntry[] }) {
             aria-label={`${item.name} — İncele`}
             className="group relative block rounded-xl border border-line-strong/60 bg-surface-card shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:-translate-y-0.5 hover:border-line-strong hover:shadow-e2 focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 sm:rounded-[18px] dt:rounded-[22px]"
           >
-            <span className="relative block aspect-[5/1] overflow-hidden rounded-t-[inherit] lg:rounded-[inherit]">
+            <span className="relative block aspect-[91/20] overflow-hidden rounded-t-[inherit] lg:rounded-[inherit]">
               <Image
                 src={item.image}
                 alt={`${item.name} güvenlik sistemleri`}

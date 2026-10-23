@@ -30,9 +30,10 @@ import {
 import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
-/* 5:1 cuts of the supplied banners (*.jpeg, 2.95-3.42 : 1): each banner whole
-   in the middle, its sides continued from its own edge colour into its own
-   ground, so the frame fills with nothing cropped. */
+/* 4.55:1 cuts of the supplied banners (*.jpeg, 2.95-3.42 : 1): each banner
+   whole in the middle, its outermost column carried straight out to the
+   sides — no blur, no fade (the client's call) — so the frame fills with
+   nothing cropped. */
 import dahuaBanner from '../../public/brand-banners/dahua-wide.webp';
 import hikvisionBanner from '../../public/brand-banners/hikvision-wide.webp';
 import unvBanner from '../../public/brand-banners/unv-wide.webp';
