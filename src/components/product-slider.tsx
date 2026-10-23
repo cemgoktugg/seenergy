@@ -10,10 +10,11 @@
  * LOOK (2026-10-23, after a red/blue pair and a light grid were both turned
  * down as plain): a security control-room monitor. Each panel is a dark
  * graphite screen lit from its top-left corner, with
- *   - a channel readout in the bottom corner — a pulsing red "CANLI" light,
- *     "CH 01" / "CH 02" and the product count, in monospace, the way a CCTV
- *     monitor labels a feed (in the footer row, so the panel stays as short
- *     as the client asked for);
+ *   - a channel readout in the bottom corner — "CH 01" / "CH 02", the
+ *     product count and the page, in monospace, the way a CCTV monitor labels
+ *     a feed (in the footer row, so the panel stays as short as the client
+ *     asked for). A red "CANLI" light was there and was removed: these are
+ *     not live feeds, and the client asked why it said so;
  *   - viewfinder corner marks, the site's dot matrix in light ink, and a slow
  *     scan line passing behind the cards;
  *   - the running light round its frame that the brand banners above carry
@@ -120,7 +121,7 @@ export function ProductSlider({
         {/* Behind everything: the dot matrix, a corner glow, the scan line. */}
         <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 -z-10 opacity-70" />
         <span aria-hidden className="pointer-events-none absolute -left-24 -top-28 -z-10 h-64 w-64 rounded-full bg-white/[0.07] blur-3xl" />
-        <span aria-hidden className="tech-scan pointer-events-none absolute inset-x-0 top-0 -z-10 h-28" />
+        <span aria-hidden className="tech-scan pointer-events-none absolute inset-x-0 top-0 -z-10 h-32" />
         {/* Viewfinder corners. */}
         <span aria-hidden className={`${CORNER} left-2 top-2 rounded-tl-md border-l-2 border-t-2`} />
         <span aria-hidden className={`${CORNER} right-2 top-2 rounded-tr-md border-r-2 border-t-2`} />
@@ -198,13 +199,6 @@ export function ProductSlider({
           )}
           {/* The channel readout, the way a CCTV monitor labels its feed. */}
           <p className="flex shrink-0 items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">
-            <span className="inline-flex items-center gap-1.5 rounded-[5px] border border-[rgb(255_77_77/0.35)] bg-[rgb(255_77_77/0.1)] px-1.5 py-[3px] text-[rgb(255_140_140)]">
-              <span aria-hidden className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff4d4d] opacity-70 motion-reduce:hidden" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[#ff4d4d]" />
-              </span>
-              Canlı
-            </span>
             <span className="rounded-[5px] border border-white/15 bg-white/5 px-1.5 py-[3px] text-white/75">CH {channel}</span>
             <span className="hidden sm:inline">{String(products.length).padStart(2, '0')} ürün</span>
             {pages > 1 ? (

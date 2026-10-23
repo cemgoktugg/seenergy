@@ -1050,21 +1050,30 @@ html {
   background-position: 8px 8px;
   mask-image: radial-gradient(120% 90% at 50% 0%, black 25%, transparent 75%);
 }
+/* A scan beam: a bright leading line at the bottom edge with a glow trailing
+   above it, travelling down (made more visible and slower at the client's
+   request, 2026-10-23). */
 .tech-scan {
   background: linear-gradient(
     to bottom,
-    transparent,
-    color-mix(in srgb, var(--tech-ink, var(--color-text-primary)) 9%, transparent) 50%,
-    transparent
+    transparent 0%,
+    color-mix(in srgb, var(--tech-ink, var(--color-text-primary)) 5%, transparent) 55%,
+    color-mix(in srgb, var(--tech-ink, var(--color-text-primary)) 16%, transparent) 92%,
+    color-mix(in srgb, var(--tech-ink, var(--color-text-primary)) 55%, transparent) 99%,
+    transparent 100%
   );
-  animation: tech-scan 7s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  box-shadow: 0 6px 18px -6px color-mix(in srgb, var(--tech-ink, var(--color-text-primary)) 35%, transparent);
+  animation: tech-scan 12s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
+/* Exactly across the panel, top edge to bottom edge, so the beam is on
+   screen for the whole cycle (it used to travel nine of its own heights and
+   spend two thirds of the time below the panel). */
 @keyframes tech-scan {
   from {
-    transform: translateY(-100%);
+    top: -8rem;
   }
   to {
-    transform: translateY(900%);
+    top: 100%;
   }
 }
 @media (prefers-reduced-motion: reduce) {
