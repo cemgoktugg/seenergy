@@ -325,6 +325,7 @@
      readable sections. Applied in exactly one place, <Section>, so the whole
      page's rhythm retunes from this line. */
   --space-section: 40px;
+  --space-section-compact: 16px;
 }
 
 @media (min-width: 1200px) {
@@ -333,6 +334,7 @@
     /* Desktop has the height to spend, and it is where the seven brand bands
        otherwise run together most. */
     --space-section: 64px;
+    --space-section-compact: 24px;
   }
 }
 

@@ -8,9 +8,9 @@
  * `--space-section` token existed but was referenced nowhere, so measured gaps
  * between bands were 0 and the homepage read as a single uncut column.
  *
- * Every band now goes through here and takes its top space from the one token.
- * Retune the rhythm in globals.css and the whole page follows; nothing is
- * spaced by hand any more.
+ * Every band now goes through here and takes its top space from the shared
+ * tokens. The compact variant brings the brand banners closer to the hero.
+ * Retune the rhythm in globals.css; nothing is spaced by hand at call sites.
  *
  * `track` picks the horizontal rail, because they are genuinely different and
  * measured:
@@ -28,6 +28,7 @@ export function Section({
   track = 'main',
   className = '',
   first = false,
+  compact = false,
 }: {
   children: ReactNode;
   /** Names the region. Omit for bands whose heading already names them. */
@@ -40,10 +41,14 @@ export function Section({
    * is no preceding section to separate it from.
    */
   first?: boolean;
+  /** A smaller gap for content visually connected to the preceding band. */
+  compact?: boolean;
 }) {
   const container =
     track === 'nav' ? 'container-nav' : track === 'bleed' ? '' : 'container-main';
-  const rhythm = first ? 'pt-2.5 dt:pt-5' : 'pt-(--space-section)';
+  const rhythm = first
+    ? 'pt-2.5 dt:pt-5'
+    : compact ? 'pt-(--space-section-compact)' : 'pt-(--space-section)';
 
   return (
     <section

@@ -89,7 +89,7 @@ export default async function HomePage() {
 
       {/* 04b — four clickable brand banners, in a two-by-two grid. */}
       {brandBoard.length > 0 ? (
-        <Section label="Markalar">
+        <Section label="Markalar" compact>
           <BrandBoard items={brandBoard} />
         </Section>
       ) : null}
