@@ -68,7 +68,7 @@ function Logo({ className = '' }: { className?: string }) {
       className={`relative flex min-w-11 items-center justify-center before:absolute before:inset-x-0 before:-inset-y-[7px] before:content-[''] sm:min-w-0 sm:justify-start ${className}`}
       aria-label={SITE.name}
     >
-      <BrandMark className="h-[34px] w-auto shrink-0 sm:hidden" />
+      <BrandMark shine className="flex h-[34px] w-auto shrink-0 sm:hidden" />
       {/* The wordmark is withdrawn below `sm`, leaving the S mark — the same
           thing the condensed sticky bar does. (Measured when the wordmark was
           still set as text; the rule carries over to the image lockup, which
@@ -85,7 +85,7 @@ function Logo({ className = '' }: { className?: string }) {
           Worth noting for future header checks: comparing the LINK boxes shows
           a tidy 12px gap and reports no collision. The overflow is only visible
           if you measure the text box. */}
-      <BrandLogo className="hidden h-[30px] w-auto shrink-0 sm:block dt:h-[40px]" />
+      <BrandLogo shine className="hidden h-[30px] w-auto shrink-0 sm:flex dt:h-[40px]" />
     </Link>
   );
 }
@@ -355,8 +355,8 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
             tabIndex={condensed ? 0 : -1}
             className="flex shrink-0 items-center"
           >
-            <BrandMark tone="light" className="h-7 w-auto sm:hidden" />
-            <BrandLogoCompact tone="light" className="hidden h-[22px] w-auto sm:block dt:h-[26px]" />
+            <BrandMark shine tone="light" className="flex h-7 w-auto sm:hidden" />
+            <BrandLogoCompact shine tone="light" className="hidden h-[22px] w-auto sm:flex dt:h-[26px]" />
           </Link>
 
           <div className="min-w-0 flex-1">

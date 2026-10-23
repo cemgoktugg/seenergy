@@ -24,49 +24,56 @@
  *   tone="light"  always white — surfaces that are dark in both themes,
  *                 such as the condensed sticky bar
  *
+ * `shine` (2026-10-24, the client asked for an effect on the logo): a silver
+ * glint sweeps across the letters every few seconds — the light the category
+ * bar's metal carries, landing on the logo. The glint is a layer masked by the
+ * logo file itself (`.logo-shine` in globals.css), so it shows on the letters
+ * only; steel-blue on a white logo, where white would vanish. The logo lifts
+ * slightly on hover. Still under reduced motion.
+ *
  * The images are decorative (`alt=""`): every place that shows one wraps it in
  * a link that already carries the site name.
  */
 
-type LogoProps = { className?: string; tone?: 'auto' | 'light' };
+import type { CSSProperties } from 'react';
+
+type LogoProps = { className?: string; tone?: 'auto' | 'light'; shine?: boolean };
 
 const toneClass = (tone: LogoProps['tone']) => (tone === 'light' ? 'invert' : 'logo-auto');
 
-export function BrandMark({ className = '', tone = 'auto' }: LogoProps) {
+function Logo({
+  src,
+  width,
+  height,
+  className = '',
+  tone = 'auto',
+  shine = false,
+}: LogoProps & { src: string; width: number; height: number }) {
+  if (!shine) {
+    return (
+      <img src={src} width={width} height={height} alt="" decoding="async" className={`${toneClass(tone)} ${className}`} />
+    );
+  }
+  /* The sizing and visibility classes go on the wrapper, which takes the
+     image's own width; the glint layer sits on top, masked by the same file. */
   return (
-    <img
-      src="/brand/seenergy-mark.webp"
-      width={240}
-      height={286}
-      alt=""
-      decoding="async"
-      className={`${toneClass(tone)} ${className}`}
-    />
+    <span
+      style={{ '--logo-mask': `url(${src})` } as CSSProperties}
+      className={`logo-shine ${tone === 'light' ? 'logo-shine-on-dark' : ''} transition-transform duration-(--duration-base) ease-out hover:scale-[1.03] ${className}`}
+    >
+      <img src={src} width={width} height={height} alt="" decoding="async" className={`${toneClass(tone)} h-full w-auto`} />
+    </span>
   );
 }
 
-export function BrandLogo({ className = '', tone = 'auto' }: LogoProps) {
-  return (
-    <img
-      src="/brand/seenergy-logo.webp"
-      width={960}
-      height={216}
-      alt=""
-      decoding="async"
-      className={`${toneClass(tone)} ${className}`}
-    />
-  );
+export function BrandMark(props: LogoProps) {
+  return <Logo src="/brand/seenergy-mark.webp" width={240} height={286} {...props} />;
 }
 
-export function BrandLogoCompact({ className = '', tone = 'auto' }: LogoProps) {
-  return (
-    <img
-      src="/brand/seenergy-logo-compact.webp"
-      width={720}
-      height={162}
-      alt=""
-      decoding="async"
-      className={`${toneClass(tone)} ${className}`}
-    />
-  );
+export function BrandLogo(props: LogoProps) {
+  return <Logo src="/brand/seenergy-logo.webp" width={960} height={216} {...props} />;
+}
+
+export function BrandLogoCompact(props: LogoProps) {
+  return <Logo src="/brand/seenergy-logo-compact.webp" width={720} height={162} {...props} />;
 }

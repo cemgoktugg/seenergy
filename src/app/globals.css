@@ -1143,3 +1143,51 @@ html {
     opacity: 0;
   }
 }
+
+/* Logo glint (brand-mark.tsx, `shine`): a silver light sweeping across the
+   letters every 7s, masked by the logo file itself so it never leaves them.
+   White on the black (light-theme) logo; steel blue on a white logo — the
+   dark theme and the dark sticky bar — where white would vanish. */
+.logo-shine {
+  position: relative;
+  --logo-sheen: rgb(255 255 255 / 0.9);
+}
+.logo-shine-on-dark {
+  --logo-sheen: rgb(110 132 160 / 0.95);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) .logo-shine {
+    --logo-sheen: rgb(110 132 160 / 0.95);
+  }
+}
+:root[data-theme='dark'] .logo-shine {
+  --logo-sheen: rgb(110 132 160 / 0.95);
+}
+.logo-shine::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask: var(--logo-mask) center / 100% 100% no-repeat;
+  mask: var(--logo-mask) center / 100% 100% no-repeat;
+  background: linear-gradient(110deg, transparent 38%, var(--logo-sheen) 50%, transparent 62%);
+  background-size: 300% 100%;
+  background-repeat: no-repeat;
+  animation: logo-sheen 7s ease-in-out infinite;
+}
+@keyframes logo-sheen {
+  0%,
+  55% {
+    background-position: 100% 0;
+  }
+  85%,
+  100% {
+    background-position: 0% 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .logo-shine::after {
+    animation: none;
+    opacity: 0;
+  }
+}
