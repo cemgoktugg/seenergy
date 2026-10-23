@@ -34,7 +34,8 @@ import type { Product } from '@/data/catalog';
  * One look for both panels (2026-10-23: the client found a red and a blue
  * panel disjointed, and asked for something that says "electronics and
  * security technology"). The CCTV monitor is the motif: viewfinder corner
- * marks, a faint engineering grid, a slow scan line behind the cards, and a
+ * marks, a faint dot matrix (the page ground's dots, tighter), a slow scan
+ * line behind the cards, and a
  * status LED with a monospaced product count beside the heading. All in the
  * site's steel palette; the white cards carry the colour.
  */
