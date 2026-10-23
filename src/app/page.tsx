@@ -30,10 +30,13 @@ import {
 import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
-import dahuaBanner from '../../public/brand-banners/dahua.jpeg';
-import hikvisionBanner from '../../public/brand-banners/hikvision.jpeg';
-import unvBanner from '../../public/brand-banners/unv.jpeg';
-import neutronBanner from '../../public/brand-banners/neutron.jpeg';
+/* 5:1 cuts of the supplied banners (*.jpeg, 2.95-3.42 : 1): each banner whole
+   in the middle, its sides continued from its own edge colour into its own
+   ground, so the frame fills with nothing cropped. */
+import dahuaBanner from '../../public/brand-banners/dahua-wide.webp';
+import hikvisionBanner from '../../public/brand-banners/hikvision-wide.webp';
+import unvBanner from '../../public/brand-banners/unv-wide.webp';
+import neutronBanner from '../../public/brand-banners/neutron-wide.webp';
 
 /** The client's img/1–4 banners, in reading order. */
 const BRAND_BANNERS = [

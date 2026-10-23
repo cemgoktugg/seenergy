@@ -100,7 +100,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
       <div className="relative m-2 mb-0 overflow-hidden rounded-[calc(var(--card-radius)-4px)] bg-white">
         <Link href={href} className="block" aria-label={product.name}>
           <div className={`flex items-center justify-center p-3 ${
-            compact ? 'h-[132px] sm:h-[148px] dt:h-[175px]' : 'h-[172px] sm:h-[188px] dt:h-[220px] dt:p-4'
+            compact ? 'h-[112px] sm:h-[124px] dt:h-[122px]' : 'h-[172px] sm:h-[188px] dt:h-[220px] dt:p-4'
           }`}>
             <img
               src={product.image}
@@ -174,7 +174,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
       {/* Fixed height so that every card in a row puts its price on the same
           line, whatever the name length or whether there is a discount.
           12 + brand 14 + 4 + name 36 + 10 + old price 16 + price 26 + 12. */}
-      <div className={`card-detail relative flex flex-col px-3 ${compact ? 'h-[122px] pt-2.5' : 'h-[130px] pt-3'}`}>
+      <div className={`card-detail relative flex flex-col px-3 ${compact ? 'h-[112px] pt-2' : 'h-[130px] pt-3'}`}>
         {/* Not uppercased: under lang="tr" CSS capitalises i as İ, turning
             Tekniva into "TEKNİVA" — right for Turkish words, wrong for a
             brand's own spelling. */}
@@ -188,7 +188,7 @@ export function ProductCard({ product, compact = false }: { product: Product; co
           </Link>
         </h3>
 
-        <div className={compact ? 'mt-2' : 'mt-2.5'}>
+        <div className={compact ? 'mt-1.5' : 'mt-2.5'}>
           {/* One sentence for assistive tech; the visual parts are hidden from
               it so the price is heard once, complete. */}
           <p className="sr-only">
