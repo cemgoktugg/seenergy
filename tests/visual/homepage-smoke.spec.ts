@@ -101,9 +101,9 @@ test.describe('homepage', () => {
   test('brand wall, trust row and footer are visible', async ({ page }) => {
     await gotoStable(page, '/');
 
-    // The stacked brand bands, one region per brand ("<Marka> ürünleri"). The
-    // single tabbed "Markalar" region this asserted was reverted on 2026-09-26.
-    await expect(page.locator('section[aria-label$=" ürünleri"]').first()).toBeVisible();
+    // The product showcases were removed; the logo wall remains in the
+    // "Blog & Markalarımız" band.
+    await expect(page.locator('.brand-wall-plate')).toBeVisible();
     await expect(page.getByRole('contentinfo')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Popüler Kategoriler' })).toBeVisible();
   });

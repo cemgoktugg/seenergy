@@ -13,7 +13,6 @@
  * of globals.css rather than nineteen class lists.
  */
 
-import { BrandSection } from '@/components/brand-section';
 import { Hero } from '@/components/hero';
 import { BrandBoard, type BrandBoardEntry } from '@/components/brand-board';
 import { ProductSlider } from '@/components/product-slider';
@@ -30,7 +29,7 @@ import {
 } from '@/components/sections';
 import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
-import { loadVitrin, type BrandBand } from '@/lib/medusa/vitrin';
+import { loadVitrin } from '@/lib/medusa/vitrin';
 
 export default async function HomePage() {
   const [{ byId, byBrandSlug, brandFromSlug, mixed }, vitrin] = await Promise.all([
@@ -82,27 +81,6 @@ export default async function HomePage() {
   const banner = (key: keyof typeof vitrin.banners, fallback: NonNullable<(typeof vitrin.banners)['wide']>) =>
     vitrin.banners[key] ?? fallback;
 
-  /* Only bands whose brand still has products — a band with no products
-     would be a logo over an empty shelf. */
-  const brandBands = vitrin.brandBands.filter((band) => brandFromSlug(band.brandHandle));
-
-  /** The brand showcases retained below the paired product sliders. */
-  const brandBand = (band: BrandBand) => {
-    const chosen = band.productIds.map((id) => byId(id)).filter((p): p is Product => Boolean(p));
-    return (
-      <Section key={band.brandHandle}>
-        <BrandSection
-          brand={brandFromSlug(band.brandHandle) ?? band.brandHandle}
-          tagline={band.tagline}
-          href={`/marka/${band.brandHandle}`}
-          logo={band.logo}
-          banner={band.banner || undefined}
-          products={chosen.length > 0 ? chosen.slice(0, 4) : byBrandSlug(band.brandHandle).slice(0, 4)}
-        />
-      </Section>
-    );
-  };
-
   return (
     <>
       {/* 04 — hero band. `first`: nothing precedes it, so it keeps the tight
@@ -151,11 +129,6 @@ export default async function HomePage() {
           />
         </div>
       </Section>
-
-      {/* 08c — the showcases that followed the former "Neden SEENERGY" band.
-             The client removed the range from "Süper Fırsat Ürünleri" through
-             that band, including the first four brand showcases. */}
-      {brandBands.slice(4).map(brandBand)}
 
       {/* 12 — tabbed product block: 3 tabs + 5×3 grid.
              The largest single section on the reference homepage. */}
