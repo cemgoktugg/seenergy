@@ -511,7 +511,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
            exactly the upper bound of the `header+nav` critical band already
            declared in visual.config.mjs, so the diff budget still applies
            unchanged. */
-        className="relative hidden bg-brand-nav dt:block dt:h-[48px]"
+        className="nav-metal relative hidden dt:block dt:h-[48px]"
         onMouseLeave={scheduleClose}
       >
         <div className="container-header h-full">
@@ -549,13 +549,15 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
                        The radius is invisible until the item has a surface,
                        i.e. on hover or open. */
                     className={`group relative flex h-full items-center justify-center rounded-t-(--card-radius) px-2.5 text-center text-[13px] font-semibold leading-[1.2] tracking-[-0.005em] transition-colors duration-(--duration-fast) ease-in-out ${
-                      open ? 'bg-chrome-soft text-white' : 'text-white/80 hover:bg-chrome-soft hover:text-white'
+                      open
+                        ? 'bg-white/[0.09] text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.18)]'
+                        : 'text-white/80 hover:bg-white/[0.07] hover:text-white hover:shadow-[inset_0_1px_0_rgb(255_255_255/0.14)]'
                     }`}
                   >
                     {item.short}
                     <span
                       aria-hidden
-                      className={`absolute inset-x-2.5 bottom-0 h-[3px] rounded-t-full bg-linear-to-r from-grad-1 to-grad-4 transition-opacity duration-(--duration-fast) group-hover:opacity-100 ${
+                      className={`absolute inset-x-2.5 bottom-0 h-[3px] rounded-t-full bg-linear-to-r from-transparent via-white to-transparent shadow-[0_0_10px_rgb(255_255_255/0.6)] transition-opacity duration-(--duration-fast) group-hover:opacity-100 ${
                         open ? 'opacity-100' : 'opacity-0'
                       }`}
                     />
