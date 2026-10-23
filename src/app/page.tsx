@@ -25,9 +25,7 @@ import {
   BlogCards,
   BrandGrid,
   DualBanners,
-  PromoProductRow,
   SeoEditorial,
-  TechBand,
   TrustRow,
 } from '@/components/sections';
 import type { Product } from '@/data/catalog';
@@ -88,15 +86,7 @@ export default async function HomePage() {
      would be a logo over an empty shelf. */
   const brandBands = vitrin.brandBands.filter((band) => brandFromSlug(band.brandHandle));
 
-  /**
-   * One brand band, rendered in two runs below.
-   *
-   * The seven showcases stay structurally identical on purpose — see
-   * BrandSection's own note: seven different layouts would read as seven
-   * competing headers rather than a rhythm. The monotony problem is the length
-   * of the unbroken run, not the sameness of the bands, so the technical band
-   * splits the run instead of the bands varying.
-   */
+  /** The brand showcases retained below the paired product sliders. */
   const brandBand = (band: BrandBand) => {
     const chosen = band.productIds.map((id) => byId(id)).filter((p): p is Product => Boolean(p));
     return (
@@ -162,66 +152,9 @@ export default async function HomePage() {
         </div>
       </Section>
 
-      {/* 07 — promo tile + 4 products */}
-      <Section label="Süper fırsat ürünleri">
-        <PromoProductRow
-          promo={(() => {
-            const promo = banner('super-firsat-promo', {
-              title: 'Süper Fırsat',
-              subtitle: 'Ürünleri',
-              href: '/kampanyalar',
-              /* A transparent CUTOUT, not the category illustration that stood
-                 here. `/mock/categories/*.svg` carry their own background
-                 plate, which was invisible while the art was a 45%-opacity
-                 texture and became an amorphous purple blob the moment the
-                 tile gave it real space. Cutouts composite cleanly onto brand
-                 colour — the same pairing CATEGORY_TILES already uses. The
-                 shop should upload cutouts here too (admin → Vitrin →
-                 Bannerlar → Süper Fırsat kartı). */
-              productImage: '/mock/products/cutout/dish-white.svg',
-              tone: 'mor',
-            });
-            // Older content kept this tile's cut-out in `image`.
-            const art = promo.productImage ?? promo.image ?? '';
-            return { title: promo.title, subtitle: promo.subtitle ?? '', href: promo.href, image: art };
-          })()}
-          products={pick('super-firsat', 4, 0)}
-        />
-      </Section>
-
-      {/* 08 — brand showcases (admin → Vitrin → Marka vitrinleri).
-             These replace the two category bands that stood here (All In One
-             Bilgisayarlar / Oto Ses ve Görüntü): the client wants this stretch
-             of the homepage organised by brand, and Tekniva leads because the
-             all-in-one band was the model for the whole series. */}
-      {brandBands.slice(0, 4).map(brandBand)}
-
-      {/* 08b — full-bleed technical band, placed INSIDE the brand run.
-             Measured: the seven showcases ran y=1793→5576 as one unbroken
-             3783px stretch on an even 541px pitch. Putting the band after all
-             seven left that stretch intact and only capped it; splitting it
-             four/three breaks the monotony where it actually occurs, into two
-             runs of roughly 1900px.
-             Figures are the shop's to set (admin → Vitrin → Neden SEENERGY). */}
-      <Section track="bleed">
-        <TechBand
-          {...(vitrin.techBand ?? {
-            eyebrow: 'Neden SEENERGY',
-            title: "Güvenlik altyapısında tedarik, tek adresten",
-            description:
-              "CCTV ve kayıt sistemlerinden network, alarm, yangın algılama ve geçiş kontrolüne, uydu ve seslendirme sistemlerine kadar güvenlik altyapısının ürünleri; hem son kullanıcıya hem kurumsal alıcıya aynı stok derinliğiyle.",
-            stats: [
-              { value: '12.000+', label: 'Katalogdaki ürün çeşidi' },
-              { value: '45+', label: 'Yetkili satıcısı olduğumuz marka' },
-              { value: '16:00', label: 'Aynı gün kargo için son saat' },
-              { value: '24 ay', label: 'Garanti kapsamındaki ürünler' },
-            ],
-            cta: { label: 'Kurumsal alım ve bayilik', href: '/toptan-satis' },
-          })}
-        />
-      </Section>
-
-      {/* 08c — the remaining showcases, after the break. */}
+      {/* 08c — the showcases that followed the former "Neden SEENERGY" band.
+             The client removed the range from "Süper Fırsat Ürünleri" through
+             that band, including the first four brand showcases. */}
       {brandBands.slice(4).map(brandBand)}
 
       {/* 12 — tabbed product block: 3 tabs + 5×3 grid.
