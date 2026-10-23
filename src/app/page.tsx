@@ -30,13 +30,17 @@ import {
 import type { Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
+import dahuaBanner from '../../public/brand-banners/dahua.jpeg';
+import hikvisionBanner from '../../public/brand-banners/hikvision.jpeg';
+import unvBanner from '../../public/brand-banners/unv.jpeg';
+import neutronBanner from '../../public/brand-banners/neutron.jpeg';
 
 /** The client's img/1–4 banners, in reading order. */
 const BRAND_BANNERS = [
-  { handle: 'dahua', name: 'Dahua', image: '/brand-banners/dahua.jpeg' },
-  { handle: 'hikvision', name: 'Hikvision', image: '/brand-banners/hikvision.jpeg' },
-  { handle: 'unv', name: 'UNV', image: '/brand-banners/unv.jpeg' },
-  { handle: 'neutron', name: 'Neutron', image: '/brand-banners/neutron.jpeg' },
+  { handle: 'dahua', name: 'Dahua', image: dahuaBanner },
+  { handle: 'hikvision', name: 'Hikvision', image: hikvisionBanner },
+  { handle: 'unv', name: 'UNV', image: unvBanner },
+  { handle: 'neutron', name: 'Neutron', image: neutronBanner },
 ];
 
 export default async function HomePage() {
