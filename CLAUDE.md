@@ -46,7 +46,15 @@ These routes are real, not placeholders:
 /sepet                Medusa cart — quantities, KDV-inclusive totals
 /odeme                checkout — address, shipping, havale/EFT or kapıda ödeme
 /siparis/[id]         order confirmation (guest-readable by the order id)
-/hesabim              sign in / register; signed in: profile and orders
+/hesabim              sign in / register; signed in: orders, /adresler,
+                      /bilgiler (profile, password)
+/siparis-takibi       guest order lookup (number + e-mail)
+/iletisim, /kurumsal, /toptan-satis, /bayi-basvurusu, /havale-bildirim,
+/is-ilanlari          request forms → admin → Talepler
+/hakkimizda, /sss, /kargo-teslimat, /iade-degisim, /garanti, /b2b-giris,
+/mesafeli-satis-sozlesmesi, /on-bilgilendirme-formu, /kvkk,
+/kvkk-aydinlatma-metni, /gizlilik, /cerez-politikasi, /kullanim-kosullari
+/markalar, /blog, /blog/[slug], /yeni-gelenler, /kampanyalar/*
 ```
 
 **Categories come from one tree: `src/data/categories.ts`** — the client's own
@@ -176,9 +184,26 @@ the file module — fill-only, it never overwrites an admin edit. The PDF link i
 `null`, which the storefront shows as "Fiyat için teklif isteyin" with a
 "Teklif İste" link instead of add-to-cart, and stock is then not reported.
 
+**Şirket bilgileri** (Vitrin block `company`): legal name, phone, WhatsApp,
+e-mail, address, hours, MERSİS, tax, KEP, bank / IBAN. Footer, contact card,
+contracts and the order page's havale details read it — change contact data
+there, never in code.
+
+**Talepler** (`inquiry` module, admin → Talepler): every storefront form —
+iletişim / teklif (`/iletisim?konu=teklif&urun=<SKU>`, which every quote
+button opens), kurumsal, toptan, bayi, havale bildirimi, iş başvurusu — goes
+through `InquiryForm` → `submitInquiry` → `POST /store/inquiries`. With no
+e-mail provider, this admin screen is where requests arrive.
+
+Corporate / help / legal pages share `InfoPage` (`src/components/info-page.tsx`,
+side menu `INFO_NAV`). Account: `/hesabim` (orders), `/hesabim/adresler`
+(Medusa address book), `/hesabim/bilgiler` (profile + password change via
+`POST /store/customers/me/password`). Checkout offers the saved addresses and
+can save a new one. `/siparis-takibi` uses `GET /store/order-lookup`.
+
 Not built yet: online card payment (iyzico/PayTR), transactional e-mail (no
-notification provider — nothing is e-mailed automatically), password reset
-(needs e-mail), the legal pages checkout links to.
+notification provider — nothing is e-mailed automatically), self-service
+password reset (needs e-mail; the sign-in form points to the contact form).
 
 ### Homepage vertical rhythm — do not set section spacing by hand
 

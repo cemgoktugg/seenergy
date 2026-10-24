@@ -5,6 +5,7 @@ import { CheckoutForm, type ShippingChoice } from '@/app/odeme/checkout-form';
 import { currentCart } from '@/lib/medusa/cart-cookie';
 import { toCartSummary } from '@/lib/medusa/cart-summary';
 import { medusa } from '@/lib/medusa/client';
+import { listAddresses } from '@/lib/medusa/customer-data';
 import { currentCustomer } from '@/lib/medusa/session';
 
 /**
@@ -36,6 +37,23 @@ export default async function CheckoutPage() {
     '/store/shipping-options',
     { query: { cart_id: cart.id }, cache: 'no-store' },
   );
+  /* The signed-in customer's address book, offered as one-click choices;
+     the default one is picked to begin with. */
+  const addresses = customer
+    ? (await listAddresses()).map((address) => ({
+        id: address.id,
+        label: address.address_name || [address.city, address.province].filter(Boolean).join(' / ') || 'Adres',
+        first_name: address.first_name ?? '',
+        last_name: address.last_name ?? '',
+        phone: address.phone?.replace(/^\+90/, '0') ?? '',
+        province: address.province ?? '',
+        district: address.city ?? '',
+        address: address.address_1 ?? '',
+        postal_code: address.postal_code ?? '',
+        is_default: address.is_default_shipping,
+      }))
+    : [];
+
   const shipping: ShippingChoice[] = shipping_options
     .map((option) => ({
       id: option.id,
@@ -61,6 +79,7 @@ export default async function CheckoutPage() {
         cart={summary}
         shipping={shipping}
         signedIn={customer !== null}
+        addresses={addresses}
         prefill={
           customer
             ? {

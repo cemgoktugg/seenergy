@@ -23,6 +23,20 @@ import { PROVINCES_SORTED } from '@/data/provinces';
 import type { CartSummary } from '@/lib/medusa/cart-summary';
 import { placeOrder } from '@/lib/medusa/checkout';
 
+/** A saved address, flattened to the form's own field names. */
+export interface SavedAddress {
+  id: string;
+  label: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  province: string;
+  district: string;
+  address: string;
+  postal_code: string;
+  is_default: boolean;
+}
+
 export interface ShippingChoice {
   id: string;
   name: string;
@@ -66,15 +80,39 @@ export function CheckoutForm({
   shipping,
   signedIn,
   prefill,
+  addresses = [],
 }: {
   cart: CartSummary;
   shipping: ShippingChoice[];
   signedIn: boolean;
+  addresses?: SavedAddress[];
   /** The signed-in customer's details; typed input wins after a failed submit. */
   prefill?: Record<string, string>;
 }) {
   const [state, action] = useActionState<CheckoutState, FormData>(placeOrder, {});
-  const v = state.values ?? prefill ?? {};
+  /* Which saved address fills the address fields ('' = a new one). The
+     fields are uncontrolled, so the group is re-keyed on a change and
+     remounts with that address's values. After a failed submit what was
+     typed wins. */
+  const [picked, setPicked] = useState(
+    state.values ? '' : (addresses.find((address) => address.is_default) ?? addresses[0])?.id ?? '',
+  );
+  const pickedAddress = addresses.find((address) => address.id === picked);
+  const v: Record<string, string> =
+    state.values ??
+    (pickedAddress
+      ? {
+          ...prefill,
+          first_name: pickedAddress.first_name,
+          last_name: pickedAddress.last_name,
+          phone: prefill?.phone || pickedAddress.phone,
+          province: pickedAddress.province,
+          district: pickedAddress.district,
+          address: pickedAddress.address,
+          postal_code: pickedAddress.postal_code,
+        }
+      : prefill) ??
+    {};
   const err = state.fieldErrors ?? {};
   const invalid = (name: string) => invalidProps(err, name);
 
@@ -116,7 +154,45 @@ export function CheckoutForm({
           </Step>
 
           <Step index={2} title="Teslimat adresi">
-            <div className="grid gap-4 md:grid-cols-2">
+            {addresses.length > 0 ? (
+              <fieldset className="mb-5">
+                <legend className="text-[13px] font-semibold text-text-primary">Kayıtlı adreslerim</legend>
+                <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                  {[...addresses, null].map((address) => {
+                    const id = address?.id ?? '';
+                    return (
+                      <label
+                        key={id || 'new'}
+                        className="flex cursor-pointer items-start gap-2.5 rounded-(--card-radius) border border-line-strong px-3.5 py-3 text-[13px] has-checked:border-brand has-checked:bg-brand-soft"
+                      >
+                        <input
+                          type="radio"
+                          name="saved_address"
+                          value={id}
+                          checked={picked === id}
+                          onChange={() => setPicked(id)}
+                          className="mt-0.5 accent-(--color-brand)"
+                        />
+                        <span className="min-w-0">
+                          <span className="block font-bold text-text-primary">
+                            {address ? address.label : 'Yeni adres gir'}
+                            {address?.is_default ? <span className="ml-1.5 text-[11px] font-semibold text-text-secondary">(varsayılan)</span> : null}
+                          </span>
+                          {address ? (
+                            <span className="mt-0.5 block truncate text-text-secondary">
+                              {address.first_name} {address.last_name} · {address.district} / {address.province}
+                            </span>
+                          ) : (
+                            <span className="mt-0.5 block text-text-secondary">Bu siparişe başka bir adres</span>
+                          )}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            ) : null}
+            <div key={picked || 'new'} className="grid gap-4 md:grid-cols-2">
               <Field name="first_name" label="Ad" error={err.first_name}>
                 <input id="first_name" name="first_name" autoComplete="given-name" required defaultValue={v.first_name} className={inputClass} {...invalid('first_name')} />
               </Field>
@@ -180,6 +256,12 @@ export function CheckoutForm({
                 ))}
               </div>
               <p className="mt-2 text-[12px] text-text-secondary">Fatura adresi teslimat adresiyle aynıdır.</p>
+              {signedIn && !picked ? (
+                <label className="mt-3 flex items-center gap-2.5 text-[13px] font-medium text-text-primary">
+                  <input type="checkbox" name="save_address" defaultChecked={addresses.length === 0} className="h-4 w-4 accent-(--color-brand)" />
+                  Bu adresi adreslerime kaydet
+                </label>
+              ) : null}
 
               {invoice === 'kurumsal' ? (
                 <div className="mt-4 grid gap-4 md:grid-cols-2">

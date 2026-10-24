@@ -37,6 +37,7 @@ interface StoreOrder {
   shipping_total: number;
   tax_total: number;
   total: number;
+  payment_status?: string;
   shipping_address: {
     first_name: string | null;
     last_name: string | null;
@@ -79,7 +80,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
   try {
     [{ order }, { details }] = await Promise.all([
       medusa<{ order: StoreOrder }>(`/store/orders/${id}`, {
-        query: { fields: '*items,*shipping_address,*shipping_methods' },
+        query: { fields: '*items,*shipping_address,*shipping_methods,+payment_status' },
         cache: 'no-store',
       }),
       // The core Store API never returns order metadata; this backend route
@@ -153,6 +154,17 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
               Açıklama kısmına sipariş numaranızı (<strong className="font-mono">{reference}</strong>) yazın.
               Ödemeniz hesabımıza ulaştığında siparişiniz kargoya verilir.
             </p>
+            {/* The system provider marks a placed order "authorized"; money is in
+                only once the shop captures it in the admin. */}
+            {!['captured', 'partially_captured', 'refunded'].includes(order.payment_status ?? '') ? (
+              <Link
+                href={`/havale-bildirim?siparis=${reference}`}
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-surface-card px-4 py-2 text-[13px] font-semibold text-text-primary hover:border-text-primary"
+              >
+                <Landmark size={15} strokeWidth={2} aria-hidden />
+                Ödemeyi yaptım, bildir
+              </Link>
+            ) : null}
           </section>
         ) : method === 'kapida' ? (
           <section className="rounded-(--panel-radius) border border-brand bg-brand-soft p-4 dt:p-5">

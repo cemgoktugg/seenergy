@@ -39,6 +39,7 @@ const FIELDS = [
   'tax_number',
   'note',
   'agreement',
+  'save_address',
 ] as const;
 
 type Values = Record<(typeof FIELDS)[number], string>;
@@ -173,6 +174,20 @@ export async function placeOrder(_previous: CheckoutState, form: FormData): Prom
           : 'Mağaza sunucusuna ulaşılamıyor. Birazdan tekrar deneyin.',
       values: echo,
     };
+  }
+
+  // A signed-in customer asked to keep a new address: add it to their book.
+  // Best effort — the order is placed either way.
+  if (values.save_address === 'on') {
+    const token = await readToken();
+    if (token) {
+      await medusa('/store/customers/me/addresses', {
+        method: 'POST',
+        token,
+        cache: 'no-store',
+        body: { ...address, address_name: values.district, is_default_shipping: true, is_default_billing: true },
+      }).catch(() => undefined);
+    }
   }
 
   // The cart is an order now; the next visit starts a fresh one.

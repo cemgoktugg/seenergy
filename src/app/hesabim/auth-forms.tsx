@@ -80,6 +80,15 @@ export function AuthForms({ next }: { next: string }) {
           </Field>
         </div>
         <Submit idle="Giriş Yap" busy="Giriş yapılıyor…" />
+        {/* No e-mail provider yet, so no self-service reset link to send:
+            the request goes to the shop, which can reset it from the admin. */}
+        <p className="mt-3 text-[12.5px] text-text-secondary">
+          Şifrenizi mi unuttunuz?{' '}
+          <Link href="/iletisim?konu=genel" className="font-semibold text-text-primary underline underline-offset-2">
+            Bize yazın
+          </Link>
+          , şifrenizi sıfırlayalım.
+        </p>
       </form>
 
       <form action={registerAction} noValidate className={panel}>
