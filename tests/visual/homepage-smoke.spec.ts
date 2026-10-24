@@ -105,7 +105,7 @@ test.describe('homepage', () => {
     await gotoStable(page, '/');
 
     // The logo wall sits in the "Markalarımız" band, under the brand cards.
-    await expect(page.locator('.brand-wall-plate')).toBeVisible();
+    await expect(page.getByRole('region', { name: 'Marka duvarı' })).toBeVisible();
     await expect(page.getByRole('contentinfo')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Popüler Kategoriler' })).toBeVisible();
   });

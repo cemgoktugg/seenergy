@@ -894,10 +894,8 @@ html.reveal-ready [data-reveal]:not(.is-revealed) {
     display: none;
   }
 
-  /* 104px, not the marquee's 120: at 120 exactly three marks filled a 390px
-     row and nothing hinted there was more. 3.4 per row shows the next edge. */
+  /* The chips size to their names; snapping keeps a swipe landing on one. */
   .brand-track > li {
-    width: 104px;
     scroll-snap-align: start;
   }
 

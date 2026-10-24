@@ -505,87 +505,94 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
 }
 
 /**
- * Brand wall.
- * Measured: 47 logos on a ~119 × 70 tile across the 1320 container — 11 per row,
- * 5 rows, band height 365. A 10-column grid of 30 logos came out at 234px and
- * was the single largest remaining vertical error on the page.
+ * Brand wall — redesigned 2026-10-24 ("daha modern"). The generated mock
+ * marks (a tiny icon plus the name, unreadable at wall size) gave way to
+ * chips: a steel monogram and the brand name on a card that lifts on hover.
+ * A fixed label on the left gives the count and the way to /markalar; two
+ * rows run opposite ways behind it, fading in and out at the edges, paused
+ * while the pointer or focus is on the wall. The chips follow the theme, so
+ * the panel no longer needs `brand-wall-plate` to pin it light.
+ *
+ * Touch (`@media (hover: none)` in globals.css): no animation — a finger
+ * cannot pause it — and the rows become swipeable instead.
  */
 export function BrandGrid() {
-  // Two rows running opposite ways. Split rather than duplicated, so all 45
-  // brands appear exactly once per row-pair.
+  // Two rows running opposite ways. Split rather than duplicated, so every
+  // brand appears exactly once per row-pair.
   const half = Math.ceil(BRANDS.length / 2);
   const rows = [BRANDS.slice(0, half), BRANDS.slice(half)];
 
-  /* `brand-wall-plate` is an opt-in companion class, not decoration: in dark
-     mode it pins this one surface light. Every one of the 45 generated marks
-     carries an opaque white plate, so on a dark surface this panel would
-     render as 45 white rectangles. See the dark block in globals.css.
-     (Above `return (`, not inside it — third time this session.) */
   return (
-    <div className="brand-wall-plate group/wall overflow-hidden rounded-(--card-radius) border border-line bg-surface-card py-4">
-      {/* Each row fades out at both ends, so marks glide in and out of the
-          panel instead of being guillotined at its edge. */}
-      {rows.map((row, index) => (
-        <div
-          key={index}
-          className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_7%,#000_93%,transparent)]"
+    <div
+      role="region"
+      aria-label="Marka duvarı"
+      className="group/wall relative isolate flex overflow-hidden rounded-(--panel-radius) border border-line bg-linear-to-br from-surface-card to-surface-page shadow-e1"
+    >
+      <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 -z-10 opacity-60" />
+
+      {/* --- the fixed label ------------------------------------------- */}
+      <div className="relative z-10 hidden w-[230px] shrink-0 flex-col justify-center border-r border-line bg-surface-card/80 px-6 py-6 backdrop-blur lg:flex">
+        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+          <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
+          Marka ağı
+        </p>
+        <p className="mt-2 text-[40px] font-extrabold leading-none tracking-tight text-text-primary tabular-nums">
+          {BRANDS.length}+
+        </p>
+        <p className="mt-1.5 text-[13px] leading-snug text-text-secondary">marka, tek çatı altında</p>
+        <Link
+          href="/markalar"
+          className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-[12.5px] font-bold text-white transition-colors duration-(--duration-fast) hover:bg-brand-dark"
         >
-          <ul
-            className={`brand-track flex w-max items-center ${
-              index === 0
-                ? 'animate-[brand-marquee_64s_linear_infinite]'
-                : 'animate-[brand-marquee_78s_linear_infinite] [animation-direction:reverse]'
-            } group-hover/wall:[animation-play-state:paused] group-focus-within/wall:[animation-play-state:paused]`}
+          Tümünü gör
+          <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
+        </Link>
+      </div>
+
+      {/* --- the moving rows --------------------------------------------- */}
+      <div className="min-w-0 flex-1 space-y-3 py-5">
+        {rows.map((row, index) => (
+          <div
+            key={index}
+            className="overflow-hidden [mask-image:linear-gradient(90deg,transparent,#000_8%,#000_92%,transparent)]"
           >
-            {/* The list, then the same list again for the seamless wrap. The
-                second copy is hidden from assistive tech and from the tab
-                order — it is the same 22 links a second time. */}
-            {[false, true].map((duplicate) =>
-              row.map((brand) => (
-                <li
-                  key={`${duplicate ? 'dup-' : ''}${brand.href}`}
-                  aria-hidden={duplicate || undefined}
-                  className={`grid h-[70px] w-[120px] shrink-0 place-items-center lg:h-[78px] lg:w-[150px] ${
-                    duplicate ? 'brand-dup' : ''
-                  }`}
-                >
-                  <Link
-                    href={brand.href}
-                    /* The duplicate exists only to make the loop seamless, so
-                       it is skipped by the keyboard as well as by AT. */
-                    tabIndex={duplicate ? -1 : undefined}
-                    className="block"
-                    title={brand.name}
+            <ul
+              className={`brand-track flex w-max items-center gap-3 px-1.5 py-1 ${
+                index === 0
+                  ? 'animate-[brand-marquee_70s_linear_infinite]'
+                  : 'animate-[brand-marquee_84s_linear_infinite] [animation-direction:reverse]'
+              } group-hover/wall:[animation-play-state:paused] group-focus-within/wall:[animation-play-state:paused]`}
+            >
+              {/* The list, then the same list again for the seamless wrap. The
+                  second copy is hidden from assistive tech and from the tab
+                  order — the same links a second time. */}
+              {[false, true].map((duplicate) =>
+                row.map((brand) => (
+                  <li
+                    key={`${duplicate ? 'dup-' : ''}${brand.href}`}
+                    aria-hidden={duplicate || undefined}
+                    className={`shrink-0 ${duplicate ? 'brand-dup' : ''}`}
                   >
-                    {/* Intrinsic size of the generated brand marks (viewBox
-                        "0 0 220 90"). With `h-9 w-auto` the height was fixed
-                        but the width was not reserved, so all 45 logos resolved
-                        to zero width and the wall reflowed as they decoded —
-                        the one genuine layout shift on this page. Declaring the
-                        real ratio lets the browser reserve the box first. */}
-                    <img
-                      src={brand.image}
-                      alt={duplicate ? '' : brand.name}
-                      width={220}
-                      height={90}
-                      /* opacity-75, not 60. The 45 marks are painted in six
-                         brand colours, and `grayscale` is luminance-based, so
-                         they resolve to six different greys spanning 50 tones
-                         (51..101). At 60% over white that put the blue and teal
-                         marks — 30 of the 45 — at 2.53:1, under the 3:1 WCAG
-                         1.4.11 floor for graphical objects, and made the wall
-                         look patchy. At 75% the range is 3.37:1..5.74:1, so
-                         every mark clears the floor. */
-                      className="mx-auto h-9 w-auto opacity-75 grayscale transition duration-(--duration-base) hover:opacity-100 hover:grayscale-0 lg:h-12"
-                      loading="lazy"
-                    />
-                  </Link>
-                </li>
-              )),
-            )}
-          </ul>
-        </div>
-      ))}
+                    <Link
+                      href={brand.href}
+                      tabIndex={duplicate ? -1 : undefined}
+                      className="group/chip flex h-12 items-center gap-2.5 rounded-full border border-line bg-surface-card py-1.5 pl-1.5 pr-5 shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-0.5 hover:border-line-strong hover:shadow-e2"
+                    >
+                      <span
+                        aria-hidden
+                        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-linear-to-br from-grad-2 to-grad-4 text-[12px] font-extrabold tracking-tight text-white transition-transform duration-(--duration-base) group-hover/chip:scale-110"
+                      >
+                        {brand.name.slice(0, 2).toUpperCase()}
+                      </span>
+                      <span className="whitespace-nowrap text-[14px] font-semibold text-text-primary">{brand.name}</span>
+                    </Link>
+                  </li>
+                )),
+              )}
+            </ul>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
