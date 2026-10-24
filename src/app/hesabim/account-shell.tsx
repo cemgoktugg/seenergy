@@ -46,7 +46,7 @@ export function AccountShell({
                 {initials}
               </span>
               <span className="min-w-0">
-                <span className="block text-[11px] font-bold uppercase tracking-[0.14em] text-white/55">Hesabım</span>
+                <span className="block text-[12px] font-bold uppercase tracking-[0.14em] text-white/55">Hesabım</span>
                 <span className="block truncate text-[16px] font-extrabold">{name || 'Hoş geldiniz'}</span>
                 <span className="block truncate text-[12px] text-white/65">{customer.email}</span>
               </span>
@@ -61,7 +61,7 @@ export function AccountShell({
                     <Link
                       href={href}
                       aria-current={active ? 'page' : undefined}
-                      className={`flex items-center gap-2.5 rounded-(--card-radius) px-3 py-2.5 text-[13.5px] font-semibold transition-colors ${
+                      className={`flex items-center gap-2.5 rounded-(--card-radius) px-3 py-2.5 text-[14px] font-semibold transition-colors ${
                         active ? 'bg-brand text-white' : 'text-text-primary hover:bg-surface-page'
                       }`}
                     >
@@ -76,7 +76,7 @@ export function AccountShell({
                 <form action={signOut}>
                   <button
                     type="submit"
-                    className="flex w-full items-center gap-2.5 rounded-(--card-radius) px-3 py-2.5 text-left text-[13.5px] font-semibold text-text-secondary transition-colors hover:bg-danger/10 hover:text-danger-ink"
+                    className="flex w-full items-center gap-2.5 rounded-(--card-radius) px-3 py-2.5 text-left text-[14px] font-semibold text-text-secondary transition-colors hover:bg-danger/10 hover:text-danger-ink"
                   >
                     <LogOut size={16} strokeWidth={2} aria-hidden className="shrink-0" />
                     Çıkış yap
@@ -90,11 +90,11 @@ export function AccountShell({
         <div className="min-w-0">
           <div className="flex flex-wrap items-end justify-between gap-3">
             <div>
-              <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary dt:text-[11px]">
+              <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
                 <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
                 Hesabım
               </p>
-              <h1 className="mt-1.5 text-[24px] font-extrabold tracking-tight text-text-primary dt:text-[30px]">{title}</h1>
+              <h1 className="mt-1.5 text-[24px] font-extrabold tracking-tight text-text-primary dt:text-[32px]">{title}</h1>
             </div>
             {action}
           </div>

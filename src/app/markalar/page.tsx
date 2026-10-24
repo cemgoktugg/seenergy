@@ -65,8 +65,8 @@ export default async function BrandsPage() {
         <span className="font-medium text-text-primary">Markalar</span>
       </nav>
 
-      <h1 className="mt-3 text-[26px] font-extrabold tracking-tight text-text-primary dt:text-[34px]">Markalarımız</h1>
-      <p className="mt-2 max-w-[70ch] text-[14.5px] leading-relaxed text-text-secondary">
+      <h1 className="mt-3 text-[24px] font-extrabold tracking-tight text-text-primary dt:text-[32px]">Markalarımız</h1>
+      <p className="mt-2 max-w-[70ch] text-[14px] leading-relaxed text-text-secondary">
         Kendi markamız SEENERGY ve resmi yetkili satıcısı olduğumuz güvenlik markaları ile katalogdaki tüm
         markalar. Bir markaya tıklayarak ürünlerini görebilirsiniz.
       </p>
@@ -94,8 +94,8 @@ export default async function BrandsPage() {
                   {brand.name.slice(0, 2).toUpperCase()}
                 </span>
                 <span className="min-w-0">
-                  <span className="block truncate text-[13.5px] font-bold text-text-primary">{brand.name}</span>
-                  <span className="block text-[11.5px] text-text-secondary">{brand.count} ürün</span>
+                  <span className="block truncate text-[14px] font-bold text-text-primary">{brand.name}</span>
+                  <span className="block text-[12px] text-text-secondary">{brand.count} ürün</span>
                 </span>
               </Link>
             </li>

@@ -45,6 +45,7 @@ import { Check, Heart, MessageSquareQuote, Scale, ShoppingCart } from 'lucide-re
 import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
 import { discountPercent, formatPrice, PRICE_ON_REQUEST, priceLabel, type Product } from '@/data/catalog';
+import { imageProps } from '@/lib/image';
 
 /** Below this many units the card says so. It is the real Medusa stock. */
 const LOW_STOCK = 5;
@@ -124,14 +125,14 @@ export function ProductCard({
       style={featured ? ({ '--i': index } as CSSProperties) : undefined}
       className={`group relative flex h-full flex-col overflow-hidden border bg-surface-card transition-[box-shadow,border-color] duration-(--duration-base) ${
       compact
-        ? 'rounded-[14px] border-line-strong/60 hover:border-line-strong hover:shadow-e1'
+        ? 'rounded-(--card-radius) border-line-strong/60 hover:border-line-strong hover:shadow-e1'
         : featured
           ? 'rounded-(--card-radius) border-line shadow-e1 transition-[box-shadow,border-color,transform] hover:-translate-y-1 hover:border-line-strong hover:shadow-e3'
           : 'rounded-(--card-radius) border-line shadow-e1 hover:border-line-strong hover:shadow-e2'
     }`}>
       {/* --- image stage ------------------------------------------------ */}
       <div
-        className={`relative m-2 mb-0 overflow-hidden rounded-[calc(var(--card-radius)-4px)] ${
+        className={`relative m-2 mb-0 overflow-hidden rounded-(--card-radius) ${
           featured ? 'bg-[radial-gradient(75%_70%_at_50%_45%,#ffffff_0%,#ffffff_45%,#eef0f3_100%)]' : 'bg-white'
         }`}
       >
@@ -147,12 +148,12 @@ export function ProductCard({
             }`}
           >
             <img
-              src={image}
+              {...imageProps(image, featured ? 260 : 240)}
               alt={product.name}
               width={220}
               height={220}
               loading="lazy"
-              className={`h-full w-full rounded-md object-contain transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.04] ${
+              className={`h-full w-full rounded-(--card-radius) object-contain transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.04] ${
                 soldOut ? 'opacity-45 grayscale' : ''
               }`}
             />
@@ -168,7 +169,7 @@ export function ProductCard({
 
         {badge && (
           <span
-            className={`pointer-events-none absolute left-2 top-2 rounded-full px-2.5 py-1 text-[10.5px] font-bold leading-none tracking-[0.01em] ${badge.className}`}
+            className={`pointer-events-none absolute left-2 top-2 rounded-full px-2.5 py-1 text-[12px] font-bold leading-none tracking-[0.01em] ${badge.className}`}
           >
             {badge.label}
           </span>
@@ -210,11 +211,11 @@ export function ProductCard({
         </button>
 
         {soldOut ? (
-          <span className="pointer-events-none absolute bottom-2 left-2 rounded-full bg-ink-fixed/85 px-2.5 py-1 text-[10.5px] font-bold leading-none text-white">
+          <span className="pointer-events-none absolute bottom-2 left-2 rounded-full bg-ink-fixed/85 px-2.5 py-1 text-[12px] font-bold leading-none text-white">
             Tükendi
           </span>
         ) : lowStock ? (
-          <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[10.5px] font-bold leading-none text-warning ring-1 ring-black/5">
+          <span className="pointer-events-none absolute bottom-2 left-2 inline-flex items-center gap-1.5 rounded-full bg-white/95 px-2.5 py-1 text-[12px] font-bold leading-none text-warning ring-1 ring-black/5">
             <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-warning" />
             Son {product.stock} ürün
           </span>
@@ -229,7 +230,7 @@ export function ProductCard({
         {/* Not uppercased: under lang="tr" CSS capitalises i as İ, turning
             Tekniva into "TEKNİVA" — right for Turkish words, wrong for a
             brand's own spelling. */}
-        <p className="truncate text-[11.5px] font-semibold leading-[14px] tracking-[0.02em] text-text-secondary">
+        <p className="truncate text-[12px] font-semibold leading-[14px] tracking-[0.02em] text-text-secondary">
           {product.brand}
         </p>
 
@@ -257,7 +258,7 @@ export function ProductCard({
               <span className="line-through decoration-text-secondary/60">{formatPrice(product.compareAtPrice)}</span>
             ) : null}
             {discount !== null && discount > 0 && (
-              <span className="rounded-full bg-danger/10 px-1.5 py-[2px] text-[11px] font-bold leading-none text-danger-ink">
+              <span className="rounded-full bg-danger/10 px-1.5 py-[2px] text-[12px] font-bold leading-none text-danger-ink">
                 %{discount}
               </span>
             )}
@@ -265,7 +266,7 @@ export function ProductCard({
 
           {/* Tabular figures: prices sit in grids four and five across, and
               proportional digits make those columns visibly ragged. */}
-          <div className="flex h-[30px] items-center justify-between gap-2">
+          <div className="flex h-9 items-center justify-between gap-2">
             {product.price == null ? (
               <>
                 <p aria-hidden className="card-touch text-[13px] font-bold leading-tight text-text-primary sm:text-[14px]">
@@ -274,7 +275,7 @@ export function ProductCard({
                 <Link
                   href={quoteHref(product.sku)}
                   aria-label={`${product.name} için teklif isteyin`}
-                  className="card-quick inline-flex h-[30px] items-center gap-1.5 rounded-full border border-line-strong px-3.5 text-[13px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:border-brand hover:bg-brand hover:text-white"
+                  className="card-quick inline-flex h-9 items-center gap-1.5 rounded-full border border-line-strong px-3.5 text-[13px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:border-brand hover:bg-brand hover:text-white"
                 >
                   <MessageSquareQuote size={15} strokeWidth={2} aria-hidden />
                   Teklif İste
@@ -282,7 +283,7 @@ export function ProductCard({
               </>
             ) : (
               <>
-                <p aria-hidden className="text-[17px] font-extrabold leading-none tracking-[-0.01em] tabular-nums text-text-primary sm:text-[19px] dt:text-[20px]">
+                <p aria-hidden className="text-[16px] font-extrabold leading-none tracking-[-0.01em] tabular-nums text-text-primary sm:text-[20px] dt:text-[20px]">
                   {formatPrice(product.price)}
                 </p>
                 {/* Always on screen for a pointer — the hover-only overlay this
@@ -318,7 +319,7 @@ export function ProductCard({
             <Link
               href={quoteHref(product.sku)}
               aria-label={`${product.name} için teklif isteyin`}
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[13.5px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark"
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark"
             >
               <MessageSquareQuote size={16} strokeWidth={2} aria-hidden />
               Teklif İste
@@ -329,7 +330,7 @@ export function ProductCard({
               disabled={soldOut}
               onClick={() => void cart.add(product.variantId, 1, product.name)}
               aria-label={`${product.name} ürününü sepete ekle`}
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[13.5px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
+              className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
             >
               <ShoppingCart size={16} strokeWidth={2} aria-hidden />
               {soldOut ? 'Tükendi' : added ? 'Sepete Eklendi' : 'Sepete Ekle'}

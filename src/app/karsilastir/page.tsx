@@ -40,6 +40,7 @@ import { useCompareItems } from '@/components/compare-data';
 import { categoryMeta, discountPercent, formatPrice, PRICE_ON_REQUEST, type Product } from '@/data/catalog';
 import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { keySpecsOf, type SpecGroup } from '@/data/specs';
+import { imageProps } from '@/lib/image';
 
 type Row = { label: string; raw: string[]; cells: ReactNode[] };
 type Group = { title: string; rows: Row[] };
@@ -74,7 +75,7 @@ export default function ComparePage() {
           >
             <Scale size={28} strokeWidth={1.8} />
           </span>
-          <h1 className="mt-5 text-[24px] font-extrabold tracking-tight text-text-primary dt:text-[30px]">
+          <h1 className="mt-5 text-[24px] font-extrabold tracking-tight text-text-primary dt:text-[32px]">
             Karşılaştırma listeniz boş
           </h1>
           <p className="mt-3 text-[14px] leading-relaxed text-text-secondary">
@@ -83,7 +84,7 @@ export default function ComparePage() {
           </p>
           <Link
             href="/kategori"
-            className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-brand-dark"
+            className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-6 h-13 text-[16px] font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             <ArrowLeft size={17} strokeWidth={2} aria-hidden />
             Ürünleri keşfet
@@ -140,7 +141,7 @@ export default function ComparePage() {
         'Ürün kodu',
         products.map((p) => p.sku),
         products.map((p) => (
-          <span key={p.id} className="font-mono text-[12.5px]">
+          <span key={p.id} className="font-mono text-[13px]">
             {p.sku}
           </span>
         )),
@@ -183,7 +184,7 @@ export default function ComparePage() {
   return (
     <>
       <section className="container-main pt-4 dt:pt-6">
-        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary dt:text-[11px]">
+        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
           <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
           Karşılaştırma
         </p>
@@ -198,7 +199,7 @@ export default function ComparePage() {
             </p>
           </div>
           <div className="flex flex-wrap items-center gap-4">
-            <label className="inline-flex cursor-pointer select-none items-center gap-2.5 text-[13.5px] font-semibold text-text-primary">
+            <label className="inline-flex cursor-pointer select-none items-center gap-2.5 text-[14px] font-semibold text-text-primary">
               <input
                 type="checkbox"
                 checked={onlyDiff}
@@ -237,7 +238,7 @@ export default function ComparePage() {
             <thead>
               <tr>
                 <th scope="col" className="sticky left-0 z-10 border-b border-line bg-surface-card p-3 align-bottom">
-                  <span className="text-[11px] font-bold uppercase tracking-[0.12em] text-text-secondary">Özellik</span>
+                  <span className="text-[12px] font-bold uppercase tracking-[0.12em] text-text-secondary">Özellik</span>
                 </th>
                 {products.map((product) => {
                   const inCart = cart.quantityOf(product.variantId) > 0;
@@ -255,9 +256,9 @@ export default function ComparePage() {
                         </button>
                         <Link href={`/urun/${product.slug}`} className="group block">
                           <span className="flex h-28 items-center justify-center overflow-hidden rounded-(--card-radius) bg-white p-2 dt:h-36">
-                            <img src={product.image} alt="" loading="lazy" className="max-h-full max-w-full object-contain" />
+                            <img {...imageProps(product.image, 160)} alt="" loading="lazy" className="max-h-full max-w-full object-contain" />
                           </span>
-                          <span className="mt-3 block text-[11px] font-bold text-text-secondary">{product.brand}</span>
+                          <span className="mt-3 block text-[12px] font-bold text-text-secondary">{product.brand}</span>
                           <span className="mt-0.5 line-clamp-2 min-h-[36px] text-[13px] font-semibold leading-[1.35] text-text-primary group-hover:underline">
                             {product.name}
                           </span>
@@ -273,7 +274,7 @@ export default function ComparePage() {
                                   <span className="font-bold text-danger-ink">%{discount}</span>
                                 </p>
                               ) : null}
-                              <p className="text-[19px] font-extrabold tabular-nums text-text-primary">
+                              <p className="text-[20px] font-extrabold tabular-nums text-text-primary">
                                 {formatPrice(product.price)}
                               </p>
                             </>
@@ -349,7 +350,7 @@ function GroupRows({ group, columns, products }: { group: Group; columns: number
         <th
           colSpan={columns + 1}
           scope="colgroup"
-          className="border-b border-line bg-surface-page px-3 py-2.5 text-left text-[11px] font-bold uppercase tracking-[0.12em] text-text-primary"
+          className="border-b border-line bg-surface-page px-3 py-2.5 text-left text-[12px] font-bold uppercase tracking-[0.12em] text-text-primary"
         >
           {group.title}
         </th>
@@ -360,7 +361,7 @@ function GroupRows({ group, columns, products }: { group: Group; columns: number
           <tr key={row.label} className="border-b border-line last:border-b-0">
             <th
               scope="row"
-              className="sticky left-0 z-10 bg-surface-card p-3 align-top text-[12.5px] font-medium text-text-secondary"
+              className="sticky left-0 z-10 bg-surface-card p-3 align-top text-[13px] font-medium text-text-secondary"
             >
               <span className="flex items-start gap-1.5">
                 {different && (

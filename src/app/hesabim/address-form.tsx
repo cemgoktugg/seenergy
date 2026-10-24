@@ -36,7 +36,7 @@ export function AddressForm({ initial }: { initial: AddressValues }) {
     <form action={action} noValidate className="rounded-(--panel-radius) border border-line bg-surface-card p-5 shadow-e1 dt:p-6">
       {initial.id ? <input type="hidden" name="id" value={initial.id} /> : null}
       {state.error ? (
-        <p role="alert" className="mb-4 rounded-(--card-radius) border border-danger/30 bg-danger/5 px-3.5 py-2.5 text-[13.5px] font-medium text-danger-ink">
+        <p role="alert" className="mb-4 rounded-(--card-radius) border border-danger/30 bg-danger/5 px-3.5 py-2.5 text-[14px] font-medium text-danger-ink">
           {state.error}
         </p>
       ) : null}
@@ -85,7 +85,7 @@ export function AddressForm({ initial }: { initial: AddressValues }) {
           <input id="postal_code" name="postal_code" inputMode="numeric" maxLength={5} defaultValue={str('postal_code')} className={inputClass} {...invalidProps(err, 'postal_code')} />
         </Field>
       </div>
-      <label className="mt-5 flex items-center gap-2.5 text-[13.5px] font-medium text-text-primary">
+      <label className="mt-5 flex items-center gap-2.5 text-[14px] font-medium text-text-primary">
         <input type="checkbox" name="is_default" defaultChecked={Boolean(initial.is_default)} className="h-4 w-4 accent-[var(--color-brand)]" />
         Varsayılan teslimat adresim olsun
       </label>

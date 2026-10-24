@@ -11,7 +11,7 @@ import { changePassword, updateProfile, type FormState } from '@/lib/medusa/acco
 function Notice({ state }: { state: FormState }) {
   if (state.ok) {
     return (
-      <p role="status" className="mb-4 flex items-center gap-2 rounded-(--card-radius) border border-success/30 bg-success/5 px-3.5 py-2.5 text-[13.5px] font-medium text-success-ink">
+      <p role="status" className="mb-4 flex items-center gap-2 rounded-(--card-radius) border border-success/30 bg-success/5 px-3.5 py-2.5 text-[14px] font-medium text-success-ink">
         <CheckCircle2 size={16} strokeWidth={2} aria-hidden />
         {state.ok}
       </p>
@@ -19,7 +19,7 @@ function Notice({ state }: { state: FormState }) {
   }
   if (state.error) {
     return (
-      <p role="alert" className="mb-4 rounded-(--card-radius) border border-danger/30 bg-danger/5 px-3.5 py-2.5 text-[13.5px] font-medium text-danger-ink">
+      <p role="alert" className="mb-4 rounded-(--card-radius) border border-danger/30 bg-danger/5 px-3.5 py-2.5 text-[14px] font-medium text-danger-ink">
         {state.error}
       </p>
     );

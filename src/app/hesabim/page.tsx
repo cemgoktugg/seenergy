@@ -7,6 +7,7 @@ import { AuthForms } from '@/app/hesabim/auth-forms';
 import { formatPrice } from '@/data/catalog';
 import { medusa } from '@/lib/medusa/client';
 import { currentCustomer, readToken } from '@/lib/medusa/session';
+import { imageProps } from '@/lib/image';
 
 /**
  * Account — `/hesabim`.
@@ -63,7 +64,7 @@ export default async function AccountPage({
   if (!customer) {
     return (
       <div className="container-main pb-12 pt-4 dt:pt-6">
-        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary dt:text-[11px]">
+        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
           <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
           Hesabım
         </p>
@@ -127,9 +128,9 @@ export default async function AccountPage({
         {orders.length === 0 ? (
           <div className="px-5 py-12 text-center">
             <Package aria-hidden size={30} strokeWidth={1.8} className="mx-auto text-text-secondary" />
-            <p className="mt-3 text-[15px] font-semibold text-text-primary">Henüz siparişiniz yok.</p>
+            <p className="mt-3 text-[16px] font-semibold text-text-primary">Henüz siparişiniz yok.</p>
             <p className="mt-1 text-[13px] text-text-secondary">Verdiğiniz siparişler burada listelenir.</p>
-            <Link href="/" className="mt-5 inline-flex rounded-full bg-brand px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-brand-dark">
+            <Link href="/" className="mt-5 inline-flex items-center rounded-full bg-brand px-5 h-11 text-[14px] font-semibold text-white hover:bg-brand-dark">
               Alışverişe başla
             </Link>
           </div>
@@ -147,7 +148,7 @@ export default async function AccountPage({
                       <span key={item.id} className="grid h-12 w-12 place-items-center overflow-hidden rounded-(--card-radius) border border-line bg-white p-1 shadow-e1">
                         {item.thumbnail ? (
                           // eslint-disable-next-line @next/next/no-img-element
-                          <img src={item.thumbnail} alt="" loading="lazy" className="h-full w-full object-contain" />
+                          <img {...imageProps(item.thumbnail, 48)} alt="" loading="lazy" className="h-full w-full object-contain" />
                         ) : (
                           <Package size={18} strokeWidth={1.8} aria-hidden className="text-text-secondary" />
                         )}
@@ -156,19 +157,19 @@ export default async function AccountPage({
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="flex flex-wrap items-center gap-2">
-                      <span className="font-mono text-[13.5px] font-bold text-text-primary">SE-{order.display_id}</span>
-                      <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold ${toneClass[status.tone]}`}>{status.label}</span>
+                      <span className="font-mono text-[14px] font-bold text-text-primary">SE-{order.display_id}</span>
+                      <span className={`rounded-full px-2.5 py-0.5 text-[12px] font-bold ${toneClass[status.tone]}`}>{status.label}</span>
                     </p>
-                    <p className="mt-0.5 text-[12.5px] text-text-secondary">
+                    <p className="mt-0.5 text-[13px] text-text-secondary">
                       {new Date(order.created_at).toLocaleDateString('tr-TR', { dateStyle: 'long' })} · {count} ürün
                     </p>
                   </div>
-                  <span className="text-[15px] font-extrabold tabular-nums text-text-primary">{formatPrice(order.total)}</span>
+                  <span className="text-[16px] font-extrabold tabular-nums text-text-primary">{formatPrice(order.total)}</span>
                   <div className="flex w-full flex-wrap gap-2 sm:w-auto">
                     {transfer ? (
                       <Link
                         href={`/havale-bildirim?siparis=SE-${order.display_id}`}
-                        className="inline-flex items-center gap-1.5 rounded-full border border-line-strong px-3.5 py-2 text-[12.5px] font-semibold text-text-primary hover:border-text-primary"
+                        className="inline-flex items-center gap-1.5 rounded-full border border-line-strong px-3.5 h-9 text-[13px] font-semibold text-text-primary hover:border-text-primary"
                       >
                         <Landmark size={14} strokeWidth={2} aria-hidden />
                         Havale bildir
@@ -176,7 +177,7 @@ export default async function AccountPage({
                     ) : null}
                     <Link
                       href={`/siparis/${order.id}`}
-                      className="inline-flex items-center gap-1 rounded-full bg-brand px-3.5 py-2 text-[12.5px] font-semibold text-white hover:bg-brand-dark"
+                      className="inline-flex items-center gap-1 rounded-full bg-brand px-3.5 h-9 text-[13px] font-semibold text-white hover:bg-brand-dark"
                     >
                       Detay
                       <ChevronRight size={14} strokeWidth={2.25} aria-hidden />

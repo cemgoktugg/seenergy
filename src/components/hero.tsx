@@ -159,7 +159,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                   <div className="relative sm:max-w-[44%]">
                     {slide.eyebrow ? (
                       <p
-                        className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/65 dt:text-[11px] ${active ? RISE : ''}`}
+                        className={`flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-white/65 ${active ? RISE : ''}`}
                         style={{ animationDelay: '40ms' }}
                       >
                         <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
@@ -170,7 +170,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                     {/* As authored, not uppercased: a sentence-case headline
                         reads faster, and the shop's own capitalisation stays. */}
                     <h2
-                      className={`mt-2 line-clamp-2 text-[22px] font-extrabold leading-[1.08] tracking-[-0.02em] text-white sm:line-clamp-3 sm:text-[28px] md:text-[34px] dt:mt-3 dt:text-[42px] ${active ? RISE : ''}`}
+                      className={`mt-2 line-clamp-2 text-[24px] font-extrabold leading-[1.08] tracking-[-0.02em] text-white sm:line-clamp-3 sm:text-[32px] md:text-[32px] dt:mt-3 dt:text-[40px] ${active ? RISE : ''}`}
                       style={{ animationDelay: '110ms' }}
                     >
                       {slide.title}

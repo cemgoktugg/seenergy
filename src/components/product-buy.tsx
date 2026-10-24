@@ -171,7 +171,7 @@ export function ProductBuy({ product }: { product: Product }) {
             type="button"
             disabled={blocked}
             onClick={() => void buyNow()}
-            className="mt-2.5 flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-text-primary bg-surface-card text-[15px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card disabled:cursor-not-allowed disabled:opacity-40"
+            className="mt-2.5 flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-text-primary bg-surface-card text-[16px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card disabled:cursor-not-allowed disabled:opacity-40"
           >
             <Zap size={17} strokeWidth={2.25} aria-hidden />
             Hemen Al
@@ -200,9 +200,9 @@ export function ProductBuy({ product }: { product: Product }) {
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface-card/95 px-3 py-2.5 shadow-e3 backdrop-blur dt:hidden">
         <div className="flex items-center gap-3">
           <div className="min-w-0">
-            <p className="truncate text-[11px] text-text-secondary">{product.sku || product.brand}</p>
+            <p className="truncate text-[12px] text-text-secondary">{product.sku || product.brand}</p>
             <p
-              className={`font-extrabold leading-tight tabular-nums text-text-primary ${onRequest ? 'text-[13px]' : 'text-[17px]'}`}
+              className={`font-extrabold leading-tight tabular-nums text-text-primary ${onRequest ? 'text-[13px]' : 'text-[16px]'}`}
             >
               {priceLabel(product.price)}
             </p>

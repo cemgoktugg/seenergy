@@ -37,7 +37,7 @@ export default function FavouritesPage() {
           >
             <Heart size={22} strokeWidth={2} />
           </span>
-          <h1 className="mt-4 text-[24px] font-extrabold tracking-tight text-text-primary dt:text-[30px]">
+          <h1 className="mt-4 text-[24px] font-extrabold tracking-tight text-text-primary dt:text-[32px]">
             Favori listeniz boş
           </h1>
           <p className="mt-3 text-[14px] leading-relaxed text-text-secondary">
@@ -46,7 +46,7 @@ export default function FavouritesPage() {
           </p>
           <Link
             href="/"
-            className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-[16px] font-semibold text-white transition-colors hover:bg-brand-dark"
+            className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-6 h-13 text-[16px] font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             <ArrowLeft size={17} strokeWidth={2} aria-hidden />
             Ürünlere göz at
@@ -59,7 +59,7 @@ export default function FavouritesPage() {
   return (
     <>
       <section className="container-main pt-4 dt:pt-6">
-        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary dt:text-[11px]">
+        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
           <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
           Favoriler
         </p>

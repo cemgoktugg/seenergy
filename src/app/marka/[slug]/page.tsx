@@ -64,7 +64,7 @@ export default async function BrandPage({
     return (
       <div className="container-main py-16">
         <div className="mx-auto max-w-2xl rounded-(--panel-radius) border border-line bg-surface-card shadow-e1 px-6 py-12 text-center">
-          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+          <p className="font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
             Katalog kapsamı
           </p>
           <h1 className="mt-3 text-[20px] font-extrabold tracking-tight text-text-primary dt:text-[24px]">

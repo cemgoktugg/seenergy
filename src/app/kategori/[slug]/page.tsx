@@ -44,14 +44,14 @@ function Chip({ href, label, count, active }: { href: string; label: string; cou
     <Link
       href={href}
       aria-current={active ? 'page' : undefined}
-      className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-semibold transition-colors duration-(--duration-fast) ${
+      className={`inline-flex h-9 items-center gap-1.5 rounded-full border px-3.5 text-[13px] font-semibold transition-colors duration-(--duration-fast) ${
         active
           ? 'border-brand bg-brand text-white'
           : 'border-line-strong bg-surface-card text-text-primary hover:border-brand'
       }`}
     >
       {label}
-      <span className={`text-[11px] font-medium tabular-nums ${active ? 'text-white/70' : 'text-text-secondary'}`}>
+      <span className={`text-[12px] font-medium tabular-nums ${active ? 'text-white/70' : 'text-text-secondary'}`}>
         {count}
       </span>
     </Link>
@@ -72,7 +72,7 @@ export default async function CategoryPage({
     return (
       <div className="container-main py-16">
         <div className="mx-auto max-w-2xl rounded-(--panel-radius) border border-line bg-surface-card shadow-e1 px-6 py-12 text-center">
-          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+          <p className="font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
             Katalog kapsamı
           </p>
           <h1 className="mt-3 text-[20px] font-extrabold tracking-tight text-text-primary dt:text-[24px]">
@@ -86,7 +86,7 @@ export default async function CategoryPage({
               <li key={node.slug}>
                 <Link
                   href={categoryHref(node.slug)}
-                  className="inline-flex rounded-full border border-line-strong px-3 py-1.5 text-[13px] font-medium text-text-primary transition-colors hover:border-brand hover:bg-brand hover:text-white"
+                  className="inline-flex h-9 items-center rounded-full border border-line-strong px-3.5 text-[13px] font-medium text-text-primary transition-colors hover:border-brand hover:bg-brand hover:text-white"
                 >
                   {node.label}
                 </Link>

@@ -63,7 +63,7 @@ export default async function OrderTrackingPage({
     >
       <form method="get" action="/siparis-takibi" className="not-prose rounded-(--panel-radius) border border-line bg-surface-page p-5">
         {error ? (
-          <p role="alert" className="mb-4 rounded-(--card-radius) border border-danger/30 bg-danger/5 px-3.5 py-2.5 text-[13.5px] font-medium text-danger-ink">
+          <p role="alert" className="mb-4 rounded-(--card-radius) border border-danger/30 bg-danger/5 px-3.5 py-2.5 text-[14px] font-medium text-danger-ink">
             {error}
           </p>
         ) : null}
@@ -77,7 +77,7 @@ export default async function OrderTrackingPage({
         </div>
         <button
           type="submit"
-          className="mt-5 inline-flex h-12 items-center gap-2 rounded-full bg-brand px-6 text-[15px] font-bold text-white shadow-e2 transition-[transform,background-color] hover:-translate-y-px hover:bg-brand-dark"
+          className="mt-5 inline-flex h-12 items-center gap-2 rounded-full bg-brand px-6 text-[16px] font-bold text-white shadow-e2 transition-[transform,background-color] hover:-translate-y-px hover:bg-brand-dark"
         >
           <Search size={17} strokeWidth={2} aria-hidden />
           Siparişi bul

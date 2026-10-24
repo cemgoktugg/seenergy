@@ -66,7 +66,7 @@ export default async function CheckoutPage() {
   return (
     <>
       <section className="container-main pt-4 dt:pt-6">
-        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary dt:text-[11px]">
+        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
           <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
           Ödeme
         </p>

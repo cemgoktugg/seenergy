@@ -54,7 +54,7 @@ export default async function SearchPage({
           >
             <Search size={22} strokeWidth={2} />
           </span>
-          <h1 className="mt-4 text-[24px] font-extrabold tracking-tight text-text-primary dt:text-[30px]">
+          <h1 className="mt-4 text-[24px] font-extrabold tracking-tight text-text-primary dt:text-[32px]">
             Ne aramıştınız?
           </h1>
           <p className="mt-3 text-[14px] leading-relaxed text-text-secondary">
@@ -65,7 +65,7 @@ export default async function SearchPage({
         </div>
 
         <section className="mx-auto mt-10 max-w-3xl" aria-label="Kategoriler">
-          <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-text-secondary">
+          <p className="text-[12px] font-bold uppercase tracking-[0.12em] text-text-secondary">
             Kategoriler
           </p>
           <ul className="mt-3 flex flex-wrap gap-1.5">
@@ -83,7 +83,7 @@ export default async function SearchPage({
             ))}
           </ul>
 
-          <p className="mt-8 text-[11px] font-bold uppercase tracking-[0.12em] text-text-secondary">
+          <p className="mt-8 text-[12px] font-bold uppercase tracking-[0.12em] text-text-secondary">
             Markalar
           </p>
           <ul className="mt-3 flex flex-wrap gap-1.5">
@@ -109,7 +109,7 @@ export default async function SearchPage({
     return (
       <div className="container-main py-14 dt:py-20">
         <div className="mx-auto max-w-2xl rounded-(--panel-radius) border border-line bg-surface-card shadow-e1 px-6 py-12 text-center">
-          <p className="font-mono text-[11px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+          <p className="font-mono text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
             0 sonuç
           </p>
           <h1 className="mt-3 text-[20px] font-extrabold tracking-tight text-text-primary dt:text-[24px]">

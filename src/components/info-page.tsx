@@ -87,15 +87,15 @@ export function InfoPage({
         <article className="min-w-0">
           <header className="relative overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card px-5 py-6 shadow-e1 dt:px-8 dt:py-8">
             <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 opacity-60" />
-            <p className="relative flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary dt:text-[11px]">
+            <p className="relative flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
               <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
               {eyebrow}
             </p>
-            <h1 className="relative mt-2 text-[26px] font-extrabold leading-tight tracking-tight text-text-primary text-balance dt:text-[34px]">
+            <h1 className="relative mt-2 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary text-balance dt:text-[32px]">
               {title}
             </h1>
             {lede ? (
-              <p className="relative mt-3 max-w-[68ch] text-[14.5px] leading-relaxed text-text-secondary dt:text-[15.5px]">{lede}</p>
+              <p className="relative mt-3 max-w-[68ch] text-[14px] leading-relaxed text-text-secondary dt:text-[16px]">{lede}</p>
             ) : null}
             {updated ? <p className="relative mt-3 text-[12px] text-text-secondary">Son güncelleme: {updated}</p> : null}
           </header>
@@ -109,7 +109,7 @@ export function InfoPage({
           <nav aria-label="Kurumsal ve yardım sayfaları" className="rounded-(--panel-radius) border border-line bg-surface-card p-3 shadow-e1">
             {INFO_NAV.map((group) => (
               <div key={group.title} className="py-1.5 first:pt-0.5">
-                <p className="px-2.5 pb-1.5 pt-1 text-[10.5px] font-bold uppercase tracking-[0.14em] text-text-secondary">{group.title}</p>
+                <p className="px-2.5 pb-1.5 pt-1 text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">{group.title}</p>
                 <ul>
                   {group.links.map((link) => {
                     const active = link.href === path;
@@ -118,7 +118,7 @@ export function InfoPage({
                         <Link
                           href={link.href}
                           aria-current={active ? 'page' : undefined}
-                          className={`flex items-center justify-between gap-2 rounded-(--card-radius) px-2.5 py-2 text-[13.5px] transition-colors duration-(--duration-fast) ${
+                          className={`flex items-center justify-between gap-2 rounded-(--card-radius) px-2.5 py-2 text-[14px] transition-colors duration-(--duration-fast) ${
                             active ? 'bg-brand font-semibold text-white' : 'text-text-primary hover:bg-surface-page'
                           }`}
                         >
@@ -144,13 +144,13 @@ export function InfoPage({
 export function ContactCard({ company }: { company: Company }) {
   return (
     <div className="nav-metal relative overflow-hidden rounded-(--panel-radius) p-5 text-white shadow-e2">
-      <p className="relative text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/60">Yardım mı lazım?</p>
-      <p className="relative mt-1.5 text-[17px] font-extrabold tracking-tight">Bize ulaşın</p>
-      {company.hours ? <p className="relative mt-1 text-[12.5px] text-white/65">{company.hours}</p> : null}
+      <p className="relative text-[12px] font-bold uppercase tracking-[0.16em] text-white/60">Yardım mı lazım?</p>
+      <p className="relative mt-1.5 text-[16px] font-extrabold tracking-tight">Bize ulaşın</p>
+      {company.hours ? <p className="relative mt-1 text-[13px] text-white/65">{company.hours}</p> : null}
       <ul className="relative mt-4 space-y-2">
         {company.phone ? (
           <li>
-            <a href={telHref(company.phone)} className="flex items-center gap-2.5 rounded-(--card-radius) bg-white/[0.08] px-3 py-2.5 text-[13.5px] font-semibold transition-colors hover:bg-white/15">
+            <a href={telHref(company.phone)} className="flex items-center gap-2.5 rounded-(--card-radius) bg-white/[0.08] px-3 py-2.5 text-[14px] font-semibold transition-colors hover:bg-white/15">
               <Phone size={16} strokeWidth={2} aria-hidden />
               {company.phone}
             </a>
@@ -158,7 +158,7 @@ export function ContactCard({ company }: { company: Company }) {
         ) : null}
         {company.whatsapp ? (
           <li>
-            <a href={waHref(company.whatsapp)} target="_blank" rel="noopener" className="flex items-center gap-2.5 rounded-(--card-radius) bg-white/[0.08] px-3 py-2.5 text-[13.5px] font-semibold transition-colors hover:bg-white/15">
+            <a href={waHref(company.whatsapp)} target="_blank" rel="noopener" className="flex items-center gap-2.5 rounded-(--card-radius) bg-white/[0.08] px-3 py-2.5 text-[14px] font-semibold transition-colors hover:bg-white/15">
               <MessageCircle size={16} strokeWidth={2} aria-hidden />
               WhatsApp
             </a>
@@ -166,14 +166,14 @@ export function ContactCard({ company }: { company: Company }) {
         ) : null}
         {company.email ? (
           <li>
-            <a href={`mailto:${company.email}`} className="flex items-center gap-2.5 rounded-(--card-radius) bg-white/[0.08] px-3 py-2.5 text-[13.5px] font-semibold transition-colors hover:bg-white/15">
+            <a href={`mailto:${company.email}`} className="flex items-center gap-2.5 rounded-(--card-radius) bg-white/[0.08] px-3 py-2.5 text-[14px] font-semibold transition-colors hover:bg-white/15">
               <Mail size={16} strokeWidth={2} aria-hidden />
               <span className="truncate">{company.email}</span>
             </a>
           </li>
         ) : null}
         <li>
-          <Link href="/iletisim" className="flex items-center justify-center gap-1.5 rounded-full bg-white px-3 py-2.5 text-[13px] font-bold text-ink-fixed transition-transform hover:-translate-y-px">
+          <Link href="/iletisim" className="flex items-center justify-center gap-1.5 rounded-full bg-white px-3 h-11 text-[13px] font-bold text-ink-fixed transition-transform hover:-translate-y-px">
             İletişim formu
             <ChevronRight size={14} strokeWidth={2.5} aria-hidden />
           </Link>

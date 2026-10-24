@@ -46,7 +46,7 @@ export async function EmptyScope({ title }: { title: string }) {
         <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 opacity-60" />
         <div className="relative grid gap-6 px-5 py-7 dt:grid-cols-[minmax(0,1fr)_minmax(0,460px)] dt:gap-10 dt:px-8 dt:py-9">
           <div>
-            <p className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface-card px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary">
+            <p className="inline-flex items-center gap-2 rounded-full border border-line-strong bg-surface-card px-3 py-1 text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">
               <span aria-hidden className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-grad-3 opacity-60" />
                 <span className="relative inline-flex h-2 w-2 rounded-full bg-grad-3" />
@@ -55,7 +55,7 @@ export async function EmptyScope({ title }: { title: string }) {
             </p>
             <h2
               id="empty-scope-title"
-              className="mt-4 text-[22px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[28px]"
+              className="mt-4 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[32px]"
             >
               {title} ürünleri çok yakında burada
             </h2>
@@ -122,7 +122,7 @@ export async function EmptyScope({ title }: { title: string }) {
                   className="inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-surface-card px-3.5 py-1.5 text-[13px] font-medium text-text-primary transition-colors hover:border-brand hover:bg-brand hover:text-white"
                 >
                   {node.label}
-                  <span className="text-[11px] tabular-nums opacity-60">{byCategory(node.slug).length}</span>
+                  <span className="text-[12px] tabular-nums opacity-60">{byCategory(node.slug).length}</span>
                 </Link>
               </li>
             ))}

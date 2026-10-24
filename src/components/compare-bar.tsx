@@ -20,6 +20,7 @@ import { ArrowRight, Scale, X } from 'lucide-react';
 
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
 import { useCompareItems } from '@/components/compare-data';
+import { imageProps } from '@/lib/image';
 
 export function CompareBar() {
   const pathname = usePathname();
@@ -60,7 +61,7 @@ export function CompareBar() {
                   className="grid h-12 w-12 place-items-center overflow-hidden rounded-(--card-radius) border border-line bg-white p-1"
                 >
                   {item ? (
-                    <img src={item.image} alt={item.name} className="h-full w-full object-contain" />
+                    <img {...imageProps(item.image, 56)} alt={item.name} className="h-full w-full object-contain" />
                   ) : (
                     <span aria-hidden className="h-full w-full animate-pulse rounded bg-surface-page" />
                   )}
@@ -103,7 +104,7 @@ export function CompareBar() {
             <ArrowRight size={16} strokeWidth={2.25} aria-hidden />
           </Link>
         ) : (
-          <span className="flex h-11 shrink-0 items-center rounded-full bg-surface-page px-4 text-[12.5px] font-semibold text-text-secondary">
+          <span className="flex h-11 shrink-0 items-center rounded-full bg-surface-page px-4 text-[13px] font-semibold text-text-secondary">
             1 ürün daha seçin
           </span>
         )}

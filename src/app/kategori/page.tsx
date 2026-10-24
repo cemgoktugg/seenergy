@@ -29,7 +29,7 @@ export default async function CategoriesPage() {
       <div className="overflow-hidden rounded-(--panel-radius) border border-line bg-linear-to-b from-surface-card to-surface-page shadow-e1">
         <span aria-hidden className="block h-[3px] w-full bg-linear-to-r from-grad-1 via-grad-3 to-grad-4" />
         <div className="px-4 py-5 dt:px-6 dt:py-6">
-          <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary dt:text-[11px]">
+          <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
             <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
             Katalog
           </p>
@@ -69,7 +69,7 @@ export default async function CategoriesPage() {
                   </span>
                 )}
                 <span className="min-w-0 flex-1">
-                  <span className="block text-[15px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[16px]">
+                  <span className="block text-[16px] font-extrabold leading-tight tracking-tight text-text-primary">
                     {node.label}
                   </span>
                   <span className="mt-0.5 block text-[12px] tabular-nums text-text-secondary">
@@ -91,7 +91,7 @@ export default async function CategoriesPage() {
                     <li key={child.slug}>
                       <Link
                         href={categoryHref(child.slug)}
-                        className="flex items-center justify-between gap-2 rounded-(--card-radius) px-3 py-2 text-[13.5px] font-medium text-text-primary transition-colors duration-(--duration-fast) hover:bg-surface-page"
+                        className="flex items-center justify-between gap-2 rounded-(--card-radius) px-3 py-2 text-[14px] font-medium text-text-primary transition-colors duration-(--duration-fast) hover:bg-surface-page"
                       >
                         {child.label}
                         <span className="text-[12px] tabular-nums text-text-secondary">

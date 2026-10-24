@@ -141,10 +141,10 @@ function SpecCard({ group, index }: { group: Group; index: number }) {
     >
       <div className="flex items-center gap-3 border-b border-line px-4 py-3.5 dt:px-5">
         <IconTile icon={GROUP_ICONS[group.title] ?? CircuitBoard} />
-        <h3 id={id} className="min-w-0 flex-1 truncate text-[15px] font-extrabold tracking-tight text-text-primary dt:text-[16px]">
+        <h3 id={id} className="min-w-0 flex-1 truncate text-[16px] font-extrabold tracking-tight text-text-primary">
           {group.title}
         </h3>
-        <span className="shrink-0 rounded-full bg-surface-page px-2.5 py-1 text-[11px] font-semibold tabular-nums text-text-secondary">
+        <span className="shrink-0 rounded-full bg-surface-page px-2.5 py-1 text-[12px] font-semibold tabular-nums text-text-secondary">
           {group.rows.length} özellik
         </span>
       </div>
@@ -159,7 +159,7 @@ function SpecCard({ group, index }: { group: Group; index: number }) {
               >
                 {row.label}
               </th>
-              <td className="px-4 py-3 align-top text-[13.5px] font-semibold leading-snug tabular-nums text-text-primary dt:pr-5">
+              <td className="px-4 py-3 align-top text-[14px] font-semibold leading-snug tabular-nums text-text-primary dt:pr-5">
                 {row.href ? (
                   <Link
                     href={row.href}
@@ -169,7 +169,7 @@ function SpecCard({ group, index }: { group: Group; index: number }) {
                     <ChevronRight size={13} strokeWidth={2.25} aria-hidden className="text-text-secondary" />
                   </Link>
                 ) : row.mono ? (
-                  <span className="rounded-md border border-line bg-surface-card px-1.5 py-0.5 font-mono text-[12px] uppercase tracking-[0.04em]">
+                  <span className="rounded-(--card-radius) border border-line bg-surface-card px-1.5 py-0.5 font-mono text-[12px] uppercase tracking-[0.04em]">
                     {row.value}
                   </span>
                 ) : (
@@ -203,7 +203,7 @@ function CompatibilityCard({ items }: { items: CompatibilityItem[] }) {
       <div className="flex items-center gap-3 border-b border-line px-4 py-3.5 dt:px-5">
         <IconTile icon={Plug} />
         <div className="min-w-0">
-          <h3 id="spec-compatibility" className="text-[15px] font-extrabold tracking-tight text-text-primary dt:text-[16px]">
+          <h3 id="spec-compatibility" className="text-[16px] font-extrabold tracking-tight text-text-primary">
             Uyumluluk
           </h3>
           <p className="text-[12px] text-text-secondary">Birlikte çalıştığı sistemler ve bağlantılar</p>
@@ -272,7 +272,7 @@ function OrderCard({ product }: { product: Product }) {
       aria-labelledby="spec-order"
       className="rounded-(--panel-radius) border border-line bg-surface-card px-4 py-4 shadow-e1 dt:px-5"
     >
-      <h3 id="spec-order" className="text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary">
+      <h3 id="spec-order" className="text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">
         Sipariş bilgileri
       </h3>
       <dl className="mt-3 space-y-3">
@@ -285,7 +285,7 @@ function OrderCard({ product }: { product: Product }) {
               <Icon size={15} strokeWidth={2} />
             </span>
             <div className="min-w-0">
-              <dt className="text-[11.5px] text-text-secondary">{label}</dt>
+              <dt className="text-[12px] text-text-secondary">{label}</dt>
               <dd className="text-[13px] font-semibold text-text-primary">{value}</dd>
             </div>
           </div>
@@ -318,14 +318,14 @@ function SupportCard({ product }: { product: Product }) {
       <div className="relative mt-4 flex flex-wrap gap-2">
         <Link
           href={`/iletisim?konu=teknik&urun=${encodeURIComponent(product.sku)}`}
-          className="inline-flex items-center gap-1 rounded-full bg-white px-4 py-2 text-[13px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) hover:bg-white/85"
+          className="inline-flex items-center gap-1 rounded-full bg-white px-4 h-9 text-[13px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) hover:bg-white/85"
         >
           Bize ulaşın
           <ChevronRight size={14} strokeWidth={2.25} aria-hidden />
         </Link>
         <Link
           href="/kurumsal"
-          className="inline-flex items-center rounded-full border border-white/25 px-4 py-2 text-[13px] font-semibold text-white transition-colors duration-(--duration-fast) hover:bg-white/10"
+          className="inline-flex items-center rounded-full border border-white/25 px-4 h-9 text-[13px] font-semibold text-white transition-colors duration-(--duration-fast) hover:bg-white/10"
         >
           Kurumsal teklif
         </Link>
@@ -364,7 +364,7 @@ export function ProductSpecs({ product, specs }: { product: Product; specs: Spec
       </SectionHeading>
 
       {typical && (
-        <p className="mt-3 flex items-start gap-2 rounded-(--card-radius) border border-line bg-surface-card px-3.5 py-2.5 text-[12.5px] leading-relaxed text-text-secondary">
+        <p className="mt-3 flex items-start gap-2 rounded-(--card-radius) border border-line bg-surface-card px-3.5 py-2.5 text-[13px] leading-relaxed text-text-secondary">
           <Info size={15} strokeWidth={2} aria-hidden className="mt-0.5 shrink-0 text-text-primary" />
           <span>
             Bu tablo, <span className="font-semibold text-text-primary">{categoryMeta(product.category).label}</span>{' '}

@@ -12,6 +12,7 @@
 import Link from 'next/link';
 
 import { priceLabel, type Product } from '@/data/catalog';
+import { imageProps } from '@/lib/image';
 
 export function ProductRow({ product }: { product: Product }) {
   return (
@@ -21,7 +22,7 @@ export function ProductRow({ product }: { product: Product }) {
     >
       <span className="grid h-14 w-14 shrink-0 place-items-center overflow-hidden rounded-(--card-radius) border border-line bg-surface-card">
         <img
-          src={product.image}
+          {...imageProps(product.image, 56)}
           alt=""
           width={56}
           height={56}
@@ -31,7 +32,7 @@ export function ProductRow({ product }: { product: Product }) {
       </span>
 
       <span className="min-w-0 flex-1">
-        <span className="block truncate text-[11px] font-bold text-text-secondary">
+        <span className="block truncate text-[12px] font-bold text-text-secondary">
           {product.brand}
         </span>
         <span className="line-clamp-2 text-[13px] leading-[1.35] text-text-primary transition-colors group-hover:text-brand-text">

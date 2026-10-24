@@ -38,14 +38,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         <article className="min-w-0 overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e1">
           <header className="grid gap-6 border-b border-line p-6 md:grid-cols-[minmax(0,1fr)_200px] md:items-center dt:p-8">
             <div>
-              <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary dt:text-[11px]">
+              <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
                 <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
                 Blog
               </p>
               <h1 className="mt-2 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary text-balance dt:text-[32px]">
                 {article.title}
               </h1>
-              <p className="mt-3 text-[15px] leading-relaxed text-text-secondary">{article.excerpt}</p>
+              <p className="mt-3 text-[16px] leading-relaxed text-text-secondary">{article.excerpt}</p>
             </div>
             <span className="hidden h-40 place-items-center rounded-(--card-radius) bg-linear-to-br from-white to-wash-fixed p-5 md:grid">
               <img src={article.image} alt="" className="h-full w-auto object-contain" />
@@ -67,10 +67,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             )}
           </div>
           <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line bg-surface-page px-6 py-4 dt:px-8">
-            <p className="text-[13.5px] font-semibold text-text-primary">İlgili ürünler: {article.related.label}</p>
+            <p className="text-[14px] font-semibold text-text-primary">İlgili ürünler: {article.related.label}</p>
             <Link
               href={article.related.href}
-              className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-[13px] font-bold text-white hover:bg-brand-dark"
+              className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 h-9 text-[13px] font-bold text-white hover:bg-brand-dark"
             >
               Ürünleri incele
               <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
@@ -80,7 +80,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         <aside className="flex flex-col gap-(--space-grid-gap) lg:sticky lg:top-(--sticky-offset)">
           <div className="rounded-(--panel-radius) border border-line bg-surface-card p-4 shadow-e1">
-            <p className="text-[10.5px] font-bold uppercase tracking-[0.14em] text-text-secondary">Diğer yazılar</p>
+            <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">Diğer yazılar</p>
             <ul className="mt-2 divide-y divide-line">
               {others.map((item) => (
                 <li key={item.slug}>
@@ -101,7 +101,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
             </p>
             <Link
               href="/iletisim?konu=teknik"
-              className="relative mt-4 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[13px] font-bold text-ink-fixed"
+              className="relative mt-4 inline-flex items-center gap-1.5 rounded-full bg-white px-4 h-9 text-[13px] font-bold text-ink-fixed"
             >
               Teknik destek al
               <ArrowRight size={14} strokeWidth={2.5} aria-hidden />

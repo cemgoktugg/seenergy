@@ -190,7 +190,7 @@ export function PromoProductRow({
           />
         </span>
         <div className="relative z-10 p-4 text-white lg:p-5">
-          <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.16em] text-white/80">
+          <p className="flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.16em] text-white/80">
             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-white" aria-hidden />
             Kampanya
           </p>
@@ -200,7 +200,7 @@ export function PromoProductRow({
           <p className="text-[20px] font-extrabold leading-[1.1] tracking-tight text-white/85 sm:text-[24px]">
             {promo.subtitle}
           </p>
-          <span className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-white px-3.5 py-2 text-[11px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) ease-in-out group-hover:bg-surface-instalment group-hover:text-white">
+          <span className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-white px-3.5 h-9 text-[12px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) ease-in-out group-hover:bg-surface-instalment group-hover:text-white">
             HEMEN İNCELE
             <ArrowRight size={13} strokeWidth={2.5} aria-hidden />
           </span>
@@ -272,7 +272,7 @@ export function CategoryTiles({ tiles }: { tiles: CategoryTile[] }) {
                   and the banners use — a label in a pill said "this is a
                   button" and nothing more. */}
               <span
-                className={`mt-2 inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-[10px] font-bold lg:text-[11px] ${
+                className={`mt-2 inline-flex w-fit items-center gap-1.5 rounded-full px-3 py-1 text-[12px] font-bold ${
                   filled ? 'bg-white text-ink-fixed' : 'bg-brand text-white'
                 }`}
               >
@@ -370,7 +370,7 @@ export function TechBand({
       <div className="container-main py-9 dt:py-14">
         <div className="flex flex-col gap-6 dt:flex-row dt:items-end dt:justify-between dt:gap-10">
           <div className="min-w-0">
-            <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-white/70 dt:text-[11px]">
+            <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-white/70">
               <span
                 aria-hidden
                 className="h-[3px] w-5 rounded-full bg-linear-to-r from-grad-1 to-grad-4 dt:w-7"
@@ -389,7 +389,7 @@ export function TechBand({
           {cta ? (
             <Link
               href={cta.href}
-              className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-white px-5 py-3 text-[13px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) ease-in-out hover:bg-highlight dt:text-[14px]"
+              className="inline-flex w-fit shrink-0 items-center gap-2 rounded-full bg-white px-5 h-13 text-[13px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) ease-in-out hover:bg-highlight dt:text-[14px]"
             >
               {cta.label}
               <ArrowRight size={15} strokeWidth={2.5} aria-hidden />
@@ -408,7 +408,7 @@ export function TechBand({
                 <span className="block text-[24px] font-extrabold leading-none tracking-tight tabular-nums text-highlight dt:text-[32px]">
                   {stat.value}
                 </span>
-                <span className="mt-2 block text-[11px] font-medium leading-snug text-white/65 dt:mt-2.5 dt:text-[13px]">
+                <span className="mt-2 block text-[12px] font-medium leading-snug text-white/65 dt:mt-2.5 dt:text-[13px]">
                   {stat.label}
                 </span>
               </dd>
@@ -469,7 +469,7 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
                 in the middle of its own box. */}
             <div className="flex min-h-[112px] flex-col p-3.5 dt:p-4">
               <p
-                className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] ${
+                className={`flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.14em] ${
                   dark ? 'text-white/60' : 'text-text-secondary'
                 }`}
               >
@@ -487,7 +487,7 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
                 {post.title}
               </h3>
               <span
-                className={`mt-auto inline-flex items-center gap-1 pt-3 text-[11px] font-semibold transition-colors duration-(--duration-fast) ease-in-out dt:text-[12px] ${
+                className={`mt-auto inline-flex items-center gap-1 pt-3 text-[12px] font-semibold transition-colors duration-(--duration-fast) ease-in-out ${
                   dark
                     ? 'text-white/65 group-hover:text-white'
                     : 'text-text-secondary group-hover:text-brand-dark'
@@ -532,7 +532,7 @@ export function BrandGrid() {
 
       {/* --- the fixed label ------------------------------------------- */}
       <div className="relative z-10 hidden w-[230px] shrink-0 flex-col justify-center border-r border-line bg-surface-card/80 px-6 py-6 backdrop-blur lg:flex">
-        <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary">
+        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
           <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
           Marka ağı
         </p>
@@ -542,7 +542,7 @@ export function BrandGrid() {
         <p className="mt-1.5 text-[13px] leading-snug text-text-secondary">marka, tek çatı altında</p>
         <Link
           href="/markalar"
-          className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-brand px-4 py-2 text-[12.5px] font-bold text-white transition-colors duration-(--duration-fast) hover:bg-brand-dark"
+          className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-brand px-4 h-9 text-[13px] font-bold text-white transition-colors duration-(--duration-fast) hover:bg-brand-dark"
         >
           Tümünü gör
           <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
@@ -620,7 +620,7 @@ export function TrustRow({ items }: { items: TrustItem[] }) {
               <span className="block text-[13px] font-bold text-text-primary lg:text-[16px]">
                 {item.title}
               </span>
-              <span className="block text-[11px] text-text-secondary lg:text-[13px]">
+              <span className="block text-[12px] text-text-secondary lg:text-[13px]">
                 {item.subtitle}
               </span>
             </span>
@@ -643,7 +643,7 @@ export function SeoEditorial() {
       <h1 className="text-[20px] font-bold tracking-tight text-text-primary lg:text-[24px]">
         Güvenlik Teknolojileri Tedariki
       </h1>
-      <h2 className="mt-1.5 text-[16px] font-medium text-text-secondary lg:text-[16px]">
+      <h2 className="mt-1.5 text-[16px] font-medium text-text-secondary">
         Toptan ve perakende güvenlik sistemleri
       </h2>
       {/* Measured at 1440: these two paragraphs ran the full 1320px container at

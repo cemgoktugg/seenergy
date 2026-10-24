@@ -39,7 +39,7 @@ export function SectionHeading({
     <div className="flex items-end justify-between gap-3">
       <div className="min-w-0">
         <p
-          className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] ${compact ? '' : 'dt:text-[11px]'} ${
+          className={`flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] ${compact ? '' : 'dt:text-[12px]'} ${
             dark ? 'text-white/60' : 'text-text-secondary'
           }`}
         >
@@ -48,7 +48,7 @@ export function SectionHeading({
         </p>
         <h2
           id={id}
-          className={`mt-1 truncate text-[18px] font-extrabold tracking-tight ${compact ? 'leading-[1.4] dt:text-[20px]' : 'dt:mt-1.5 dt:text-[22px]'} ${
+          className={`mt-1 truncate text-[20px] font-extrabold tracking-tight ${compact ? 'leading-[1.4] dt:text-[20px]' : 'dt:mt-1.5 dt:text-[24px]'} ${
             dark ? 'text-white' : 'text-text-primary'
           }`}
         >

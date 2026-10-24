@@ -21,6 +21,7 @@
 
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
+import { imageProps } from '@/lib/image';
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -116,7 +117,7 @@ function Thumbs({
               : 'border-line opacity-70 hover:border-line-strong hover:opacity-100'
           }`}
         >
-          <img src={src} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
+          <img {...imageProps(src, 80)} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
         </button>
       ))}
     </div>
@@ -239,7 +240,7 @@ export function ProductGallery({
                 className="block h-full w-full cursor-zoom-in overflow-hidden p-6 sm:p-8 dt:p-10"
               >
                 <img
-                  src={src}
+                  {...imageProps(src, 640)}
                   alt={index === 0 ? alt : `${alt} — ${index + 1}. görsel`}
                   width={800}
                   height={800}
@@ -285,7 +286,7 @@ export function ProductGallery({
             </button>
             <p
               aria-live="polite"
-              className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-chrome/80 px-2.5 py-1 font-mono text-[11px] tabular-nums text-white backdrop-blur"
+              className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-chrome/80 px-2.5 py-1 font-mono text-[12px] tabular-nums text-white backdrop-blur"
             >
               {active + 1} / {count}
             </p>

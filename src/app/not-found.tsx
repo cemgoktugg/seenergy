@@ -30,14 +30,14 @@ export default function NotFound() {
       <div className="mt-7 flex flex-wrap items-center justify-center gap-2.5">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-[16px] font-semibold text-white transition-colors hover:bg-brand-dark"
+          className="inline-flex items-center gap-2 rounded-full bg-brand px-6 h-13 text-[16px] font-semibold text-white transition-colors hover:bg-brand-dark"
         >
           <ArrowLeft size={17} strokeWidth={2} aria-hidden />
           Ana sayfaya dön
         </Link>
         <Link
           href="/arama"
-          className="inline-flex items-center gap-2 rounded-full border border-line-strong px-6 py-3 text-[16px] font-semibold text-text-primary transition-colors hover:border-brand hover:bg-brand hover:text-white"
+          className="inline-flex items-center gap-2 rounded-full border border-line-strong px-6 h-13 text-[16px] font-semibold text-text-primary transition-colors hover:border-brand hover:bg-brand hover:text-white"
         >
           <Search size={17} strokeWidth={2} aria-hidden />
           Ürün ara

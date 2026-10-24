@@ -31,7 +31,7 @@ function Eyebrow({ text, dark }: { text?: string; dark?: boolean }) {
   if (!text) return null;
   return (
     <p
-      className={`flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] dt:text-[11px] ${
+      className={`flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] ${
         dark ? 'text-white/60' : 'text-text-secondary'
       }`}
     >
@@ -52,11 +52,11 @@ export function BrandShowcase({ own, partners, brands }: { own: Banner; partners
         <span aria-hidden className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-white/[0.08] blur-3xl" />
         <div className="relative">
           <Eyebrow text={own.eyebrow} dark />
-          <h3 className="mt-2 text-[22px] font-extrabold leading-tight tracking-tight dt:text-[26px]">{own.title}</h3>
+          <h3 className="mt-2 text-[24px] font-extrabold leading-tight tracking-tight">{own.title}</h3>
           {own.subtitle ? <p className="mt-1.5 max-w-[42ch] text-[13px] text-white/65">{own.subtitle}</p> : null}
         </div>
         <div className="relative mt-6 flex items-end justify-between gap-4">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[12.5px] font-bold text-ink-fixed shadow-lg shadow-black/30 transition-transform duration-(--duration-fast) group-hover:translate-x-0.5">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 h-9 text-[13px] font-bold text-ink-fixed shadow-lg shadow-black/30 transition-transform duration-(--duration-fast) group-hover:translate-x-0.5">
             İncele
             <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
           </span>
@@ -76,7 +76,7 @@ export function BrandShowcase({ own, partners, brands }: { own: Banner; partners
           </div>
           <Link
             href={partners.href}
-            className="hidden shrink-0 items-center gap-1.5 rounded-full border border-line-strong px-4 py-2 text-[12.5px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:border-text-primary sm:inline-flex"
+            className="hidden shrink-0 items-center gap-1.5 rounded-full border border-line-strong px-4 h-9 text-[13px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:border-text-primary sm:inline-flex"
           >
             İncele
             <ArrowRight size={14} strokeWidth={2.5} aria-hidden />

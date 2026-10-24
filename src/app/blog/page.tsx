@@ -33,12 +33,12 @@ export default function BlogIndexPage() {
         <ChevronRight size={13} strokeWidth={2} aria-hidden className="mx-1 inline text-line-strong" />
         <span className="font-medium text-text-primary">Blog</span>
       </nav>
-      <p className="mt-4 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.18em] text-text-secondary dt:text-[11px]">
+      <p className="mt-4 flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
         <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
         Bilgi ve rehber
       </p>
-      <h1 className="mt-2 text-[28px] font-extrabold tracking-tight text-text-primary dt:text-[36px]">Blog</h1>
-      <p className="mt-2 max-w-[62ch] text-[14.5px] text-text-secondary">
+      <h1 className="mt-2 text-[32px] font-extrabold tracking-tight text-text-primary dt:text-[40px]">Blog</h1>
+      <p className="mt-2 max-w-[62ch] text-[14px] text-text-secondary">
         Güvenlik kameraları, kayıt cihazları, network ve elektronik ürünler hakkında doğru seçimi yapmanıza yardımcı
         olacak rehberler.
       </p>
@@ -49,12 +49,12 @@ export default function BlogIndexPage() {
         className="nav-metal group relative mt-6 grid overflow-hidden rounded-(--panel-radius) text-white shadow-e2 md:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]"
       >
         <div className="relative p-6 dt:p-9">
-          <p className="text-[10.5px] font-bold uppercase tracking-[0.16em] text-white/60">
+          <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-white/60">
             Öne çıkan rehber · {minutes(lead)} dk okuma
           </p>
-          <h2 className="mt-2 text-[22px] font-extrabold leading-tight tracking-tight dt:text-[28px]">{lead.title}</h2>
+          <h2 className="mt-2 text-[24px] font-extrabold leading-tight tracking-tight dt:text-[32px]">{lead.title}</h2>
           <p className="mt-3 max-w-[52ch] text-[14px] leading-relaxed text-white/70">{lead.excerpt}</p>
-          <span className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-[13px] font-bold text-ink-fixed">
+          <span className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-white px-4 h-9 text-[13px] font-bold text-ink-fixed">
             Yazıyı oku
             <ArrowRight size={14} strokeWidth={2.5} aria-hidden className="transition-transform group-hover:translate-x-0.5" />
           </span>
@@ -84,8 +84,8 @@ export default function BlogIndexPage() {
                 />
               </span>
               <span className="flex flex-1 flex-col p-4">
-                <span className="text-[11px] font-semibold text-text-secondary">{minutes(article)} dk okuma</span>
-                <span className="mt-1 text-[15px] font-extrabold leading-snug text-text-primary">{article.title}</span>
+                <span className="text-[12px] font-semibold text-text-secondary">{minutes(article)} dk okuma</span>
+                <span className="mt-1 text-[16px] font-extrabold leading-snug text-text-primary">{article.title}</span>
                 <span className="mt-2 line-clamp-3 text-[13px] leading-relaxed text-text-secondary">{article.excerpt}</span>
                 <span className="mt-auto inline-flex items-center gap-1 pt-4 text-[13px] font-bold text-text-primary">
                   Oku

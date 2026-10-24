@@ -9,6 +9,7 @@ import { formatPrice } from '@/data/catalog';
 import { paymentLabel } from '@/data/checkout';
 import { MedusaError, medusa } from '@/lib/medusa/client';
 import { loadVitrin } from '@/lib/medusa/vitrin';
+import { imageProps } from '@/lib/image';
 
 /**
  * Order confirmation — `/siparis/[id]`.
@@ -118,7 +119,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
       <div className="mx-auto mt-8 grid max-w-3xl gap-(--space-grid-gap)">
         {method === 'havale' ? (
           <section className="rounded-(--panel-radius) border border-brand bg-brand-soft p-4 dt:p-5">
-            <h2 className="flex items-center gap-2 text-[15px] font-extrabold text-text-primary">
+            <h2 className="flex items-center gap-2 text-[16px] font-extrabold text-text-primary">
               <Landmark size={18} strokeWidth={2} aria-hidden />
               Havale / EFT ile ödeme
             </h2>
@@ -159,7 +160,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
             {!['captured', 'partially_captured', 'refunded'].includes(order.payment_status ?? '') ? (
               <Link
                 href={`/havale-bildirim?siparis=${reference}`}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-surface-card px-4 py-2 text-[13px] font-semibold text-text-primary hover:border-text-primary"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-line-strong bg-surface-card px-4 h-9 text-[13px] font-semibold text-text-primary hover:border-text-primary"
               >
                 <Landmark size={15} strokeWidth={2} aria-hidden />
                 Ödemeyi yaptım, bildir
@@ -168,7 +169,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
           </section>
         ) : method === 'kapida' ? (
           <section className="rounded-(--panel-radius) border border-brand bg-brand-soft p-4 dt:p-5">
-            <h2 className="flex items-center gap-2 text-[15px] font-extrabold text-text-primary">
+            <h2 className="flex items-center gap-2 text-[16px] font-extrabold text-text-primary">
               <Truck size={18} strokeWidth={2} aria-hidden />
               Kapıda ödeme
             </h2>
@@ -180,14 +181,14 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         ) : null}
 
         <section className="rounded-(--panel-radius) border border-line bg-surface-card shadow-e1">
-          <h2 className="border-b border-line px-4 py-3 text-[15px] font-extrabold text-text-primary">
+          <h2 className="border-b border-line px-4 py-3 text-[16px] font-extrabold text-text-primary">
             Sipariş özeti
           </h2>
           <ul className="divide-y divide-line">
             {order.items.map((item) => (
               <li key={item.id} className="flex items-center gap-3 px-4 py-3">
                 <span className="grid h-12 w-12 shrink-0 place-items-center rounded-(--card-radius) border border-line">
-                  <img src={imagePath(item.thumbnail)} alt="" width={48} height={48} className="h-full w-full object-contain p-1" />
+                  <img {...imageProps(imagePath(item.thumbnail), 48)} alt="" width={48} height={48} className="h-full w-full object-contain p-1" />
                 </span>
                 <span className="min-w-0 flex-1 text-[13px] text-text-primary">
                   {item.product_handle ? (
@@ -216,11 +217,11 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
                 {order.shipping_total === 0 ? 'Ücretsiz' : formatPrice(order.shipping_total)}
               </dd>
             </div>
-            <div className="flex justify-between pt-1.5 text-[15px]">
+            <div className="flex justify-between pt-1.5 text-[16px]">
               <dt className="font-bold text-text-primary">Toplam</dt>
               <dd className="font-extrabold tabular-nums text-text-primary">{formatPrice(order.total)}</dd>
             </div>
-            <p className="text-right text-[11px] text-text-secondary">
+            <p className="text-right text-[12px] text-text-secondary">
               KDV dahil ({formatPrice(order.tax_total)})
             </p>
           </dl>
@@ -254,7 +255,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
         <div className="text-center">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-[15px] font-semibold text-white transition-colors hover:bg-brand-dark"
+            className="inline-flex items-center gap-2 rounded-full bg-brand px-6 h-13 text-[16px] font-semibold text-white transition-colors hover:bg-brand-dark"
           >
             Alışverişe devam et
           </Link>

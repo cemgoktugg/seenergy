@@ -47,9 +47,9 @@ export function InquiryForm({
     return (
       <div role="status" className="rounded-(--panel-radius) border border-success/30 bg-success/5 px-5 py-8 text-center">
         <CheckCircle2 size={34} strokeWidth={1.8} aria-hidden className="mx-auto text-success-ink" />
-        <p className="mt-3 text-[18px] font-extrabold text-text-primary">{successTitle}</p>
+        <p className="mt-3 text-[20px] font-extrabold text-text-primary">{successTitle}</p>
         <p className="mx-auto mt-1.5 max-w-[46ch] text-[14px] text-text-secondary">{successText}</p>
-        <Link href="/" className="mt-5 inline-flex rounded-full bg-brand px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-brand-dark">
+        <Link href="/" className="mt-5 inline-flex items-center rounded-full bg-brand px-5 h-11 text-[14px] font-semibold text-white hover:bg-brand-dark">
           Alışverişe devam et
         </Link>
       </div>
@@ -73,7 +73,7 @@ export function InquiryForm({
       </div>
 
       {state.error ? (
-        <p role="alert" className="mb-4 rounded-(--card-radius) border border-danger/30 bg-danger/5 px-3.5 py-2.5 text-[13.5px] font-medium text-danger-ink">
+        <p role="alert" className="mb-4 rounded-(--card-radius) border border-danger/30 bg-danger/5 px-3.5 py-2.5 text-[14px] font-medium text-danger-ink">
           {state.error}
         </p>
       ) : null}
@@ -138,7 +138,7 @@ export function InquiryForm({
       <button
         type="submit"
         disabled={pending}
-        className="mt-5 inline-flex h-12 items-center gap-2 rounded-full bg-brand px-6 text-[15px] font-bold text-white shadow-e2 transition-[transform,background-color] hover:-translate-y-px hover:bg-brand-dark disabled:translate-y-0 disabled:opacity-60"
+        className="mt-5 inline-flex h-12 items-center gap-2 rounded-full bg-brand px-6 text-[16px] font-bold text-white shadow-e2 transition-[transform,background-color] hover:-translate-y-px hover:bg-brand-dark disabled:translate-y-0 disabled:opacity-60"
       >
         <Send size={17} strokeWidth={2} aria-hidden />
         {pending ? 'Gönderiliyor…' : submitLabel}

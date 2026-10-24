@@ -49,7 +49,7 @@ export function FilterDrawer({
         <SlidersHorizontal size={16} strokeWidth={2} aria-hidden />
         Filtrele
         {count > 0 && (
-          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand px-1 text-[11px] font-bold text-white">
+          <span className="grid h-5 min-w-5 place-items-center rounded-full bg-brand px-1 text-[12px] font-bold text-white">
             {count}
           </span>
         )}

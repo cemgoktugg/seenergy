@@ -22,7 +22,7 @@ function Submit({ idle, busy }: { idle: string; busy: string }) {
     <button
       type="submit"
       disabled={pending}
-      className="mt-5 flex h-12 w-full items-center justify-center rounded-full bg-brand text-[15px] font-bold text-white transition-colors hover:bg-brand-dark disabled:cursor-wait disabled:opacity-70"
+      className="mt-5 flex h-12 w-full items-center justify-center rounded-full bg-brand text-[16px] font-bold text-white transition-colors hover:bg-brand-dark disabled:cursor-wait disabled:opacity-70"
     >
       {pending ? busy : idle}
     </button>
@@ -58,7 +58,7 @@ export function AuthForms({ next }: { next: string }) {
   return (
     <div className="grid gap-(--space-grid-gap) md:grid-cols-2">
       <form action={signInAction} noValidate className={`${panel} flex flex-col`}>
-        <h2 className="text-[18px] font-extrabold tracking-tight text-text-primary">Giriş yap</h2>
+        <h2 className="text-[20px] font-extrabold tracking-tight text-text-primary">Giriş yap</h2>
         <p className="mt-1 mb-5 text-[13px] text-text-secondary">
           Siparişlerinizi görmek ve daha hızlı ödeme yapmak için.
         </p>
@@ -90,7 +90,7 @@ export function AuthForms({ next }: { next: string }) {
         <Submit idle="Giriş Yap" busy="Giriş yapılıyor…" />
         {/* No e-mail provider yet, so no self-service reset link to send:
             the request goes to the shop, which can reset it from the admin. */}
-        <p className="mt-3 text-[12.5px] text-text-secondary">
+        <p className="mt-3 text-[13px] text-text-secondary">
           Şifrenizi mi unuttunuz?{' '}
           <Link href="/iletisim?konu=genel" className="font-semibold text-text-primary underline underline-offset-2">
             Bize yazın
@@ -119,7 +119,7 @@ export function AuthForms({ next }: { next: string }) {
       </form>
 
       <form action={registerAction} noValidate className={panel}>
-        <h2 className="text-[18px] font-extrabold tracking-tight text-text-primary">Üye ol</h2>
+        <h2 className="text-[20px] font-extrabold tracking-tight text-text-primary">Üye ol</h2>
         <p className="mt-1 mb-5 text-[13px] text-text-secondary">
           Üye olmadan da sipariş verebilirsiniz; üyelik siparişlerinizi tek yerde toplar.
         </p>

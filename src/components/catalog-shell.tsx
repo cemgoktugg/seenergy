@@ -53,14 +53,14 @@ function FilterOption({
       >
         <span
           aria-hidden
-          className={`grid h-[18px] w-[18px] shrink-0 place-items-center rounded-md border transition-colors ${
+          className={`grid h-[18px] w-[18px] shrink-0 place-items-center rounded-(--card-radius) border transition-colors ${
             checked ? 'border-brand bg-brand text-white' : 'border-line-strong bg-surface-card'
           }`}
         >
           {checked && <Check size={12} strokeWidth={3} />}
         </span>
         <span className="min-w-0 flex-1 truncate text-[13px] text-text-primary">{label}</span>
-        <span className="shrink-0 font-mono text-[11px] tabular-nums text-text-secondary">
+        <span className="shrink-0 font-mono text-[12px] tabular-nums text-text-secondary">
           {count}
         </span>
       </Link>
@@ -71,7 +71,7 @@ function FilterOption({
 function FilterGroup({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="border-t border-line py-4 first:border-t-0 first:pt-0">
-      <h3 className="mb-2 text-[11px] font-bold uppercase tracking-[0.12em] text-text-secondary">
+      <h3 className="mb-2 text-[12px] font-bold uppercase tracking-[0.12em] text-text-secondary">
         {title}
       </h3>
       {children}
@@ -334,7 +334,7 @@ export async function CatalogShell({
               row, and the column form costs ~50px less above the fold. */}
           <div className="grid gap-4 px-4 py-5 md:grid-cols-[minmax(0,1fr)_auto] md:gap-8 dt:px-6 dt:py-6">
             <div>
-              <p className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-text-secondary dt:text-[11px]">
+              <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
                 <span
                   aria-hidden
                   className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4"
@@ -359,7 +359,7 @@ export async function CatalogShell({
                     key={stat.label}
                     className="md:flex md:items-baseline md:justify-between md:gap-4"
                   >
-                    <dt className="text-[10px] font-bold uppercase tracking-[0.12em] text-text-secondary dt:text-[11px]">
+                    <dt className="text-[12px] font-bold uppercase tracking-[0.12em] text-text-secondary">
                       {stat.label}
                     </dt>
                     <dd className="text-[13px] font-extrabold tabular-nums text-text-primary dt:text-[14px]">
@@ -434,7 +434,7 @@ export async function CatalogShell({
                         siralama: sort.key === 'onerilen' ? undefined : sort.key,
                       })}
                       aria-current={selected}
-                      className={`whitespace-nowrap rounded-full px-3 py-1.5 text-[12px] transition-colors duration-(--duration-fast) ${
+                      className={`inline-flex h-9 items-center whitespace-nowrap rounded-full px-3.5 text-[13px] transition-colors duration-(--duration-fast) ${
                         selected
                           ? 'bg-brand font-bold text-white'
                           : 'font-medium text-text-secondary hover:bg-surface-page hover:text-text-primary'
@@ -491,7 +491,7 @@ export async function CatalogShell({
                   </p>
                   <Link
                     href={clearTo}
-                    className="mt-5 inline-flex items-center rounded-full bg-brand px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-brand-dark"
+                    className="mt-5 inline-flex items-center rounded-full bg-brand px-5 h-11 text-[14px] font-semibold text-white transition-colors hover:bg-brand-dark"
                   >
                     Filtreleri temizle
                   </Link>

@@ -27,7 +27,7 @@ export default async function AddressesPage({ searchParams }: { searchParams: Pr
       action={
         <Link
           href="/hesabim/adresler/yeni"
-          className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 py-2.5 text-[13.5px] font-bold text-white hover:bg-brand-dark"
+          className="inline-flex items-center gap-1.5 rounded-full bg-brand px-4 h-11 text-[14px] font-bold text-white hover:bg-brand-dark"
         >
           <Plus size={16} strokeWidth={2.25} aria-hidden />
           Yeni adres
@@ -35,7 +35,7 @@ export default async function AddressesPage({ searchParams }: { searchParams: Pr
       }
     >
       {kaydedildi ? (
-        <p role="status" className="mb-4 flex items-center gap-2 rounded-(--card-radius) border border-success/30 bg-success/5 px-3.5 py-2.5 text-[13.5px] font-medium text-success-ink">
+        <p role="status" className="mb-4 flex items-center gap-2 rounded-(--card-radius) border border-success/30 bg-success/5 px-3.5 py-2.5 text-[14px] font-medium text-success-ink">
           <CheckCircle2 size={16} strokeWidth={2} aria-hidden />
           Adres kaydedildi.
         </p>
@@ -44,9 +44,9 @@ export default async function AddressesPage({ searchParams }: { searchParams: Pr
       {addresses.length === 0 ? (
         <div className="rounded-(--panel-radius) border border-dashed border-line-strong bg-surface-card px-5 py-12 text-center">
           <MapPin size={30} strokeWidth={1.8} aria-hidden className="mx-auto text-text-secondary" />
-          <p className="mt-3 text-[15px] font-semibold text-text-primary">Kayıtlı adresiniz yok.</p>
+          <p className="mt-3 text-[16px] font-semibold text-text-primary">Kayıtlı adresiniz yok.</p>
           <p className="mt-1 text-[13px] text-text-secondary">Adres eklerseniz ödeme sayfasında tek tıkla seçebilirsiniz.</p>
-          <Link href="/hesabim/adresler/yeni" className="mt-5 inline-flex rounded-full bg-brand px-5 py-2.5 text-[14px] font-semibold text-white hover:bg-brand-dark">
+          <Link href="/hesabim/adresler/yeni" className="mt-5 inline-flex items-center rounded-full bg-brand px-5 h-11 text-[14px] font-semibold text-white hover:bg-brand-dark">
             Adres ekle
           </Link>
         </div>
@@ -60,15 +60,15 @@ export default async function AddressesPage({ searchParams }: { searchParams: Pr
               }`}
             >
               <p className="flex items-center justify-between gap-2">
-                <span className="text-[15px] font-extrabold text-text-primary">{address.address_name || 'Adres'}</span>
+                <span className="text-[16px] font-extrabold text-text-primary">{address.address_name || 'Adres'}</span>
                 {address.is_default_shipping ? (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-brand px-2.5 py-0.5 text-[11px] font-bold text-white">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-brand px-2.5 py-0.5 text-[12px] font-bold text-white">
                     <Star size={11} strokeWidth={2.5} aria-hidden />
                     Varsayılan
                   </span>
                 ) : null}
               </p>
-              <p className="mt-2 text-[13.5px] font-semibold text-text-primary">
+              <p className="mt-2 text-[14px] font-semibold text-text-primary">
                 {[address.first_name, address.last_name].filter(Boolean).join(' ')}
                 {address.company ? ` · ${address.company}` : ''}
               </p>
@@ -77,7 +77,7 @@ export default async function AddressesPage({ searchParams }: { searchParams: Pr
               <div className="mt-4 flex flex-wrap gap-2 border-t border-line pt-4">
                 <Link
                   href={`/hesabim/adresler/${address.id}`}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-line-strong px-3.5 py-1.5 text-[12.5px] font-semibold text-text-primary hover:border-text-primary"
+                  className="inline-flex items-center gap-1.5 rounded-full border border-line-strong px-3.5 py-1.5 text-[13px] font-semibold text-text-primary hover:border-text-primary"
                 >
                   <Pencil size={13} strokeWidth={2} aria-hidden />
                   Düzenle
@@ -85,7 +85,7 @@ export default async function AddressesPage({ searchParams }: { searchParams: Pr
                 {address.is_default_shipping ? null : (
                   <form action={makeDefaultAddress}>
                     <input type="hidden" name="id" value={address.id} />
-                    <button type="submit" className="inline-flex items-center gap-1.5 rounded-full border border-line-strong px-3.5 py-1.5 text-[12.5px] font-semibold text-text-primary hover:border-text-primary">
+                    <button type="submit" className="inline-flex items-center gap-1.5 rounded-full border border-line-strong px-3.5 py-1.5 text-[13px] font-semibold text-text-primary hover:border-text-primary">
                       <Star size={13} strokeWidth={2} aria-hidden />
                       Varsayılan yap
                     </button>
@@ -93,7 +93,7 @@ export default async function AddressesPage({ searchParams }: { searchParams: Pr
                 )}
                 <form action={deleteAddress} className="ml-auto">
                   <input type="hidden" name="id" value={address.id} />
-                  <button type="submit" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-semibold text-text-secondary hover:bg-danger/10 hover:text-danger-ink">
+                  <button type="submit" className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[13px] font-semibold text-text-secondary hover:bg-danger/10 hover:text-danger-ink">
                     <Trash2 size={13} strokeWidth={2} aria-hidden />
                     Sil
                   </button>

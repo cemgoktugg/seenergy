@@ -39,9 +39,9 @@ export function BrandBoard({ items }: { items: BrandBoardEntry[] }) {
             href={item.href}
             aria-label={`${item.name} — İncele`}
             style={{ '--frame-accent': item.accent, animationDelay: `${-index * 1.4}s` } as CSSProperties}
-            className="brand-frame group relative block rounded-xl p-[2px] shadow-e1 transition-[transform,box-shadow] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-0.5 hover:shadow-e3 focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 sm:rounded-[18px] dt:rounded-[22px]"
+            className="brand-frame group relative block rounded-(--card-radius) p-[2px] shadow-e1 transition-[transform,box-shadow] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-0.5 hover:shadow-e3 focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 sm:rounded-(--panel-radius) dt:rounded-(--panel-radius)"
           >
-            <span className="relative block overflow-hidden rounded-[10px] bg-surface-card sm:rounded-[16px] dt:rounded-[20px]">
+            <span className="relative block overflow-hidden rounded-(--card-radius) bg-surface-card sm:rounded-(--panel-radius) dt:rounded-(--panel-radius)">
               <span className="relative block aspect-[3/1] overflow-hidden">
                 <Image
                   src={item.image}
@@ -56,7 +56,7 @@ export function BrandBoard({ items }: { items: BrandBoardEntry[] }) {
                   className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/4 -skew-x-[20deg] bg-linear-to-r from-transparent via-white/45 to-transparent transition-transform duration-[1100ms] ease-out motion-reduce:hidden group-hover:translate-x-[620%]"
                 />
               </span>
-              <span className="relative my-1 mr-1 ml-auto flex min-h-6 w-fit items-center gap-1 rounded-full bg-brand-fixed/90 px-2 text-[10px] font-semibold text-white shadow-e1 ring-1 ring-white/20 backdrop-blur-sm transition-colors duration-(--duration-fast) group-hover:bg-brand-fixed lg:absolute lg:bottom-2 lg:left-3 lg:m-0 lg:min-h-7 lg:gap-1.5 lg:px-3 lg:text-[11px] dt:left-4 dt:min-h-8 dt:gap-2 dt:px-4 dt:text-[12px]">
+              <span className="relative my-1 mr-1 ml-auto flex min-h-6 w-fit items-center gap-1 rounded-full bg-brand-fixed/90 px-2 text-[12px] font-semibold text-white shadow-e1 ring-1 ring-white/20 backdrop-blur-sm transition-colors duration-(--duration-fast) group-hover:bg-brand-fixed lg:absolute lg:bottom-2 lg:left-3 lg:m-0 lg:min-h-7 lg:gap-1.5 lg:px-3 dt:left-4 dt:min-h-8 dt:gap-2 dt:px-4">
                 İncele
                 <ArrowRight
                   size={14}

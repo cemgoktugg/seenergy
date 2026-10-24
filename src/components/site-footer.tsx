@@ -113,7 +113,7 @@ export function NewsletterBar() {
           ))}
         </ul>
 
-        <form className="flex w-full max-w-xl items-stretch overflow-hidden rounded-full bg-white">
+        <form className="flex h-[52px] w-full max-w-xl items-center overflow-hidden rounded-full bg-white">
           <label htmlFor="newsletter-email" className="sr-only">
             E-posta adresiniz
           </label>
@@ -122,11 +122,11 @@ export function NewsletterBar() {
             type="email"
             name="email"
             placeholder="Bizden haberdar ol"
-            className="min-w-0 flex-1 bg-transparent px-5 py-3 text-[14px] text-text-primary outline-none placeholder:text-text-secondary"
+            className="h-full min-w-0 flex-1 bg-transparent px-5 text-[14px] text-text-primary outline-none placeholder:text-text-secondary"
           />
           <button
             type="submit"
-            className="my-1 mr-1 shrink-0 rounded-full bg-brand px-5 text-[14px] font-semibold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark"
+            className="mr-1 h-11 shrink-0 rounded-full bg-brand px-5 text-[14px] font-semibold text-white transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark"
           >
             Kayıt Ol
           </button>
@@ -160,7 +160,7 @@ export function SiteFooter({ company }: { company: Company }) {
                 >
                   {node.label}
                 </Link>
-                <ul className="mt-2.5 space-y-2">
+                <ul className="mt-2.5 space-y-2 pointer-coarse:mt-1 pointer-coarse:space-y-0">
                   {node.children!.map((child) => (
                     <li key={child.slug}>
                       <Link
@@ -176,7 +176,7 @@ export function SiteFooter({ company }: { company: Company }) {
             ))}
             <div className="col-span-2 sm:col-span-3 lg:col-span-2">
               <p className="text-[14px] font-bold text-text-primary">Diğer kategoriler</p>
-              <ul className="mt-2.5 grid grid-cols-2 gap-x-6 gap-y-2">
+              <ul className="mt-2.5 grid grid-cols-2 gap-x-6 gap-y-2 pointer-coarse:mt-1 pointer-coarse:gap-y-0">
                 {SINGLES.map((node) => (
                   <li key={node.slug}>
                     <Link
@@ -220,7 +220,7 @@ export function SiteFooter({ company }: { company: Company }) {
 ${company.address}` : ''}
             </address>
             {company.hours ? <p className="mt-2 text-[12px] text-text-secondary lg:text-[13px]">{company.hours}</p> : null}
-            <Link href="/iletisim" className="mt-3 inline-flex text-[12.5px] font-semibold text-text-primary underline underline-offset-4 hover:text-brand-dark">
+            <Link href="/iletisim" className="mt-3 inline-flex text-[13px] font-semibold text-text-primary underline underline-offset-4 hover:text-brand-dark">
               İletişim sayfası
             </Link>
           </div>
@@ -233,7 +233,7 @@ ${company.address}` : ''}
           {PAYMENT_METHODS.map((method) => (
             <li
               key={method}
-              className="shrink-0 whitespace-nowrap rounded-md border border-line bg-surface-page px-2.5 py-1 text-[10px] font-medium text-text-secondary lg:px-3 lg:py-1.5 lg:text-[11px]"
+              className="shrink-0 whitespace-nowrap rounded-(--card-radius) border border-line bg-surface-page px-2.5 py-1 text-[12px] font-medium text-text-secondary lg:px-3 lg:py-1.5"
             >
               {method}
             </li>

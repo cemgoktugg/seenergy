@@ -59,7 +59,7 @@ export function FooterColumns({ columns }: { columns: readonly FooterColumn[] })
 
             <ul
               id={panelId}
-              className={`space-y-2.5 pb-4 lg:mt-4 lg:block lg:pb-0 ${isOpen ? 'block' : 'hidden'}`}
+              className={`space-y-2.5 pb-4 pointer-coarse:space-y-0 lg:mt-4 lg:block lg:pb-0 ${isOpen ? 'block' : 'hidden'}`}
             >
               {column.links.map((link) => (
                 <li key={`${column.title}-${link.label}`}>

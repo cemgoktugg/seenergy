@@ -79,14 +79,14 @@ export default async function ContactPage({
               <Icon size={18} strokeWidth={2} aria-hidden />
             </span>
             <span className="min-w-0">
-              <span className="block text-[11.5px] font-bold uppercase tracking-[0.1em] text-text-secondary">{label}</span>
-              <span className="mt-0.5 block whitespace-pre-line text-[14.5px] font-semibold text-text-primary">{value}</span>
+              <span className="block text-[12px] font-bold uppercase tracking-[0.1em] text-text-secondary">{label}</span>
+              <span className="mt-0.5 block whitespace-pre-line text-[14px] font-semibold text-text-primary">{value}</span>
             </span>
           </a>
         ))}
       </div>
       {company.hours ? (
-        <p className="not-prose flex items-center gap-2 text-[13.5px] text-text-secondary">
+        <p className="not-prose flex items-center gap-2 text-[14px] text-text-secondary">
           <Clock size={15} strokeWidth={2} aria-hidden />
           {company.hours}
         </p>

@@ -112,21 +112,21 @@ export function ProductSlider({
       /* The running frame light of the brand banners above, in steel. Out of
          step with them (the delay) so the page does not pulse in unison. */
       style={{ '--frame-accent': '#c9ced6', animationDelay: `${channel === '01' ? -2.1 : -4.9}s` } as CSSProperties}
-      className="brand-frame flex h-full min-w-0 flex-col rounded-[22px] p-[1.5px] shadow-e2"
+      className="brand-frame flex h-full min-w-0 flex-col rounded-(--panel-radius) p-[1.5px] shadow-e2"
     >
       <div
         style={{ '--tech-ink': '#ffffff' } as CSSProperties}
-        className="relative isolate flex h-full flex-col overflow-hidden rounded-[20.5px] bg-[radial-gradient(130%_100%_at_0%_0%,#323844_0%,#191c23_45%,#0e1014_100%)] text-white"
+        className="relative isolate flex h-full flex-col overflow-hidden rounded-(--panel-radius) bg-[radial-gradient(130%_100%_at_0%_0%,#323844_0%,#191c23_45%,#0e1014_100%)] text-white"
       >
         {/* Behind everything: the dot matrix, a corner glow, the scan line. */}
         <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 -z-10 opacity-70" />
         <span aria-hidden className="pointer-events-none absolute -left-24 -top-28 -z-10 h-64 w-64 rounded-full bg-white/[0.07] blur-3xl" />
         <span aria-hidden className="tech-scan pointer-events-none absolute inset-x-0 top-0 -z-10 h-32" />
         {/* Viewfinder corners. */}
-        <span aria-hidden className={`${CORNER} left-2 top-2 rounded-tl-md border-l-2 border-t-2`} />
-        <span aria-hidden className={`${CORNER} right-2 top-2 rounded-tr-md border-r-2 border-t-2`} />
-        <span aria-hidden className={`${CORNER} bottom-2 left-2 rounded-bl-md border-b-2 border-l-2`} />
-        <span aria-hidden className={`${CORNER} bottom-2 right-2 rounded-br-md border-b-2 border-r-2`} />
+        <span aria-hidden className={`${CORNER} left-2 top-2 rounded-tl-(--card-radius) border-l-2 border-t-2`} />
+        <span aria-hidden className={`${CORNER} right-2 top-2 rounded-tr-(--card-radius) border-r-2 border-t-2`} />
+        <span aria-hidden className={`${CORNER} bottom-2 left-2 rounded-bl-(--card-radius) border-b-2 border-l-2`} />
+        <span aria-hidden className={`${CORNER} bottom-2 right-2 rounded-br-(--card-radius) border-b-2 border-r-2`} />
 
         {/* --- header ---------------------------------------------------- */}
         <div className="relative px-4 pt-4 dt:px-5">
@@ -198,8 +198,8 @@ export function ProductSlider({
             <span />
           )}
           {/* The channel readout, the way a CCTV monitor labels its feed. */}
-          <p className="flex shrink-0 items-center gap-2 font-mono text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">
-            <span className="rounded-[5px] border border-white/15 bg-white/5 px-1.5 py-[3px] text-white/75">CH {channel}</span>
+          <p className="flex shrink-0 items-center gap-2 font-mono text-[12px] font-semibold uppercase tracking-[0.14em] text-white/55">
+            <span className="rounded-(--card-radius) border border-white/15 bg-white/5 px-1.5 py-[3px] text-white/75">CH {channel}</span>
             <span className="hidden sm:inline">{String(products.length).padStart(2, '0')} ürün</span>
             {pages > 1 ? (
               <span aria-hidden className="hidden tabular-nums text-white/45 dt:inline">

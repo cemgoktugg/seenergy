@@ -26,6 +26,7 @@ import { useCatalog } from '@/components/catalog-provider';
 import { ProductCard } from '@/components/product-card';
 import { SectionHeading } from '@/components/section-heading';
 import { FREE_SHIPPING_FROM, formatPrice, type Product } from '@/data/catalog';
+import { imageProps } from '@/lib/image';
 
 const PROMISES = [
   { icon: ShieldCheck, text: 'Faturalı ve garantili ürün' },
@@ -122,7 +123,7 @@ export default function CartPage() {
   return (
     <>
       <section className="container-main pt-4 dt:pt-6">
-        <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-text-secondary">
+        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">
           <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
           Sepet
         </p>
@@ -176,7 +177,7 @@ export default function CartPage() {
                     className="grid h-20 w-20 shrink-0 place-items-center overflow-hidden rounded-(--card-radius) border border-line bg-white dt:h-24 dt:w-24"
                   >
                     <img
-                      src={line.image}
+                      {...imageProps(line.image, 96)}
                       alt=""
                       width={96}
                       height={96}

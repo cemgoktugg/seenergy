@@ -46,7 +46,7 @@ export default async function PlaceholderPage({
 
       <Link
         href="/"
-        className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-6 py-3 text-[16px] font-semibold text-white transition-colors hover:bg-brand-dark"
+        className="mt-7 inline-flex items-center gap-2 rounded-full bg-brand px-6 h-13 text-[16px] font-semibold text-white transition-colors hover:bg-brand-dark"
       >
         <ArrowLeft size={17} strokeWidth={2} aria-hidden />
         Ana sayfaya dön

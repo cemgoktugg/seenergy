@@ -201,8 +201,8 @@ function PriceBlock({ product }: { product: Product }) {
   if (product.price == null) {
     return (
       <div>
-        <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-text-secondary">Fiyat</p>
-        <p className="mt-1 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[28px]">
+        <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">Fiyat</p>
+        <p className="mt-1 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[32px]">
           {PRICE_ON_REQUEST}
         </p>
         <p className="mt-1.5 text-[13px] leading-relaxed text-text-secondary">
@@ -234,14 +234,14 @@ function PriceBlock({ product }: { product: Product }) {
         )}
       </div>
       <p aria-hidden className="mt-1 flex items-baseline gap-2">
-        <span className="text-[32px] font-extrabold leading-none tracking-tight tabular-nums text-text-primary dt:text-[38px]">
+        <span className="text-[32px] font-extrabold leading-none tracking-tight tabular-nums text-text-primary dt:text-[40px]">
           {formatPrice(product.price)}
         </span>
         <span className="text-[12px] font-medium text-text-secondary">KDV dahil</span>
       </p>
 
       {INSTALMENTS_AVAILABLE && product.instalment && (
-        <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-(--card-radius) border border-highlight/40 bg-surface-instalment px-2.5 py-1.5 text-[11px] font-medium text-white">
+        <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-(--card-radius) border border-highlight/40 bg-surface-instalment px-2.5 py-1.5 text-[12px] font-medium text-white">
           PEŞİN FİYATINA <span className="font-extrabold text-highlight">3 TAKSİT</span>
         </p>
       )}
@@ -458,12 +458,12 @@ export default async function ProductPage({
                   product.stock > 0 && (product.badge === 'super-firsat' || product.freeShipping) ? (
                     <>
                       {product.badge === 'super-firsat' && (
-                        <span className="w-fit rounded-full bg-info px-2.5 py-1 text-[11px] font-medium text-white">
+                        <span className="w-fit rounded-full bg-info px-2.5 py-1 text-[12px] font-medium text-white">
                           Süper Fırsat
                         </span>
                       )}
                       {product.freeShipping && (
-                        <span className="w-fit rounded-full bg-success px-2.5 py-1 text-[11px] font-medium text-white">
+                        <span className="w-fit rounded-full bg-success px-2.5 py-1 text-[12px] font-medium text-white">
                           Ücretsiz Kargo
                         </span>
                       )}
@@ -477,7 +477,7 @@ export default async function ProductPage({
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={`/marka/${brandSlug(product.brand)}`}
-                  className="inline-flex items-center rounded-full bg-chrome px-3 py-1 text-[11.5px] font-extrabold tracking-[0.08em] text-white transition-opacity duration-(--duration-fast) hover:opacity-85"
+                  className="inline-flex items-center rounded-full bg-chrome px-3 py-1 text-[12px] font-extrabold tracking-[0.08em] text-white transition-opacity duration-(--duration-fast) hover:opacity-85"
                 >
                   {product.brand}
                 </Link>
@@ -493,11 +493,11 @@ export default async function ProductPage({
                 </span>
               </div>
 
-              <h1 className="mt-4 text-[26px] font-extrabold leading-[1.12] tracking-tight text-text-primary text-balance dt:text-[36px]">
+              <h1 className="mt-4 text-[24px] font-extrabold leading-[1.12] tracking-tight text-text-primary text-balance dt:text-[40px]">
                 {product.name}
               </h1>
               {lead && (
-                <p className="mt-3 max-w-[60ch] text-[14.5px] leading-relaxed text-text-secondary dt:text-[15px]">{lead}</p>
+                <p className="mt-3 max-w-[60ch] text-[14px] leading-relaxed text-text-secondary dt:text-[16px]">{lead}</p>
               )}
 
               {keySpecsOf(product, 4, details.specs).length > 0 && (
@@ -554,7 +554,7 @@ export default async function ProductPage({
                 {PRODUCT_TRUST.map((item) => {
                   const Icon = TRUST_ICONS[item.icon];
                   return (
-                    <li key={item.label} className="flex items-center gap-2 text-[12.5px] font-medium text-text-primary">
+                    <li key={item.label} className="flex items-center gap-2 text-[13px] font-medium text-text-primary">
                       <Icon size={16} strokeWidth={2} aria-hidden className="shrink-0 text-text-secondary" />
                       {item.label}
                     </li>
@@ -608,7 +608,7 @@ export default async function ProductPage({
           <SectionHeading eyebrow="Ürün detayları" title="Ürün Açıklaması" />
           <div className="mt-4 grid items-start gap-(--space-grid-gap) lg:grid-cols-[minmax(0,1fr)_400px]">
             <div className="rounded-(--panel-radius) border border-line bg-surface-card px-5 py-5 shadow-e1 dt:px-7 dt:py-6">
-              <div className="max-w-[72ch] space-y-4 text-[14.5px] leading-[1.75] text-text-primary dt:text-[15px]">
+              <div className="max-w-[72ch] space-y-4 text-[14px] leading-[1.75] text-text-primary dt:text-[16px]">
                 {paragraphs.map((paragraph) => (
                   <p key={paragraph} className="whitespace-pre-line">
                     {paragraph}
@@ -625,12 +625,12 @@ export default async function ProductPage({
                   aria-hidden
                   className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-grad-1/25 blur-3xl"
                 />
-                <p className="relative text-[10.5px] font-bold uppercase tracking-[0.18em] text-white/55">
+                <p className="relative text-[12px] font-bold uppercase tracking-[0.18em] text-white/55">
                   Öne çıkan özellikler
                 </p>
                 <ul className="relative mt-4 space-y-3">
                   {bullets.map((line) => (
-                    <li key={line} className="flex items-start gap-3 text-[13.5px] leading-snug">
+                    <li key={line} className="flex items-start gap-3 text-[14px] leading-snug">
                       <span
                         aria-hidden
                         className="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white text-chrome"

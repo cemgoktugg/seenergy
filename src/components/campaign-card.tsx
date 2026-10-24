@@ -51,7 +51,7 @@ const SIZE: Record<Size, { box: string; pad: string; title: string; plate: strin
   tile: {
     box: 'aspect-[172/104] sm:aspect-[340/120] dt:aspect-auto dt:h-full',
     pad: 'px-3.5 sm:px-5 dt:px-6',
-    title: 'text-[13px] sm:text-[17px] dt:text-[20px]',
+    title: 'text-[13px] sm:text-[16px] dt:text-[20px]',
     plate: 'hidden sm:block w-[38%] m-2.5 dt:m-3',
     cta: 'link',
   },
@@ -122,7 +122,7 @@ export function CampaignCard({ eyebrow, title, subtitle, href, tone, productImag
       <div className={`relative z-10 flex min-w-0 flex-1 flex-col justify-center ${s.pad}`}>
         {eyebrow ? (
           <p
-            className={`flex items-center gap-1.5 text-[8.5px] font-bold uppercase tracking-[0.16em] sm:text-[10px] ${
+            className={`flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.16em] ${
               light ? 'text-white/75' : 'text-ink-fixed/60'
             }`}
           >
@@ -138,13 +138,13 @@ export function CampaignCard({ eyebrow, title, subtitle, href, tone, productImag
           {title}
         </p>
         {subtitle ? (
-          <p className={`mt-1 line-clamp-2 text-[11.5px] leading-snug sm:text-[13px] dt:text-[14px] ${light ? 'text-white/75' : 'text-ink-fixed/70'}`}>
+          <p className={`mt-1 line-clamp-2 text-[12px] leading-snug sm:text-[13px] dt:text-[14px] ${light ? 'text-white/75' : 'text-ink-fixed/70'}`}>
             {subtitle}
           </p>
         ) : null}
         {s.cta === 'pill' ? (
           <span
-            className={`mt-2.5 inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[11.5px] font-bold transition-colors duration-(--duration-fast) dt:mt-3 dt:text-[12.5px] ${
+            className={`mt-2.5 inline-flex w-fit items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[12px] font-bold transition-colors duration-(--duration-fast) dt:mt-3 dt:text-[13px] ${
               /* grad-3, not brand: the light tone stays light in dark mode, so its
                  accent must not follow the theme either. */
               light ? 'bg-white text-ink-fixed group-hover:bg-white/90' : 'bg-grad-3 text-white group-hover:bg-ink-fixed'
@@ -154,7 +154,7 @@ export function CampaignCard({ eyebrow, title, subtitle, href, tone, productImag
             <ArrowRight size={13} strokeWidth={2.5} aria-hidden className="transition-transform duration-(--duration-base) group-hover:translate-x-0.5" />
           </span>
         ) : (
-          <span className={`mt-1.5 inline-flex items-center gap-1 text-[10px] font-bold sm:text-[11.5px] dt:mt-3 dt:text-[12px] ${light ? 'text-white/85 group-hover:text-white' : 'text-grad-3'}`}>
+          <span className={`mt-1.5 inline-flex items-center gap-1 text-[12px] font-bold dt:mt-3 ${light ? 'text-white/85 group-hover:text-white' : 'text-grad-3'}`}>
             İncele
             <ArrowRight size={12} strokeWidth={2.5} aria-hidden className="transition-transform duration-(--duration-base) group-hover:translate-x-0.5" />
           </span>
@@ -164,7 +164,7 @@ export function CampaignCard({ eyebrow, title, subtitle, href, tone, productImag
       {/* --- product plate ------------------------------------------------ */}
       {productImage && !image ? (
         <div
-          className={`relative shrink-0 self-stretch overflow-hidden rounded-[calc(var(--panel-radius)-4px)] bg-[radial-gradient(120%_100%_at_60%_35%,#ffffff_0%,#f5f5f8_60%,#eaeaf1_100%)] ${s.plate}`}
+          className={`relative shrink-0 self-stretch overflow-hidden rounded-(--card-radius) bg-[radial-gradient(120%_100%_at_60%_35%,#ffffff_0%,#f5f5f8_60%,#eaeaf1_100%)] ${s.plate}`}
         >
           <img
             src={productImage}

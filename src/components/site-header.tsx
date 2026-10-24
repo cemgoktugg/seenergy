@@ -42,6 +42,7 @@ import { useCart } from '@/components/cart-provider';
 import { formatPrice } from '@/data/catalog';
 import { CATEGORY_ICONS } from '@/components/category-icons';
 import { NAV_FEATURED, PRIMARY_NAV, SITE, UTILITY_LINKS, type NavItem } from '@/data/site';
+import { imageProps } from '@/lib/image';
 
 const UTILITY_ICONS = { info: Info, phone: Phone, truck: Truck, badge: BadgeIcon };
 
@@ -165,7 +166,7 @@ function SearchField({
         type="search"
         autoFocus={autoFocus}
         placeholder="Ürün, marka veya ürün kodu ara"
-        className={`min-w-0 flex-1 bg-transparent pl-[18px] pr-2 text-[16px] outline-none dt:text-[16px] ${
+        className={`min-w-0 flex-1 bg-transparent pl-[18px] pr-2 text-[16px] outline-none ${
           dark
             ? 'text-white placeholder:text-white/55'
             : 'text-text-primary placeholder:text-text-secondary'
@@ -174,7 +175,7 @@ function SearchField({
       {shortcut && (
         <kbd
           aria-hidden
-          className="my-auto mr-1 hidden shrink-0 rounded-md border border-line-strong bg-surface-card px-1.5 py-0.5 font-mono text-[11px] leading-none text-text-secondary group-focus-within:hidden dt:block"
+          className="my-auto mr-1 hidden shrink-0 rounded-(--card-radius) border border-line-strong bg-surface-card px-1.5 py-0.5 font-mono text-[12px] leading-none text-text-secondary group-focus-within:hidden dt:block"
         >
           /
         </kbd>
@@ -245,7 +246,7 @@ function HeaderActions() {
               replays the pulse — the header answering the click. */}
           <span
             key={bump}
-            className={`absolute right-0 top-0 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[11px] font-bold text-white ring-2 ring-surface-card dt:-right-1 dt:-top-1 ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
+            className={`absolute right-0 top-0 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[12px] font-bold text-white ring-2 ring-surface-card dt:-right-1 dt:-top-1 ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
           >
             {cartCount}
           </span>
@@ -274,7 +275,7 @@ function CategoryIntro({ item, menuModels, onClose }: { item: NavItem; menuModel
   return (
     <div className="relative flex w-[250px] shrink-0 flex-col overflow-hidden bg-chrome p-6 text-white">
       <span aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-grad-1/25 blur-3xl" />
-      <p className="relative text-[11px] font-bold uppercase tracking-[0.18em] text-white/55">Kategori</p>
+      <p className="relative text-[12px] font-bold uppercase tracking-[0.18em] text-white/55">Kategori</p>
       <p className="relative mt-1.5 text-[20px] font-extrabold leading-tight tracking-tight">{item.label}</p>
       <p className="relative mt-2 text-[13px] text-white/65">
         {item.children ? `${item.children.length} alt kategori · ` : ''}
@@ -300,7 +301,7 @@ function ModelLink({ model, onClose }: { model: MenuModels[string][number]; onCl
       className="group/model -mx-2 flex items-center gap-3 rounded-(--card-radius) px-2 py-1.5 transition-colors duration-(--duration-fast) hover:bg-surface-page"
     >
       <span className="grid h-10 w-10 shrink-0 place-items-center overflow-hidden rounded-(--card-radius) border border-line bg-surface-card p-1 transition-colors duration-(--duration-fast) group-hover/model:border-line-strong">
-        <img src={model.image} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
+        <img {...imageProps(model.image, 40)} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
       </span>
       <span className="min-w-0">
         <span className="block truncate text-[13px] font-bold text-text-primary">{model.label}</span>
@@ -332,7 +333,7 @@ function CategoryBody({ item, menuModels, onClose }: { item: NavItem; menuModels
     ) : (
       <div className="flex-1 px-6 py-14 text-center">
         <div>
-          <p className="text-[15px] font-extrabold text-text-primary">Bu kategorinin ürünleri yakında burada</p>
+          <p className="text-[16px] font-extrabold text-text-primary">Bu kategorinin ürünleri yakında burada</p>
           <p className="mt-1 text-[13px] text-text-secondary">Fiyat ve stok bilgisi için bize yazabilirsiniz.</p>
           <Link
             href={`/iletisim?konu=teklif&urun=${encodeURIComponent(item.label)}`}
@@ -440,7 +441,7 @@ function AllCategoriesPanel({ menuModels, onClose }: { menuModels: MenuModels; o
       <div className="flex min-w-0 flex-1 flex-col overflow-y-auto">
         <div className="flex items-center justify-between gap-4 border-b border-line px-6 py-4">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-text-secondary">Kategori</p>
+            <p className="text-[12px] font-bold uppercase tracking-[0.16em] text-text-secondary">Kategori</p>
             <p className="mt-0.5 text-[20px] font-extrabold tracking-tight text-text-primary">{item.label}</p>
           </div>
           <Link
@@ -560,7 +561,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
             href="/"
             aria-label={SITE.name}
             tabIndex={condensed ? 0 : -1}
-            className="flex shrink-0 items-center"
+            className="flex h-11 min-w-11 shrink-0 items-center justify-center sm:justify-start"
           >
             <BrandMark shine tone="light" className="flex h-7 w-auto sm:hidden" />
             <BrandLogoCompact shine tone="light" className="hidden h-[22px] w-auto sm:flex dt:h-[26px]" />
@@ -579,7 +580,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
             <ShoppingCart size={20} strokeWidth={1.9} aria-hidden />
             <span
               key={bump}
-              className={`absolute right-0 top-0 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[10px] font-bold text-white ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
+              className={`absolute right-0 top-0 grid h-[17px] min-w-[17px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[12px] font-bold text-white ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
             >
               {cartCount}
             </span>
@@ -908,7 +909,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
                             <Link
                               href={child.href}
                               onClick={() => setDrawerOpen(false)}
-                              className="block px-7 py-2.5 text-[13.5px] font-medium text-text-secondary transition-colors hover:text-text-primary"
+                              className="block px-7 py-2.5 text-[14px] font-medium text-text-secondary transition-colors hover:text-text-primary"
                             >
                               {child.label}
                             </Link>

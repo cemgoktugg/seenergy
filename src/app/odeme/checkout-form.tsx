@@ -22,6 +22,7 @@ import { formatPrice } from '@/data/catalog';
 import { PROVINCES_SORTED } from '@/data/provinces';
 import type { CartSummary } from '@/lib/medusa/cart-summary';
 import { placeOrder } from '@/lib/medusa/checkout';
+import { imageProps } from '@/lib/image';
 
 /** A saved address, flattened to the form's own field names. */
 export interface SavedAddress {
@@ -176,7 +177,7 @@ export function CheckoutForm({
                         <span className="min-w-0">
                           <span className="block font-bold text-text-primary">
                             {address ? address.label : 'Yeni adres gir'}
-                            {address?.is_default ? <span className="ml-1.5 text-[11px] font-semibold text-text-secondary">(varsayılan)</span> : null}
+                            {address?.is_default ? <span className="ml-1.5 text-[12px] font-semibold text-text-secondary">(varsayılan)</span> : null}
                           </span>
                           {address ? (
                             <span className="mt-0.5 block truncate text-text-secondary">
@@ -241,7 +242,7 @@ export function CheckoutForm({
                 ].map((option) => (
                   <label
                     key={option.id}
-                    className="flex cursor-pointer items-center gap-2 rounded-full border border-line-strong px-3.5 py-2 text-[13px] font-medium text-text-primary has-checked:border-brand has-checked:bg-brand-soft"
+                    className="flex cursor-pointer items-center gap-2 rounded-full border border-line-strong px-3.5 h-11 text-[13px] font-medium text-text-primary has-checked:border-brand has-checked:bg-brand-soft"
                   >
                     <input
                       type="radio"
@@ -363,8 +364,8 @@ export function CheckoutForm({
                 {cart.lines.map((line) => (
                   <li key={line.id} className="flex items-center gap-2.5">
                     <span className="relative grid h-12 w-12 shrink-0 place-items-center rounded-(--card-radius) border border-line bg-surface-card">
-                      <img src={line.image} alt="" width={48} height={48} className="h-full w-full object-contain p-1" />
-                      <span className="absolute -right-1.5 -top-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-text-primary px-1 text-[10px] font-bold text-surface-card">
+                      <img {...imageProps(line.image, 48)} alt="" width={48} height={48} className="h-full w-full object-contain p-1" />
+                      <span className="absolute -right-1.5 -top-1.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-text-primary px-1 text-[12px] font-bold text-surface-card">
                         {line.quantity}
                       </span>
                     </span>
@@ -389,11 +390,11 @@ export function CheckoutForm({
 
               <div className="flex items-baseline justify-between pt-3">
                 <span className="text-[13px] font-semibold text-text-primary">Toplam</span>
-                <span className="text-[22px] font-extrabold tabular-nums text-text-primary">
+                <span className="text-[24px] font-extrabold tabular-nums text-text-primary">
                   {formatPrice(cart.itemTotal + shippingAmount)}
                 </span>
               </div>
-              <p className="mt-1 text-right text-[11px] text-text-secondary">KDV dahil</p>
+              <p className="mt-1 text-right text-[12px] text-text-secondary">KDV dahil</p>
 
               <label className="mt-4 flex items-start gap-2.5 text-[12px] leading-relaxed text-text-secondary">
                 <input
@@ -422,7 +423,7 @@ export function CheckoutForm({
 
               <SubmitButton />
 
-              <p className="mt-3 flex items-center justify-center gap-1.5 text-[11px] text-text-secondary">
+              <p className="mt-3 flex items-center justify-center gap-1.5 text-[12px] text-text-secondary">
                 <ShieldCheck size={14} strokeWidth={1.9} aria-hidden />
                 Bilgileriniz yalnızca siparişiniz için kullanılır.
               </p>

@@ -36,7 +36,7 @@ import type { Product } from '@/data/catalog';
 
 function SpecChip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center rounded-md border border-line bg-surface-page px-2 py-[3px] font-mono text-[10px] uppercase tracking-[0.08em] tabular-nums text-text-secondary">
+    <span className="inline-flex items-center rounded-(--card-radius) border border-line bg-surface-page px-2 py-[3px] font-mono text-[12px] uppercase tracking-[0.08em] tabular-nums text-text-secondary">
       {children}
     </span>
   );

@@ -166,7 +166,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           <div
             key={notice.id}
             role="status"
-            className="pointer-events-auto flex w-full max-w-md animate-[toast-in_320ms_var(--ease-out)_both] items-center gap-3 rounded-(--card-radius) border border-line bg-surface-card py-2.5 pl-3 pr-2 text-[13.5px] text-text-primary shadow-e3"
+            className="pointer-events-auto flex w-full max-w-md animate-[toast-in_320ms_var(--ease-out)_both] items-center gap-3 rounded-(--card-radius) border border-line bg-surface-card py-2.5 pl-3 pr-2 text-[14px] text-text-primary shadow-e3"
           >
             <span aria-hidden className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-brand-soft text-brand-text">
               <Check size={16} strokeWidth={2.5} />
@@ -175,7 +175,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             <Link
               href="/sepet"
               onClick={() => setNotice(null)}
-              className="shrink-0 rounded-full bg-brand px-3.5 py-2 text-[12.5px] font-semibold text-white transition-colors hover:bg-brand-dark"
+              className="inline-flex items-center shrink-0 rounded-full bg-brand px-3.5 h-9 text-[13px] font-semibold text-white transition-colors hover:bg-brand-dark"
             >
               Sepete git
             </Link>
