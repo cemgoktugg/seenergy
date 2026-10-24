@@ -61,7 +61,7 @@ export default async function TransferNoticePage({ searchParams }: { searchParam
         initial={{ order: siparis ?? '' }}
         fields={[
           ...CONTACT_FIELDS,
-          { name: 'order', label: 'Sipariş numarası', required: true, placeholder: 'Örn. 1024' },
+          { name: 'order', label: 'Sipariş numarası', required: true, placeholder: 'Örn. SE-1024' },
           { name: 'amount', label: 'Gönderilen tutar (TL)', required: true, placeholder: 'Örn. 2.450,00' },
           { name: 'bank', label: 'Gönderdiğiniz banka', placeholder: 'Örn. Ziraat Bankası' },
           { name: 'date', label: 'Ödeme tarihi', type: 'date' },
