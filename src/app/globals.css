@@ -1191,3 +1191,42 @@ html {
     opacity: 0;
   }
 }
+
+/* "Keşfet · Öne Çıkanlar" (ProductCard `featured`, 2026-10-24).
+   Float: each picture rises and settles a few pixels, out of step per card.
+   Entrance: when the band is revealed the cards rise in one after another
+   (--i is the card's index). An animation, not a transition, with
+   `backwards` fill, so it holds the start state only during its own delay and
+   leaves the card's hover lift untouched afterwards. Both are off under
+   reduced motion, where RevealOnScroll never arms either. */
+.featured-float {
+  animation: featured-float 6s ease-in-out infinite;
+}
+@keyframes featured-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+html.reveal-ready [data-reveal]:not(.is-revealed) .featured-grid > article {
+  opacity: 0;
+}
+html.reveal-ready [data-reveal].is-revealed .featured-grid > article {
+  animation: featured-in 700ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+@keyframes featured-in {
+  from {
+    opacity: 0;
+    transform: translateY(22px) scale(0.97);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .featured-float,
+  html.reveal-ready [data-reveal].is-revealed .featured-grid > article {
+    animation: none;
+  }
+}

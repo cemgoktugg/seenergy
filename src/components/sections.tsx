@@ -81,6 +81,7 @@ export function ProductGrid({
   products,
   columns = 4,
   layout = 'rail',
+  featured = false,
 }: {
   products: Product[];
   columns?: 4 | 5;
@@ -96,6 +97,9 @@ export function ProductGrid({
    * A band is something you glance at; a listing is the thing you came to read.
    */
   layout?: 'rail' | 'grid';
+  /** The homepage's "Öne Çıkanlar" band: larger, floating pictures and a
+   *  staggered entrance (see ProductCard's `featured`). */
+  featured?: boolean;
 }) {
   // Measured: 20px gutter. At 1440 that yields (1320 − 4×20)/5 = 248px and
   // (1320 − 3×20)/4 = 315px — the two card widths read off the reference.
@@ -113,10 +117,10 @@ export function ProductGrid({
 
   return (
     <div
-      className={`rail rail-rows-lg gap-(--space-grid-gap) auto-cols-[46%] sm:auto-cols-[31%] lg:grid lg:auto-cols-auto lg:overflow-visible ${desktop}`}
+      className={`rail rail-rows-lg gap-(--space-grid-gap) auto-cols-[46%] sm:auto-cols-[31%] lg:grid lg:auto-cols-auto lg:overflow-visible ${desktop} ${featured ? 'featured-grid' : ''}`}
     >
-      {products.map((product) => (
-        <ProductCard key={product.id} product={product} />
+      {products.map((product, index) => (
+        <ProductCard key={product.id} product={product} featured={featured} index={index} />
       ))}
     </div>
   );

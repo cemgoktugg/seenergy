@@ -36,6 +36,7 @@
 
 'use client';
 
+import type { CSSProperties } from 'react';
 import Link from 'next/link';
 import { Heart, MessageSquareQuote, Scale, ShoppingCart } from 'lucide-react';
 
@@ -67,7 +68,25 @@ function displayName(product: Product): string {
     : product.name;
 }
 
-export function ProductCard({ product, compact = false }: { product: Product; compact?: boolean }) {
+/**
+ * `featured` (the homepage's "Keşfet · Öne Çıkanlar" grid, 2026-10-24): a
+ * taller picture stage, the transparent cutout instead of the plated file —
+ * the product clearly larger, clear of the favourite / compare buttons —
+ * on a soft spotlight, the picture floating gently (`.featured-float`, out of
+ * step per card via `index`), and on hover a lift and a metallic shine across
+ * the stage. Listing pages keep the plain card.
+ */
+export function ProductCard({
+  product,
+  compact = false,
+  featured = false,
+  index = 0,
+}: {
+  product: Product;
+  compact?: boolean;
+  featured?: boolean;
+  index?: number;
+}) {
   /* Stock speaks only for a product that can be bought now. A price-on-request
      model reports its stock in the quote, so its 0 is not "Tükendi" — that
      greyed out the client's whole CCTV range. */
@@ -89,21 +108,44 @@ export function ProductCard({ product, compact = false }: { product: Product; co
   const discount = discountPercent(product);
   const badge = product.badge && !soldOut ? BADGES[product.badge] : null;
   const href = `/urun/${product.slug}`;
+  /* Featured stages carry a soft spotlight, on which the mock catalogue's
+     plated files show their white plate as a box; their transparent cutouts
+     (same names under cutout/, as the product page uses) do not. Uploaded
+     photos pass through. */
+  const image =
+    featured && product.image.startsWith('/mock/products/')
+      ? product.image.replace('/mock/products/', '/mock/products/cutout/')
+      : product.image;
 
   return (
-    <article className={`group relative flex h-full flex-col overflow-hidden border bg-surface-card transition-[box-shadow,border-color] duration-(--duration-base) ${
+    <article
+      style={featured ? ({ '--i': index } as CSSProperties) : undefined}
+      className={`group relative flex h-full flex-col overflow-hidden border bg-surface-card transition-[box-shadow,border-color] duration-(--duration-base) ${
       compact
         ? 'rounded-[14px] border-line-strong/60 hover:border-line-strong hover:shadow-e1'
-        : 'rounded-(--card-radius) border-line shadow-e1 hover:border-line-strong hover:shadow-e2'
+        : featured
+          ? 'rounded-(--card-radius) border-line shadow-e1 transition-[box-shadow,border-color,transform] hover:-translate-y-1 hover:border-line-strong hover:shadow-e3'
+          : 'rounded-(--card-radius) border-line shadow-e1 hover:border-line-strong hover:shadow-e2'
     }`}>
       {/* --- image stage ------------------------------------------------ */}
-      <div className="relative m-2 mb-0 overflow-hidden rounded-[calc(var(--card-radius)-4px)] bg-white">
+      <div
+        className={`relative m-2 mb-0 overflow-hidden rounded-[calc(var(--card-radius)-4px)] ${
+          featured ? 'bg-[radial-gradient(75%_70%_at_50%_45%,#ffffff_0%,#ffffff_45%,#eef0f3_100%)]' : 'bg-white'
+        }`}
+      >
         <Link href={href} className="block" aria-label={product.name}>
-          <div className={`flex items-center justify-center p-3 ${
-            compact ? 'h-[112px] sm:h-[124px] dt:h-[122px]' : 'h-[172px] sm:h-[188px] dt:h-[220px] dt:p-4'
-          }`}>
+          <div
+            style={featured ? { animationDelay: `${-(index % 7) * 0.9}s` } : undefined}
+            className={`flex items-center justify-center ${
+              compact
+                ? 'h-[112px] p-3 sm:h-[124px] dt:h-[122px]'
+                : featured
+                  ? 'featured-float h-[184px] px-11 py-4 sm:h-[200px] dt:h-[240px] dt:px-12 dt:py-6'
+                  : 'h-[172px] p-3 sm:h-[188px] dt:h-[220px] dt:p-4'
+            }`}
+          >
             <img
-              src={product.image}
+              src={image}
               alt={product.name}
               width={220}
               height={220}
@@ -114,6 +156,13 @@ export function ProductCard({ product, compact = false }: { product: Product; co
             />
           </div>
         </Link>
+        {/* Featured: a metallic gloss crossing the stage on hover. */}
+        {featured && (
+          <span
+            aria-hidden
+            className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 -skew-x-[20deg] bg-linear-to-r from-transparent via-white/70 to-transparent opacity-0 transition-[transform,opacity] duration-[900ms] ease-out group-hover:translate-x-[450%] group-hover:opacity-100 motion-reduce:hidden"
+          />
+        )}
 
         {badge && (
           <span

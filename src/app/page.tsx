@@ -136,7 +136,7 @@ export default async function HomePage() {
       <Section label="Öne çıkan ürünler">
         <SectionHeading eyebrow="Keşfet" title="Öne Çıkanlar" />
         <div className="pt-3 dt:pt-4">
-          <ProductGrid products={pick('one-cikan', 16, 4)} columns={4} />
+          <ProductGrid products={pick('one-cikan', 16, 4)} columns={4} featured />
         </div>
       </Section>
 
