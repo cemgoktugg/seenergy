@@ -21,7 +21,9 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const { data } = await query.graph({
     entity: "order",
     fields: ["id", "email"],
-    filters: { display_id: number },
+    // display_id is a number at runtime; the generated filter type only
+    // offers strings, so the literal is cast rather than stringified.
+    filters: { display_id: number } as never,
   });
   const order = data.find((row: { email?: string | null }) => (row.email ?? "").toLowerCase() === email);
   if (!order) {
