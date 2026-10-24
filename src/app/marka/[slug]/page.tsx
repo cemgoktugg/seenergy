@@ -11,8 +11,23 @@ import Link from 'next/link';
 
 import { CatalogShell } from '@/components/catalog-shell';
 import { brandSlug } from '@/data/catalog';
+import { BRANDS } from '@/data/site';
 import type { SearchParams } from '@/lib/catalog-query';
 import { loadCatalog } from '@/lib/medusa/catalog';
+
+/**
+ * Brands the site already names before the catalogue carries them: the
+ * homepage's brand strip and the client's four brand banners. Their pages
+ * open on the shell's coming-soon panel under the brand's own name; only a
+ * slug nobody links to gets the plain list of brands below.
+ */
+const ANNOUNCED: Record<string, string> = {
+  ...Object.fromEntries(BRANDS.map((brand) => [brand.href.split('/').pop()!, brand.name])),
+  dahua: 'Dahua',
+  hikvision: 'Hikvision',
+  unv: 'UNV',
+  neutron: 'Neutron',
+};
 
 export async function generateStaticParams() {
   const { brands } = await loadCatalog();
@@ -26,7 +41,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const { brandFromSlug } = await loadCatalog();
-  const brand = brandFromSlug(slug);
+  const brand = brandFromSlug(slug) ?? ANNOUNCED[slug];
   return {
     title: brand ? `${brand} ürünleri` : 'Marka',
     alternates: { canonical: `/marka/${slug}` },
@@ -42,7 +57,7 @@ export default async function BrandPage({
 }) {
   const [{ slug }, query, { brands: catalogBrands, brandFromSlug, byBrandSlug }] =
     await Promise.all([params, searchParams, loadCatalog()]);
-  const brand = brandFromSlug(slug);
+  const brand = brandFromSlug(slug) ?? ANNOUNCED[slug];
 
   if (!brand) {
     const brands = [...catalogBrands].sort((a, b) => a.localeCompare(b, 'tr'));
@@ -81,7 +96,11 @@ export default async function BrandPage({
     <CatalogShell
       eyebrow="Marka"
       title={brand}
-      description={`${brand} markasının katalogdaki ${scope.length} modeli.`}
+      description={
+        scope.length
+          ? `${brand} markasının katalogdaki ${scope.length} modeli.`
+          : `${brand} ürünleri için fiyat ve stok bilgisini bizden alabilirsiniz.`
+      }
       basePath={`/marka/${slug}`}
       scope={scope}
       params={query}

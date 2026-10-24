@@ -11,6 +11,7 @@
 import Link from 'next/link';
 import { Check, X } from 'lucide-react';
 
+import { EmptyScope } from '@/components/empty-scope';
 import { FilterDrawer } from '@/components/filter-drawer';
 import { ProductGrid } from '@/components/sections';
 import { formatPrice, type Product } from '@/data/catalog';
@@ -372,6 +373,11 @@ export async function CatalogShell({
         </div>
       </section>
 
+      {/* No products at all in this scope: a filter rail over nothing reads
+          as a broken page, so the scope gets the quote-and-featured panel. */}
+      {scope.length === 0 ? (
+        <EmptyScope title={title} />
+      ) : (
       <section className="container-main pb-10 pt-4 dt:pt-6" aria-label="Ürün listesi">
         <div className="grid gap-(--space-grid-gap) dt:grid-cols-[264px_minmax(0,1fr)]">
           {/* Desktop filter rail */}
@@ -475,28 +481,6 @@ export async function CatalogShell({
                   parsing.) */}
               {results.length > 0 ? (
                 <ProductGrid products={results} columns={4} layout="grid" />
-              ) : scope.length === 0 ? (
-                <div className="grid place-items-center rounded-(--panel-radius) border border-dashed border-line-strong bg-surface-card px-6 py-16 text-center">
-                  <p className="text-[16px] font-extrabold text-text-primary">Bu listede henüz ürün yok</p>
-                  <p className="mt-2 max-w-md text-[13px] leading-relaxed text-text-secondary">
-                    Ürünler eklendikçe burada listelenecek. Bu alandaki bir ürünü ya da projenizi sormak için
-                    bize ulaşabilirsiniz.
-                  </p>
-                  <div className="mt-5 flex flex-wrap justify-center gap-2">
-                    <Link
-                      href="/iletisim"
-                      className="inline-flex items-center rounded-full bg-brand px-5 py-2.5 text-[14px] font-semibold text-white transition-colors hover:bg-brand-dark"
-                    >
-                      Bize ulaşın
-                    </Link>
-                    <Link
-                      href="/kategori"
-                      className="inline-flex items-center rounded-full border border-line-strong px-5 py-2.5 text-[14px] font-semibold text-text-primary transition-colors hover:border-brand"
-                    >
-                      Tüm kategoriler
-                    </Link>
-                  </div>
-                </div>
               ) : (
                 <div className="grid place-items-center rounded-(--panel-radius) border border-dashed border-line-strong bg-surface-card px-6 py-16 text-center">
                   <p className="text-[16px] font-extrabold text-text-primary">
@@ -517,6 +501,7 @@ export async function CatalogShell({
           </div>
         </div>
       </section>
+      )}
     </>
   );
 }
