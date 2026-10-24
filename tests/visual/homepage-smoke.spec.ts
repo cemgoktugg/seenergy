@@ -79,7 +79,10 @@ test.describe('homepage', () => {
     // Section headers exist as real headings. (Was "All In One Bilgisayarlar",
     // a band that became the per-brand bands; the assertion outlived it.)
     await expect(page.getByRole('heading', { name: 'Haftanın Ürünleri' }).first()).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Blog & Markalarımız' })).toBeVisible();
+    // Since 2026-10-24 the brands have their own band under "Öne Çıkanlar"
+    // and the dark band holds the blog alone.
+    await expect(page.getByRole('heading', { name: 'Markalarımız', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Blog', exact: true })).toBeVisible();
   });
 
   test('product card keeps the measured proportions', async ({ page }) => {
@@ -101,8 +104,7 @@ test.describe('homepage', () => {
   test('brand wall, trust row and footer are visible', async ({ page }) => {
     await gotoStable(page, '/');
 
-    // The product showcases were removed; the logo wall remains in the
-    // "Blog & Markalarımız" band.
+    // The logo wall sits in the "Markalarımız" band, under the brand cards.
     await expect(page.locator('.brand-wall-plate')).toBeVisible();
     await expect(page.getByRole('contentinfo')).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Popüler Kategoriler' })).toBeVisible();

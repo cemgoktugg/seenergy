@@ -243,7 +243,7 @@ const VitrinPage = () => {
           <ListPreview list={list("one-cikan")} storefront={storefront} count={16} />
         </Band>
 
-        <Band n={++n} title="Blog ve markalar" where="Sayfa sonuna doğru koyu bölümdeki iki büyük banner." to="/vitrin/blok/banner">
+        <Band n={++n} title="Markalarımız" where="Öne Çıkanlar'ın altındaki iki marka kartı: yazıları ve bağlantıları buradan (Bannerlar → Markalarımız). Sol kartta SEENERGY logosu, sağ kartta Marka panosundaki markaların logoları gösterilir; ürün görseli alanı bu iki kartta kullanılmaz." to="/vitrin/blok/banner">
           <ImagePreview blocks={[...banner("dual-1"), ...banner("dual-2")]} storefront={storefront} />
         </Band>
 

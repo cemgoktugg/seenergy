@@ -15,6 +15,7 @@
 
 import { Hero } from '@/components/hero';
 import { BrandBoard, type BrandBoardEntry } from '@/components/brand-board';
+import { BrandShowcase, type PartnerBrand } from '@/components/brand-showcase';
 import { ProductSlider } from '@/components/product-slider';
 import { RevealOnScroll } from '@/components/reveal-on-scroll';
 import { Section } from '@/components/section';
@@ -22,7 +23,6 @@ import { SectionHeading } from '@/components/section-heading';
 import {
   BlogCards,
   BrandGrid,
-  DualBanners,
   ProductGrid,
   SeoEditorial,
   TrustRow,
@@ -77,6 +77,26 @@ export default async function HomePage() {
 
   const banner = (key: keyof typeof vitrin.banners, fallback: NonNullable<(typeof vitrin.banners)['wide']>) =>
     vitrin.banners[key] ?? fallback;
+
+  /* "Markalarımız": copy from the dual-1 / dual-2 banner slots, the
+     authorised brands from the brand board (admin → Vitrin → Marka panosu). */
+  const ownBrands = banner('dual-1', {
+    eyebrow: 'Kendi markalarımız',
+    title: 'Tescilli Markalarımız',
+    href: '/marka/seenergy',
+    tone: 'koyu',
+  });
+  const partnerCard = banner('dual-2', {
+    eyebrow: 'Yetkili satıcılık',
+    title: 'Resmi Yetkili Satıcısı Olduğumuz Markalar',
+    href: '/markalar',
+    tone: 'acik',
+  });
+  const partnerBrands: PartnerBrand[] = vitrin.brandBoard.map(({ brandHandle, logo }) => ({
+    name: brandFromSlug(brandHandle) ?? (brandHandle.length <= 3 ? brandHandle.toUpperCase() : brandHandle.charAt(0).toUpperCase() + brandHandle.slice(1)),
+    href: `/marka/${brandHandle}`,
+    logo,
+  }));
 
   return (
     <>
@@ -140,6 +160,19 @@ export default async function HomePage() {
         </div>
       </Section>
 
+      {/* 12b — Markalarımız (2026-10-24): the two brand cards and the brand
+             wall, moved up here from the dark blog band at the client's
+             request and redesigned (see BrandShowcase). */}
+      <Section label="Markalarımız">
+        <SectionHeading eyebrow="Markalar" title="Markalarımız" action={{ label: 'Tüm markalar', href: '/markalar' }} />
+        <div className="pt-3 dt:pt-4">
+          <BrandShowcase own={ownBrands} partners={partnerCard} brands={partnerBrands} />
+        </div>
+        <div className="pt-(--space-grid-gap)">
+          <BrandGrid />
+        </div>
+      </Section>
+
       {/* 13 — the second campaign-tile strip stood here. Removed when category
              discovery moved up to 04b: four category tiles at 73% depth, under
              a twelve-category board at 8%, is the same job done twice and the
@@ -147,17 +180,12 @@ export default async function HomePage() {
              CATEGORY_TILES_SECONDARY both still exist, so restoring it is a
              two-line change if the client wants the strip back. */}
 
-      {/* 14-17 — the second dark anchor.
-             Measured, the page ran light from the technical band at y=3960 all
-             the way to the footer: 5.570px of unbroken white-on-grey. These
-             three bands — blog, the brand promos, the brand wall — were also
-             the weakest stretch, and the brand wall specifically was the
-             deadest region on the page. Folding them into one chrome band gives
-             the page a light → dark → light → dark → footer rhythm and puts a
-             frame around the part that had none.
-             The brand wall stays a WHITE panel inside the dark: the generated
-             brand marks carry an opaque white plate, so on chrome they would
-             render as 45 white rectangles. Framed rather than inverted. */}
+      {/* 14-17 — the second dark anchor, holding the blog.
+             It was folded together from three weak light bands (blog, brand
+             promos, brand wall) to give the page a light → dark → light →
+             dark → footer rhythm. On 2026-10-24 the brand promos and the
+             brand wall moved up under "Öne Çıkanlar" (12b) at the client's
+             request; the band keeps the blog and its dark rhythm. */}
       <Section track="bleed">
         <div className="relative overflow-hidden bg-chrome py-9 dt:py-14">
           <span
@@ -165,35 +193,11 @@ export default async function HomePage() {
             className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-grad-1 via-grad-3 to-grad-4"
           />
           <div className="container-main">
-            <SectionHeading eyebrow="Bilgi ve markalar" title="Blog & Markalarımız" tone="dark" />
+            <SectionHeading eyebrow="Bilgi ve rehber" title="Blog" tone="dark" />
             <div className="pt-2.5 dt:pt-3">
               <BlogCards tone="dark" />
             </div>
 
-            <div className="pt-(--space-section)">
-              <DualBanners
-                items={[
-                  banner('dual-1', {
-                    eyebrow: 'Kendi markalarımız',
-                    title: 'Tescilli Markalarımız',
-                    href: '/markalar',
-                    tone: 'acik',
-                    productImage: '/mock/products/cutout/receiver-white.svg',
-                  }),
-                  banner('dual-2', {
-                    eyebrow: 'Yetkili satıcılık',
-                    title: 'Resmi Yetkili Satıcısı Olduğumuz Markalar',
-                    href: '/markalar',
-                    tone: 'turkuaz',
-                    productImage: '/mock/products/cutout/camera-white.svg',
-                  }),
-                ]}
-              />
-            </div>
-
-            <div className="pt-(--space-section)">
-              <BrandGrid />
-            </div>
           </div>
         </div>
       </Section>

@@ -85,8 +85,8 @@ const SLOT_NAMES: Record<string, string> = {
   "hero-side-1": "Sağ üst kart",
   "hero-side-2": "Sağ alt kart",
   wide: "Marka panosu başlığı (dört marka karesinin üstündeki şerit)",
-  "dual-1": "Çift banner — sol (koyu bölüm)",
-  "dual-2": "Çift banner — sağ (koyu bölüm)",
+  "dual-1": "Markalarımız — sol kart: Tescilli markalarımız (SEENERGY logosu sabit)",
+  "dual-2": "Markalarımız — sağ kart: Yetkili satıcılık (logolar Marka panosundan gelir)",
   "super-firsat-promo": "Süper Fırsat kartı (mor kart)",
 }
 
