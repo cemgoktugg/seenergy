@@ -225,6 +225,30 @@ The page ground is white with a faint dot grid and a sparse tile of technical
 line icons (`--page-ground`, `--page-dot`, `--page-pattern` in
 `globals.css`; tiles in `public/patterns/`).
 
+### Design system scales (2026-10-25) — stay on them
+
+A measured review found 29 font sizes (half-pixels, 101 texts under 12px),
+seven radii and ten button heights. They were snapped to one system; new code
+uses only these values:
+
+- **Type:** `text-[12px]` `13` `14` `16` `20` `24` `32` `40`. Nothing under 12.
+- **Radius:** `rounded-(--card-radius)` (10), `rounded-(--panel-radius)` (18),
+  `rounded-full`. No other radius.
+- **Pill buttons:** `h-9` (36, small), `h-11` (44, default), `h-13` (52,
+  primary/hero). Height, not `py-*`.
+- **Touch:** `@media (pointer: coarse)` in globals.css gives footer links,
+  breadcrumbs (`nav[aria-label='Konum']`), `dd > a` and text pills a 44px box.
+  Icon buttons carry an `aria-label` and size their own hit area.
+- **Images:** an uploaded product photo goes through `imageProps(src, width)`
+  (`src/lib/image.ts`) — Next's optimizer at the drawn size, 1×/2×. Uploads
+  are 1200px; drawn raw they made a listing 1.3 MB.
+
+Header: "Tüm Kategoriler" opens the whole tree (two panes); the bar names
+`NAV_FEATURED` (`src/data/site.ts`) on one line — 5 at 1200, 6 from 1440, 7
+from 1536 — so it never wraps. Product cards: a pointer gets the round cart
+button in the price row (`.card-quick`), touch the full-width one
+(`.card-cta`), never both.
+
 `Section` also picks the horizontal track: `main` (1320 content), `nav` (the
 wider 1400 chrome track the footer stack uses) and `bleed` (full width, for
 bands that paint edge to edge and bring their own inner container).

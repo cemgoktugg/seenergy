@@ -46,7 +46,7 @@ export const PRIMARY_NAV: NavItem[] = CATEGORY_TREE.map((node) => ({
 /**
  * The categories the nav bar names on one line, in order. Fourteen two-line
  * labels made a cramped bar; the full tree lives behind "Tüm Kategoriler".
- * The bar shows the first five at 1200, six from 1280 and all seven from 1440.
+ * The bar shows the first five at 1200, six from 1440 and all seven from 1536.
  */
 export const NAV_FEATURED = [
   '/kategori/cctv-guvenlik-sistemleri',

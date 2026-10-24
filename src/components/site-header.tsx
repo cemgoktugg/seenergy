@@ -711,7 +711,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
         aria-label="Ana kategoriler"
         /* One line, not fourteen two-line labels: "Tüm Kategoriler" opens the
            whole tree, and the bar names the seven categories people shop most
-           (NAV_FEATURED) — five at 1200, six from 1280, seven from 1440. */
+           (NAV_FEATURED) — five at 1200, six from 1440, seven from 1536. */
         className="nav-metal relative hidden dt:block dt:h-[48px]"
         onMouseLeave={scheduleClose}
       >
