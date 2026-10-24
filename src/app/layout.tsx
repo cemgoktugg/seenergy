@@ -62,7 +62,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const { byCategory } = await loadCatalog();
   const menuModels: MenuModels = {};
   for (const item of PRIMARY_NAV) {
-    for (const child of item.children ?? []) {
+    // A category without subcategories lists its own models under its own
+    // href — the all-categories panel shows them when it is selected.
+    for (const child of item.children ?? [item]) {
       const key = child.href.replace('/kategori/', '');
       // The house brand's own range leads its columns: that is the list the
       // client gave for this menu; other brands' products follow.

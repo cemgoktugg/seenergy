@@ -56,9 +56,7 @@ export function ProductBuy({ product }: { product: Product }) {
       ? 'Ekleniyor…'
       : atStock
         ? 'Stoktaki tümü sepette'
-        : inCart > 0
-          ? `Sepete Ekle (${inCart} sepette)`
-          : 'Sepete Ekle';
+        : 'Sepete Ekle';
   const blocked = soldOut || atStock || cart.busy;
 
   const addToCart = async () => {
@@ -152,10 +150,17 @@ export function ProductBuy({ product }: { product: Product }) {
               type="button"
               disabled={blocked}
               onClick={() => void addToCart()}
-              className="flex h-13 min-w-[180px] flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[16px] font-bold text-white shadow-e2 transition-[transform,background-color] duration-(--duration-fast) ease-in-out hover:-translate-y-px hover:bg-brand-dark disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
+              className="flex h-13 min-w-[180px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand text-[16px] font-bold text-white shadow-e2 transition-[transform,background-color] duration-(--duration-fast) ease-in-out hover:-translate-y-px hover:bg-brand-dark disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
             >
               <ShoppingCart size={19} strokeWidth={2} aria-hidden />
               {label}
+              {/* The count rides as a pill, not in the label: "Sepete Ekle
+                  (1 sepette)" broke onto two lines on a phone. */}
+              {inCart > 0 && !atStock && !cart.busy && (
+                <span className="hidden rounded-full bg-white/20 px-2 py-0.5 text-[12px] font-bold tabular-nums sm:inline">
+                  {inCart} sepette
+                </span>
+              )}
             </button>
             {/* Beside the cart button from `sm`; below it the row has no
                 room for a third control, so it moves to the secondary row. */}

@@ -125,7 +125,7 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                 {/* Always light, in both themes: it is the plate the product
                     stands on, the same idea as the product card's stage. Out
                     to the viewport's right edge from `sm`. */}
-                <div className="absolute inset-x-0 top-0 h-[190px] overflow-hidden bg-[radial-gradient(120%_100%_at_60%_40%,#ffffff_0%,#f3f4f7_55%,#e3e5ea_100%)] sm:inset-y-0 sm:left-auto sm:right-0 sm:h-auto sm:w-[54%]">
+                <div className="absolute inset-x-0 top-0 h-[190px] overflow-hidden bg-[radial-gradient(120%_100%_at_60%_40%,#ffffff_0%,#f3f4f7_55%,#e3e5ea_100%)] sm:inset-y-0 sm:left-auto sm:right-0 sm:h-auto sm:w-[56%] sm:[clip-path:polygon(16%_0,100%_0,100%_100%,0_100%)]">
                   {/* multiply on the contained picture: a product shot on white
                       loses its white box and stands on the stage instead of
                       sitting on it as a pasted rectangle. Safe because the
@@ -140,15 +140,12 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                     className={
                       cover
                         ? `object-cover ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`
-                        : `object-contain p-6 mix-blend-multiply sm:py-10 sm:pl-24 sm:pr-8 dt:py-12 dt:pl-40 dt:pr-14 ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
+                        : `object-contain p-5 mix-blend-multiply sm:py-8 sm:pl-24 sm:pr-8 dt:py-10 dt:pl-32 dt:pr-12 ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
                     }
                   />
-                  {/* The seam: the dark panel fades into the stage instead of
-                      meeting it at a hard vertical edge. */}
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute inset-y-0 left-0 hidden w-28 bg-linear-to-r from-chrome to-transparent sm:block dt:w-40"
-                  />
+                  {/* The seam is a clean diagonal cut (the clip-path above). A
+                      dark-to-clear gradient laid over the light stage read as a
+                      grey smear. */}
                 </div>
 
                 {/* --- copy ------------------------------------------------- */}
@@ -206,22 +203,35 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                       </ul>
                     ) : null}
 
-                    {/* The arrow travels on hover: motion that says "this goes
-                        somewhere". */}
-                    <Link
-                      href={slide.href}
-                      tabIndex={active ? 0 : -1}
-                      className={`group/cta mt-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-[12.5px] font-bold text-ink-fixed shadow-lg shadow-black/30 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand hover:text-white sm:mt-5 sm:px-5 sm:py-2.5 sm:text-[13.5px] dt:mt-7 dt:px-7 dt:py-3.5 dt:text-[15px] ${active ? RISE : ''}`}
+                    {/* Two actions: the slide's own, and a quote — most of this
+                        range sells by project, so "Teklif Al" is offered on
+                        every slide rather than left to the footer. The arrow
+                        travels on hover: motion that says "this goes somewhere". */}
+                    <div
+                      className={`mt-4 flex flex-wrap items-center gap-2.5 sm:mt-5 dt:mt-7 dt:gap-3 ${active ? RISE : ''}`}
                       style={{ animationDelay: '300ms' }}
                     >
-                      {slide.cta}
-                      <ArrowRight
-                        size={16}
-                        strokeWidth={2.25}
-                        aria-hidden
-                        className="transition-transform duration-(--duration-base) ease-out group-hover/cta:translate-x-1"
-                      />
-                    </Link>
+                      <Link
+                        href={slide.href}
+                        tabIndex={active ? 0 : -1}
+                        className="group/cta inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-[14px] font-bold text-ink-fixed shadow-lg shadow-black/30 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand hover:text-white dt:h-[52px] dt:px-7 dt:text-[16px]"
+                      >
+                        {slide.cta}
+                        <ArrowRight
+                          size={16}
+                          strokeWidth={2.25}
+                          aria-hidden
+                          className="transition-transform duration-(--duration-base) ease-out group-hover/cta:translate-x-1"
+                        />
+                      </Link>
+                      <Link
+                        href="/iletisim?konu=teklif"
+                        tabIndex={active ? 0 : -1}
+                        className="hidden h-11 items-center rounded-full border border-white/30 px-5 text-[14px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:border-white hover:bg-white/10 sm:inline-flex dt:h-[52px] dt:px-7 dt:text-[16px]"
+                      >
+                        Teklif Al
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>

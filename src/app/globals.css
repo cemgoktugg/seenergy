@@ -922,6 +922,22 @@ html.reveal-ready [data-reveal]:not(.is-revealed) {
   Unlayered on purpose: these have to beat the Tailwind utilities on the same
   elements, and layered rules cannot.
 */
+/* Product card actions: a pointer gets the round cart button in the price
+   row (`.card-quick`), a finger the full-width button under it (`.card-cta`)
+   — never both. `.card-touch` is the price-on-request text, which a pointer
+   sees as the "Teklif İste" pill instead. */
+@media (hover: hover) {
+  .card-cta,
+  .card-touch {
+    display: none;
+  }
+}
+@media (hover: none) {
+  .card-quick {
+    display: none;
+  }
+}
+
 @media (hover: none) {
   .card-detail {
     height: auto;

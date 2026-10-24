@@ -9,6 +9,7 @@
  */
 
 import Link from 'next/link';
+import { Heart, MapPin, Package, Zap } from 'lucide-react';
 import { useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
 
@@ -39,6 +40,13 @@ function Alert({ message }: { message?: string }) {
   ) : null;
 }
 
+const BENEFITS = [
+  { icon: Package, title: 'Sipariş takibi', text: 'Tüm siparişleriniz ve durumları tek yerde' },
+  { icon: Zap, title: 'Hızlı ödeme', text: 'Kayıtlı adreslerle tek adımda sipariş' },
+  { icon: MapPin, title: 'Adres defteri', text: 'Ev, iş ve şantiye adresleriniz hazır' },
+  { icon: Heart, title: 'Favoriler', text: 'Beğendiğiniz ürünleri kaydedin' },
+];
+
 const panel = 'rounded-(--panel-radius) border border-line bg-surface-card p-5 shadow-e1 dt:p-7';
 
 export function AuthForms({ next }: { next: string }) {
@@ -49,7 +57,7 @@ export function AuthForms({ next }: { next: string }) {
 
   return (
     <div className="grid gap-(--space-grid-gap) md:grid-cols-2">
-      <form action={signInAction} noValidate className={panel}>
+      <form action={signInAction} noValidate className={`${panel} flex flex-col`}>
         <h2 className="text-[18px] font-extrabold tracking-tight text-text-primary">Giriş yap</h2>
         <p className="mt-1 mb-5 text-[13px] text-text-secondary">
           Siparişlerinizi görmek ve daha hızlı ödeme yapmak için.
@@ -89,6 +97,25 @@ export function AuthForms({ next }: { next: string }) {
           </Link>
           , şifrenizi sıfırlayalım.
         </p>
+
+        {/* The sign-in card is shorter than the registration form beside it;
+            what membership gives fills that space with a reason to have one. */}
+        <div className="mt-6 border-t border-line pt-5 dt:mt-auto">
+          <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">Üyelik avantajları</p>
+          <ul className="mt-3 grid gap-2.5 sm:grid-cols-2">
+            {BENEFITS.map(({ icon: Icon, title, text }) => (
+              <li key={title} className="flex items-start gap-3 rounded-(--card-radius) bg-surface-page p-3">
+                <span aria-hidden className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-linear-to-br from-grad-2 to-grad-4 text-white">
+                  <Icon size={16} strokeWidth={2} />
+                </span>
+                <span>
+                  <span className="block text-[13px] font-bold text-text-primary">{title}</span>
+                  <span className="block text-[12px] leading-snug text-text-secondary">{text}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </form>
 
       <form action={registerAction} noValidate className={panel}>

@@ -77,7 +77,11 @@ function read(): Theme {
 /** The server renders the neutral state; nothing else is knowable there. */
 const serverSnapshot = (): Theme => 'system';
 
-export function ThemeToggle({ className = '' }: { className?: string }) {
+/**
+ * `inline` is the labelled form for the desktop utility strip: an unlabelled
+ * monitor glyph beside the account and cart buttons read as a device link.
+ */
+export function ThemeToggle({ className = '', inline = false }: { className?: string; inline?: boolean }) {
   const theme = useSyncExternalStore(subscribe, read, serverSnapshot);
 
   const cycle = useCallback(() => {
@@ -109,9 +113,10 @@ export function ThemeToggle({ className = '' }: { className?: string }) {
       /* Base is geometry only. Colour comes from the caller, because this
          control appears both on the white header row and on chrome, and those
          want opposite inks. */
-      className={`grid h-11 w-11 shrink-0 place-items-center rounded-full transition-colors duration-(--duration-fast) ease-in-out ${className}`}
+      className={`${inline ? 'flex items-center gap-1.5' : 'grid h-11 w-11 shrink-0 place-items-center rounded-full'} transition-colors duration-(--duration-fast) ease-in-out ${className}`}
     >
-      <Icon size={16} strokeWidth={1.9} aria-hidden />
+      <Icon size={inline ? 14 : 16} strokeWidth={1.9} aria-hidden />
+      {inline && <span>{LABELS[theme]}</span>}
     </button>
   );
 }

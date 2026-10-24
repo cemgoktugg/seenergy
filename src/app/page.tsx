@@ -207,9 +207,10 @@ export default async function HomePage() {
         <SeoEditorial />
       </Section>
 
-      {/* 19 — trust row. Part of the footer stack, so it uses the wider 1400
-             chrome track rather than the 1320 content container. */}
-      <Section track="nav" className="pb-6">
+      {/* 19 — trust row. On the 1320 content track like every band above it:
+             on the wider 1400 chrome track its boxes stood ~40px proud of the
+             column on each side. */}
+      <Section className="pb-6">
         <TrustRow items={vitrin.trust} />
       </Section>
 

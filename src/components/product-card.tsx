@@ -40,7 +40,7 @@ import type { CSSProperties } from 'react';
 import Link from 'next/link';
 
 import { quoteHref } from '@/lib/contact';
-import { Heart, MessageSquareQuote, Scale, ShoppingCart } from 'lucide-react';
+import { Check, Heart, MessageSquareQuote, Scale, ShoppingCart } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
@@ -249,37 +249,70 @@ export function ProductCard({
           </p>
 
           {/* Reserved even when empty, so a discounted and an undiscounted
-              card keep their prices level. */}
-          <p aria-hidden className="h-4 text-[12px] leading-4 tabular-nums text-text-secondary line-through decoration-text-secondary/60">
-            {product.compareAtPrice ? formatPrice(product.compareAtPrice) : ''}
+              card keep their prices level. The discount sits here, beside the
+              price it is measured from, which leaves the price row room for
+              the cart button. */}
+          <p aria-hidden className="flex h-4 items-center gap-1.5 text-[12px] leading-4 tabular-nums text-text-secondary">
+            {product.compareAtPrice ? (
+              <span className="line-through decoration-text-secondary/60">{formatPrice(product.compareAtPrice)}</span>
+            ) : null}
+            {discount !== null && discount > 0 && (
+              <span className="rounded-full bg-danger/10 px-1.5 py-[2px] text-[11px] font-bold leading-none text-danger-ink">
+                %{discount}
+              </span>
+            )}
           </p>
 
           {/* Tabular figures: prices sit in grids four and five across, and
               proportional digits make those columns visibly ragged. */}
-          <div aria-hidden className="flex h-[26px] items-center gap-2">
+          <div className="flex h-[30px] items-center justify-between gap-2">
             {product.price == null ? (
-              <p className="text-[13px] font-bold leading-tight text-text-primary sm:text-[14px]">{PRICE_ON_REQUEST}</p>
+              <>
+                <p aria-hidden className="card-touch text-[13px] font-bold leading-tight text-text-primary sm:text-[14px]">
+                  {PRICE_ON_REQUEST}
+                </p>
+                <Link
+                  href={quoteHref(product.sku)}
+                  aria-label={`${product.name} için teklif isteyin`}
+                  className="card-quick inline-flex h-[30px] items-center gap-1.5 rounded-full border border-line-strong px-3.5 text-[13px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:border-brand hover:bg-brand hover:text-white"
+                >
+                  <MessageSquareQuote size={15} strokeWidth={2} aria-hidden />
+                  Teklif İste
+                </Link>
+              </>
             ) : (
-              <p className="text-[17px] font-extrabold leading-none tracking-[-0.01em] tabular-nums text-text-primary sm:text-[19px] dt:text-[20px]">
-                {formatPrice(product.price)}
-              </p>
-            )}
-            {discount !== null && discount > 0 && (
-              <span className="shrink-0 rounded-full bg-danger/10 px-1.5 py-[3px] text-[11px] font-bold leading-none tabular-nums text-danger-ink">
-                %{discount}
-              </span>
+              <>
+                <p aria-hidden className="text-[17px] font-extrabold leading-none tracking-[-0.01em] tabular-nums text-text-primary sm:text-[19px] dt:text-[20px]">
+                  {formatPrice(product.price)}
+                </p>
+                {/* Always on screen for a pointer — the hover-only overlay this
+                    replaced left a shopper who never hovered without a way to
+                    buy from the card. It opens into "Sepete Ekle" on hover.
+                    Touch devices keep the full-width button below instead
+                    (`.card-quick` / `.card-cta` in globals.css). */}
+                <button
+                  type="button"
+                  disabled={soldOut}
+                  onClick={() => void cart.add(product.variantId, 1, product.name)}
+                  aria-label={`${product.name} ürününü sepete ekle`}
+                  className="card-quick group/add inline-flex h-9 shrink-0 items-center rounded-full bg-brand px-[9px] text-white shadow-e1 transition-colors duration-(--duration-fast) hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
+                >
+                  {added ? <Check size={18} strokeWidth={2.5} aria-hidden /> : <ShoppingCart size={18} strokeWidth={2} aria-hidden />}
+                  <span className="max-w-0 overflow-hidden whitespace-nowrap text-[13px] font-bold transition-[max-width,margin] duration-(--duration-base) ease-(--ease-out) group-hover:ml-1.5 group-hover:mr-1 group-hover:max-w-[110px] group-focus-visible/add:ml-1.5 group-focus-visible/add:max-w-[110px]">
+                    {soldOut ? 'Tükendi' : added ? 'Sepette' : 'Sepete Ekle'}
+                  </span>
+                </button>
+              </>
             )}
           </div>
         </div>
 
-        {/* --- cart control ----------------------------------------------
-            With a pointer: an overlay revealed on hover, across the bottom of
-            the image stage — it covers neither the name (a click there must
-            open the product) nor the price (the number being read).
-            Without one (`@media (hover: none)` in globals.css) it joins the
-            flow under the price, and every card grows by the same amount.
-            Focus-within keeps it reachable by keyboard in both. */}
-        <div className="card-cta pointer-events-none absolute inset-x-0 bottom-[calc(100%+8px)] translate-y-2 px-4 opacity-0 transition-[opacity,transform] duration-(--duration-base) ease-(--ease-out) group-hover:pointer-events-auto group-hover:translate-y-0 group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:translate-y-0 group-focus-within:opacity-100">
+        {/* --- cart control, touch only ----------------------------------
+            Without a pointer (`@media (hover: none)` in globals.css) the
+            action is a full-width button under the price, and every card grows
+            by the same amount. With a pointer it is the round button in the
+            price row above, and this block is not rendered visible. */}
+        <div className="card-cta">
           {/* No price: nothing to put in a cart — the action is a quote. */}
           {product.price == null ? (
             <Link

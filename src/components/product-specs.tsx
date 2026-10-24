@@ -60,6 +60,7 @@ import {
 } from 'lucide-react';
 
 import { SectionHeading } from '@/components/section-heading';
+import { SpecFold } from '@/components/spec-fold';
 import { brandSlug, categoryMeta, formatPrice, FREE_SHIPPING_FROM, type Product } from '@/data/catalog';
 import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { categorySpec, type CompatibilityItem, type SpecGroup } from '@/data/specs';
@@ -378,12 +379,18 @@ export function ProductSpecs({ product, specs }: { product: Product; specs: Spec
           {/* Compatibility flows WITH the groups rather than heading the rail:
               in the rail it made that column ~260px taller than the groups, so
               the rail could never stick. Here it balances the two columns. */}
-          <div className="dt:columns-2 dt:gap-(--space-grid-gap)">
-            {groups.map((group, index) => (
-              <SpecCard key={group.title} group={group} index={index} />
-            ))}
-            {compatibility.length > 0 && <CompatibilityCard items={compatibility} />}
-          </div>
+          {(() => {
+            const cards = (
+              <div className="dt:columns-2 dt:gap-(--space-grid-gap)">
+                {groups.map((group, index) => (
+                  <SpecCard key={group.title} group={group} index={index} />
+                ))}
+                {compatibility.length > 0 && <CompatibilityCard items={compatibility} />}
+              </div>
+            );
+            /* A short sheet fits a phone screen as it is; only a long one folds. */
+            return rowCount > 8 ? <SpecFold total={rowCount}>{cards}</SpecFold> : cards;
+          })()}
           <p className="max-w-[80ch] text-[12px] leading-relaxed text-text-secondary">
             Teknik özellikler üretici tarafından önceden haber verilmeksizin değiştirilebilir. Siparişten önce
             teyit etmek için ürün kodunu belirterek teknik destek ekibimize ulaşabilirsiniz.

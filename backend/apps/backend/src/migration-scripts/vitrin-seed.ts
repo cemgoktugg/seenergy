@@ -82,7 +82,7 @@ export default async function vitrin_seed({ container }: { container: MedusaCont
       chips: ["CCTV ve kayıt", "Network ve PoE", "Alarm ve geçiş kontrol"],
       cta: "Kategorileri Gör",
       href: "/kategori",
-      image: "/brand/seenergy-logo-hero.webp",
+      image: "/hero/seenergy-cctv.webp",
       fit: "contain",
     }, 0),
     block("hero-slide", {

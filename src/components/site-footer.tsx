@@ -10,7 +10,8 @@
 import Link from 'next/link';
 
 import { FooterColumns } from '@/components/footer-columns';
-import { FOOTER_COLUMNS, PAYMENT_METHODS, POPULAR_CATEGORIES, SITE } from '@/data/site';
+import { CATEGORY_TREE, categoryHref } from '@/data/categories';
+import { FOOTER_COLUMNS, PAYMENT_METHODS, SITE } from '@/data/site';
 import { telHref, waHref } from '@/lib/contact';
 import type { Company } from '@/lib/medusa/vitrin';
 
@@ -81,6 +82,9 @@ const SOCIAL: { label: string; href: string; Icon: Glyph }[] = [
   { label: 'Mesajlaşma', href: 'https://example.com', Icon: SocialMessage },
 ];
 
+const GROUPED = CATEGORY_TREE.filter((node) => node.children?.length);
+const SINGLES = CATEGORY_TREE.filter((node) => !node.children?.length);
+
 /**
  * Newsletter + social strip.
  *
@@ -92,7 +96,7 @@ const SOCIAL: { label: string; href: string; Icon: Glyph }[] = [
 export function NewsletterBar() {
   return (
     <section className="bg-linear-to-r from-grad-1 via-grad-3 to-grad-4 py-4">
-      <div className="container-nav flex flex-col items-center gap-4 lg:flex-row lg:justify-between">
+      <div className="container-main flex flex-col items-center gap-4 lg:flex-row lg:justify-between">
         <ul className="flex items-center gap-2.5">
           {SOCIAL.map(({ label, href, Icon }) => (
             <li key={label}>
@@ -136,7 +140,7 @@ export function NewsletterBar() {
 export function SiteFooter({ company }: { company: Company }) {
   return (
     <footer className="bg-surface-page pt-8">
-      <div className="container-nav">
+      <div className="container-main">
         <section aria-labelledby="popular-categories">
           <h2
             id="popular-categories"
@@ -144,18 +148,48 @@ export function SiteFooter({ company }: { company: Company }) {
           >
             Popüler Kategoriler
           </h2>
-          <ul className="mt-4 grid grid-cols-2 gap-x-6 gap-y-2 sm:grid-cols-3 lg:grid-cols-6">
-            {POPULAR_CATEGORIES.map((category) => (
-              <li key={category.href}>
+          {/* Grouped by the tree rather than one 26-link wall: the three
+              categories with subcategories each get a column headed by the
+              parent, and the eleven without share the last two. */}
+          <div className="mt-5 grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-3 lg:grid-cols-5">
+            {GROUPED.map((node) => (
+              <div key={node.slug}>
                 <Link
-                  href={category.href}
-                  className="text-[12px] text-text-secondary transition-colors hover:text-brand-dark lg:text-[13px]"
+                  href={categoryHref(node.slug)}
+                  className="text-[14px] font-bold text-text-primary transition-colors hover:text-brand-dark"
                 >
-                  {category.label}
+                  {node.label}
                 </Link>
-              </li>
+                <ul className="mt-2.5 space-y-2">
+                  {node.children!.map((child) => (
+                    <li key={child.slug}>
+                      <Link
+                        href={categoryHref(child.slug)}
+                        className="text-[13px] text-text-secondary transition-colors hover:text-brand-dark"
+                      >
+                        {child.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+            <div className="col-span-2 sm:col-span-3 lg:col-span-2">
+              <p className="text-[14px] font-bold text-text-primary">Diğer kategoriler</p>
+              <ul className="mt-2.5 grid grid-cols-2 gap-x-6 gap-y-2">
+                {SINGLES.map((node) => (
+                  <li key={node.slug}>
+                    <Link
+                      href={categoryHref(node.slug)}
+                      className="text-[13px] text-text-secondary transition-colors hover:text-brand-dark"
+                    >
+                      {node.label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
         </section>
 
         {/* Measured: three link columns, then a contact block on the right —
@@ -208,7 +242,7 @@ ${company.address}` : ''}
       </div>
 
       <div className="mt-6 border-t border-line bg-surface-utility py-4">
-        <div className="container-nav flex flex-col items-center justify-center gap-1 text-center text-[12px] text-text-secondary">
+        <div className="container-main flex flex-col items-center justify-center gap-1 text-center text-[12px] text-text-secondary">
           {/* Measured 105 characters on a single line at 12px across the 1400
               track — the longest measure left on the page once the editorial
               block was bounded. Capped so it wraps to two readable lines. */}

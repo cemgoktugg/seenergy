@@ -43,6 +43,21 @@ export const PRIMARY_NAV: NavItem[] = CATEGORY_TREE.map((node) => ({
   children: node.children?.map((child) => ({ label: child.label, href: categoryHref(child.slug) })),
 }));
 
+/**
+ * The categories the nav bar names on one line, in order. Fourteen two-line
+ * labels made a cramped bar; the full tree lives behind "Tüm Kategoriler".
+ * The bar shows the first five at 1200, six from 1280 and all seven from 1440.
+ */
+export const NAV_FEATURED = [
+  '/kategori/cctv-guvenlik-sistemleri',
+  '/kategori/kayit-ve-depolama',
+  '/kategori/network-urunleri',
+  '/kategori/uydu-sistemleri',
+  '/kategori/alarm-sistemleri',
+  '/kategori/yangin-algilama-sistemleri',
+  '/kategori/gecis-kontrol-sistemleri',
+];
+
 export const UTILITY_LINKS = [
   { label: 'Hakkımızda', href: '/hakkimizda', icon: 'info' as const },
   { label: 'İletişim', href: '/iletisim', icon: 'phone' as const },
@@ -130,7 +145,7 @@ export const HERO_SLIDES = [
     chips: ["CCTV ve kayıt", "Network ve PoE", "Alarm ve geçiş kontrol"],
     cta: "Kategorileri Gör",
     href: "/kategori",
-    image: "/brand/seenergy-logo-hero.webp",
+    image: "/hero/seenergy-cctv.webp",
     fit: "contain",
   },
   {

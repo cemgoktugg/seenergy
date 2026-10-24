@@ -315,15 +315,18 @@ function KeySpecs({ product, own }: { product: Product; own: SpecGroup[] }) {
             key={spec.label}
             className="flex min-w-0 items-center gap-3 rounded-(--card-radius) border border-line bg-surface-page px-3 py-2.5"
           >
+            {/* The icon steps aside below `sm`: two columns at 390 left the
+                value ~90px and cut "8 kanal IP ka…" short. Values wrap to two
+                lines rather than truncating. */}
             <span
               aria-hidden
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-(--card-radius) bg-linear-to-br from-grad-2 to-grad-4 text-white shadow-e1"
+              className="hidden h-9 w-9 shrink-0 place-items-center rounded-(--card-radius) bg-linear-to-br from-grad-2 to-grad-4 text-white shadow-e1 sm:grid"
             >
               <Icon size={17} strokeWidth={2} />
             </span>
             <div className="min-w-0">
-              <dt className="truncate text-[11px] font-medium text-text-secondary">{spec.label}</dt>
-              <dd className="truncate text-[13.5px] font-bold tabular-nums text-text-primary">{spec.value}</dd>
+              <dt className="truncate text-[12px] font-medium text-text-secondary">{spec.label}</dt>
+              <dd className="line-clamp-2 text-[14px] font-bold leading-snug tabular-nums text-text-primary">{spec.value}</dd>
             </div>
           </div>
         );
@@ -344,8 +347,15 @@ export default async function ProductPage({
   const product = bySlug(slug);
   if (!product) notFound();
 
-  const siblings = otherModelsOf(product);
-  const alternatives = alternativesTo(product);
+  /* A brand row of one or two cards left most of a four-column shelf empty.
+     Under four other models it has no row of its own: those models lead the
+     "Benzer Ürünler" row instead, the rest of it filled from the category. */
+  const siblingsAll = otherModelsOf(product);
+  const ownRow = siblingsAll.length >= 4;
+  const siblings = ownRow ? siblingsAll : [];
+  const alternatives = ownRow
+    ? alternativesTo(product)
+    : [...siblingsAll, ...alternativesTo(product).filter((item) => !siblingsAll.some((own) => own.id === item.id))];
   const details = await loadProductDetails(product.id);
   const category = categoryMeta(product.category);
   const { paragraphs, bullets } = partsOf(details.description);
