@@ -27,8 +27,7 @@ import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
 import { priceLabel, type Product } from '@/data/catalog';
 
-/** Where a quote request goes. */
-const QUOTE_HREF = '/iletisim';
+import { quoteHref } from '@/lib/contact';
 
 export function ProductBuy({ product }: { product: Product }) {
   /* The cart is Medusa's, shared through CartProvider: the header badge, the
@@ -109,7 +108,7 @@ export function ProductBuy({ product }: { product: Product }) {
       {onRequest ? (
         <div className="mt-5 flex items-stretch gap-2.5">
           <Link
-            href={QUOTE_HREF}
+            href={quoteHref(product.sku)}
             className="flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[16px] font-bold text-white shadow-e2 transition-[transform,background-color] duration-(--duration-fast) ease-in-out hover:-translate-y-px hover:bg-brand-dark"
           >
             <MessageSquareQuote size={19} strokeWidth={2} aria-hidden />
@@ -179,7 +178,7 @@ export function ProductBuy({ product }: { product: Product }) {
       <div className="mt-4 flex flex-wrap items-center gap-2.5 border-t border-line pt-4">
         {!onRequest && (
           <Link
-            href={QUOTE_HREF}
+            href={quoteHref(product.sku)}
             className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-line-strong text-[13px] font-semibold text-text-primary transition-colors duration-(--duration-fast) hover:border-text-primary"
           >
             <MessageSquareQuote size={16} strokeWidth={1.9} aria-hidden />
@@ -205,7 +204,7 @@ export function ProductBuy({ product }: { product: Product }) {
           </div>
           {onRequest ? (
             <Link
-              href={QUOTE_HREF}
+              href={quoteHref(product.sku)}
               className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-bold text-white"
             >
               <MessageSquareQuote size={17} strokeWidth={2} aria-hidden />

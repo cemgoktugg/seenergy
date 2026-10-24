@@ -38,6 +38,8 @@
 
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
+
+import { quoteHref } from '@/lib/contact';
 import { Heart, MessageSquareQuote, Scale, ShoppingCart } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
@@ -281,7 +283,7 @@ export function ProductCard({
           {/* No price: nothing to put in a cart — the action is a quote. */}
           {product.price == null ? (
             <Link
-              href="/iletisim"
+              href={quoteHref(product.sku)}
               aria-label={`${product.name} için teklif isteyin`}
               className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[13.5px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark"
             >

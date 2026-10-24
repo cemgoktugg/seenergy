@@ -316,7 +316,7 @@ function SupportCard({ product }: { product: Product }) {
       </p>
       <div className="relative mt-4 flex flex-wrap gap-2">
         <Link
-          href="/iletisim"
+          href={`/iletisim?konu=teknik&urun=${encodeURIComponent(product.sku)}`}
           className="inline-flex items-center gap-1 rounded-full bg-white px-4 py-2 text-[13px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) hover:bg-white/85"
         >
           Bize ulaşın

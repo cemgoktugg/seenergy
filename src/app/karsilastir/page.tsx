@@ -29,6 +29,8 @@
 
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
+
+import { quoteHref } from '@/lib/contact';
 import { ArrowLeft, Check, MessageSquareQuote, Minus, Plus, Scale, ShoppingCart, X } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
@@ -280,7 +282,7 @@ export default function ComparePage() {
                         <div className="mt-auto pt-2">
                           {product.price == null ? (
                             <Link
-                              href="/iletisim"
+                              href={quoteHref(product.sku)}
                               className="flex h-10 w-full items-center justify-center gap-1.5 rounded-full border border-line-strong text-[13px] font-semibold text-text-primary transition-colors hover:border-text-primary"
                             >
                               <MessageSquareQuote size={15} strokeWidth={2} aria-hidden />

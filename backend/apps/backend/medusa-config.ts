@@ -42,6 +42,8 @@ module.exports = defineConfig({
   modules: [
     // SEENERGY Vitrin: the storefront's editable design content.
     { resolve: './src/modules/vitrin' },
+    // SEENERGY Talepler: requests left on the storefront's forms.
+    { resolve: './src/modules/inquiry' },
     // Pictures uploaded in the admin. Medusa's local provider writes each
     // file's public URL with a hard default of http://localhost:9000/static,
     // so on a live server every upload would have been stored with a
