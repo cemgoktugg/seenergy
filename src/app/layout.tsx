@@ -51,7 +51,7 @@ const THEME_SCRIPT = `try{var t=localStorage.getItem('seenergy-theme');if(t==='d
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   // Cached under the `vitrin` tag, so every page stays static.
-  const { announcement } = await loadVitrin();
+  const { announcement, company } = await loadVitrin();
 
   /* The mega panel lists each subcategory's models (the client asked for
      "AHD Sistem" to open onto SE-1080LD, SE-1080MD…). Built here, on the
@@ -110,7 +110,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <SiteHeader promo={announcement} menuModels={menuModels} />
             <main id="icerik">{children}</main>
             <NewsletterBar />
-            <SiteFooter />
+            <SiteFooter company={company} />
             <CompareBar />
           </StoreProvider>
         </CartProvider>

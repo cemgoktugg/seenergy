@@ -11,6 +11,13 @@ const backend = new URL(process.env.MEDUSA_BACKEND_URL ?? 'http://localhost:9000
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  /* Old and alternative addresses of pages that now exist under one name. */
+  async redirects() {
+    return [
+      { source: '/mesafeli-satis', destination: '/mesafeli-satis-sozlesmesi', permanent: true },
+      { source: '/kampanyalar', destination: '/kampanyalar/haftanin-urunleri', permanent: false },
+    ];
+  },
   images: {
     remotePatterns: [
       {

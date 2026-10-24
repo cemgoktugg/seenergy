@@ -176,6 +176,30 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       backgroundPhoto,
     ],
   },
+  company: {
+    title: "Şirket bilgileri",
+    where:
+      "Sitenin her yerinde kullanılan iletişim ve şirket bilgileri: alt bilgi, İletişim sayfası, sözleşmeler (Mesafeli Satış, Ön Bilgilendirme, KVKK), sipariş onayındaki havale bilgileri. Boş bırakılan alan sitede gösterilmez.",
+    repeatable: false,
+    itemName: "şirket bilgisi",
+    itemTitle: () => "Şirket bilgileri",
+    fields: [
+      { name: "legal_name", label: "Şirket unvanı", type: "text", required: true, placeholder: "SEENERGY Güvenlik Teknolojileri A.Ş.", hint: "Sözleşmelerde satıcı olarak yazılır." },
+      { name: "phone", label: "Telefon", type: "text", placeholder: "0850 000 00 00" },
+      { name: "whatsapp", label: "WhatsApp hattı", type: "text", placeholder: "0532 000 00 00", hint: "Doldurulursa iletişim sayfasında ve ürün sayfalarındaki teklif kutusunda WhatsApp düğmesi çıkar." },
+      { name: "email", label: "E-posta", type: "text", placeholder: "info@ornek.com.tr" },
+      { name: "address", label: "Adres", type: "textarea" },
+      { name: "hours", label: "Çalışma saatleri", type: "text", placeholder: "Hafta içi 09:00 – 18:00, Cumartesi 09:00 – 14:00" },
+      { name: "map_url", label: "Harita bağlantısı", type: "text", hint: "Google Haritalar'daki 'Paylaş' bağlantısı. İletişim sayfasında 'Yol tarifi al' düğmesi olur." },
+      { name: "mersis", label: "MERSİS numarası", type: "text" },
+      { name: "tax_office", label: "Vergi dairesi", type: "text" },
+      { name: "tax_number", label: "Vergi numarası", type: "text" },
+      { name: "kep", label: "KEP adresi", type: "text" },
+      { name: "bank_name", label: "Banka adı (havale / EFT)", type: "text", hint: "Havale / EFT ile verilen siparişlerin onay sayfasında gösterilir." },
+      { name: "bank_holder", label: "Hesap sahibi", type: "text" },
+      { name: "iban", label: "IBAN", type: "text", placeholder: "TR00 0000 0000 0000 0000 0000 00", hint: "Gerçek IBAN girilene kadar müşteriye 'banka bilgileri ayrıca iletilecek' denir; yanlış bir hesaba ödeme yapılmaz." },
+    ],
+  },
   "brand-board": {
     title: "Marka panosu",
     where:

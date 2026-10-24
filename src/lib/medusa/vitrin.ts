@@ -81,8 +81,45 @@ const BRAND_BOARD: BrandBoardItem[] = ['dahua', 'hikvision', 'neutron', 'unv'].m
   logo: `/brand-logos/${handle}.webp`,
 }));
 
+/** Şirket bilgileri (admin → Vitrin → Şirket bilgileri). Empty = not shown. */
+export interface Company {
+  legalName: string;
+  phone: string;
+  whatsapp: string;
+  email: string;
+  address: string;
+  hours: string;
+  mapUrl: string;
+  mersis: string;
+  taxOffice: string;
+  taxNumber: string;
+  kep: string;
+  bankName: string;
+  bankHolder: string;
+  iban: string;
+}
+
+/** Until the block exists: what the footer showed, and the old BANK_* env. */
+const COMPANY_FALLBACK: Company = {
+  legalName: 'SEENERGY Güvenlik Teknolojileri A.Ş.',
+  phone: '0850 000 00 00',
+  whatsapp: '',
+  email: '',
+  address: 'Organize Sanayi Bölgesi, 4. Cadde No: 12\nBaşakşehir / İstanbul',
+  hours: 'Hafta içi 09:00 – 18:00',
+  mapUrl: '',
+  mersis: '',
+  taxOffice: '',
+  taxNumber: '',
+  kep: '',
+  bankName: process.env.BANK_NAME ?? '',
+  bankHolder: process.env.BANK_HOLDER ?? '',
+  iban: process.env.BANK_IBAN ?? '',
+};
+
 export interface Vitrin {
   announcement: string;
+  company: Company;
   slides: HeroSlide[];
   heroSide: Banner[];
   banners: Partial<Record<'wide' | 'dual-1' | 'dual-2' | 'super-firsat-promo', Banner>>;
@@ -115,6 +152,7 @@ interface StoreVitrin {
       cta_href?: string;
     }>[];
     trust: Block<TrustItem>[];
+    company: Block<Record<string, unknown>>[];
   }>;
 }
 
@@ -140,6 +178,27 @@ const toBanner = (data: RawBanner): Banner => ({
   tone: (TONES as readonly string[]).includes(str(data.tone)) ? (data.tone as Tone) : 'koyu',
 });
 
+function toCompany(data: Record<string, unknown> | undefined): Company {
+  if (!data) return COMPANY_FALLBACK;
+  return {
+    legalName: str(data.legal_name) || COMPANY_FALLBACK.legalName,
+    phone: str(data.phone),
+    whatsapp: str(data.whatsapp),
+    email: str(data.email),
+    address: str(data.address),
+    hours: str(data.hours),
+    mapUrl: str(data.map_url),
+    mersis: str(data.mersis),
+    taxOffice: str(data.tax_office),
+    taxNumber: str(data.tax_number),
+    kep: str(data.kep),
+    // The storefront's BANK_* env still answers until the admin has a value.
+    bankName: str(data.bank_name) || (process.env.BANK_NAME ?? ''),
+    bankHolder: str(data.bank_holder) || (process.env.BANK_HOLDER ?? ''),
+    iban: str(data.iban) || (process.env.BANK_IBAN ?? ''),
+  };
+}
+
 /** What the site showed before the Vitrin module existed. */
 const FALLBACK: Vitrin = {
   announcement: SITE.promo,
@@ -161,6 +220,7 @@ const FALLBACK: Vitrin = {
   brandBoard: BRAND_BOARD,
   techBand: null,
   trust: TRUST_ITEMS.map((item) => ({ ...item })),
+  company: COMPANY_FALLBACK,
   lists: {},
 };
 
@@ -183,6 +243,7 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
 
   return {
     announcement: str(b.announcement?.[0]?.data.text),
+    company: toCompany(b.company?.[0]?.data),
     slides: (b['hero-slide'] ?? [])
       .map((block) => ({
         ...block.data,

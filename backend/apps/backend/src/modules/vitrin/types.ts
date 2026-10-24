@@ -12,6 +12,7 @@ export type BlockGroup =
   | "banner"
   | "brand-band"
   | "brand-board"
+  | "company"
   | "tech-band"
   | "trust"
 

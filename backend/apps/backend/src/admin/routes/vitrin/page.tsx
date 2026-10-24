@@ -173,6 +173,13 @@ const VitrinPage = () => {
           <Heading level="h2">Ana sayfa, yukarıdan aşağı</Heading>
         </div>
 
+        <Band n={++n} title={GROUPS.company.title} where={GROUPS.company.where} to="/vitrin/blok/company">
+          <Text size="small" className="text-ui-fg-subtle">
+            {group("company")[0]?.data.legal_name ?? "—"} · {group("company")[0]?.data.phone || "telefon yok"} ·{" "}
+            {group("company")[0]?.data.iban ? "IBAN girildi" : "IBAN girilmedi"}
+          </Text>
+        </Band>
+
         <Band n={++n} title={GROUPS.announcement.title} where={GROUPS.announcement.where} to="/vitrin/blok/announcement">
           <Badge size="small">{announcement?.data.text ?? "—"}</Badge>
         </Band>

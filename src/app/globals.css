@@ -1228,3 +1228,127 @@ html.reveal-ready [data-reveal].is-revealed .featured-grid > article {
     animation: none;
   }
 }
+
+/* Body text of the corporate, legal and help pages (info-page.tsx). */
+.info-prose {
+  color: var(--color-text-primary);
+  font-size: 14.5px;
+  line-height: 1.75;
+}
+.info-prose > * + * {
+  margin-top: 0.9em;
+}
+.info-prose h2 {
+  margin-top: 1.9em;
+  font-size: 19px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.3;
+}
+.info-prose h2:first-child {
+  margin-top: 0;
+}
+.info-prose h3 {
+  margin-top: 1.4em;
+  font-size: 15.5px;
+  font-weight: 700;
+}
+.info-prose p,
+.info-prose li {
+  color: color-mix(in srgb, var(--color-text-primary) 84%, var(--color-surface-card));
+}
+.info-prose ul,
+.info-prose ol {
+  padding-left: 1.3em;
+}
+.info-prose ul {
+  list-style: disc;
+}
+.info-prose ol {
+  list-style: decimal;
+}
+.info-prose li + li {
+  margin-top: 0.35em;
+}
+.info-prose li::marker {
+  color: var(--color-text-secondary);
+}
+.info-prose a {
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.info-prose strong {
+  color: var(--color-text-primary);
+  font-weight: 700;
+}
+.info-prose table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+.info-prose th,
+.info-prose td {
+  border-bottom: 1px solid var(--color-line);
+  padding: 0.6em 0.75em 0.6em 0;
+  text-align: left;
+  vertical-align: top;
+}
+.info-prose th {
+  width: 34%;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+}
+@media (min-width: 1200px) {
+  .info-prose {
+    font-size: 15px;
+  }
+}
+
+/* FAQ accordions (/sss): native <details>, no script. */
+.info-prose .faq-group + .faq-group {
+  margin-top: 2em;
+}
+.info-prose .faq-item {
+  margin-top: 0.6em;
+  border: 1px solid var(--color-line);
+  border-radius: var(--card-radius);
+  background: var(--color-surface-card);
+  transition: border-color var(--duration-fast);
+}
+.info-prose .faq-item[open] {
+  border-color: var(--color-line-strong);
+}
+.info-prose .faq-item summary {
+  display: flex;
+  cursor: pointer;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.85em 1em;
+  font-weight: 700;
+  list-style: none;
+}
+.info-prose .faq-item summary::-webkit-details-marker {
+  display: none;
+}
+.info-prose .faq-item summary::after {
+  content: '+';
+  flex-shrink: 0;
+  font-size: 1.25em;
+  font-weight: 400;
+  color: var(--color-text-secondary);
+  transition: transform var(--duration-base);
+}
+.info-prose .faq-item[open] summary::after {
+  transform: rotate(45deg);
+}
+.info-prose .faq-answer {
+  padding: 0 1em 0.9em;
+}
+
+/* Card grids inside a prose page keep their own link styling. */
+.info-prose .not-prose a {
+  font-weight: inherit;
+  text-decoration: none;
+}

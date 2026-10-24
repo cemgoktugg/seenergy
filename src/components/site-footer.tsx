@@ -11,6 +11,8 @@ import Link from 'next/link';
 
 import { FooterColumns } from '@/components/footer-columns';
 import { FOOTER_COLUMNS, PAYMENT_METHODS, POPULAR_CATEGORIES, SITE } from '@/data/site';
+import { telHref, waHref } from '@/lib/contact';
+import type { Company } from '@/lib/medusa/vitrin';
 
 /**
  * Generic social glyphs drawn inline.
@@ -130,7 +132,8 @@ export function NewsletterBar() {
   );
 }
 
-export function SiteFooter() {
+/** `company`: admin → Vitrin → Şirket bilgileri; empty fields are not shown. */
+export function SiteFooter({ company }: { company: Company }) {
   return (
     <footer className="bg-surface-page pt-8">
       <div className="container-nav">
@@ -162,14 +165,30 @@ export function SiteFooter() {
 
           <div className="col-span-2 lg:col-span-1">
             <p className="text-[14px] font-bold text-text-primary">Bize Ulaşın</p>
-            <p className="mt-4 text-[16px] font-bold text-text-primary">0850 000 00 00</p>
-            <address className="mt-3 text-[12px] not-italic leading-relaxed text-text-secondary lg:text-[13px]">
-              {SITE.name}
-              <br />
-              Organize Sanayi Bölgesi, 4. Cadde No: 12
-              <br />
-              Başakşehir / İstanbul
+            {company.phone ? (
+              <a href={telHref(company.phone)} className="mt-4 block text-[16px] font-bold text-text-primary hover:text-brand-dark">
+                {company.phone}
+              </a>
+            ) : null}
+            {company.whatsapp ? (
+              <a href={waHref(company.whatsapp)} target="_blank" rel="noopener" className="mt-1 block text-[13px] font-semibold text-text-secondary hover:text-text-primary">
+                WhatsApp: {company.whatsapp}
+              </a>
+            ) : null}
+            {company.email ? (
+              <a href={`mailto:${company.email}`} className="mt-1 block text-[13px] text-text-secondary hover:text-text-primary">
+                {company.email}
+              </a>
+            ) : null}
+            <address className="mt-3 whitespace-pre-line text-[12px] not-italic leading-relaxed text-text-secondary lg:text-[13px]">
+              {company.legalName || SITE.name}
+              {company.address ? `
+${company.address}` : ''}
             </address>
+            {company.hours ? <p className="mt-2 text-[12px] text-text-secondary lg:text-[13px]">{company.hours}</p> : null}
+            <Link href="/iletisim" className="mt-3 inline-flex text-[12.5px] font-semibold text-text-primary underline underline-offset-4 hover:text-brand-dark">
+              İletişim sayfası
+            </Link>
           </div>
         </div>
 

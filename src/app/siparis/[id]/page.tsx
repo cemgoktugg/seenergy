@@ -8,6 +8,7 @@ import { CartReset } from '@/app/siparis/[id]/cart-reset';
 import { formatPrice } from '@/data/catalog';
 import { paymentLabel } from '@/data/checkout';
 import { MedusaError, medusa } from '@/lib/medusa/client';
+import { loadVitrin } from '@/lib/medusa/vitrin';
 
 /**
  * Order confirmation — `/siparis/[id]`.
@@ -16,8 +17,8 @@ import { MedusaError, medusa } from '@/lib/medusa/client';
  * re-computation of the cart. The id is Medusa's unguessable order id, which
  * is what lets a guest see their order without an account.
  *
- * Bank details are read from the environment (BANK_NAME, BANK_HOLDER,
- * BANK_IBAN) and never invented: until they are configured, the page says the
+ * Bank details come from admin → Vitrin → Şirket bilgileri (the BANK_* env
+ * still answers until the admin has a value) and are never invented: until they are configured, the page says the
  * details will follow by e-mail rather than printing a placeholder IBAN that
  * someone might pay into.
  */
@@ -67,14 +68,10 @@ const imagePath = (thumbnail: string | null) => {
   }
 };
 
-const BANK = {
-  name: process.env.BANK_NAME,
-  holder: process.env.BANK_HOLDER,
-  iban: process.env.BANK_IBAN,
-};
-
 export default async function OrderPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
+  const { company } = await loadVitrin();
+  const BANK = { name: company.bankName, holder: company.bankHolder, iban: company.iban };
   if (!/^order_[A-Z0-9]+$/.test(id)) notFound();
 
   let order: StoreOrder;

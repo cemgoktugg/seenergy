@@ -253,7 +253,7 @@ export const FOOTER_COLUMNS = [
   {
     title: 'Müşteri İlişkileri',
     links: [
-      { label: 'Mesafeli Satış Sözleşmesi', href: '/mesafeli-satis' },
+      { label: 'Mesafeli Satış Sözleşmesi', href: '/mesafeli-satis-sozlesmesi' },
       { label: 'Gizlilik ve Güvenlik', href: '/gizlilik' },
       { label: 'Kullanım Koşulları', href: '/kullanim-kosullari' },
       { label: 'İade ve Değişim Şartları', href: '/iade-degisim' },

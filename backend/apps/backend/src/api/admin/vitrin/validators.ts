@@ -18,6 +18,7 @@ export const BLOCK_GROUPS = [
   "banner",
   "brand-band",
   "brand-board",
+  "company",
   "tech-band",
   "trust",
 ] as const
