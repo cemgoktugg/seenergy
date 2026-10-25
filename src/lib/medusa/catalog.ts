@@ -205,6 +205,39 @@ export interface ProductDetails {
   specs: SpecGroup[];
   /** The manufacturer's datasheet (PDF), when one was uploaded. */
   datasheet: string | null;
+  /** Leader-line labels drawn over the first photo (see Callout). */
+  callouts: Callout[];
+}
+
+/**
+ * One label on the product photo, datasheet style: a dot on the part (x, y —
+ * fractions of the photo, 0–1), a line to a tag at the stage's left or right
+ * edge at height `ty`. Stored as `metadata.callouts`; only for a photo whose
+ * points were placed by hand, since a dot on the wrong part is worse than none.
+ */
+export interface Callout {
+  x: number;
+  y: number;
+  ty: number;
+  side: 'left' | 'right';
+  value: string;
+  label: string;
+}
+
+const fraction = (value: unknown): number | null =>
+  typeof value === 'number' && value >= 0 && value <= 1 ? value : null;
+
+export function calloutsFrom(value: unknown): Callout[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap((item) => {
+    const c = item as Record<string, unknown> | null;
+    const x = fraction(c?.x);
+    const y = fraction(c?.y);
+    const ty = fraction(c?.ty) ?? y;
+    const text = str(c?.value);
+    if (x == null || y == null || ty == null || !text) return [];
+    return [{ x, y, ty, side: c?.side === 'left' ? 'left' : 'right', value: text, label: str(c?.label) } as Callout];
+  }).slice(0, 4);
 }
 
 const str = (value: unknown): string => (typeof value === 'string' ? value.trim() : '');
@@ -239,5 +272,6 @@ export const loadProductDetails = cache(async (id: string): Promise<ProductDetai
     description: str(product?.description),
     specs: specsFrom(product?.metadata?.specs),
     datasheet: str(product?.metadata?.datasheet_url) || null,
+    callouts: calloutsFrom(product?.metadata?.callouts),
   };
 });

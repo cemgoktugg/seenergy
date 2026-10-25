@@ -21,26 +21,22 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Heart, Minus, MessageSquareQuote, Plus, Scale, ShoppingCart, Zap } from 'lucide-react';
+import { FileText, Heart, Minus, MessageSquareQuote, Plus, Scale, ShoppingCart, Zap } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
 import { priceLabel, type Product } from '@/data/catalog';
 
-import { quoteHref } from '@/lib/contact';
+import { quoteHref, waHref } from '@/lib/contact';
 
-export function ProductBuy({ product }: { product: Product }) {
+export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?: string }) {
   /* The cart is Medusa's, shared through CartProvider: the header badge, the
      cards and the cart page all read the same response this button updates. */
   const cart = useCart();
   const router = useRouter();
   const inCart = cart.quantityOf(product.variantId);
-  const { has, toggle, count, ready } = useStore();
+  const { has, toggle, ready } = useStore();
   const favourite = ready && has('favourites', product.id);
-  const comparing = ready && has('compare', product.id);
-  /* The limit is enforced in the store; surfacing it here stops the control
-     from looking broken when a fifth product silently refuses to be added. */
-  const compareFull = ready && !comparing && count('compare') >= COMPARE_LIMIT;
   const onRequest = product.price == null;
   const soldOut = product.stock === 0;
   /* Stock is enforced by Medusa; capping the stepper at what is left saves
@@ -84,34 +80,26 @@ export function ProductBuy({ product }: { product: Product }) {
     </button>
   );
 
-  const compareButton = (
-    <button
-      type="button"
-      onClick={() => toggle('compare', product.id)}
-      disabled={compareFull}
-      aria-pressed={comparing}
-      className={`flex h-11 flex-1 items-center justify-center gap-2 rounded-full border text-[13px] font-semibold transition-colors duration-(--duration-fast) disabled:cursor-not-allowed disabled:opacity-50 ${
-        comparing
-          ? 'border-text-primary bg-surface-page text-text-primary'
-          : 'border-line-strong text-text-primary hover:border-text-primary'
-      }`}
-    >
-      <Scale size={16} strokeWidth={1.9} aria-hidden />
-      {comparing ? 'Karşılaştırmada' : compareFull ? `Karşılaştırma dolu (${COMPARE_LIMIT})` : 'Karşılaştır'}
-    </button>
-  );
-
   return (
     <>
       {onRequest ? (
-        <div className="mt-5 flex items-stretch gap-2.5">
+        <div className="mt-4 flex flex-wrap items-stretch gap-2.5">
           <Link
             href={quoteHref(product.sku)}
-            className="flex h-13 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[16px] font-bold text-white shadow-e2 transition-[transform,background-color] duration-(--duration-fast) ease-in-out hover:-translate-y-px hover:bg-brand-dark"
+            className="flex h-13 flex-1 basis-full items-center justify-center gap-2 rounded-full bg-brand text-[16px] sm:basis-0 font-bold text-white transition-colors duration-(--duration-fast) hover:bg-brand-dark"
           >
-            <MessageSquareQuote size={19} strokeWidth={2} aria-hidden />
-            Fiyat Teklifi Al
+            Teklif al
           </Link>
+          {whatsapp ? (
+            <a
+              href={waHref(whatsapp, `Merhaba, ${product.sku} için fiyat almak istiyorum.`)}
+              target="_blank"
+              rel="noopener"
+              className="flex h-13 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-text-primary bg-surface-card text-[16px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card"
+            >
+              WhatsApp’tan sor
+            </a>
+          ) : null}
           {favouriteButton('grid')}
         </div>
       ) : (
@@ -179,21 +167,8 @@ export function ProductBuy({ product }: { product: Product }) {
         </>
       )}
 
-      {/* Secondary: a quote for volume / project buyers, and compare. */}
-      <div className="mt-4 flex flex-wrap items-center gap-2.5 border-t border-line pt-4">
-        {!onRequest && (
-          <Link
-            href={quoteHref(product.sku)}
-            className="flex h-11 flex-1 items-center justify-center gap-2 rounded-full border border-line-strong text-[13px] font-semibold text-text-primary transition-colors duration-(--duration-fast) hover:border-text-primary"
-          >
-            <MessageSquareQuote size={16} strokeWidth={1.9} aria-hidden />
-            <span className="sm:hidden">Teklif iste</span>
-            <span className="hidden sm:inline">Toplu alım için teklif iste</span>
-          </Link>
-        )}
-        {compareButton}
-        {!onRequest && favouriteButton('grid h-11! w-11! sm:hidden')}
-      </div>
+      {/* Below `sm` the favourite has no room beside the cart button. */}
+      {!onRequest && <div className="mt-2.5 flex justify-end sm:hidden">{favouriteButton('grid h-11! w-11!')}</div>}
 
       {/* Sticky buy bar, below `dt` only: the desktop buy card stays in view on
           its own. It floats over the page, so it takes the overlay shadow. */}
@@ -204,7 +179,7 @@ export function ProductBuy({ product }: { product: Product }) {
             <p
               className={`font-extrabold leading-tight tabular-nums text-text-primary ${onRequest ? 'text-[13px]' : 'text-[16px]'}`}
             >
-              {priceLabel(product.price)}
+              {onRequest ? 'Fiyat teklifle' : priceLabel(product.price)}
             </p>
           </div>
           {onRequest ? (
@@ -213,7 +188,7 @@ export function ProductBuy({ product }: { product: Product }) {
               className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-bold text-white"
             >
               <MessageSquareQuote size={17} strokeWidth={2} aria-hidden />
-              Fiyat Teklifi Al
+              Teklif al
             </Link>
           ) : (
             <button
@@ -229,5 +204,58 @@ export function ProductBuy({ product }: { product: Product }) {
         </div>
       </div>
     </>
+  );
+}
+
+/**
+ * The line of plain links under the offer box: the datasheet, compare, and the
+ * next thing a buyer of this product needs (recorders for a camera). Text
+ * links, not a third row of pill buttons — they are reference, not purchase.
+ */
+export function ProductLinks({
+  product,
+  datasheet,
+  related,
+}: {
+  product: Product;
+  datasheet: string | null;
+  related?: { label: string; href: string } | null;
+}) {
+  const { has, toggle, count, ready } = useStore();
+  const comparing = ready && has('compare', product.id);
+  const compareFull = ready && !comparing && count('compare') >= COMPARE_LIMIT;
+  const link =
+    'inline-flex min-h-9 items-center gap-1.5 text-[14px] font-semibold text-text-primary underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-text-primary';
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1">
+      {datasheet && (
+        <a href={datasheet} target="_blank" rel="noopener" className={link}>
+          <FileText size={16} strokeWidth={2} aria-hidden />
+          Teknik föy (PDF)
+        </a>
+      )}
+      <button
+        type="button"
+        onClick={() => toggle('compare', product.id)}
+        disabled={compareFull}
+        aria-pressed={comparing}
+        className={`${link} disabled:cursor-not-allowed disabled:opacity-50`}
+      >
+        <Scale size={16} strokeWidth={1.9} aria-hidden />
+        {comparing ? 'Karşılaştırmada' : compareFull ? `Karşılaştırma dolu (${COMPARE_LIMIT})` : 'Karşılaştırmaya ekle'}
+      </button>
+      {product.price != null && (
+        <Link href={quoteHref(product.sku)} className={link}>
+          <MessageSquareQuote size={16} strokeWidth={1.9} aria-hidden />
+          Toplu alım için teklif
+        </Link>
+      )}
+      {related && (
+        <Link href={related.href} className={link}>
+          {related.label}
+        </Link>
+      )}
+    </div>
   );
 }

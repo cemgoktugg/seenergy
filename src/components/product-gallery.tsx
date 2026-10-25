@@ -22,6 +22,7 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
 import { imageProps } from '@/lib/image';
+import type { Callout } from '@/lib/medusa/catalog';
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -124,15 +125,71 @@ function Thumbs({
   );
 }
 
+/** Photo fraction (0–1) → stage percent: the picture sits in a 7% inset. */
+const onStage = (fraction: number) => 7 + fraction * 86;
+
+/**
+ * Datasheet-style labels over the first photo: a dot on the part, a line that
+ * breaks once and runs to a tag at the stage edge. Drawn in stage percent so
+ * they hold at every width (the picture is square and inset by a percentage).
+ * They step aside while the mouse zooms the picture, which they would no
+ * longer line up with.
+ */
+function CalloutLayer({ callouts }: { callouts: Callout[] }) {
+  return (
+    <div aria-hidden className="pointer-events-none absolute inset-0 transition-opacity duration-(--duration-fast) pointer-fine:group-hover:opacity-0">
+      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
+        {callouts.map((c) => {
+          const x = onStage(c.x);
+          const y = onStage(c.y);
+          const ty = onStage(c.ty);
+          const edge = c.side === 'left' ? 3 : 97;
+          const bend = Math.abs(ty - y) < 1 ? x : x + (c.side === 'left' ? -6 : 6);
+          return (
+            <polyline
+              key={`${c.value}-${c.x}`}
+              points={`${x},${y} ${bend},${ty} ${edge},${ty}`}
+              fill="none"
+              stroke="rgb(31 35 40 / 0.55)"
+              strokeWidth="1"
+              vectorEffect="non-scaling-stroke"
+            />
+          );
+        })}
+      </svg>
+      {callouts.map((c) => (
+        <span
+          key={`dot-${c.value}-${c.x}`}
+          className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[rgb(195,19,28)] bg-white shadow-[0_0_0_4px_rgb(195_19_28/0.12)]"
+          style={{ left: `${onStage(c.x)}%`, top: `${onStage(c.y)}%` }}
+        />
+      ))}
+      {callouts.map((c) => (
+        <span
+          key={`tag-${c.value}-${c.x}`}
+          className="absolute -translate-y-1/2 rounded-(--card-radius) border border-[#dadde1] bg-white px-2.5 py-1.5 text-ink-fixed shadow-e1 dt:px-3 dt:py-2"
+          style={{ top: `${onStage(c.ty)}%`, ...(c.side === 'left' ? { left: '3%' } : { right: '3%' }) }}
+        >
+          <span className="block text-[14px] font-bold leading-tight tabular-nums dt:text-[16px]">{c.value}</span>
+          {c.label && <span className="block text-[12px] leading-tight text-[#5f6770]">{c.label}</span>}
+        </span>
+      ))}
+    </div>
+  );
+}
+
 export function ProductGallery({
   images,
   alt,
   badges,
+  callouts = [],
 }: {
   images: string[];
   alt: string;
   /** Server-rendered status pills, laid over the stage's top-left corner. */
   badges?: ReactNode;
+  /** Leader-line labels for the FIRST picture (metadata.callouts). */
+  callouts?: Callout[];
 }) {
   const count = images.length;
   const many = count > 1;
@@ -217,8 +274,12 @@ export function ProductGallery({
       onKeyDown={onKeyDown}
     >
       {/* --- stage ------------------------------------------------------ */}
-      <div className="group relative overflow-hidden rounded-(--panel-radius) border border-line bg-linear-to-b from-surface-card to-surface-page shadow-e1">
-        <span aria-hidden className="absolute inset-x-0 top-0 z-10 block h-[3px] bg-linear-to-r from-grad-1 via-grad-3 to-grad-4" />
+      {/* A plate, not a card: the same light steel in both themes (the
+          product photos are shot on white and multiply onto it), with the
+          corner marks of a technical drawing instead of a border and shadow. */}
+      <div className="group relative overflow-hidden rounded-(--panel-radius) bg-[#f4f5f7]">
+        {!badges && <span aria-hidden className="pointer-events-none absolute left-4 top-4 z-10 h-4 w-4 border-l border-t border-[#b9bec5]" />}
+        <span aria-hidden className="pointer-events-none absolute bottom-4 right-4 z-10 h-4 w-4 border-b border-r border-[#b9bec5]" />
 
         <div ref={stageRef} className={TRACK}>
           {images.map((src, index) => (
@@ -228,7 +289,7 @@ export function ProductGallery({
               aria-roledescription={many ? 'görsel' : undefined}
               aria-label={many ? `${index + 1} / ${count}` : undefined}
               aria-hidden={many && index !== active ? true : undefined}
-              className="aspect-square w-full shrink-0 snap-center [scroll-snap-stop:always]"
+              className="relative aspect-square w-full shrink-0 snap-center [scroll-snap-stop:always]"
             >
               <button
                 type="button"
@@ -237,7 +298,7 @@ export function ProductGallery({
                 onPointerLeave={zoomOut}
                 tabIndex={index === active ? 0 : -1}
                 aria-label="Görseli tam ekran aç"
-                className="block h-full w-full cursor-zoom-in overflow-hidden p-6 sm:p-8 dt:p-10"
+                className="block h-full w-full cursor-zoom-in overflow-hidden p-[7%]"
               >
                 <img
                   {...imageProps(src, 640)}
@@ -248,9 +309,10 @@ export function ProductGallery({
                   fetchPriority={index === 0 ? 'high' : undefined}
                   decoding={index === 0 ? 'sync' : 'async'}
                   draggable={false}
-                  className="h-full w-full object-contain transition-transform duration-(--duration-base) ease-out motion-reduce:transition-none"
+                  className="h-full w-full object-contain mix-blend-multiply transition-transform duration-(--duration-base) ease-out motion-reduce:transition-none"
                 />
               </button>
+              {index === 0 && callouts.length > 0 && <CalloutLayer callouts={callouts} />}
             </div>
           ))}
         </div>

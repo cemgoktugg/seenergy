@@ -34,10 +34,14 @@ These routes are real, not placeholders:
 
 ```
 /                     homepage
-/urun/[slug]          product detail — hero (gallery + sales-first buy card:
-                      quantity, Sepete Ekle, Hemen Al; quote/compare secondary),
-                      sticky section bar, description + highlights, spec
-                      table, the brand's other models, similar products
+/urun/[slug]          product detail, datasheet style (2026-10-25): photo on a
+                      plate with leader-line callouts (metadata.callouts, x/y
+                      fractions of the photo — set by hand per photo, migration
+                      seenergy-cctv-callouts), model code as the heading, a
+                      3/6-cell spec summary from the product's own sheet, the
+                      offer plate (price or "Fiyat teklifle"), a link row
+                      (teknik föy, karşılaştır, uyumlu NVR/DVR), spec table,
+                      similar products
 /kategori             all categories — the tree with its subcategories
 /kategori/[slug]      category listing, for every category and subcategory;
                       a parent lists its subcategories' products too

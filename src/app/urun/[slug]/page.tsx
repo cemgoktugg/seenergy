@@ -35,29 +35,17 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
-  Aperture,
   BadgeCheck,
-  BatteryCharging,
-  Camera,
   Check,
   ChevronRight,
-  Cpu,
   Download,
-  FileText,
-  HardDrive,
   Headphones,
-  Layers,
-  Moon,
   ReceiptText,
   RefreshCcw,
-  Sun,
-  Tag,
   Truck,
-  Wifi,
-  type LucideIcon,
 } from 'lucide-react';
 
-import { ProductBuy } from '@/components/product-buy';
+import { ProductBuy, ProductLinks } from '@/components/product-buy';
 import { ProductGallery } from '@/components/product-gallery';
 import { ProductSpecs } from '@/components/product-specs';
 import { SectionHeading } from '@/components/section-heading';
@@ -75,6 +63,7 @@ import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { PRODUCT_TRUST, SITE } from '@/data/site';
 import { keySpecsOf, type SpecGroup } from '@/data/specs';
 import { loadCatalog, loadProductDetails, loadProducts } from '@/lib/medusa/catalog';
+import { loadVitrin } from '@/lib/medusa/vitrin';
 
 const TRUST_ICONS = {
   invoice: ReceiptText,
@@ -194,21 +183,88 @@ function Breadcrumb({ product }: { product: Product }) {
  * whole meaning, so a screen reader hears "2.849,90 ₺, önceki fiyat 3.238,52 ₺,
  * %12 indirim" instead of three disconnected numbers.
  */
+/**
+ * The heading as a datasheet heads a model: its code, then what it is.
+ * "SEENERGY SE-IPC5083LD 5MP IP Dome Kamera" becomes SE-IPC5083LD over
+ * "5MP IP Dome Kamera". A name without a leading code (a token with a digit)
+ * stays whole.
+ */
+function titleOf(product: Product): { code: string; rest: string } {
+  const brand = product.brand.toLocaleLowerCase('tr');
+  const bare = product.name.toLocaleLowerCase('tr').startsWith(brand + ' ')
+    ? product.name.slice(product.brand.length + 1).trim()
+    : product.name;
+  const match = bare.match(/^([A-Z0-9][A-Z0-9.-]*\d[A-Z0-9.-]*)\s+(.+)$/);
+  return match ? { code: match[1], rest: match[2] } : { code: bare, rest: '' };
+}
+
+/** Which rows a buyer decides on, most decisive first. */
+const SHEET_ORDER = [
+  /^çözünürlük/i,
+  /kanal sayısı/i,
+  /^lens/i,
+  /gece/i,
+  /solar panel/i,
+  /optik|yakınlaştırma/i,
+  /bağlantı/i,
+  /video sıkıştırma|kodlama/i,
+  /disk/i,
+  /giriş voltajı|besleme/i,
+  /güç tüketimi/i,
+  /koruma sınıfı/i,
+];
+
+/**
+ * The six-cell summary: the product's own sheet, picked by SHEET_ORDER, each
+ * value cut to its first clause ("2,8 mm sabit · 5 MP" becomes "2,8 mm
+ * sabit"). Without an own sheet, only what the product's name states — never
+ * the category template, which is a guess about another product. Three or
+ * six cells, so the grid has no hole.
+ */
+function sheetOf(product: Product, own: SpecGroup[]): { label: string; value: string }[] {
+  const rows = own.length
+    ? own.flatMap((group) => group.rows).filter((row) => !/ürün tipi/i.test(row.label))
+    : keySpecsOf({ ...product, price: null }, 6, []);
+  const picked: typeof rows = [];
+  for (const pattern of SHEET_ORDER) {
+    const row = rows.find((candidate) => pattern.test(candidate.label) && !picked.includes(candidate));
+    if (row) picked.push(row);
+  }
+  const cells = picked.map((row) => {
+    let value = row.value.split(' · ')[0].replace(/^En çok /, '');
+    /* A long first clause keeps its figure and unit: "8 W monokristal
+       silikon" wrapped to three lines in a cell meant for "8 W". */
+    const figure = value.length > 14 ? value.match(/^[\d.,]+(?:\s?[–-]\s?[\d.,]+)?\s?[A-Za-z°%]+/) : null;
+    if (figure) value = figure[0];
+    return { label: row.label.charAt(0).toLocaleLowerCase('tr') + row.label.slice(1), value };
+  });
+  return cells.length >= 6 ? cells.slice(0, 6) : cells.length >= 3 ? cells.slice(0, 3) : [];
+}
+
+function SpecSheet({ cells }: { cells: { label: string; value: string }[] }) {
+  return (
+    <dl className="mt-5 grid grid-cols-2 overflow-hidden rounded-(--panel-radius) border border-line sm:grid-cols-3">
+      {cells.map((cell) => (
+        <div key={cell.label} className="-mb-px -mr-px border-b border-r border-line px-4 py-3">
+          <dt className="sr-only">{cell.label}</dt>
+          <dd className="text-[16px] font-bold leading-tight sm:text-[20px] tabular-nums text-text-primary">{cell.value}</dd>
+          <dd aria-hidden className="mt-0.5 text-[13px] text-text-secondary">{cell.label}</dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 function PriceBlock({ product }: { product: Product }) {
   const discount = discountPercent(product);
 
   /* No price yet: the block says how to get one instead of printing a 0. */
   if (product.price == null) {
     return (
-      <div>
-        <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">Fiyat</p>
-        <p className="mt-1 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[32px]">
-          {PRICE_ON_REQUEST}
-        </p>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-text-secondary">
-          Bu model için güncel fiyat ve stok bilgisi teklifle verilir. Ürün kodu{' '}
-          <span className="font-mono font-semibold text-text-primary">{product.sku}</span>.
-        </p>
+      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+        <p className="text-[24px] font-extrabold leading-tight tracking-tight text-text-primary">Fiyat teklifle</p>
+        <p className="text-[14px] text-text-secondary">Aynı gün dönüş</p>
+        <p className="sr-only">{PRICE_ON_REQUEST}</p>
       </div>
     );
   }
@@ -282,59 +338,6 @@ function ShippingLine({ product }: { product: Product }) {
   );
 }
 
-/** A mark for a headline spec, read off its label. */
-function iconFor(label: string): LucideIcon {
-  const key = label.toLocaleLowerCase('tr');
-  if (/çözünürlük|görüntü/.test(key)) return Camera;
-  if (/lens/.test(key)) return Aperture;
-  if (/gece/.test(key)) return Moon;
-  if (/solar|panel/.test(key)) return Sun;
-  if (/batarya|pil|kapasite|enerji/.test(key)) return BatteryCharging;
-  if (/bağlantı|ağ|wi-?fi/.test(key)) return Wifi;
-  if (/disk|depolama|bellek/.test(key)) return HardDrive;
-  if (/kanal|port/.test(key)) return Layers;
-  if (/tip/.test(key)) return Tag;
-  return Cpu;
-}
-
-/**
- * Headline specs — the values that answer "will this work for me" before the
- * buy button, not after it (docs/PRODUCT_MODEL §2.3): the product's own sheet
- * when it has one, otherwise read out of its name.
- */
-function KeySpecs({ product, own }: { product: Product; own: SpecGroup[] }) {
-  const specs = keySpecsOf(product, 4, own);
-  if (specs.length === 0) return null;
-
-  return (
-    <dl className="grid grid-cols-2 gap-2.5">
-      {specs.map((spec) => {
-        const Icon = iconFor(spec.label);
-        return (
-          <div
-            key={spec.label}
-            className="flex min-w-0 items-center gap-3 rounded-(--card-radius) border border-line bg-surface-page px-3 py-2.5"
-          >
-            {/* The icon steps aside below `sm`: two columns at 390 left the
-                value ~90px and cut "8 kanal IP ka…" short. Values wrap to two
-                lines rather than truncating. */}
-            <span
-              aria-hidden
-              className="hidden h-9 w-9 shrink-0 place-items-center rounded-(--card-radius) bg-linear-to-br from-grad-2 to-grad-4 text-white shadow-e1 sm:grid"
-            >
-              <Icon size={17} strokeWidth={2} />
-            </span>
-            <div className="min-w-0">
-              <dt className="truncate text-[12px] font-medium text-text-secondary">{spec.label}</dt>
-              <dd className="line-clamp-2 text-[14px] font-bold leading-snug tabular-nums text-text-primary">{spec.value}</dd>
-            </div>
-          </div>
-        );
-      })}
-    </dl>
-  );
-}
-
 /* ------------------------------------------------------------------ */
 
 export default async function ProductPage({
@@ -356,7 +359,16 @@ export default async function ProductPage({
   const alternatives = ownRow
     ? alternativesTo(product)
     : [...siblingsAll, ...alternativesTo(product).filter((item) => !siblingsAll.some((own) => own.id === item.id))];
-  const details = await loadProductDetails(product.id);
+  const [details, { company }] = await Promise.all([loadProductDetails(product.id), loadVitrin()]);
+  const title = titleOf(product);
+  const sheet = sheetOf(product, details.specs);
+  /* What a camera buyer needs next: a recorder of the same system. */
+  const related =
+    product.category === 'ip-sistem' && !/nvr/i.test(product.name)
+      ? { label: 'Uyumlu NVR kayıt cihazları', href: '/arama?q=NVR' }
+      : product.category === 'ahd-sistem' && !/dvr/i.test(product.name)
+        ? { label: 'Uyumlu DVR kayıt cihazları', href: '/arama?q=DVR' }
+        : null;
   const category = categoryMeta(product.category);
   const { paragraphs, bullets } = partsOf(details.description);
   const lead = summaryOf(details.description, 190);
@@ -437,10 +449,6 @@ export default async function ProductPage({
           One white band over the grey page, so the product and its purchase
           read as the page's subject and everything below as reference. */}
       <section aria-label="Ürün bilgileri" className="relative overflow-hidden border-b border-line bg-surface-card">
-        <span
-          aria-hidden
-          className="pointer-events-none absolute -right-40 -top-40 h-[520px] w-[520px] rounded-full bg-grad-1/15 blur-3xl"
-        />
         <div className="container-main relative pb-8 pt-3 dt:pb-14 dt:pt-5">
           <Breadcrumb product={product} />
 
@@ -454,6 +462,7 @@ export default async function ProductPage({
                 key={product.id}
                 images={gallery}
                 alt={product.name}
+                callouts={details.callouts}
                 badges={
                   product.stock > 0 && (product.badge === 'super-firsat' || product.freeShipping) ? (
                     <>
@@ -474,42 +483,35 @@ export default async function ProductPage({
             </div>
 
             <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <Link
-                  href={`/marka/${brandSlug(product.brand)}`}
-                  className="inline-flex items-center rounded-full bg-chrome px-3 py-1 text-[12px] font-extrabold tracking-[0.08em] text-white transition-opacity duration-(--duration-fast) hover:opacity-85"
-                >
+              <p className="flex flex-wrap items-center gap-x-2 text-[14px] text-text-secondary">
+                <Link href={`/marka/${brandSlug(product.brand)}`} className="font-bold text-text-primary hover:underline">
                   {product.brand}
                 </Link>
-                <Link
-                  href={category.href}
-                  className="inline-flex items-center rounded-full border border-line px-3 py-1 text-[12px] font-semibold text-text-secondary transition-colors duration-(--duration-fast) hover:border-text-primary hover:text-text-primary"
-                >
+                <Link href={category.href} className="hover:text-text-primary hover:underline">
                   {category.label}
                 </Link>
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-line px-3 py-1 text-[12px] text-text-secondary">
-                  Ürün kodu
-                  <span className="font-mono font-semibold text-text-primary">{product.sku}</span>
-                </span>
-              </div>
+              </p>
 
-              <h1 className="mt-4 text-[24px] font-extrabold leading-[1.12] tracking-tight text-text-primary text-balance dt:text-[40px]">
-                {product.name}
+              {/* The model code leads, the way a datasheet is headed: it is
+                  what an installer searches for and quotes. The rest of the
+                  name is the second line of the same heading. */}
+              <h1 className="mt-1.5 text-text-primary">
+                <span className="block text-[32px] font-extrabold leading-none tracking-tight tabular-nums dt:text-[40px]">
+                  {title.code}
+                </span>
+                {title.rest && (
+                  <span className="mt-2 block text-[20px] font-medium leading-snug text-text-secondary">{title.rest}</span>
+                )}
               </h1>
               {lead && (
-                <p className="mt-3 max-w-[60ch] text-[14px] leading-relaxed text-text-secondary dt:text-[16px]">{lead}</p>
+                <p className="mt-4 max-w-[60ch] text-[14px] leading-relaxed text-text-secondary dt:text-[16px]">{lead}</p>
               )}
 
-              {keySpecsOf(product, 4, details.specs).length > 0 && (
-                <div className="mt-5">
-                  <KeySpecs product={product} own={details.specs} />
-                </div>
-              )}
+              {sheet.length > 0 && <SpecSheet cells={sheet} />}
 
-              {/* The purchase card: price, availability, quantity and the cart
-                  button are one decision, so they sit on one surface. Quote and
-                  compare are secondary and sit under the cart button. */}
-              <div className="mt-5 rounded-(--panel-radius) border border-line bg-surface-card p-5 shadow-e2 dt:p-6">
+              {/* The offer: price (or "teklifle"), availability and the one
+                  decision, on a plain plate rather than a shadowed card. */}
+              <div className="mt-5 rounded-(--panel-radius) bg-surface-page p-5 dt:p-6">
                 <PriceBlock product={product} />
                 {product.price != null && (
                   <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5">
@@ -517,38 +519,10 @@ export default async function ProductPage({
                     <ShippingLine product={product} />
                   </div>
                 )}
-                <ProductBuy product={product} />
+                <ProductBuy product={product} whatsapp={company.whatsapp || company.phone} />
               </div>
 
-              {/* The manufacturer's datasheet. Installers and project buyers
-                  ask for it before anything else. */}
-              {details.datasheet && (
-                <a
-                  href={details.datasheet}
-                  target="_blank"
-                  rel="noopener"
-                  className="group mt-3 flex items-center gap-3 rounded-(--panel-radius) border border-line bg-surface-card px-4 py-3 transition-colors duration-(--duration-fast) hover:border-text-primary"
-                >
-                  <span
-                    aria-hidden
-                    className="grid h-10 w-10 shrink-0 place-items-center rounded-(--card-radius) bg-[rgb(195,19,28)]/10 text-[rgb(195,19,28)]"
-                  >
-                    <FileText size={19} strokeWidth={2} />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-[14px] font-bold text-text-primary">Teknik föy (PDF)</span>
-                    <span className="block truncate text-[12px] text-text-secondary">
-                      {product.sku} · üretici teknik özellik belgesi
-                    </span>
-                  </span>
-                  <Download
-                    size={18}
-                    strokeWidth={2.25}
-                    aria-hidden
-                    className="shrink-0 text-text-secondary transition-transform duration-(--duration-fast) group-hover:translate-y-0.5 group-hover:text-text-primary"
-                  />
-                </a>
-              )}
+              <ProductLinks product={product} datasheet={details.datasheet} related={related} />
 
               <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-line pt-5 sm:grid-cols-3">
                 {PRODUCT_TRUST.map((item) => {
