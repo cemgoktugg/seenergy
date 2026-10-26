@@ -28,20 +28,27 @@
  * scrolling working for free, and stays inside the dependency budget — no
  * carousel library.
  *
- * Deliberately NOT autoplaying. The hero above it already advances on a 5s
- * timer; two more self-advancing tracks in the same viewport would fight it for
- * attention and, just as importantly, would make every screenshot in the visual
- * workbench land on a different frame. Paging is user-driven.
+ * Autoplay (2026-10-26, the client's request): each panel turns its page on
+ * a timer, and wraps back to the first. The two panels run on different
+ * intervals (6s and 7s) so they never jump in unison, and both rest while
+ * the pointer is over them, while focus is inside, while they are off screen,
+ * and under reduced motion — where nothing moves on its own at all. A pause
+ * button (WCAG 2.2.2) sits with the page segments; the active segment fills
+ * over the interval, so the visitor can see a change is coming. Arrows and
+ * segments still page by hand, and doing so restarts the timer.
  */
 
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type CSSProperties } from 'react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 
 import { ProductCard } from '@/components/product-card';
 import { SectionHeading } from '@/components/section-heading';
 import type { Product } from '@/data/catalog';
 
 const CORNER = 'pointer-events-none absolute h-3.5 w-3.5 border-white/35';
+
+/** Per panel, so the pair drifts apart instead of turning together. */
+const INTERVAL: Record<string, number> = { '01': 6000, '02': 7000 };
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' &&
@@ -62,8 +69,25 @@ export function ProductSlider({
   channel: string;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLElement>(null);
   const [page, setPage] = useState(0);
   const [pages, setPages] = useState(1);
+  const [hovered, setHovered] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [onScreen, setOnScreen] = useState(false);
+  const interval = INTERVAL[channel] ?? 6000;
+
+  /* The motion preference is external state, read by subscription: live if it
+     changes with the page open, `true` on the server so nothing starts there. */
+  const reduced = useSyncExternalStore(
+    (onStoreChange) => {
+      const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+      query.addEventListener('change', onStoreChange);
+      return () => query.removeEventListener('change', onStoreChange);
+    },
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches,
+    () => true,
+  );
 
   /* One page is one track width, so the page count follows from the scroll
      extent. Measured on mount, on resize and on every scroll — the cards are
@@ -102,13 +126,37 @@ export function ProductSlider({
     [pages],
   );
 
+  /* Only while the panel is on screen: a timer turning pages nobody can see
+     would land the visitor mid-list when they scroll back to it. */
+  useEffect(() => {
+    const el = panelRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(([entry]) => setOnScreen(entry.isIntersecting), { threshold: 0.4 });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  const running = !paused && !hovered && onScreen && !reduced && pages > 1;
+
+  /* Keyed on `page`: a manual turn restarts the wait, as the fill shows. */
+  useEffect(() => {
+    if (!running) return;
+    const timer = setTimeout(() => goTo(page + 1 >= pages ? 0 : page + 1), interval);
+    return () => clearTimeout(timer);
+  }, [running, page, pages, interval, goTo]);
+
   const controlBase =
     'grid h-11 w-11 place-items-center rounded-full text-white transition-colors duration-(--duration-fast) enabled:hover:bg-white enabled:hover:text-ink-fixed disabled:cursor-not-allowed disabled:opacity-30 dt:h-8 dt:w-8';
 
   return (
     <section
+      ref={panelRef}
       aria-roledescription="carousel"
       aria-label={title}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onFocusCapture={() => setHovered(true)}
+      onBlurCapture={() => setHovered(false)}
       /* The running frame light of the brand banners above, in steel. Out of
          step with them (the delay) so the page does not pulse in unison. */
       style={{ '--frame-accent': '#c9ced6', animationDelay: `${channel === '01' ? -2.1 : -4.9}s` } as CSSProperties}
@@ -178,7 +226,18 @@ export function ProductSlider({
             and the rail can fit every card in one page. */}
         <div className="mt-auto flex items-center justify-between gap-4 px-4 pb-4 pt-1.5 dt:px-5">
           {pages > 1 ? (
-            <div className="flex min-w-0 flex-1 items-center gap-1 dt:flex-none">
+            <div className="flex min-w-0 flex-1 items-center gap-2 dt:flex-none">
+              {!reduced && (
+                <button
+                  type="button"
+                  onClick={() => setPaused((value) => !value)}
+                  aria-label={paused ? `${title}: otomatik geçişi başlat` : `${title}: otomatik geçişi durdur`}
+                  className="relative grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/20 text-white/80 transition-colors before:absolute before:-inset-2 before:content-[''] hover:border-white/50 hover:text-white"
+                >
+                  {paused ? <Play size={11} strokeWidth={2.5} aria-hidden /> : <Pause size={11} strokeWidth={2.5} aria-hidden />}
+                </button>
+              )}
+              <div className="flex min-w-0 flex-1 items-center gap-1 dt:flex-none">
               {Array.from({ length: pages }, (_, i) => (
                 <button
                   key={i}
@@ -189,10 +248,23 @@ export function ProductSlider({
                   /* On touch the segments share the full row and extend their
                      hit areas vertically. Desktop keeps the compact indicator. */
                   className={`relative h-1 rounded-full transition-all duration-(--duration-base) ease-out before:absolute before:inset-x-0 before:-bottom-3 before:-top-7 before:content-[''] dt:flex-none dt:before:-inset-y-2.5 ${
-                    i === page ? 'flex-1 bg-white dt:w-6' : 'flex-1 bg-white/20 hover:bg-white/45 dt:w-3'
+                    i === page ? 'flex-1 bg-white/30 dt:w-6' : 'flex-1 bg-white/20 hover:bg-white/45 dt:w-3'
                   }`}
-                />
+                >
+                  {i === page && (
+                    <span aria-hidden className="absolute inset-0 overflow-hidden rounded-full">
+                      {/* Keyed on page and run state, so the fill restarts from
+                          zero on every turn and on resume; full when resting. */}
+                      <span
+                        key={`${page}-${running ? 'run' : 'hold'}`}
+                        style={running ? { animation: `hero-progress ${interval}ms linear forwards` } : undefined}
+                        className="absolute inset-0 origin-left rounded-full bg-white"
+                      />
+                    </span>
+                  )}
+                </button>
               ))}
+              </div>
             </div>
           ) : (
             <span />

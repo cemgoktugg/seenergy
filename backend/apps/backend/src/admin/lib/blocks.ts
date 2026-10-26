@@ -295,7 +295,7 @@ export const LIST_PLACES: Record<string, string> = {
   yeni: "Marka bannerlarının altındaki 'Yeni Gelenler' rafı (ilk 8).",
   "one-cikan": "'Keşfet · Öne Çıkanlar' bölümü: 4 × 4 ızgara (ilk 16).",
   "cok-satan": "Şu an ana sayfada gösterilmiyor (sekmeli bölüm kaldırıldı).",
-  "super-firsat": "Mor 'Süper Fırsat' kartının yanındaki 4 ürün.",
+  "super-firsat": "'Fırsat Ürünleri' bölümü: Öne Çıkanlar'ın hemen üstünde 4 ürün (ilk 4). Tümü sayfası /kampanyalar/super-firsat.",
 }
 
 export const LIST_LIMITS: Record<string, number> = {

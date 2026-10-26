@@ -226,10 +226,6 @@ const VitrinPage = () => {
           </div>
         </Band>
 
-        <Band n={++n} title="Süper Fırsat Ürünleri" where={LIST_PLACES["super-firsat"]} to="/vitrin/liste/super-firsat">
-          <ListPreview list={list("super-firsat")} storefront={storefront} count={4} />
-        </Band>
-
         <Band
           n={++n}
           title="Marka vitrinleri"
@@ -244,6 +240,10 @@ const VitrinPage = () => {
           <Text size="small" className="text-ui-fg-subtle">
             “{group("tech-band")[0]?.data.title ?? "—"}”
           </Text>
+        </Band>
+
+        <Band n={++n} title="Fırsat Ürünleri" where={LIST_PLACES["super-firsat"]} to="/vitrin/liste/super-firsat">
+          <ListPreview list={list("super-firsat")} storefront={storefront} count={4} />
         </Band>
 
         <Band n={++n} title="Öne Çıkanlar" where={LIST_PLACES["one-cikan"]} to="/vitrin/liste/one-cikan">

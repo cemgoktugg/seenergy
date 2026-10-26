@@ -27,7 +27,7 @@ import {
   SeoEditorial,
   TrustRow,
 } from '@/components/sections';
-import type { Product } from '@/data/catalog';
+import { discountPercent, type Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
 /* The client's banners as supplied (img/1-4.jpeg, 2026-10-23) — no cut files,
@@ -46,7 +46,7 @@ const BRAND_BANNERS = [
 ];
 
 export default async function HomePage() {
-  const [{ byId, brandFromSlug, mixed }, vitrin] = await Promise.all([
+  const [{ byId, brandFromSlug, mixed, products }, vitrin] = await Promise.all([
     loadCatalog(),
     loadVitrin(),
   ]);
@@ -64,6 +64,17 @@ export default async function HomePage() {
       .filter((product): product is Product => Boolean(product))
       .slice(0, count);
   };
+
+  /* "Fırsat Ürünleri": the shop's own pick (admin → Vitrin → Fırsat Ürünleri,
+     the super-firsat list), first four. Until that list exists, the four
+     deepest discounts that can be bought now — never a product without a
+     struck price, which would make the band's name a claim it cannot keep. */
+  const deals = vitrin.lists['super-firsat']
+    ? pick('super-firsat', 4, 0)
+    : products
+        .filter((product) => product.price != null && product.compareAtPrice && product.stock > 0)
+        .sort((a, b) => (discountPercent(b) ?? 0) - (discountPercent(a) ?? 0))
+        .slice(0, 4);
 
   // Keep the admin's brand visibility; the supplied artwork sets image order.
   const brandBoard: BrandBoardEntry[] = BRAND_BANNERS
@@ -153,6 +164,21 @@ export default async function HomePage() {
              edited in admin → Vitrin → Öne Çıkanlar; until the list exists a
              deterministic mix stands in. On a phone the band scrolls like the
              other homepage rails. */}
+      {/* 11b — Fırsat Ürünleri (2026-10-26): four products directly above
+             Öne Çıkanlar, at the client's request. */}
+      {deals.length > 0 ? (
+        <Section label="Fırsat ürünleri">
+          <SectionHeading
+            eyebrow="Kampanya"
+            title="Fırsat Ürünleri"
+            action={{ label: 'Tümü', href: '/kampanyalar/super-firsat' }}
+          />
+          <div className="pt-3 dt:pt-4">
+            <ProductGrid products={deals} columns={4} />
+          </div>
+        </Section>
+      ) : null}
+
       <Section label="Öne çıkan ürünler">
         <SectionHeading eyebrow="Keşfet" title="Öne Çıkanlar" />
         <div className="pt-3 dt:pt-4">
