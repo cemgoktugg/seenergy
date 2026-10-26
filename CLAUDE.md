@@ -253,9 +253,9 @@ uses only these values:
 Header: "Tüm Kategoriler" opens the whole tree (two panes); the bar names
 `NAV_FEATURED` (`src/data/site.ts`) on one line — 5 at 1200, 6 from 1280, 7
 from 1440 ("Kampanyalar" was removed from its right end on 2026-10-26). The
-masthead: logo and a centred search, both 48px with shared top and bottom
-lines, and b2b / Hesabım / Sepetim at 40px (the client turned 48px icons down)
-on the same centre line,
+masthead: logo, a centred search and b2b / Hesabım / Sepetim, all 40px from
+`dt` with one top and one bottom line (the client's option C; 48px icons were
+turned down),
 and on the content track (`container-main`), so the logo and the cart line up with the page
 edges below. There is no separate header track any more. The account block spent one day on the category bar
 and went back at the client's request. Product cards: a pointer gets the round cart
