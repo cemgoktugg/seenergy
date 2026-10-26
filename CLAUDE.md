@@ -248,8 +248,10 @@ uses only these values:
   are 1200px; drawn raw they made a listing 1.3 MB.
 
 Header: "Tüm Kategoriler" opens the whole tree (two panes); the bar names
-`NAV_FEATURED` (`src/data/site.ts`) on one line — 5 at 1200, 6 from 1440, 7
-from 1536 — so it never wraps. Product cards: a pointer gets the round cart
+`NAV_FEATURED` (`src/data/site.ts`) on one line — 3 at 1200, 4 from 1280, 5
+from 1440 — and ends with b2b / Hesabım / Sepetim (moved there from the
+masthead on 2026-10-26, replacing "Kampanyalar"). The masthead is the logo
+(50px tall at desktop) and a centred search. Product cards: a pointer gets the round cart
 button in the price row (`.card-quick`), touch the full-width one
 (`.card-cta`), never both.
 
