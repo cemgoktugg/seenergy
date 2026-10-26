@@ -635,14 +635,15 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
         </div>
       </div>
 
-      {/* ---- row 2: main header, 101px --------------------------------- */}
+      {/* ---- row 2: main header, 72px (101px until 2026-10-26: 31px of air above
+          and below 40px of content made the header read oversized) ---- */}
       {/* The masthead is on the content track (2026-10-26): the logo starts
           where the slider starts and the cart ends where it ends. Logo, search,
           b2b and the icons are all 40px from `dt`: one box, one top and one
           bottom line — option C, the client's choice (2026-10-26). A 48px row
           was turned down (icons too big); 48px logo + search with 40px icons
           was tried and replaced by this. */}
-      <div className="border-b border-[rgb(215,215,215)] dt:h-[101px]">
+      <div className="border-b border-[rgb(215,215,215)] dt:h-[72px]">
         <div className="container-main flex h-[50px] items-center gap-3 dt:h-full dt:justify-between dt:gap-4">
           <button
             type="button"
