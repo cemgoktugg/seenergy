@@ -149,7 +149,7 @@ function SearchField({
     <form
       role="search"
       action="/arama"
-      className={`group flex h-[41px] w-full items-stretch overflow-hidden rounded-full border transition-colors duration-(--duration-base) ${dark ? '' : 'dt:h-12'} ${
+      className={`group flex h-[41px] w-full items-stretch overflow-hidden rounded-full border transition-colors duration-(--duration-base) ${dark ? '' : 'dt:h-10'} ${
         dark
           ? 'border-chrome-line bg-white/10 focus-within:border-grad-1 focus-within:bg-white/15'
           : 'border-line-strong bg-surface-page focus-within:border-brand focus-within:bg-surface-card'
@@ -213,7 +213,7 @@ function HeaderActions() {
      shopper guessing, and the cart now says what is in it. Below `dt` they
      stay 44px icons: the 390 row is already at its width limit. */
   const iconCircle =
-    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-12 dt:w-12 dt:bg-brand dt:text-white';
+    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-10 dt:w-10 dt:bg-brand dt:text-white';
 
   return (
     <div className="flex shrink-0 items-center gap-1 dt:gap-4 min-[85rem]:gap-5">
@@ -223,7 +223,7 @@ function HeaderActions() {
         /* Hit-tested 44×32 — the width was fine, the height was not. The 32px
            visual keeps the measured badge proportions, so `before` lifts the
            target to 44 (32 + 2×6) instead of inflating the pill. */
-        className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-12 dt:px-5 dt:text-[14px]"
+        className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-10 dt:px-4 dt:text-[13px]"
       >
         b2b
       </Link>
@@ -637,9 +637,9 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
 
       {/* ---- row 2: main header, 101px --------------------------------- */}
       {/* The masthead is on the content track (2026-10-26): the logo starts
-          where the slider starts and the cart ends where it ends. Logo, search,
-          b2b and the icons are one height (48px from `dt`), so the row shares
-          one top and one bottom line. */}
+          where the slider starts and the cart ends where it ends. The logo is
+          48px, the search, b2b and icons 40px, all on one centre line. (All
+          at 48px was tried and turned down: the icons read too big.) */}
       <div className="border-b border-[rgb(215,215,215)] dt:h-[101px]">
         <div className="container-main flex h-[50px] items-center gap-3 dt:h-full dt:justify-between dt:gap-4">
           <button
