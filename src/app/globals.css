@@ -720,33 +720,11 @@ body {
 }
 
 /*
-  Header track. Below the desktop breakpoint the header shares the content
-  container (the 51px mobile row lines up with the page); from 1200 up it
-  switches to the wider 1400 chrome track measured above.
+  The header no longer has a track of its own (2026-10-26): it sits on
+  `.container-main` like the page, so the logo starts where the slider starts
+  and the cart ends where it ends. The wider 1400 chrome track put both 40px
+  outside the content column at 1440, which read as misaligned.
 */
-.container-header {
-  width: 100%;
-  margin-inline: auto;
-  padding-inline: 8px;
-}
-@media (min-width: 600px) {
-  .container-header {
-    padding-inline: 16px;
-  }
-}
-@media (min-width: 1025px) {
-  .container-header {
-    padding-inline: 21px;
-  }
-}
-@media (min-width: 1200px) {
-  .container-header {
-    width: calc(100% - 40px);
-    max-width: 1400px;
-    padding-inline: 0;
-  }
-}
-
 /* A single focus treatment, applied through a token rather than per component. */
 :where(a, button, input, select, textarea, [tabindex]):focus-visible {
   outline: 2px solid var(--color-focus);

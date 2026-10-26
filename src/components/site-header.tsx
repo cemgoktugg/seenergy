@@ -88,7 +88,7 @@ function Logo({ className = '' }: { className?: string }) {
           Worth noting for future header checks: comparing the LINK boxes shows
           a tidy 12px gap and reports no collision. The overflow is only visible
           if you measure the text box. */}
-      <BrandLogo shine className="hidden h-[38px] w-auto shrink-0 sm:flex dt:h-[50px]" />
+      <BrandLogo shine className="hidden h-[38px] w-auto shrink-0 sm:flex dt:h-12" />
     </Link>
   );
 }
@@ -149,7 +149,7 @@ function SearchField({
     <form
       role="search"
       action="/arama"
-      className={`group flex h-[41px] w-full items-stretch overflow-hidden rounded-full border transition-colors duration-(--duration-base) ${
+      className={`group flex h-[41px] w-full items-stretch overflow-hidden rounded-full border transition-colors duration-(--duration-base) ${dark ? '' : 'dt:h-12'} ${
         dark
           ? 'border-chrome-line bg-white/10 focus-within:border-grad-1 focus-within:bg-white/15'
           : 'border-line-strong bg-surface-page focus-within:border-brand focus-within:bg-surface-card'
@@ -165,7 +165,7 @@ function SearchField({
         type="search"
         autoFocus={autoFocus}
         placeholder="Ürün, marka veya ürün kodu ara"
-        className={`min-w-0 flex-1 bg-transparent pl-[18px] pr-2 text-[16px] outline-none ${
+        className={`min-w-0 flex-1 bg-transparent pl-[18px] pr-2 text-[16px] outline-none dt:text-[14px] min-[85rem]:text-[16px] ${
           dark
             ? 'text-white placeholder:text-white/55'
             : 'text-text-primary placeholder:text-text-secondary'
@@ -174,7 +174,7 @@ function SearchField({
       {shortcut && (
         <kbd
           aria-hidden
-          className="my-auto mr-1 hidden shrink-0 rounded-(--card-radius) border border-line-strong bg-surface-card px-1.5 py-0.5 font-mono text-[12px] leading-none text-text-secondary group-focus-within:hidden dt:block"
+          className="my-auto mr-1 hidden shrink-0 rounded-(--card-radius) border border-line-strong bg-surface-card px-1.5 py-0.5 font-mono text-[12px] leading-none text-text-secondary group-focus-within:hidden min-[85rem]:block"
         >
           /
         </kbd>
@@ -213,17 +213,17 @@ function HeaderActions() {
      shopper guessing, and the cart now says what is in it. Below `dt` they
      stay 44px icons: the 390 row is already at its width limit. */
   const iconCircle =
-    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-10 dt:w-10 dt:bg-brand dt:text-white';
+    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-12 dt:w-12 dt:bg-brand dt:text-white';
 
   return (
-    <div className="flex shrink-0 items-center gap-1 dt:gap-5">
+    <div className="flex shrink-0 items-center gap-1 dt:gap-4 min-[85rem]:gap-5">
       {/* Measured: the b2b badge is present at 390 too, not desktop-only. */}
       <Link
         href="/toptan-satis"
         /* Hit-tested 44×32 — the width was fine, the height was not. The 32px
            visual keeps the measured badge proportions, so `before` lifts the
            target to 44 (32 + 2×6) instead of inflating the pill. */
-        className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-10 dt:px-4 dt:text-[13px]"
+        className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-12 dt:px-5 dt:text-[14px]"
       >
         b2b
       </Link>
@@ -539,7 +539,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
           condensed ? 'translate-y-0' : '-translate-y-full'
         } ${condensed ? '' : 'pointer-events-none'}`}
       >
-        <div className="container-header flex h-14 items-center gap-2.5 dt:gap-4">
+        <div className="container-main flex h-14 items-center gap-2.5 dt:gap-4">
           {/* Scrolling past the masthead used to take all twelve categories
               with it, leaving logo / search / cart for the remaining ~9.800px
               of page. This trigger reopens the drawer, which already holds
@@ -599,7 +599,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
           decision rather than a drift from measured geometry — the 31px height
           is untouched. */}
       <div className="hidden h-[31px] items-center border-b border-chrome-line bg-chrome dt:flex">
-        <div className="container-header relative flex items-center justify-between gap-6">
+        <div className="container-main relative flex items-center justify-between gap-6">
           {/* Reference centres this promo line across the full bar rather than
               aligning it left, so it reads as an announcement, not a link.
               16px bold was shouting inside a 31px strip; 12.5px with a gradient
@@ -636,11 +636,12 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
       </div>
 
       {/* ---- row 2: main header, 101px --------------------------------- */}
-      {/* The masthead shares the nav's wider 1400 track, not the 1320 content
-          container: the logo sits at x=20 and the cart ends at x=1429, both
-          outside the content column. */}
+      {/* The masthead is on the content track (2026-10-26): the logo starts
+          where the slider starts and the cart ends where it ends. Logo, search,
+          b2b and the icons are one height (48px from `dt`), so the row shares
+          one top and one bottom line. */}
       <div className="border-b border-[rgb(215,215,215)] dt:h-[101px]">
-        <div className="container-header flex h-[50px] items-center gap-3 dt:h-full dt:justify-between dt:gap-4">
+        <div className="container-main flex h-[50px] items-center gap-3 dt:h-full dt:justify-between dt:gap-4">
           <button
             type="button"
             aria-label="Kategori menüsünü aç"
@@ -678,7 +679,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
               at 1366. `basis-1/2` is measured against the row, i.e. against the
               container, giving 660→610 and 620→570. (`max-w-[50%]` would resolve
               against the leftover flex slot instead and collapse it to ~405.) */}
-          <div className="hidden justify-center dt:flex dt:shrink-0 dt:grow-0 dt:basis-[36%] min-[90rem]:basis-[40%]">
+          <div className="hidden justify-center dt:flex dt:shrink-0 dt:grow-0 dt:basis-[31%] min-[85rem]:basis-[36%] min-[90rem]:basis-[40%]">
             <div className="w-full">
               <SearchField id="search-desktop" shortcut />
             </div>
@@ -692,7 +693,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
         {/* Mobile search opens as a sheet under the bar — the reference keeps
             the 51px row clean and reveals search from its icon. */}
         {searchOpen && (
-          <div className="container-header pb-3 dt:hidden">
+          <div className="container-main pb-3 dt:hidden">
             <div className="flex items-center gap-2">
               <SearchField id="search-mobile" autoFocus />
               <button
@@ -719,7 +720,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
         className="nav-metal relative hidden dt:block dt:h-[48px]"
         onMouseLeave={scheduleClose}
       >
-        <div className="container-header h-full">
+        <div className="container-main h-full">
           <ul className="flex h-full items-stretch gap-1">
             <li
               onMouseEnter={() => {
@@ -798,7 +799,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
               onMouseEnter={cancelClose}
               onMouseLeave={scheduleClose}
             >
-              <div className="container-header pt-2">
+              <div className="container-main pt-2">
                 {openMega === ALL ? (
                   <AllCategoriesPanel menuModels={menuModels} onClose={() => setOpenMega(null)} />
                 ) : (
