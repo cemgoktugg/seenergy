@@ -88,7 +88,7 @@ function Logo({ className = '' }: { className?: string }) {
           Worth noting for future header checks: comparing the LINK boxes shows
           a tidy 12px gap and reports no collision. The overflow is only visible
           if you measure the text box. */}
-      <BrandLogo shine className="hidden h-[38px] w-auto shrink-0 sm:flex dt:h-10" />
+      <BrandLogo shine className="hidden h-[38px] w-auto shrink-0 sm:flex dt:h-9" />
     </Link>
   );
 }
@@ -149,7 +149,7 @@ function SearchField({
     <form
       role="search"
       action="/arama"
-      className={`group flex h-[41px] w-full items-stretch overflow-hidden rounded-full border transition-colors duration-(--duration-base) ${dark ? '' : 'dt:h-10'} ${
+      className={`group flex h-[41px] w-full items-stretch overflow-hidden rounded-full border transition-colors duration-(--duration-base) ${dark ? '' : 'dt:h-9'} ${
         dark
           ? 'border-chrome-line bg-white/10 focus-within:border-grad-1 focus-within:bg-white/15'
           : 'border-line-strong bg-surface-page focus-within:border-brand focus-within:bg-surface-card'
@@ -213,7 +213,7 @@ function HeaderActions() {
      shopper guessing, and the cart now says what is in it. Below `dt` they
      stay 44px icons: the 390 row is already at its width limit. */
   const iconCircle =
-    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-10 dt:w-10 dt:bg-brand dt:text-white';
+    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-9 dt:w-9 dt:bg-brand dt:text-white';
 
   return (
     <div className="flex shrink-0 items-center gap-1 dt:gap-4 min-[85rem]:gap-5">
@@ -223,7 +223,7 @@ function HeaderActions() {
         /* Hit-tested 44×32 — the width was fine, the height was not. The 32px
            visual keeps the measured badge proportions, so `before` lifts the
            target to 44 (32 + 2×6) instead of inflating the pill. */
-        className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-10 dt:px-4 dt:text-[13px]"
+        className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-9 dt:px-3.5 dt:text-[13px]"
       >
         b2b
       </Link>
@@ -639,8 +639,8 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
           and below 40px of content made the header read oversized) ---- */}
       {/* The masthead is on the content track (2026-10-26): the logo starts
           where the slider starts and the cart ends where it ends. Logo, search,
-          b2b and the icons are all 40px from `dt`: one box, one top and one
-          bottom line — option C, the client's choice (2026-10-26). A 48px row
+          b2b and the icons are all 36px from `dt`: one box, one top and one
+          bottom line (40px until 2026-10-26, the client asked for smaller) — option C, the client's choice (2026-10-26). A 48px row
           was turned down (icons too big); 48px logo + search with 40px icons
           was tried and replaced by this. */}
       <div className="border-b border-[rgb(215,215,215)] dt:h-[72px]">
