@@ -203,69 +203,59 @@ function SearchField({
   );
 }
 
-/**
- * b2b, account and cart. `light` is the phone's top row (44px icons, no
- * labels — the 390 row is at its width limit); `dark` sits at the right end
- * of the desktop category bar (2026-10-26, the client's call: it replaced
- * "Kampanyalar" there), labelled, with the cart's total.
- */
-function HeaderActions({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
+function HeaderActions() {
   /* The badge shows 0 until the cart has been read, on purpose: pages render
      statically, so the server HTML cannot know this visitor's cart, and a
      count in the first client pass would disagree with it. */
   const { cart, count: cartCount, bump } = useCart();
-  const dark = tone === 'dark';
-  const circle = dark
-    ? 'relative grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white/10 text-white transition-colors duration-(--duration-fast) group-hover:bg-white/20'
-    : 'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) hover:text-brand-dark';
+
+  /* From `dt` the account and cart are labelled — icon-only circles left a
+     shopper guessing, and the cart now says what is in it. Below `dt` they
+     stay 44px icons: the 390 row is already at its width limit. */
+  const iconCircle =
+    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-10 dt:w-10 dt:bg-brand dt:text-white';
 
   return (
-    <div className={`flex shrink-0 items-center ${dark ? 'h-full gap-5 pl-4' : 'gap-1'}`}>
+    <div className="flex shrink-0 items-center gap-1 dt:gap-5">
+      {/* Measured: the b2b badge is present at 390 too, not desktop-only. */}
       <Link
         href="/toptan-satis"
-        /* On the phone the 32px pill takes a 44px target from `before`. */
-        className={
-          dark
-            ? 'flex h-8 items-center rounded-full bg-white px-3.5 text-[13px] font-extrabold text-chrome transition-colors duration-(--duration-fast) hover:bg-white/85'
-            : "relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark"
-        }
+        /* Hit-tested 44×32 — the width was fine, the height was not. The 32px
+           visual keeps the measured badge proportions, so `before` lifts the
+           target to 44 (32 + 2×6) instead of inflating the pill. */
+        className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-10 dt:px-4 dt:text-[13px]"
       >
         b2b
       </Link>
-      <Link href="/hesabim" aria-label="Hesabım" className="group flex items-center gap-2">
-        <span className={circle}>
-          <User size={dark ? 18 : 20} strokeWidth={1.9} aria-hidden />
+      <Link href="/hesabim" aria-label="Hesabım" className="group flex items-center gap-2.5">
+        <span className={`${iconCircle} dt:group-hover:bg-brand-dark`}>
+          <User size={20} strokeWidth={1.9} aria-hidden />
         </span>
-        {dark && (
-          <span className="leading-tight">
-            <span className="block text-[12px] text-white/60">Giriş yap</span>
-            <span className="block text-[13px] font-bold text-white">Hesabım</span>
-          </span>
-        )}
+        <span className="hidden leading-tight dt:block">
+          <span className="block text-[12px] text-text-secondary">Giriş yap</span>
+          <span className="block text-[14px] font-bold text-text-primary">Hesabım</span>
+        </span>
       </Link>
-      <Link href="/sepet" aria-label={`Sepetim, ${cartCount} ürün`} className="group flex items-center gap-2">
-        <span className={circle}>
-          <ShoppingCart size={dark ? 18 : 20} strokeWidth={1.9} aria-hidden />
-          {/* Inset on the phone: at 320 a negative offset pushed the badge past
-              the viewport and the document scrolled 9px. Keyed on `bump`: each
-              successful add remounts it, which replays the pulse. */}
+      <Link href="/sepet" aria-label={`Sepetim, ${cartCount} ürün`} className="group flex items-center gap-2.5">
+        <span className={`${iconCircle} dt:group-hover:bg-brand-dark`}>
+          <ShoppingCart size={20} strokeWidth={1.9} aria-hidden />
+          {/* Inset rather than hung outside the button: at 320 a negative offset
+              pushed the badge past the viewport and the document scrolled 9px.
+              Keyed on `bump`: each successful add remounts the badge, which
+              replays the pulse — the header answering the click. */}
           <span
             key={bump}
-            className={`absolute grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[12px] font-bold text-white ring-2 ${
-              dark ? '-right-1.5 -top-1.5 ring-chrome' : 'right-0 top-0 ring-surface-card'
-            } ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
+            className={`absolute right-0 top-0 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[12px] font-bold text-white ring-2 ring-surface-card dt:-right-1 dt:-top-1 ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
           >
             {cartCount}
           </span>
         </span>
-        {dark && (
-          <span className="leading-tight">
-            <span className="block text-[12px] text-white/60">Sepetim</span>
-            <span className="block min-w-[64px] text-[13px] font-bold tabular-nums text-white">
-              {cart && cart.count > 0 ? formatPrice(cart.itemTotal) : 'Boş'}
-            </span>
+        <span className="hidden leading-tight dt:block">
+          <span className="block text-[12px] text-text-secondary">Sepetim</span>
+          <span className="block min-w-[72px] text-[14px] font-bold tabular-nums text-text-primary">
+            {cart && cart.count > 0 ? formatPrice(cart.itemTotal) : 'Boş'}
           </span>
-        )}
+        </span>
       </Link>
     </div>
   );
@@ -675,9 +665,9 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
             <Search size={22} strokeWidth={2} aria-hidden />
           </button>
 
-          {/* From `dt` the logo and an empty twin on the right take equal
-              shares, so the search sits on the page centre; below it the
-              wrapper is `contents` and the logo stays a flex item of the row. */}
+          {/* From `dt` the logo and the actions take equal shares, so the
+              search sits on the page centre; below it the wrapper is
+              `contents` and the logo stays a flex item of the row. */}
           <div className="contents dt:flex dt:flex-1">
             <Logo className="min-w-0 shrink dt:mr-0 dt:ml-0 mx-auto dt:mx-0" />
           </div>
@@ -688,15 +678,13 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
               at 1366. `basis-1/2` is measured against the row, i.e. against the
               container, giving 660→610 and 620→570. (`max-w-[50%]` would resolve
               against the leftover flex slot instead and collapse it to ~405.) */}
-          <div className="hidden justify-center dt:flex dt:shrink-0 dt:grow-0 dt:basis-[40%]">
+          <div className="hidden justify-center dt:flex dt:shrink-0 dt:grow-0 dt:basis-[36%] min-[90rem]:basis-[40%]">
             <div className="w-full">
               <SearchField id="search-desktop" shortcut />
             </div>
           </div>
 
-          <div aria-hidden className="hidden dt:block dt:flex-1" />
-
-          <div className="ml-auto dt:hidden">
+          <div className="ml-auto dt:ml-0 dt:flex dt:flex-1 dt:justify-end">
             <HeaderActions />
           </div>
         </div>
@@ -727,7 +715,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
         aria-label="Ana kategoriler"
         /* One line, not fourteen two-line labels: "Tüm Kategoriler" opens the
            whole tree, and the bar names the seven categories people shop most
-           (NAV_FEATURED) beside the account block — three at 1200, four from 1280, five from 1440. */
+           (NAV_FEATURED) — five at 1200, six from 1280, seven from 1440. */
         className="nav-metal relative hidden dt:block dt:h-[48px]"
         onMouseLeave={scheduleClose}
       >
@@ -764,7 +752,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
               return (
                 <li
                   key={item.href}
-                  className={index >= 5 ? 'hidden' : index >= 4 ? 'hidden min-[90rem]:flex' : index >= 3 ? 'hidden xl:flex' : 'flex'}
+                  className={index >= 6 ? 'hidden min-[90rem]:flex' : index >= 5 ? 'hidden xl:flex' : 'flex'}
                   onMouseEnter={() => {
                     cancelClose();
                     setOpenMega(item.children ? item.href : null);
@@ -791,9 +779,6 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
                 </li>
               );
             })}
-            <li className="ml-auto flex" onMouseEnter={scheduleClose}>
-              <HeaderActions tone="dark" />
-            </li>
           </ul>
         </div>
 
