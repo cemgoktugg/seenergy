@@ -1069,6 +1069,85 @@ html {
   opacity: 0.16;
   mask-image: radial-gradient(90% 80% at 50% 55%, transparent 30%, black 85%);
 }
+/* Signal pulses on the panel's traces: each trace is drawn faint, and a
+   short bright dash runs along it on a loop — data moving through the board. */
+.signal-trace {
+  fill: none;
+  stroke: color-mix(in srgb, var(--color-text-primary) 22%, transparent);
+  stroke-width: 1.5;
+}
+.signal-pulse {
+  fill: none;
+  stroke: rgb(195 19 28);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 90 910;
+  stroke-dashoffset: 1000;
+  filter: drop-shadow(0 0 4px rgb(195 19 28 / 0.8));
+  animation: signal-run 7s linear infinite;
+}
+.signal-traces g:nth-child(even) .signal-pulse {
+  stroke: #4a90e2;
+  filter: drop-shadow(0 0 4px rgb(74 144 226 / 0.85));
+}
+@keyframes signal-run {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Pointer-following light on a card (SpotlightCards sets --mx / --my and the
+   tilt --rx / --ry). ::before is the glowing border, drawn as a masked ring;
+   ::after is the inner light. Both fade in on hover. */
+.spot-card {
+  --mx: -999px;
+  --my: -999px;
+  transform: rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition:
+    transform 200ms var(--ease-out),
+    box-shadow var(--duration-base) var(--ease-out);
+}
+.spot-card:hover {
+  box-shadow: var(--shadow-e3);
+}
+.spot-card::before,
+.spot-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--duration-base) ease;
+}
+.spot-card::before {
+  z-index: 2;
+  padding: 2px;
+  background: radial-gradient(420px circle at var(--mx) var(--my), rgb(195 19 28), rgb(74 144 226 / 0.8) 35%, transparent 65%);
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+.spot-card::after {
+  z-index: 1;
+  background: radial-gradient(300px circle at var(--mx) var(--my), rgb(195 19 28 / 0.1), rgb(74 144 226 / 0.06) 45%, transparent 70%);
+}
+.spot-card:hover::before,
+.spot-card:hover::after {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .signal-pulse {
+    animation: none;
+    stroke-dashoffset: 1000;
+  }
+  .spot-card {
+    transform: none;
+  }
+}
+
 /* A scan beam: a bright leading line at the bottom edge with a glow trailing
    above it, travelling down (made more visible and slower at the client's
    request, 2026-10-23). */

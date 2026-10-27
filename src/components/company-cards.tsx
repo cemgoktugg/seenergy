@@ -3,9 +3,10 @@
  * Referanslarımız · Çözüm Ortaklarımız · Projelerimiz — three cards side by
  * side near the foot of the homepage (2026-10-27, replacing the blog cards at
  * the client's request), each leading to its page. The same day the band left
- * the black full-bleed strip for a light panel with a technology ground
- * (circuit traces, dot matrix, scan beam) and smaller cards, which lift, sweep
- * a light across their picture and draw an accent line on hover.
+ * the black full-bleed strip for a light panel with a technology ground:
+ * circuit traces with signal pulses running along them, and the dot matrix.
+ * The cards carry a pointer-following light — a glowing border and an inner
+ * glow where the mouse is, and a slight 3D tilt (SpotlightCards, .spot-card).
  *
  * The visuals are built from what the site already has rather than stock
  * photography: the sectors the shop supplies as icons, the partner brands'
@@ -17,6 +18,7 @@ import Link from 'next/link';
 import { ArrowRight, Building2, Car, Factory, GraduationCap, HeartPulse, Store } from 'lucide-react';
 
 import { SectionHeading } from '@/components/section-heading';
+import { SpotlightCards } from '@/components/spotlight-cards';
 
 const SECTORS = [
   { icon: Factory, label: 'Fabrika ve depo' },
@@ -28,6 +30,19 @@ const SECTORS = [
 ];
 
 const PARTNERS = ['dahua', 'hikvision', 'unv', 'neutron', 'ruijie', 'tp-link'];
+
+/** Circuit traces in the panel's own coordinates (1320 × 480), kept to the
+ *  edges and the gaps between the cards so they show around them. */
+const TRACES = [
+  'M0 40 H180 L210 70 H420',
+  'M1320 52 H1120 L1090 82 H900',
+  'M0 440 H140 L170 410 H360 L390 440 H560',
+  'M1320 430 H1180 L1150 400 H960',
+  'M440 0 V24 L470 54 H620',
+  'M880 480 V456 L850 426 H700',
+  'M20 120 V260 L50 290 V420',
+  'M1300 110 V240 L1270 270 V400',
+];
 
 const PLATE = 'relative h-[150px] overflow-hidden bg-[#f4f5f7] dt:h-[160px]';
 
@@ -45,16 +60,10 @@ function Card({
   return (
     <Link
       href={href}
-      className="group relative flex flex-col overflow-hidden rounded-(--card-radius) border border-line bg-surface-card shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-1 hover:border-line-strong hover:shadow-e3"
+      data-spot
+      className="spot-card group relative flex flex-col overflow-hidden rounded-(--card-radius) border border-line bg-surface-card shadow-e1"
     >
-      <div className="relative">
-        {visual}
-        {/* A light sweep across the picture on hover. */}
-        <span
-          aria-hidden
-          className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/3 -skew-x-[20deg] bg-linear-to-r from-transparent via-white/70 to-transparent opacity-0 transition-[transform,opacity] duration-[900ms] ease-out group-hover:translate-x-[450%] group-hover:opacity-100 motion-reduce:hidden"
-        />
-      </div>
+      <div className="relative">{visual}</div>
       <div className="flex flex-1 flex-col p-4 dt:p-5">
         <h3 className="text-[16px] font-extrabold tracking-tight text-text-primary dt:text-[20px]">{title}</h3>
         <p className="mt-1.5 text-[13px] leading-relaxed text-text-secondary">{text}</p>
@@ -68,11 +77,6 @@ function Card({
           />
         </span>
       </div>
-      {/* The accent line grows along the bottom edge on hover. */}
-      <span
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 h-[3px] origin-left scale-x-0 bg-linear-to-r from-grad-1 via-[rgb(195,19,28)] to-grad-4 transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-x-100"
-      />
     </Link>
   );
 }
@@ -83,15 +87,27 @@ export function CompanyCards() {
       aria-labelledby="company-cards-title"
       className="relative isolate overflow-hidden rounded-(--panel-radius) border border-line bg-linear-to-br from-surface-card via-surface-page to-[#e9edf2] px-4 py-6 shadow-e1 dt:px-8 dt:py-8"
     >
-      {/* Technology ground: a circuit-board trace pattern, the site's dot
-          matrix, a slow scan beam, and a soft light in the corner. */}
+      {/* Technology ground: circuit traces with signals running along them,
+          the site's dot matrix, and a soft light in the corner. */}
       <span aria-hidden className="circuit-ground pointer-events-none absolute inset-0 -z-10" />
       <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 -z-10 opacity-70" />
-      <span aria-hidden className="tech-scan pointer-events-none absolute inset-x-0 top-0 -z-10 h-32 opacity-60" />
+      <svg
+        aria-hidden
+        viewBox="0 0 1320 480"
+        preserveAspectRatio="xMidYMid slice"
+        className="signal-traces pointer-events-none absolute inset-0 -z-10 h-full w-full"
+      >
+        {TRACES.map((d, i) => (
+          <g key={d}>
+            <path d={d} className="signal-trace" />
+            <path d={d} pathLength={1000} className="signal-pulse" style={{ animationDelay: `${-i * 1.7}s`, animationDuration: `${6 + (i % 3) * 1.5}s` }} />
+          </g>
+        ))}
+      </svg>
       <span aria-hidden className="pointer-events-none absolute -right-24 -top-24 -z-10 h-72 w-72 rounded-full bg-grad-1/20 blur-3xl" />
 
       <SectionHeading id="company-cards-title" eyebrow="Kurumsal" title="Referanslar ve Projeler" />
-      <div className="mt-4 grid gap-(--space-grid-gap) md:grid-cols-3">
+      <SpotlightCards className="mt-4 grid gap-(--space-grid-gap) [perspective:1200px] md:grid-cols-3">
         <Card
           href="/referanslar"
           title="Referanslarımız"
@@ -142,7 +158,7 @@ export function CompanyCards() {
             </div>
           }
         />
-      </div>
+      </SpotlightCards>
     </section>
   );
 }
