@@ -169,7 +169,8 @@ but no longer on the homepage). `haftanin` and `yeni` feed the two product
 rails (first 8). Since 2026-10-26 the rails turn their pages on their own (6s / 7s,
 paused on hover, focus, off screen and under reduced motion, with a pause
 button). `super-firsat` (first 4) feeds "Fırsat Ürünleri", the band directly
-above Öne Çıkanlar. `one-cikan` feeds "Keşfet · Öne Çıkanlar", a 4 × 4 grid
+above Öne Çıkanlar. It opens with the client's artwork (img/fırsat.jpeg →
+public/campaign/firsat-urunleri.webp) as a tile beside the four cards. `one-cikan` feeds "Keşfet · Öne Çıkanlar", a 4 × 4 grid
 (first 16) — on 2026-10-24 the client had its three tabs (Haftanın Ürünleri /
 Yeni Ürünler / Çok Satanlar) removed: no tabs or such labels there, only the
 featured products. Created by `vitrin-upgrade-featured-list.ts` from what the

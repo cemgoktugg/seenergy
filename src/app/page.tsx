@@ -13,7 +13,12 @@
  * of globals.css rather than nineteen class lists.
  */
 
+import Image from 'next/image';
+import Link from 'next/link';
+import { ArrowRight } from 'lucide-react';
+
 import { Hero } from '@/components/hero';
+import { ProductCard } from '@/components/product-card';
 import { BrandBoard, type BrandBoardEntry } from '@/components/brand-board';
 import { BrandShowcase, type PartnerBrand } from '@/components/brand-showcase';
 import { ProductSlider } from '@/components/product-slider';
@@ -165,16 +170,41 @@ export default async function HomePage() {
              deterministic mix stands in. On a phone the band scrolls like the
              other homepage rails. */}
       {/* 11b — Fırsat Ürünleri (2026-10-26): four products directly above
-             Öne Çıkanlar, at the client's request. */}
+             Öne Çıkanlar. Since 2026-10-27 the band opens with the client's
+             own "Fırsat Ürünleri" artwork (img/fırsat.jpeg) as a tile beside
+             the cards, the way the client showed it: tile + four cards in one
+             row from `dt` (with a "Hemen incele" button); below it the artwork
+             is a 2:1 strip over the cards, without the button, which would
+             cover its lettering. The artwork carries the heading, so the h2 is for screen
+             readers. */}
       {deals.length > 0 ? (
         <Section label="Fırsat ürünleri">
-          <SectionHeading
-            eyebrow="Kampanya"
-            title="Fırsat Ürünleri"
-            action={{ label: 'Tümü', href: '/kampanyalar/super-firsat' }}
-          />
-          <div className="pt-3 dt:pt-4">
-            <ProductGrid products={deals} columns={4} />
+          <h2 className="sr-only">Fırsat Ürünleri</h2>
+          <div className="grid gap-(--space-grid-gap) dt:grid-cols-[minmax(0,1.35fr)_repeat(4,minmax(0,1fr))]">
+            <Link
+              href="/kampanyalar/super-firsat"
+              aria-label="Tüm fırsat ürünleri"
+              className="group relative block aspect-[2/1] overflow-hidden rounded-(--card-radius) shadow-e1 dt:aspect-auto dt:h-full"
+            >
+              <Image
+                src="/campaign/firsat-urunleri.webp"
+                alt=""
+                fill
+                sizes="(min-width: 1200px) 320px, 100vw"
+                className="object-cover transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.03]"
+              />
+              <span className="absolute bottom-6 left-1/2 hidden h-9 -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-ink-fixed px-4 text-[13px] font-bold text-white shadow-e2 transition-colors duration-(--duration-fast) group-hover:bg-[rgb(195,19,28)] dt:inline-flex">
+                Hemen incele
+                <ArrowRight size={15} strokeWidth={2.5} aria-hidden />
+              </span>
+            </Link>
+            {/* Two across on a phone, four from `sm`; from `dt` the wrapper
+                dissolves and the cards join the tile's row. */}
+            <div className="grid grid-cols-2 gap-(--space-grid-gap) sm:grid-cols-4 dt:contents">
+              {deals.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))}
+            </div>
           </div>
         </Section>
       ) : null}
