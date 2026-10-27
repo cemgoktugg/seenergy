@@ -6,7 +6,9 @@
  * They used to be two campaign tiles with a mock receiver and a mock camera
  * beside the copy. Now each card shows what it is about:
  *   - Tescilli Markalarımız: a brushed-steel card (the category bar's metal)
- *     with the SEENERGY wordmark, white, carrying the logo's glint.
+ *     with the client's own registered brands as white logo tiles — SEENERGY,
+ *     SEENERGY Home and Racksan (src/markalarr 1–3, 2026-10-27), each linking
+ *     to its brand page, the same tile as the authorised brands beside it.
  *   - Resmi Yetkili Satıcısı Olduğumuz Markalar: a light steel card with the
  *     authorised brands' logos as tiles, each linking to that brand.
  *
@@ -18,8 +20,19 @@
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
-import { BrandLogo } from '@/components/brand-mark';
 import type { Banner } from '@/lib/medusa/vitrin';
+
+/** The client's registered brands, in their order (src/markalarr 1, 2, 3). */
+const OWN_BRANDS = [
+  { name: 'SEENERGY', href: '/marka/seenergy', logo: '/brands/seenergy.webp' },
+  { name: 'SEENERGY Home', href: '/marka/seenergy-home', logo: '/brands/seenergy-home.webp' },
+  { name: 'Racksan', href: '/marka/racksan', logo: '/brands/racksan.webp' },
+];
+
+const TILE =
+  'group/tile flex h-full min-h-[76px] items-center justify-center rounded-(--card-radius) border border-line bg-white px-4 py-3 shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-1 hover:border-line-strong hover:shadow-e2 dt:min-h-[96px]';
+const TILE_IMG =
+  'max-h-[38px] w-auto max-w-full object-contain transition-transform duration-(--duration-base) group-hover/tile:scale-105 dt:max-h-[46px]';
 
 export interface PartnerBrand {
   name: string;
@@ -44,25 +57,33 @@ function Eyebrow({ text, dark }: { text?: string; dark?: boolean }) {
 export function BrandShowcase({ own, partners, brands }: { own: Banner; partners: Banner; brands: PartnerBrand[] }) {
   return (
     <div className="grid gap-(--space-grid-gap) lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
-      {/* --- own brands: brushed steel ----------------------------------- */}
-      <Link
-        href={own.href}
-        className="nav-metal group relative flex min-h-[230px] flex-col justify-between overflow-hidden rounded-(--panel-radius) p-6 text-white shadow-e2 transition-shadow duration-(--duration-base) hover:shadow-e3 dt:p-8"
-      >
+      {/* --- own brands: brushed steel, logo tiles ------------------------ */}
+      <div className="nav-metal relative flex flex-col overflow-hidden rounded-(--panel-radius) p-6 text-white shadow-e2 dt:p-8">
         <span aria-hidden className="pointer-events-none absolute -right-20 -top-24 h-64 w-64 rounded-full bg-white/[0.08] blur-3xl" />
-        <div className="relative">
-          <Eyebrow text={own.eyebrow} dark />
-          <h3 className="mt-2 text-[24px] font-extrabold leading-tight tracking-tight">{own.title}</h3>
-          {own.subtitle ? <p className="mt-1.5 max-w-[42ch] text-[13px] text-white/65">{own.subtitle}</p> : null}
-        </div>
-        <div className="relative mt-6 flex items-end justify-between gap-4">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white px-4 h-9 text-[13px] font-bold text-ink-fixed shadow-lg shadow-black/30 transition-transform duration-(--duration-fast) group-hover:translate-x-0.5">
+        <div className="relative flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <Eyebrow text={own.eyebrow} dark />
+            <h3 className="mt-2 text-[20px] font-extrabold leading-tight tracking-tight text-balance dt:text-[24px]">{own.title}</h3>
+            {own.subtitle ? <p className="mt-1.5 max-w-[42ch] text-[13px] text-white/65">{own.subtitle}</p> : null}
+          </div>
+          <Link
+            href={own.href}
+            className="hidden h-9 shrink-0 items-center gap-1.5 rounded-full bg-white px-4 text-[13px] font-bold text-ink-fixed shadow-lg shadow-black/30 transition-transform duration-(--duration-fast) hover:translate-x-0.5 sm:inline-flex"
+          >
             İncele
             <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
-          </span>
-          <BrandLogo shine tone="light" className="flex h-9 w-auto shrink-0 dt:h-12" />
+          </Link>
         </div>
-      </Link>
+        <ul className="relative mt-5 grid flex-1 grid-cols-3 gap-2.5 dt:gap-3">
+          {OWN_BRANDS.map((brand) => (
+            <li key={brand.href}>
+              <Link href={brand.href} title={brand.name} aria-label={brand.name} className={TILE}>
+                <img src={brand.logo} alt="" loading="lazy" className={TILE_IMG} />
+              </Link>
+            </li>
+          ))}
+        </ul>
+      </div>
 
       {/* --- authorised brands: light steel, logo tiles -------------------- */}
       <div className="relative flex flex-col overflow-hidden rounded-(--panel-radius) border border-line bg-linear-to-br from-surface-card via-surface-card to-wash-fixed p-6 shadow-e1 dt:p-8">
@@ -85,18 +106,8 @@ export function BrandShowcase({ own, partners, brands }: { own: Banner; partners
         <ul className="relative mt-5 grid flex-1 grid-cols-2 gap-2.5 sm:grid-cols-4 dt:gap-3">
           {brands.map((brand) => (
             <li key={brand.href}>
-              <Link
-                href={brand.href}
-                title={brand.name}
-                aria-label={brand.name}
-                className="group/tile flex h-full min-h-[76px] items-center justify-center rounded-(--card-radius) border border-line bg-white px-4 py-3 shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-1 hover:border-line-strong hover:shadow-e2 dt:min-h-[96px]"
-              >
-                <img
-                  src={brand.logo}
-                  alt=""
-                  loading="lazy"
-                  className="max-h-[38px] w-auto max-w-full object-contain transition-transform duration-(--duration-base) group-hover/tile:scale-105 dt:max-h-[46px]"
-                />
+              <Link href={brand.href} title={brand.name} aria-label={brand.name} className={TILE}>
+                <img src={brand.logo} alt="" loading="lazy" className={TILE_IMG} />
               </Link>
             </li>
           ))}
