@@ -243,23 +243,13 @@ export default async function HomePage() {
              dark → footer rhythm. On 2026-10-24 the brand promos and the
              brand wall moved up under "Öne Çıkanlar" (12b) at the client's
              request; the band keeps the blog and its dark rhythm. */}
-      <Section track="bleed">
-        <div className="relative overflow-hidden bg-chrome py-9 dt:py-14">
-          <span
-            aria-hidden
-            className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-grad-1 via-grad-3 to-grad-4"
-          />
-          <div className="container-main">
-            {/* Referanslar, çözüm ortakları, projeler (2026-10-27): the blog
-                cards this band carried gave way to them at the client's
-                request; the blog itself stays at /blog. */}
-            <SectionHeading eyebrow="Kurumsal" title="Referanslar ve Projeler" tone="dark" />
-            <div className="pt-3 dt:pt-4">
-              <CompanyCards />
-            </div>
-
-          </div>
-        </div>
+      {/* Referanslar, çözüm ortakları, projeler (2026-10-27): the blog
+          cards this band carried gave way to them at the client's request;
+          the blog itself stays at /blog. The same day it left the black
+          full-bleed band for a light panel with a circuit-board ground (see
+          CompanyCards), smaller, at the client's request. */}
+      <Section>
+        <CompanyCards />
       </Section>
 
       {/* 18 — SEO editorial */}

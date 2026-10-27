@@ -1060,6 +1060,15 @@ html {
   background-position: 8px 8px;
   mask-image: radial-gradient(120% 90% at 50% 0%, black 25%, transparent 75%);
 }
+/* A circuit-board ground (the Referanslar ve Projeler panel, 2026-10-27):
+   faint PCB traces with via pads, tiled, fading towards the middle so the
+   cards sit on clean ground and the pattern shows at the edges. */
+.circuit-ground {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='160' viewBox='0 0 240 160' fill='none' stroke='%2368707a' stroke-width='1.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M0 30h46l18 18h52M116 48v34l16 16h46M240 30h-38l-14-14h-30M178 98h62M0 112h34l20-20h28M82 92v40l12 12h56M150 144v16M200 98v36l-14 14'/%3E%3Cg fill='%2368707a' stroke='none'%3E%3Ccircle cx='116' cy='48' r='3'/%3E%3Ccircle cx='178' cy='98' r='3'/%3E%3Ccircle cx='158' cy='16' r='3'/%3E%3Ccircle cx='82' cy='92' r='3'/%3E%3Ccircle cx='150' cy='144' r='3'/%3E%3Ccircle cx='186' cy='148' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: 240px 160px;
+  opacity: 0.16;
+  mask-image: radial-gradient(90% 80% at 50% 55%, transparent 30%, black 85%);
+}
 /* A scan beam: a bright leading line at the bottom edge with a glow trailing
    above it, travelling down (made more visible and slower at the client's
    request, 2026-10-23). */
