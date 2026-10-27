@@ -311,7 +311,7 @@ export default function CartPage() {
                   </span>
                 </div>
                 <p className="mt-1 text-right text-[12px] text-text-secondary">
-                  KDV dahil ({formatPrice(cart?.taxTotal ?? 0)})
+                  Ürünlerde KDV dahil ({formatPrice(cart?.taxTotal ?? 0)})
                 </p>
 
                 <Link

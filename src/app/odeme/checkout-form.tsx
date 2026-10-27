@@ -394,7 +394,7 @@ export function CheckoutForm({
                   {formatPrice(cart.itemTotal + shippingAmount)}
                 </span>
               </div>
-              <p className="mt-1 text-right text-[12px] text-text-secondary">KDV dahil</p>
+              <p className="mt-1 text-right text-[12px] text-text-secondary">Ürünlerde KDV dahil ({formatPrice(cart.taxTotal)})</p>
 
               <label className="mt-4 flex items-start gap-2.5 text-[12px] leading-relaxed text-text-secondary">
                 <input

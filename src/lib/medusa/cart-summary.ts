@@ -29,7 +29,7 @@ export interface CartSummary {
   lines: CartLine[];
   /** Items, KDV included, before shipping. */
   itemTotal: number;
-  /** The KDV share already inside `total`. */
+  /** The KDV inside the products (item_tax_total); shipping's share is left out. */
   taxTotal: number;
   shippingTotal: number;
   discountTotal: number;
@@ -47,6 +47,8 @@ export interface StoreCart {
   email: string | null;
   item_total: number;
   tax_total: number;
+  /** The KDV inside the products alone — shipping's share left out. */
+  item_tax_total: number;
   shipping_total: number;
   discount_total: number;
   total: number;
@@ -107,7 +109,9 @@ export function toCartSummary(cart: StoreCart | null): CartSummary | null {
       total: item.total ?? item.unit_price * item.quantity,
     })),
     itemTotal: cart.item_total,
-    taxTotal: cart.tax_total,
+    /* The products' KDV only. Shipping is priced KDV-inclusive and added on
+       top at its own price; its share is not reported in this line. */
+    taxTotal: cart.item_tax_total ?? cart.tax_total,
     shippingTotal: cart.shipping_total,
     discountTotal: cart.discount_total,
     total: cart.total,

@@ -37,6 +37,8 @@ interface StoreOrder {
   item_total: number;
   shipping_total: number;
   tax_total: number;
+  /** KDV inside the products alone; shipping's share is not shown. */
+  item_tax_total: number;
   total: number;
   payment_status?: string;
   shipping_address: {
@@ -222,7 +224,7 @@ export default async function OrderPage({ params }: { params: Promise<{ id: stri
               <dd className="font-extrabold tabular-nums text-text-primary">{formatPrice(order.total)}</dd>
             </div>
             <p className="text-right text-[12px] text-text-secondary">
-              KDV dahil ({formatPrice(order.tax_total)})
+              Ürünlerde KDV dahil ({formatPrice(order.item_tax_total ?? order.tax_total)})
             </p>
           </dl>
         </section>
