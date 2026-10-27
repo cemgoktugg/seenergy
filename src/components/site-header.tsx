@@ -88,7 +88,7 @@ function Logo({ className = '' }: { className?: string }) {
           Worth noting for future header checks: comparing the LINK boxes shows
           a tidy 12px gap and reports no collision. The overflow is only visible
           if you measure the text box. */}
-      <BrandLogo shine className="hidden h-[38px] w-auto shrink-0 sm:flex dt:h-9" />
+      <BrandLogo shine className="hidden h-[38px] w-auto shrink-0 sm:flex dt:h-[50px]" />
     </Link>
   );
 }
@@ -638,11 +638,10 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
       {/* ---- row 2: main header, 72px (101px until 2026-10-26: 31px of air above
           and below 40px of content made the header read oversized) ---- */}
       {/* The masthead is on the content track (2026-10-26): the logo starts
-          where the slider starts and the cart ends where it ends. Logo, search,
-          b2b and the icons are all 36px from `dt`: one box, one top and one
-          bottom line (40px until 2026-10-26, the client asked for smaller) — option C, the client's choice (2026-10-26). A 48px row
-          was turned down (icons too big); 48px logo + search with 40px icons
-          was tried and replaced by this. */}
+          where the slider starts and the cart ends where it ends. The logo is
+          large (50px) and the search, b2b and icons small (36px), all on one
+          centre line — the client's call (2026-10-27) after equal heights were
+          tried at 48px and at 36px. */}
       <div className="border-b border-[rgb(215,215,215)] dt:h-[72px]">
         <div className="container-main flex h-[50px] items-center gap-3 dt:h-full dt:justify-between dt:gap-4">
           <button

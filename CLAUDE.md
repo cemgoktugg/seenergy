@@ -254,9 +254,10 @@ Header: "Tüm Kategoriler" opens the whole tree (two panes); the bar names
 `NAV_FEATURED` (`src/data/site.ts`) on one line — 5 at 1200, 6 from 1280, 7
 from 1440 ("Kampanyalar" was removed from its right end on 2026-10-26). The
 masthead: a 72px row (101px until 2026-10-26 — the air around 40px of content
-made the header read oversized; header total 180 → 151px) holding the logo, a
-centred search and b2b / Hesabım / Sepetim, all 36px from `dt` (40px until
-2026-10-26) with one top and one bottom line (the client's option C; 48px icons were turned down),
+made the header read oversized; header total 180 → 151px) holding a large logo (50px)
+and a centred search and b2b / Hesabım / Sepetim kept small (36px), on one
+centre line — the client wants the logo big and the controls small
+(2026-10-27); equal-height rows at 48px and 36px were both tried and replaced,
 and on the content track (`container-main`), so the logo and the cart line up with the page
 edges below. There is no separate header track any more. The account block spent one day on the category bar
 and went back at the client's request. Product cards: a pointer gets the round cart
