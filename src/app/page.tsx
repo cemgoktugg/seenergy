@@ -20,6 +20,7 @@ import { ArrowRight } from 'lucide-react';
 import { Hero } from '@/components/hero';
 import { ProductCard } from '@/components/product-card';
 import { BrandBoard, type BrandBoardEntry } from '@/components/brand-board';
+import { AboutCompany } from '@/components/about-company';
 import { BrandShowcase, type PartnerBrand } from '@/components/brand-showcase';
 import { CompanyCards } from '@/components/company-cards';
 import { ProductSlider } from '@/components/product-slider';
@@ -29,7 +30,6 @@ import { SectionHeading } from '@/components/section-heading';
 import {
   BrandGrid,
   ProductGrid,
-  SeoEditorial,
   TrustRow,
 } from '@/components/sections';
 import { discountPercent, type Product } from '@/data/catalog';
@@ -252,9 +252,10 @@ export default async function HomePage() {
         <CompanyCards />
       </Section>
 
-      {/* 18 — SEO editorial */}
+      {/* 18 — Firmamız Hakkında (2026-10-27): the company's own statement,
+             replacing the "Güvenlik Teknolojileri Tedariki" SEO block. */}
       <Section>
-        <SeoEditorial />
+        <AboutCompany />
       </Section>
 
       {/* 19 — trust row. On the 1320 content track like every band above it:

@@ -641,49 +641,5 @@ export function TrustRow({ items }: { items: TrustItem[] }) {
   );
 }
 
-export function SeoEditorial() {
-  return (
-    <section className="text-center">
-      {/* These headings were 19.2px and 15px against 11.5px body copy. Raising
-          the body to 14px to fix an unreadable 184-character measure flattened
-          the ladder underneath them: 15/14 is a 1.07x step, which is no
-          hierarchy at all, and 19.2/14 only 1.37x. Restoring the step is a
-          consequence of that fix rather than a separate opinion —
-          26/14 = 1.86x and 17/14 = 1.21x read as heading, subheading, body. */}
-      <h1 className="text-[20px] font-bold tracking-tight text-text-primary lg:text-[24px]">
-        Güvenlik Teknolojileri Tedariki
-      </h1>
-      <h2 className="mt-1.5 text-[16px] font-medium text-text-secondary">
-        Toptan ve perakende güvenlik sistemleri
-      </h2>
-      {/* Measured at 1440: these two paragraphs ran the full 1320px container at
-          11.5px, centred — 184 characters on a single line against a 60–75
-          guideline, and the smallest body copy on the page. Three faults in one
-          block, all fixed here:
-            measure   1320px → max-w-[60ch]. 66ch was tried first and measured
-                      76 characters: a `ch` is the width of "0", and Turkish
-                      prose averages narrower, so the cap must sit below the
-                      character count you actually want. 60ch measures ~69.
-            size      11.5px → 14px, above the 12px body-copy floor
-            leading   15px on 11.5px (1.3) → 1.7, which long-form text needs
-          The block stays centred; only its measure is bounded. */}
-      <p className="mx-auto mt-4 max-w-[60ch] text-[13px] leading-[1.7] text-text-secondary lg:text-[14px]">
-        <strong className="font-semibold text-text-primary">
-          CCTV, network, alarm ve geçiş kontrol sistemleri…
-        </strong>{' '}
-        CCTV ve kayıt sistemlerinden network ürünlerine, alarm, yangın algılama ve geçiş
-        kontrolünden uydu ve seslendirme sistemlerine kadar güvenlik altyapısının ürünlerini
-        tek katalogda topluyoruz. Hem son kullanıcıya hem de kurumsal alıcıya aynı stok
-        derinliğiyle hizmet veriyoruz.
-      </p>
-      <p className="mx-auto mt-3 max-w-[60ch] text-[13px] leading-[1.7] text-text-secondary lg:text-[14px]">
-        Teknik ekibimiz ürün seçiminde uyumluluk ve kurulum konularında destek sağlar.
-        Toptan alımlarda kademeli fiyatlandırma ve bayi koşulları için toptan satış
-        sayfamızı inceleyebilirsiniz.
-      </p>
-    </section>
-  );
-}
-
 /** Utility type re-export so the page file needs a single import source. */
 export type { NavItem };
