@@ -76,7 +76,7 @@ export interface BrandBoardItem {
 }
 
 /** The board's first content, as the migration seeds it (vitrin-upgrade-brand-board). */
-const BRAND_BOARD: BrandBoardItem[] = ['dahua', 'hikvision', 'neutron', 'unv'].map((handle) => ({
+const BRAND_BOARD: BrandBoardItem[] = ['dahua', 'hikvision', 'unv', 'neutron'].map((handle) => ({
   brandHandle: handle,
   logo: `/brand-logos/${handle}.webp`,
 }));

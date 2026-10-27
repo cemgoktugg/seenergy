@@ -21,12 +21,12 @@ import { Hero } from '@/components/hero';
 import { ProductCard } from '@/components/product-card';
 import { BrandBoard, type BrandBoardEntry } from '@/components/brand-board';
 import { BrandShowcase, type PartnerBrand } from '@/components/brand-showcase';
+import { CompanyCards } from '@/components/company-cards';
 import { ProductSlider } from '@/components/product-slider';
 import { RevealOnScroll } from '@/components/reveal-on-scroll';
 import { Section } from '@/components/section';
 import { SectionHeading } from '@/components/section-heading';
 import {
-  BlogCards,
   BrandGrid,
   ProductGrid,
   SeoEditorial,
@@ -250,9 +250,12 @@ export default async function HomePage() {
             className="absolute inset-x-0 top-0 h-[3px] bg-linear-to-r from-grad-1 via-grad-3 to-grad-4"
           />
           <div className="container-main">
-            <SectionHeading eyebrow="Bilgi ve rehber" title="Blog" tone="dark" />
-            <div className="pt-2.5 dt:pt-3">
-              <BlogCards tone="dark" />
+            {/* Referanslar, çözüm ortakları, projeler (2026-10-27): the blog
+                cards this band carried gave way to them at the client's
+                request; the blog itself stays at /blog. */}
+            <SectionHeading eyebrow="Kurumsal" title="Referanslar ve Projeler" tone="dark" />
+            <div className="pt-3 dt:pt-4">
+              <CompanyCards />
             </div>
 
           </div>

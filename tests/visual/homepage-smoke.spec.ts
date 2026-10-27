@@ -80,9 +80,10 @@ test.describe('homepage', () => {
     // a band that became the per-brand bands; the assertion outlived it.)
     await expect(page.getByRole('heading', { name: 'Haftanın Ürünleri' }).first()).toBeVisible();
     // Since 2026-10-24 the brands have their own band under "Öne Çıkanlar"
-    // and the dark band holds the blog alone.
+    // and the dark band holds references, partners and projects (the blog
+    // cards left it on 2026-10-27).
     await expect(page.getByRole('heading', { name: 'Markalarımız', exact: true })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Blog', exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Referanslar ve Projeler', exact: true })).toBeVisible();
   });
 
   test('product card keeps the measured proportions', async ({ page }) => {

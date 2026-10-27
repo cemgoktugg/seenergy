@@ -186,7 +186,7 @@ export const BLOG_POSTS = [
  * logos (src/markalarr, 2026-10-27), trimmed and converted into
  * public/brands/<slug>.webp. It replaced 45 generated placeholder names.
  *
- * Every logo is drawn in the same 150 × 40 box, as large as it fits (the
+ * Every logo is drawn in the same 120 × 32 box, as large as it fits (the
  * client asked for one size for all, 2026-10-27). `href` is the brand page; a
  * brand without products there opens the "çok yakında" quote panel.
  */

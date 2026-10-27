@@ -1276,8 +1276,17 @@ html.reveal-ready [data-reveal].is-revealed .featured-grid > article {
   .info-prose ol {
     padding-left: 1.3em;
   }
-  .info-prose ul {
+  .info-prose ul:not(.not-prose) {
     list-style: disc;
+  }
+  /* A grid or tile list inside the prose (e.g. the partner logos) is not a
+     bulleted list: no markers, no indent, no stacked item gap. */
+  .info-prose ul.not-prose {
+    padding-left: 0;
+    list-style: none;
+  }
+  .info-prose .not-prose li + li {
+    margin-top: 0;
   }
   .info-prose ol {
     list-style: decimal;

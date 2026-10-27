@@ -59,6 +59,9 @@ These routes are real, not placeholders:
 /mesafeli-satis-sozlesmesi, /on-bilgilendirme-formu, /kvkk,
 /kvkk-aydinlatma-metni, /gizlilik, /cerez-politikasi, /kullanim-kosullari
 /markalar, /blog, /blog/[slug], /yeni-gelenler, /kampanyalar/*
+/referanslar, /cozum-ortaklarimiz, /projeler   the homepage's dark band leads here
+                      (Referanslar ve Projeler, three cards — it carried the
+                      blog cards until 2026-10-27; /blog itself remains)
 ```
 
 **Categories come from one tree: `src/data/categories.ts`** — the client's own

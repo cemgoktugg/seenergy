@@ -21,6 +21,9 @@ export const INFO_NAV = [
     title: 'Kurumsal',
     links: [
       { label: 'Hakkımızda', href: '/hakkimizda' },
+      { label: 'Referanslarımız', href: '/referanslar' },
+      { label: 'Çözüm Ortaklarımız', href: '/cozum-ortaklarimiz' },
+      { label: 'Projelerimiz', href: '/projeler' },
       { label: 'İletişim', href: '/iletisim' },
       { label: 'Kurumsal Satış ve Proje', href: '/kurumsal' },
       { label: 'Toptan Satış', href: '/toptan-satis' },

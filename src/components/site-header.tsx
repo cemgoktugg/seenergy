@@ -736,8 +736,11 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
                 aria-haspopup="true"
                 onClick={() => setOpenMega(openMega === ALL ? null : ALL)}
                 onFocus={() => setOpenMega(ALL)}
-                className={`flex h-full items-center gap-2.5 whitespace-nowrap px-4 text-[14px] font-bold text-white transition-colors duration-(--duration-fast) ${
-                  openMega === ALL ? 'bg-white/[0.14]' : 'bg-white/[0.07] hover:bg-white/[0.12]'
+                /* The bar's one coloured element (2026-10-27, the client wanted
+                   it more prominent): the site's signal red, the same red as the
+                   cart badge, so the way into every category is found first. */
+                className={`flex h-full items-center gap-2.5 whitespace-nowrap px-5 text-[14px] font-extrabold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25)] transition-colors duration-(--duration-fast) ${
+                  openMega === ALL ? 'bg-[rgb(150,12,20)]' : 'bg-[rgb(195,19,28)] hover:bg-[rgb(170,15,24)]'
                 }`}
               >
                 <Menu size={18} strokeWidth={2.25} aria-hidden />

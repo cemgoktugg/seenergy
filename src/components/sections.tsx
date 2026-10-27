@@ -506,7 +506,7 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
 
 /**
  * Brand wall — the client's real brand logos (2026-10-27), each on a white
- * tile, all in one 150 × 40 box (see BRANDS in data/site.ts). Before that
+ * tile, all in one 120 × 32 box (see BRANDS in data/site.ts). Before that
  * it showed monogram chips of 45 generated placeholder names.
  * A fixed label on the left gives the count and the way to /markalar; two
  * rows run opposite ways behind it, fading in and out at the edges, paused
@@ -580,19 +580,20 @@ export function BrandGrid() {
                       tabIndex={duplicate ? -1 : undefined}
                       aria-label={brand.name}
                       title={brand.name}
-                      className="flex h-16 w-[184px] items-center justify-center rounded-(--card-radius) border border-line bg-white px-4 shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-0.5 hover:border-line-strong hover:shadow-e2"
+                      className="flex h-[51px] w-[147px] items-center justify-center rounded-(--card-radius) border border-line bg-white px-3 shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-0.5 hover:border-line-strong hover:shadow-e2"
                     >
-                      {/* One box for every logo: 150 × 40, each as large as
-                          it fits inside it. Not lazy: on a moving track the
+                      {/* One box for every logo: 120 × 32 (150 × 40 until
+                          2026-10-27, 20% smaller at the client's request), each
+                          as large as it fits inside it. Not lazy: on a moving track the
                           browser noticed some tiles too late and left them
                           blank; all 33 logos together are ~316 KB. */}
                       <img
                         src={brand.image}
                         alt=""
-                        width={150}
-                        height={40}
+                        width={120}
+                        height={32}
                         decoding="async"
-                        className="h-10 w-[150px] object-contain"
+                        className="h-8 w-[120px] object-contain"
                       />
                     </Link>
                   </li>
