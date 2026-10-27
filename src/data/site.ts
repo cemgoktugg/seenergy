@@ -181,20 +181,51 @@ export const BLOG_POSTS = [
   { title: 'Akıllı Kumanda Nasıl Sıfırlanır?', href: '/blog/akilli-kumanda-sifirlama', image: '/mock/products/cutout/remote-white.svg', tone: 'turkuaz' as const },
 ];
 
+/**
+ * The brand wall (the homepage's moving logo rows) — the client's own list and
+ * logos (src/markalarr, 2026-10-27), trimmed and converted into
+ * public/brands/<slug>.webp. It replaced 45 generated placeholder names.
+ *
+ * `width` / `height` are the drawn size: every logo gets the same area
+ * (~3400 px², at most 40 tall and 150 wide), so a long wordmark like Paradox
+ * and a square badge like HES read as equals. `href` is the brand page; a
+ * brand without products there opens the "çok yakında" quote panel.
+ */
 export const BRANDS = [
-  'Voltra', 'Nexora', 'Kablonis', 'Sunmax', 'Orbisat', 'Lumenta',
-  'Akuform', 'Tekniva', 'Sonora', 'Provista', 'Elektroma', 'Digiwave',
-  'Amperis', 'Cabletek', 'Vizyontek', 'Megavolt', 'Sesyapı', 'Ledora',
-  'Kumandax', 'Servisan', 'Metrion', 'Bataryam', 'Antenix', 'Fotokam',
-  'Powerin', 'Sinyalis', 'Tamirix', 'Optivolt', 'Rezonans', 'Devrelab',
-  'Elektromar', 'Voltbir', 'Kabloteknik', 'Sesmar', 'Antenpro', 'Ledvolt',
-  'Trafolux', 'Guvenix', 'Sarjmatik', 'Devreport', 'Termolab', 'Anahtarix',
-  'Isiksan', 'Enerjix', 'Kontakform',
-].map((name) => ({
-  name,
-  href: `/marka/${name.toLowerCase().replace(/[^a-z0-9]/g, '')}`,
-  image: `/mock/brands/${name.toLowerCase().replace(/[^a-z0-9]/g, '')}.svg`,
-}));
+  { name: 'SEENERGY', slug: 'seenergy', width: 123, height: 28 },
+  { name: 'SEENERGY Home', slug: 'seenergy-home', width: 127, height: 27 },
+  { name: 'Racksan', slug: 'racksan', width: 99, height: 34 },
+  { name: 'Dahua', slug: 'dahua', width: 107, height: 32 },
+  { name: 'Hikvision', slug: 'hikvision', width: 150, height: 19 },
+  { name: 'UNV', slug: 'unv', width: 80, height: 40 },
+  { name: 'Neutron', slug: 'neutron', width: 150, height: 22 },
+  { name: 'Ruijie', slug: 'ruijie', width: 107, height: 32 },
+  { name: 'TP-Link', slug: 'tp-link', width: 95, height: 36 },
+  { name: 'Teknim', slug: 'teknim', width: 122, height: 28 },
+  { name: 'Paradox', slug: 'paradox', width: 150, height: 13 },
+  { name: 'Karel', slug: 'karel', width: 109, height: 31 },
+  { name: 'Audio', slug: 'audio', width: 102, height: 33 },
+  { name: 'Huawei', slug: 'huawei', width: 125, height: 27 },
+  { name: 'Sismik', slug: 'sismik', width: 101, height: 34 },
+  { name: 'Gold Audio', slug: 'gold-audio', width: 143, height: 24 },
+  { name: 'Wöller', slug: 'woller', width: 74, height: 40 },
+  { name: 'Westa', slug: 'westa', width: 125, height: 27 },
+  { name: 'Tescom', slug: 'tescom', width: 132, height: 26 },
+  { name: 'Dotvolt', slug: 'dotvolt', width: 102, height: 33 },
+  { name: 'Ajax', slug: 'ajax', width: 130, height: 26 },
+  { name: 'HES Cabling Systems', slug: 'hes', width: 58, height: 40 },
+  { name: 'Öznur Kablo', slug: 'oznur-kablo', width: 87, height: 39 },
+  { name: 'Reçber', slug: 'recber', width: 129, height: 26 },
+  { name: 'Armağan Kablo', slug: 'armagan-kablo', width: 130, height: 26 },
+  { name: 'Eleks', slug: 'eleks', width: 111, height: 31 },
+  { name: 'Hi-Level', slug: 'hi-level', width: 148, height: 23 },
+  { name: 'HiLook', slug: 'hilook', width: 113, height: 30 },
+  { name: 'HPE', slug: 'hpe', width: 109, height: 31 },
+  { name: 'Kioxia', slug: 'kioxia', width: 130, height: 26 },
+  { name: 'Koç Kablo', slug: 'koc-kablo', width: 62, height: 40 },
+  { name: 'MAG', slug: 'mag', width: 86, height: 39 },
+  { name: 'T&Smart', slug: 't-smart', width: 117, height: 29 },
+].map((brand) => ({ ...brand, href: `/marka/${brand.slug}`, image: `/brands/${brand.slug}.webp` }));
 
 /**
  * Brand showcases — the seven homepage bands the client asked for, built on the

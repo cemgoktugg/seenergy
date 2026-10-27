@@ -505,9 +505,9 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
 }
 
 /**
- * Brand wall — redesigned 2026-10-24 ("daha modern"). The generated mock
- * marks (a tiny icon plus the name, unreadable at wall size) gave way to
- * chips: a steel monogram and the brand name on a card that lifts on hover.
+ * Brand wall — the client's real brand logos (2026-10-27), each on a white
+ * tile at an optically equal size (see BRANDS in data/site.ts). Before that
+ * it showed monogram chips of 45 generated placeholder names.
  * A fixed label on the left gives the count and the way to /markalar; two
  * rows run opposite ways behind it, fading in and out at the edges, paused
  * while the pointer or focus is on the wall. The chips follow the theme, so
@@ -537,7 +537,7 @@ export function BrandGrid() {
           Marka ağı
         </p>
         <p className="mt-2 text-[40px] font-extrabold leading-none tracking-tight text-text-primary tabular-nums">
-          {BRANDS.length}+
+          {BRANDS.length}
         </p>
         <p className="mt-1.5 text-[13px] leading-snug text-text-secondary">marka, tek çatı altında</p>
         <Link
@@ -573,18 +573,25 @@ export function BrandGrid() {
                     aria-hidden={duplicate || undefined}
                     className={`shrink-0 ${duplicate ? 'brand-dup' : ''}`}
                   >
+                    {/* White in both themes: the logos are drawn for a white
+                        ground and several carry dark ink. */}
                     <Link
                       href={brand.href}
                       tabIndex={duplicate ? -1 : undefined}
-                      className="group/chip flex h-12 items-center gap-2.5 rounded-full border border-line bg-surface-card py-1.5 pl-1.5 pr-5 shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-0.5 hover:border-line-strong hover:shadow-e2"
+                      aria-label={brand.name}
+                      title={brand.name}
+                      className="flex h-16 w-[184px] items-center justify-center rounded-(--card-radius) border border-line bg-white px-4 shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-0.5 hover:border-line-strong hover:shadow-e2"
                     >
-                      <span
-                        aria-hidden
-                        className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-linear-to-br from-grad-2 to-grad-4 text-[12px] font-extrabold tracking-tight text-white transition-transform duration-(--duration-base) group-hover/chip:scale-110"
-                      >
-                        {brand.name.slice(0, 2).toUpperCase()}
-                      </span>
-                      <span className="whitespace-nowrap text-[14px] font-semibold text-text-primary">{brand.name}</span>
+                      <img
+                        src={brand.image}
+                        alt=""
+                        width={brand.width}
+                        height={brand.height}
+                        loading="lazy"
+                        decoding="async"
+                        style={{ width: brand.width, height: brand.height }}
+                        className="object-contain"
+                      />
                     </Link>
                   </li>
                 )),

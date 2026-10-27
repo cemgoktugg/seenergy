@@ -52,3 +52,5 @@ backend/apps/backend/uploads/
 # The client's CCTV source folder (images, datasheets, .ai files — ~450 MB).
 # Its web-ready output is generated elsewhere; the originals stay local.
 /src/CCTV/
+# the client's brand logo originals; the site serves the trimmed copies in public/brands
+src/markalarr/
