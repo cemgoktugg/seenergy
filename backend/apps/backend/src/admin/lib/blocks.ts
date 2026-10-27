@@ -293,7 +293,7 @@ export const TRUST_ICONS: { value: string; label: string }[] = [
 export const LIST_PLACES: Record<string, string> = {
   haftanin: "Marka bannerlarının altındaki 'Haftanın Ürünleri' rafı (ilk 8).",
   yeni: "Marka bannerlarının altındaki 'Yeni Gelenler' rafı (ilk 8).",
-  "one-cikan": "'Keşfet · Öne Çıkanlar' bölümü: 4 × 4 ızgara (ilk 16).",
+  "one-cikan": "'Keşfet · Öne Çıkanlar' bölümü: 4 × 5 ızgara (ilk 20).",
   "cok-satan": "Şu an ana sayfada gösterilmiyor (sekmeli bölüm kaldırıldı).",
   "super-firsat": "'Fırsat Ürünleri' bölümü: Öne Çıkanlar'ın hemen üstünde 4 ürün (ilk 4). Tümü sayfası /kampanyalar/super-firsat.",
 }
@@ -303,5 +303,5 @@ export const LIST_LIMITS: Record<string, number> = {
   yeni: 12,
   "cok-satan": 12,
   "super-firsat": 4,
-  "one-cikan": 16,
+  "one-cikan": 20,
 }

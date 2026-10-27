@@ -165,7 +165,8 @@ export default async function HomePage() {
       {/* 12 — Keşfet · Öne Çıkanlar: one 4 × 4 grid (2026-10-24). It was a
              tabbed block (Haftanın Ürünleri / Yeni Ürünler / Çok Satanlar);
              the client wanted no tabs and no such labels here, only the
-             featured products. Its own Vitrin list, "one-cikan" (first 16),
+             featured products. Its own Vitrin list, "one-cikan" (first 20 —
+             4 × 5 since 2026-10-27, the client asked for four more),
              edited in admin → Vitrin → Öne Çıkanlar; until the list exists a
              deterministic mix stands in. On a phone the band scrolls like the
              other homepage rails. */}
@@ -212,7 +213,7 @@ export default async function HomePage() {
       <Section label="Öne çıkan ürünler">
         <SectionHeading eyebrow="Keşfet" title="Öne Çıkanlar" />
         <div className="pt-3 dt:pt-4">
-          <ProductGrid products={pick('one-cikan', 16, 4)} columns={4} featured />
+          <ProductGrid products={pick('one-cikan', 20, 4)} columns={4} featured />
         </div>
       </Section>
 
