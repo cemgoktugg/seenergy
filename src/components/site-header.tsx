@@ -149,7 +149,7 @@ function SearchField({
     <form
       role="search"
       action="/arama"
-      className={`group flex h-[41px] w-full items-stretch overflow-hidden rounded-full border transition-colors duration-(--duration-base) ${dark ? '' : 'dt:h-9'} ${
+      className={`group flex h-[41px] w-full items-stretch overflow-hidden rounded-full border transition-colors duration-(--duration-base) ${dark ? '' : 'dt:h-6'} ${
         dark
           ? 'border-chrome-line bg-white/10 focus-within:border-grad-1 focus-within:bg-white/15'
           : 'border-line-strong bg-surface-page focus-within:border-brand focus-within:bg-surface-card'
@@ -165,16 +165,16 @@ function SearchField({
         type="search"
         autoFocus={autoFocus}
         placeholder="Ürün, marka veya ürün kodu ara"
-        className={`min-w-0 flex-1 bg-transparent pl-[18px] pr-2 text-[16px] outline-none dt:text-[14px] min-[85rem]:text-[16px] ${
+        className={`min-w-0 flex-1 bg-transparent pl-[18px] pr-2 text-[16px] outline-none ${
           dark
-            ? 'text-white placeholder:text-white/55'
-            : 'text-text-primary placeholder:text-text-secondary'
+            ? 'text-white placeholder:text-white/55 dt:text-[14px] min-[85rem]:text-[16px]'
+            : 'text-text-primary placeholder:text-text-secondary dt:pl-3 dt:text-[13px]'
         }`}
       />
       {shortcut && (
         <kbd
           aria-hidden
-          className="my-auto mr-1 hidden shrink-0 rounded-(--card-radius) border border-line-strong bg-surface-card px-1.5 py-0.5 font-mono text-[12px] leading-none text-text-secondary group-focus-within:hidden min-[85rem]:block"
+          className="my-auto mr-1 hidden shrink-0 rounded-(--card-radius) border border-line-strong bg-surface-card px-1.5 py-0.5 font-mono text-[12px] leading-none text-text-secondary group-focus-within:hidden"
         >
           /
         </kbd>
@@ -191,13 +191,13 @@ function SearchField({
            made a prettier floating pill and dropped the touch target from
            ~48×47 back to 41, undoing a fix made earlier in this build. The
            form's `overflow-hidden rounded-full` clips this into the pill end. */
-        className={`relative grid w-14 shrink-0 place-items-center transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] ${
+        className={`relative grid w-14 shrink-0 place-items-center transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] ${dark ? '' : 'dt:w-9'} ${
           dark
             ? 'bg-white/15 text-white hover:bg-white/25'
             : 'bg-linear-to-br from-grad-2 to-grad-3 text-white hover:from-grad-3 hover:to-grad-4'
         }`}
       >
-        <Search size={20} strokeWidth={2.25} aria-hidden />
+        <Search size={20} strokeWidth={2.25} aria-hidden className={dark ? '' : 'dt:h-3.5 dt:w-3.5'} />
       </button>
     </form>
   );
@@ -209,11 +209,12 @@ function HeaderActions() {
      count in the first client pass would disagree with it. */
   const { cart, count: cartCount, bump } = useCart();
 
-  /* From `dt` the account and cart are labelled — icon-only circles left a
-     shopper guessing, and the cart now says what is in it. Below `dt` they
-     stay 44px icons: the 390 row is already at its width limit. */
+  /* From `dt` b2b, account and cart are 24px with one-line labels (the
+     client's size, 2026-10-27): a two-line "Giriş yap / Hesabım" stood taller
+     than a 24px icon and broke the row's alignment. Below `dt` they stay 44px
+     icons: the 390 row is at its width limit, and a finger needs the size. */
   const iconCircle =
-    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-9 dt:w-9 dt:bg-brand dt:text-white';
+    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-6 dt:w-6 dt:bg-brand dt:text-white';
 
   return (
     <div className="flex shrink-0 items-center gap-1 dt:gap-4 min-[85rem]:gap-5">
@@ -223,36 +224,33 @@ function HeaderActions() {
         /* Hit-tested 44×32 — the width was fine, the height was not. The 32px
            visual keeps the measured badge proportions, so `before` lifts the
            target to 44 (32 + 2×6) instead of inflating the pill. */
-        className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-9 dt:px-3.5 dt:text-[13px]"
+        className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-6 dt:px-2.5 dt:text-[12px] dt:before:hidden"
       >
         b2b
       </Link>
-      <Link href="/hesabim" aria-label="Hesabım" className="group flex items-center gap-2.5">
+      <Link href="/hesabim" aria-label="Hesabım" className="group flex items-center gap-2">
         <span className={`${iconCircle} dt:group-hover:bg-brand-dark`}>
-          <User size={20} strokeWidth={1.9} aria-hidden />
+          <User size={20} strokeWidth={1.9} aria-hidden className="dt:h-3.5 dt:w-3.5" />
         </span>
-        <span className="hidden leading-tight dt:block">
-          <span className="block text-[12px] text-text-secondary">Giriş yap</span>
-          <span className="block text-[14px] font-bold text-text-primary">Hesabım</span>
-        </span>
+        <span className="hidden text-[13px] font-bold leading-none text-text-primary dt:block">Hesabım</span>
       </Link>
       <Link href="/sepet" aria-label={`Sepetim, ${cartCount} ürün`} className="group flex items-center gap-2.5">
         <span className={`${iconCircle} dt:group-hover:bg-brand-dark`}>
-          <ShoppingCart size={20} strokeWidth={1.9} aria-hidden />
+          <ShoppingCart size={20} strokeWidth={1.9} aria-hidden className="dt:h-3.5 dt:w-3.5" />
           {/* Inset rather than hung outside the button: at 320 a negative offset
               pushed the badge past the viewport and the document scrolled 9px.
               Keyed on `bump`: each successful add remounts the badge, which
               replays the pulse — the header answering the click. */}
           <span
             key={bump}
-            className={`absolute right-0 top-0 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[12px] font-bold text-white ring-2 ring-surface-card dt:-right-1 dt:-top-1 ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
+            className={`absolute right-0 top-0 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[rgb(195,19,28)] px-1 text-[12px] font-bold text-white ring-2 ring-surface-card dt:-right-2 dt:-top-2 dt:h-4 dt:min-w-4 dt:px-0.5 dt:leading-none ${bump > 0 ? 'animate-[cart-bump_520ms_var(--ease-out)]' : ''}`}
           >
             {cartCount}
           </span>
         </span>
-        <span className="hidden leading-tight dt:block">
-          <span className="block text-[12px] text-text-secondary">Sepetim</span>
-          <span className="block min-w-[72px] text-[14px] font-bold tabular-nums text-text-primary">
+        <span className="hidden items-baseline gap-1.5 text-[13px] leading-none dt:flex">
+          <span className="text-text-secondary">Sepetim</span>
+          <span className="font-bold tabular-nums text-text-primary">
             {cart && cart.count > 0 ? formatPrice(cart.itemTotal) : 'Boş'}
           </span>
         </span>
@@ -639,8 +637,9 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
           and below 40px of content made the header read oversized) ---- */}
       {/* The masthead is on the content track (2026-10-26): the logo starts
           where the slider starts and the cart ends where it ends. The logo is
-          large (50px) and the search, b2b and icons small (36px), all on one
-          centre line — the client's call (2026-10-27) after equal heights were
+          large (50px) and the search, b2b and icons small (24px, the client's
+          size), all on one centre line; the cart text ends on the slider's
+          right edge — the client's call (2026-10-27) after equal heights were
           tried at 48px and at 36px. */}
       <div className="border-b border-[rgb(215,215,215)] dt:h-[72px]">
         <div className="container-main flex h-[50px] items-center gap-3 dt:h-full dt:justify-between dt:gap-4">
