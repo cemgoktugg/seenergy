@@ -141,21 +141,26 @@ const splitHours = (line: string): [string, string] => {
   return match && match[1] ? [match[1], match[2]] : ['', line];
 };
 
-/** Until the admin uploads a building photo: the building from the client's
- *  artwork (the hero's), cut free of its abstract left edge. */
+/** Until the admin uploads a building photo: the client's photo of the
+ *  SEENERGY building (1175 × 812). */
 const DEFAULT_BUILDING_PHOTO = '/contact/seenergy-bina.webp';
 
 /**
  * The top box: the black SEENERGY panel on the left, the details on the
- * right, at their original proportions.
+ * right.
  *
- * The details panel follows the client's mockup (2026-10-28): the building
- * photo sits in its top-right, the facade's "SEENERGY TEKNOLOJİ A.Ş."
- * lettering there; a frosted veil with a large curved edge — an ellipse
- * anchored on the panel's bottom-left corner, with a fainter arc outside it
- * — carries the text, and the S on the glass shows faintly through it. The
- * photo's geometry is in percentages of the panel, so the lettering stays in
- * the corner at every width; its left edge fades out.
+ * The details panel carries the client's building photo with the big S on
+ * its glass right beside the "İletişim" heading (2026-10-28, the client's
+ * request). The geometry hangs off that S, which sits at 33.6% × 72% of the
+ * photo (its ring spans 28.5–38.7% across, 58–86% down):
+ *   - the photo is as wide as the panel, its top at the heading's centre and
+ *     pulled up 72% of its own height, so the S's centre lands on the
+ *     heading's centre line at every width;
+ *   - it starts 0% / 21% (phone) from the left, so the S's ring begins just
+ *     after the word; with the longer quote title it moves further right;
+ *   - left of the ring it fades out (the dark building would swallow the
+ *     heading), and it fades away just under the S, where the details
+ *     begin.
  */
 function ContactBanner({
   company,
@@ -192,24 +197,15 @@ function ContactBanner({
       </div>
 
       {/* --- address and contact details, over the building -------------- */}
-      <div className="relative isolate flex flex-col overflow-hidden px-5 pb-6 pt-[204px] sm:pt-[264px] lg:py-6 dt:px-8 dt:py-8">
-        {/* The building: a wide band on a phone; from `lg` the panel's whole
-            right side, full height, anchored left so the lettering and the S
-            land just past the veil's curve. Its left edge fades out. */}
+      <div className="relative isolate flex flex-col overflow-hidden px-5 py-6 dt:px-8 dt:py-8">
         <div
           aria-hidden
-          className="absolute inset-x-0 top-0 -z-20 h-[230px] sm:h-[290px] lg:inset-y-0 lg:left-[44%] lg:h-auto dt:left-[46%] lg:[mask-image:linear-gradient(to_right,transparent,#000_18%)]"
+          className={`absolute top-[66px] -z-10 aspect-[1175/812] w-full -translate-y-[72%] [mask-composite:intersect] [mask-image:linear-gradient(to_right,transparent_25%,#000_28.5%),linear-gradient(to_bottom,#000_82%,transparent_91%)] dt:top-[78px] ${
+            quote ? 'left-[48%] lg:left-[26%]' : 'left-[21%] lg:left-[4%] dt:left-0'
+          }`}
         >
-          <Image src={photo} alt="" fill sizes="(min-width: 1024px) 420px, 100vw" className="object-cover object-[30%_40%] lg:object-left" />
+          <Image src={photo} alt="" fill priority sizes="(min-width: 1024px) 720px, 100vw" className="object-cover" />
         </div>
-        <span
-          aria-hidden
-          className="absolute inset-0 -z-10 hidden bg-surface-card/40 lg:block lg:[clip-path:ellipse(68%_122%_at_0%_100%)] dt:[clip-path:ellipse(70%_122%_at_0%_100%)]"
-        />
-        <span
-          aria-hidden
-          className="absolute inset-x-0 bottom-0 top-[170px] -z-10 bg-surface-card/90 [clip-path:ellipse(150%_100%_at_50%_100%)] sm:top-[230px] lg:inset-0 lg:[clip-path:ellipse(62%_115%_at_0%_100%)] dt:[clip-path:ellipse(64%_115%_at_0%_100%)]"
-        />
 
         <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
           <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
@@ -219,12 +215,10 @@ function ContactBanner({
           {title}
         </h1>
 
-        <dl className="relative mt-5 space-y-4">
+        <dl className="relative mt-10 space-y-4 lg:mt-12 dt:mt-[76px]">
           {company.address ? (
             <Detail icon={MapPin} label="Adres">
-              {/* Narrower on the 1024–1199 panel, so the long first line
-                  wraps before it reaches the photo's curve. */}
-              <span className="block whitespace-pre-line lg:max-w-[225px] dt:max-w-none">{company.address}</span>
+              <span className="whitespace-pre-line">{company.address}</span>
             </Detail>
           ) : null}
           {company.phone ? (
