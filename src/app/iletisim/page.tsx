@@ -198,6 +198,17 @@ function ContactBanner({
 
       {/* --- address and contact details, over the building -------------- */}
       <div className="relative isolate flex flex-col overflow-hidden px-5 py-6 dt:px-8 dt:py-8">
+        {/* From `lg`: the building runs on down the right side to the
+            bottom corner, its edge an oval curve (2026-10-28, the client's
+            request). The photo has nothing below the S, so this is the
+            building's right flank — the corner with the vertical SEENERGY
+            sign — from the same photo; the S band above fades into it. */}
+        <div
+          aria-hidden
+          className="absolute inset-y-0 left-[56%] right-0 -z-20 hidden lg:block [clip-path:ellipse(100%_80%_at_100%_45%)]"
+        >
+          <Image src={photo} alt="" fill sizes="320px" className="object-cover object-[90%_55%]" />
+        </div>
         <div
           aria-hidden
           className={`absolute top-[66px] -z-10 aspect-[1175/812] w-full -translate-y-[72%] [mask-composite:intersect] [mask-image:linear-gradient(to_right,transparent_25%,#000_28.5%),linear-gradient(to_bottom,#000_82%,transparent_91%)] dt:top-[78px] ${
@@ -218,7 +229,8 @@ function ContactBanner({
         <dl className="relative mt-10 space-y-4 lg:mt-12 dt:mt-[76px]">
           {company.address ? (
             <Detail icon={MapPin} label="Adres">
-              <span className="whitespace-pre-line">{company.address}</span>
+              {/* Kept clear of the photo running down the right side. */}
+              <span className="block whitespace-pre-line lg:max-w-[230px] dt:max-w-[300px]">{company.address}</span>
             </Detail>
           ) : null}
           {company.phone ? (
