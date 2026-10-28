@@ -95,6 +95,25 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
       onFocusCapture={() => setHovered(true)}
       onBlurCapture={() => setHovered(false)}
     >
+      {/* The dark panel's ground (2026-10-28, the client's artwork): the
+          SEENERGY building, under every slide. It spans the left 60% — the
+          light stage covers the rest — and is set to its right side, where
+          the facade and its lettering are; the artwork's left side is a
+          bright abstract that white copy could not stand on. A chrome
+          gradient, heaviest under the copy, keeps the text legible. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 sm:right-[40%]">
+        <Image
+          src="/hero/seenergy-bina.webp"
+          alt=""
+          fill
+          priority
+          sizes="(min-width: 640px) 60vw, 100vw"
+          className="object-cover object-[85%_45%]"
+        />
+        <span className="absolute inset-0 bg-linear-to-r from-chrome/90 via-chrome/70 to-chrome/35" />
+        <span className="absolute inset-0 bg-linear-to-t from-chrome/60 to-transparent to-50%" />
+      </div>
+
       {/* A faint technical grid over the dark panel, so it is not flat black. */}
       <span
         aria-hidden
