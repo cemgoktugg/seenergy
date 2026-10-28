@@ -158,8 +158,10 @@ function trailFor(product: Product) {
   ];
 }
 
+/** The visible trail is the short one — the category path and the code; the
+ *  brand step stays in the structured data, and in the brand chip below. */
 function Breadcrumb({ product }: { product: Product }) {
-  const trail = trailFor(product);
+  const trail = trailFor(product).filter((step) => !step.href.startsWith('/marka/'));
 
   return (
     <nav aria-label="Konum" className="min-w-0">
@@ -248,11 +250,13 @@ function sheetOf(product: Product, own: SpecGroup[]): { label: string; value: st
 /** The headline specs as tiles: the figure large, what it measures under it. */
 function SpecSheet({ cells }: { cells: { label: string; value: string }[] }) {
   return (
-    <dl className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+    /* Three cells stay one row at every width (two-up left the third alone
+       under the others on a phone); six run 2 × 3, then 3 × 2. */
+    <dl className={`mt-5 grid gap-2 ${cells.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'}`}>
       {cells.map((cell) => (
-        <div key={cell.label} className="rounded-(--card-radius) border border-line bg-surface-page px-3.5 py-3">
+        <div key={cell.label} className="min-w-0 rounded-(--card-radius) border border-line bg-surface-page px-2.5 py-3 sm:px-3.5">
           <dt className="sr-only">{cell.label}</dt>
-          <dd className="text-[16px] font-extrabold leading-tight tabular-nums tracking-tight text-text-primary dt:text-[20px]">
+          <dd className="text-[14px] font-extrabold leading-tight tabular-nums tracking-tight text-text-primary sm:text-[16px] dt:text-[20px]">
             {cell.value}
           </dd>
           <dd aria-hidden className="mt-1 text-[12px] font-medium text-text-secondary">
@@ -400,9 +404,25 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { bySlug, otherModelsOf, alternativesTo } = await loadCatalog();
+  const { bySlug, otherModelsOf, alternativesTo, products } = await loadCatalog();
   const product = bySlug(slug);
   if (!product) notFound();
+
+  /* "Uyumlu Kayıt Cihazları": what a camera buyer needs next — the recorders
+     of the same system in the catalogue (AHD camera → DVR, IP camera → NVR),
+     the camera's own brand first. Recorders themselves get no such section. */
+  const recorderPattern =
+    product.category === 'ahd-sistem' && !/\bdvr\b|kayıt cihaz/i.test(product.name)
+      ? { test: /\bDVR\b|AHD Kayıt Cihaz/i, label: 'DVR' }
+      : product.category === 'ip-sistem' && !/\bnvr\b|kayıt cihaz/i.test(product.name)
+        ? { test: /\bNVR\b/i, label: 'NVR' }
+        : null;
+  const recorders = recorderPattern
+    ? products
+        .filter((item) => item.id !== product.id && recorderPattern.test.test(item.name))
+        .sort((a, b) => Number(b.brand === product.brand) - Number(a.brand === product.brand))
+        .slice(0, 4)
+    : [];
 
   /* A brand row of one or two cards left most of a four-column shelf empty.
      Under four other models it has no row of its own: those models lead the
@@ -410,19 +430,22 @@ export default async function ProductPage({
   const siblingsAll = otherModelsOf(product);
   const ownRow = siblingsAll.length >= 4;
   const siblings = ownRow ? siblingsAll : [];
-  const alternatives = ownRow
-    ? alternativesTo(product)
-    : [...siblingsAll, ...alternativesTo(product).filter((item) => !siblingsAll.some((own) => own.id === item.id))];
+  const alternatives = (
+    ownRow
+      ? alternativesTo(product)
+      : [...siblingsAll, ...alternativesTo(product).filter((item) => !siblingsAll.some((own) => own.id === item.id))]
+  ).filter((item) => !recorders.some((recorder) => recorder.id === item.id));
   const [details, { company }] = await Promise.all([loadProductDetails(product.id), loadVitrin()]);
   const title = titleOf(product);
   const sheet = sheetOf(product, details.specs);
-  /* What a camera buyer needs next: a recorder of the same system. */
-  const related =
-    product.category === 'ip-sistem' && !/nvr/i.test(product.name)
-      ? { label: 'Uyumlu NVR kayıt cihazları', href: '/arama?q=NVR' }
-      : product.category === 'ahd-sistem' && !/dvr/i.test(product.name)
-        ? { label: 'Uyumlu DVR kayıt cihazları', href: '/arama?q=DVR' }
-        : null;
+  /* The chip under the offer jumps to the recorders on this page, or — when
+     the catalogue has none yet — to a search for them. */
+  const related = recorderPattern
+    ? {
+        label: `Uyumlu ${recorderPattern.label} kayıt cihazları`,
+        href: recorders.length ? '#uyumlu-kayit-cihazlari' : `/arama?q=${recorderPattern.label}`,
+      }
+    : null;
   const category = categoryMeta(product.category);
   const brandLogo = BRANDS.find((brand) => brand.slug === brandSlug(product.brand))?.image ?? null;
   const { paragraphs, bullets } = partsOf(details.description);
@@ -441,6 +464,7 @@ export default async function ProductPage({
   const sections = [
     ...(details.description ? [{ id: 'aciklama', label: 'Ürün Açıklaması' }] : []),
     { id: 'teknik-ozellikler', label: 'Teknik Özellikler' },
+    ...(recorders.length > 0 ? [{ id: 'uyumlu-kayit-cihazlari', label: 'Uyumlu Kayıt Cihazları' }] : []),
     ...(siblings.length > 0 ? [{ id: 'diger-modeller', label: `Diğer ${product.brand} Modelleri` }] : []),
     ...(alternatives.length > 1 ? [{ id: 'benzer-urunler', label: 'Benzer Ürünler' }] : []),
   ];
@@ -522,7 +546,7 @@ export default async function ProductPage({
                   product.stock > 0 && (product.badge === 'super-firsat' || product.freeShipping) ? (
                     <>
                       {product.badge === 'super-firsat' && (
-                        <span className="w-fit rounded-full bg-info px-2.5 py-1 text-[12px] font-medium text-white">
+                        <span className="w-fit rounded-full bg-signal px-2.5 py-1 text-[12px] font-medium text-white">
                           Süper Fırsat
                         </span>
                       )}
@@ -552,10 +576,12 @@ export default async function ProductPage({
                       <span className="text-[13px] font-extrabold text-ink-fixed">{product.brand}</span>
                     )}
                   </Link>
+                  {/* The category is the page's one red accent above the offer. */}
                   <Link
                     href={category.href}
-                    className="inline-flex h-8 items-center rounded-full bg-surface-page px-3 text-[13px] font-semibold text-text-secondary transition-colors hover:text-text-primary"
+                    className="inline-flex h-8 items-center gap-1.5 rounded-full bg-signal/[0.08] px-3 text-[13px] font-bold text-signal transition-colors hover:bg-signal/[0.14]"
                   >
+                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-signal" />
                     {category.label}
                   </Link>
                 </div>
@@ -586,7 +612,8 @@ export default async function ProductPage({
 
               {/* The offer: one card — price, the purchase, and the three
                   facts that decide it (delivery, preparation, payment). */}
-              <div className="mt-5 overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2">
+              <div className="relative mt-5 overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2">
+                <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-signal" />
                 <div className="p-5 dt:p-6">
                   <PriceBlock product={product} />
                   <ProductBuy product={product} whatsapp={company.whatsapp || company.phone} />
@@ -596,17 +623,20 @@ export default async function ProductPage({
 
               <ProductLinks product={product} datasheet={details.datasheet} related={related} />
 
-              <ul className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+              {/* The four assurances as one plain strip: a row of four with
+                  hairline dividers, two by two on a phone. */}
+              <ul
+                aria-label="Alışveriş güvenceleri"
+                className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-(--card-radius) border border-line bg-line sm:grid-cols-4"
+              >
                 {PRODUCT_TRUST.filter((item) => item.icon !== 'truck').map((item) => {
                   const Icon = TRUST_ICONS[item.icon];
                   return (
                     <li
                       key={item.label}
-                      className="flex flex-col items-start gap-2 rounded-(--card-radius) border border-line px-3 py-3 text-[13px] font-semibold leading-snug text-text-primary"
+                      className="flex items-center gap-2 bg-surface-card px-3 py-3 text-[13px] font-semibold leading-snug text-text-primary"
                     >
-                      <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-surface-page text-text-primary">
-                        <Icon size={16} strokeWidth={2} />
-                      </span>
+                      <Icon size={17} strokeWidth={2} aria-hidden className="shrink-0 text-text-secondary" />
                       {item.label}
                     </li>
                   );
@@ -630,7 +660,7 @@ export default async function ProductPage({
               <li key={section.id} className="shrink-0">
                 <a
                   href={`#${section.id}`}
-                  className="relative flex h-12 items-center px-3 text-[13px] font-semibold text-text-secondary transition-colors duration-(--duration-fast) hover:text-text-primary"
+                  className="relative flex h-12 items-center px-3 text-[14px] font-semibold text-text-secondary transition-colors duration-(--duration-fast) after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:bg-signal after:transition-transform after:duration-(--duration-fast) hover:text-text-primary hover:after:scale-x-100 focus-visible:text-text-primary focus-visible:after:scale-x-100"
                 >
                   {section.label}
                 </a>
@@ -699,6 +729,20 @@ export default async function ProductPage({
       )}
 
       <ProductSpecs product={product} specs={details.specs} />
+
+      {/* --- recorders of the same system -------------------------------- */}
+      {recorders.length > 0 && recorderPattern && (
+        <section id="uyumlu-kayit-cihazlari" className="container-main scroll-mt-32 pt-8 dt:pt-12" aria-label="Uyumlu kayıt cihazları">
+          <SectionHeading
+            eyebrow={`${category.label} · ${recorderPattern.label}`}
+            title="Uyumlu Kayıt Cihazları"
+            action={{ label: 'Tümü', href: `/arama?q=${recorderPattern.label}` }}
+          />
+          <div className="pt-3">
+            <ProductGrid products={recorders} columns={4} />
+          </div>
+        </section>
+      )}
 
       {/* --- the brand's other models ------------------------------------ */}
       {siblings.length > 0 && (

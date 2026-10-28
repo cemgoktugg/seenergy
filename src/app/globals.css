@@ -175,6 +175,11 @@
      instead of sitting between the teal and the indigo as a third blue.
      White on rgb(46 85 200) measures 5.9:1 — AA for the badge's 11px text. */
   --color-info: rgb(46 85 200);
+  /* SEENERGY red (#d71920, the client's brief for the product page,
+     2026-10-28): the page's primary actions and its category accent, used
+     sparingly against the graphite. White on it measures 5.3:1 (AA). */
+  --color-signal: rgb(215 25 32);
+  --color-signal-dark: rgb(178 18 25);
   /* Emphasis on the near-black strips (instalment "3 TAKSİT"). Bright silver,
      13.0:1 on the chrome it sits on. */
   --color-highlight: rgb(214 219 226);

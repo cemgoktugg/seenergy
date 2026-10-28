@@ -86,7 +86,7 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
         <div className="mt-4 flex flex-wrap items-stretch gap-2.5">
           <Link
             href={quoteHref(product.sku)}
-            className="flex h-13 flex-1 basis-full items-center justify-center gap-2 rounded-full bg-brand text-[16px] sm:basis-0 font-bold text-white transition-colors duration-(--duration-fast) hover:bg-brand-dark"
+            className="flex h-13 flex-1 basis-full items-center justify-center gap-2 rounded-full bg-signal text-[16px] font-bold text-white shadow-e2 transition-colors duration-(--duration-fast) hover:bg-signal-dark sm:basis-0"
           >
             Teklif al
           </Link>
@@ -138,7 +138,7 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
               type="button"
               disabled={blocked}
               onClick={() => void addToCart()}
-              className="flex h-13 min-w-[180px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-brand text-[16px] font-bold text-white shadow-e2 transition-[transform,background-color] duration-(--duration-fast) ease-in-out hover:-translate-y-px hover:bg-brand-dark disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
+              className="flex h-13 min-w-[180px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-signal text-[16px] font-bold text-white shadow-e2 transition-[transform,background-color] duration-(--duration-fast) ease-in-out hover:-translate-y-px hover:bg-signal-dark disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
             >
               <ShoppingCart size={19} strokeWidth={2} aria-hidden />
               {label}
@@ -184,7 +184,7 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
           {onRequest ? (
             <Link
               href={quoteHref(product.sku)}
-              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-bold text-white"
+              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-signal text-[14px] font-bold text-white hover:bg-signal-dark"
             >
               <MessageSquareQuote size={17} strokeWidth={2} aria-hidden />
               Teklif al
@@ -194,7 +194,7 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
               type="button"
               disabled={blocked}
               onClick={() => void addToCart()}
-              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-bold text-white disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
+              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-signal text-[14px] font-bold text-white hover:bg-signal-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
             >
               <ShoppingCart size={17} strokeWidth={2} aria-hidden />
               {soldOut ? 'Tükendi' : cart.busy ? 'Ekleniyor…' : 'Sepete Ekle'}
