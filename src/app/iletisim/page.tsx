@@ -7,7 +7,7 @@ import { BrandLogo } from '@/components/brand-mark';
 import { InquiryForm } from '@/components/inquiry-form';
 import { SectionHeading } from '@/components/section-heading';
 import { CONTACT_FIELDS } from '@/data/inquiry-fields';
-import { telHref, waHref } from '@/lib/contact';
+import { directionsHref, telHref, waHref } from '@/lib/contact';
 import { imageProps } from '@/lib/image';
 import { DEPARTMENTS, hoursLines, loadVitrin, type Company, type StaffMember } from '@/lib/medusa/vitrin';
 
@@ -156,11 +156,11 @@ function ContactBanner({
   quote: boolean;
   whatsappText?: string;
 }) {
-  const mapHref =
-    company.mapUrl ||
-    (company.address
-      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(company.address.replace(/\n/g, ' '))}`
-      : '');
+  const mapHref = directionsHref({
+    query: company.mapQuery,
+    legalName: company.legalName,
+    address: company.address,
+  });
   const hours = hoursLines(company.hours);
 
   return (

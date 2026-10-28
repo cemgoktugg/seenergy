@@ -89,7 +89,6 @@ export interface Company {
   email: string;
   address: string;
   hours: string;
-  mapUrl: string;
   mersis: string;
   taxOffice: string;
   taxNumber: string;
@@ -99,6 +98,8 @@ export interface Company {
   iban: string;
   /** The /iletisim banner's photo; empty = the logo stands in. */
   buildingImage: string;
+  /** What "Yol tarifi al" asks Google Maps for; empty = legal name + city (see directionsHref). */
+  mapQuery: string;
 }
 
 /** "Hafta içi … · Hafta sonu …" → one line each (the admin separates with ·). */
@@ -117,7 +118,7 @@ const COMPANY_FALLBACK: Company = {
   address: 'İvedik OSB Mahallesi, Melih Gökçek Bulvarı Köşe\nİvedik İş Merkezi 4BJ No: 85\nYenimahalle / Ankara',
   hours: 'Hafta içi 08:00 – 18:00 · Hafta sonu 08:00 – 15:00',
   buildingImage: '',
-  mapUrl: '',
+  mapQuery: '',
   mersis: '',
   taxOffice: '',
   taxNumber: '',
@@ -216,7 +217,6 @@ function toCompany(data: Record<string, unknown> | undefined): Company {
     email: str(data.email),
     address: str(data.address),
     hours: str(data.hours),
-    mapUrl: str(data.map_url),
     mersis: str(data.mersis),
     taxOffice: str(data.tax_office),
     taxNumber: str(data.tax_number),
@@ -226,6 +226,7 @@ function toCompany(data: Record<string, unknown> | undefined): Company {
     bankHolder: str(data.bank_holder) || (process.env.BANK_HOLDER ?? ''),
     iban: str(data.iban) || (process.env.BANK_IBAN ?? ''),
     buildingImage: str(data.building_image),
+    mapQuery: str(data.map_query),
   };
 }
 

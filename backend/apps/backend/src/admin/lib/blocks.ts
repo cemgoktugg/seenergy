@@ -203,7 +203,13 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
         placeholder: "Hafta içi 08:00 – 18:00 · Hafta sonu 08:00 – 15:00",
         hint: "Satırları · işaretiyle ayırın; İletişim sayfasında her biri ayrı satırda gösterilir.",
       },
-      { name: "map_url", label: "Harita bağlantısı", type: "text", hint: "Google Haritalar'daki 'Paylaş' bağlantısı. İletişim sayfasında 'Yol tarifi al' düğmesi olur." },
+      {
+        name: "map_query",
+        label: "Haritadaki işletme adı (isteğe bağlı)",
+        type: "text",
+        placeholder: "SEENERGY Güvenlik Teknolojileri A.Ş., Yenimahalle, Ankara",
+        hint: "İletişim sayfasındaki 'Yol tarifi al' düğmesi, ziyaretçinin konumundan Google Haritalar'daki işletme kaydınıza araçla rota açar. Boşsa şirket unvanı ve adresin son satırı (ilçe / il) kullanılır. Yalnızca Google'daki işletme adınız farklıysa doldurun.",
+      },
       {
         name: "building_image",
         label: "Şirket binası fotoğrafı",
