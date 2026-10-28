@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronRight, Clock, Mail, MapPin, MessageCircle, Navigation, Phone, UserRound } from 'lucide-react';
 
+import { BrandLogo } from '@/components/brand-mark';
 import { InquiryForm } from '@/components/inquiry-form';
 import { SectionHeading } from '@/components/section-heading';
 import { CONTACT_FIELDS } from '@/data/inquiry-fields';
@@ -145,15 +146,16 @@ const splitHours = (line: string): [string, string] => {
 const DEFAULT_BUILDING_PHOTO = '/contact/seenergy-bina.webp';
 
 /**
- * The top box, after the client's own mockup (2026-10-28): the building photo
- * fills it, the SEENERGY facade on the right; on the left a frosted veil
- * with a large curved edge — an ellipse anchored on the bottom-left corner,
- * so the curve rises from the bottom toward the top-left — carries the
- * details, with a fainter second arc just outside it. The facade's lettering
- * and the S on its glass sit right beside the curve.
+ * The top box: the black SEENERGY panel on the left, the details on the
+ * right, at their original proportions.
  *
- * On a phone the photo is a band across the top and the veil rises over its
- * bottom edge in a shallow curve.
+ * The details panel follows the client's mockup (2026-10-28): the building
+ * photo sits in its top-right, the facade's "SEENERGY TEKNOLOJİ A.Ş."
+ * lettering there; a frosted veil with a large curved edge — an ellipse
+ * anchored on the panel's bottom-left corner, with a fainter arc outside it
+ * — carries the text, and the S on the glass shows faintly through it. The
+ * photo's geometry is in percentages of the panel, so the lettering stays in
+ * the corner at every width; its left edge fades out.
  */
 function ContactBanner({
   company,
@@ -177,44 +179,44 @@ function ContactBanner({
   return (
     <section
       aria-labelledby="contact-title"
-      className="relative isolate mt-4 overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2"
+      className="mt-4 grid overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]"
     >
-      {/* --- the building ------------------------------------------------
-          From `lg` it fills the right 56%, anchored left, so the facade's
-          lettering and the S on its glass land just past the veil's curve;
-          its left edge fades into the veil instead of stopping on a line. */}
-      <div className="absolute inset-x-0 top-0 -z-20 h-[240px] sm:h-[320px] lg:inset-y-0 lg:left-[49%] lg:h-auto dt:left-[44%] lg:[mask-image:linear-gradient(to_right,transparent,#000_22%)]">
-        <Image
-          src={photo}
-          alt={`${company.legalName} şirket binası`}
-          fill
-          priority
-          sizes="(min-width: 1024px) 760px, 100vw"
-          className="object-cover object-[30%_40%] lg:object-left"
-        />
+      {/* --- the black SEENERGY panel ------------------------------------ */}
+      <div className="relative min-h-[220px] sm:min-h-[300px] lg:min-h-[440px]">
+        <div className="nav-metal absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center text-white">
+          <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 opacity-25" />
+          <span aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/[0.08] blur-3xl" />
+          <BrandLogo tone="light" shine className="relative h-9 w-auto sm:h-11 dt:h-14" />
+          <p className="relative text-[13px] font-bold uppercase tracking-[0.2em] text-white/70">Güvenlik Teknolojileri A.Ş.</p>
+        </div>
       </div>
 
-      {/* --- the veil: a faint outer arc, then the frosted one ------------ */}
-      <span
-        aria-hidden
-        className="absolute inset-0 -z-10 hidden bg-surface-card/40 lg:block lg:[clip-path:ellipse(68%_128%_at_0%_100%)] dt:[clip-path:ellipse(61%_128%_at_0%_100%)]"
-      />
-      <span
-        aria-hidden
-        className="absolute inset-x-0 bottom-0 top-[180px] -z-10 bg-surface-card/90 [clip-path:ellipse(150%_100%_at_50%_100%)] sm:top-[250px] lg:inset-0 lg:[clip-path:ellipse(62%_118%_at_0%_100%)] dt:[clip-path:ellipse(56%_118%_at_0%_100%)]"
-      />
+      {/* --- address and contact details, over the building -------------- */}
+      <div className="relative isolate flex flex-col overflow-hidden px-5 py-6 dt:px-8 dt:py-8">
+        <div
+          aria-hidden
+          className="absolute left-[64%] top-[-8%] -z-20 aspect-[1284/762] w-[76%] [mask-image:linear-gradient(to_right,transparent,#000_14%),linear-gradient(to_bottom,#000_70%,transparent)] [mask-composite:intersect]"
+        >
+          <Image src={photo} alt="" fill sizes="(min-width: 1024px) 420px, 76vw" className="object-cover" />
+        </div>
+        <span
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-surface-card/40 [clip-path:ellipse(94%_81%_at_0%_55%)]"
+        />
+        <span
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-surface-card/90 [clip-path:ellipse(88%_75%_at_0%_55%)]"
+        />
 
-      {/* --- address and contact details -------------------------------- */}
-      <div className="relative flex flex-col px-5 pb-6 pt-[214px] sm:px-8 sm:pt-[278px] lg:min-h-[520px] lg:max-w-[600px] lg:px-12 lg:py-12">
-        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary dt:text-[13px]">
+        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
           <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
           {quote ? 'Fiyat teklifi' : 'Bize ulaşın'}
         </p>
-        <h1 id="contact-title" className="mt-2 text-[32px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[40px]">
+        <h1 id="contact-title" className="mt-2 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[32px]">
           {title}
         </h1>
 
-        <dl className="relative mt-6 space-y-5">
+        <dl className="relative mt-5 space-y-4">
           {company.address ? (
             <Detail icon={MapPin} label="Adres">
               <span className="whitespace-pre-line">{company.address}</span>
@@ -293,7 +295,7 @@ function Detail({ icon: Icon, label, children }: { icon: typeof Phone; label: st
       </span>
       <div className="min-w-0">
         <dt className="text-[12px] font-bold uppercase tracking-[0.1em] text-text-secondary">{label}</dt>
-        <dd className="mt-0.5 text-[14px] leading-relaxed text-text-primary dt:text-[16px]">{children}</dd>
+        <dd className="mt-0.5 text-[14px] leading-relaxed text-text-primary">{children}</dd>
       </div>
     </div>
   );
