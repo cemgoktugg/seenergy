@@ -31,18 +31,22 @@
  * which is most of why the page read as flat.
  */
 
+/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
   BadgeCheck,
+  BadgePercent,
   Check,
   ChevronRight,
   Download,
   Headphones,
+  PackageCheck,
   ReceiptText,
   RefreshCcw,
   Truck,
+  Wallet,
 } from 'lucide-react';
 
 import { ProductBuy, ProductLinks } from '@/components/product-buy';
@@ -59,8 +63,8 @@ import {
   FREE_SHIPPING_FROM,
   type Product,
 } from '@/data/catalog';
-import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
-import { PRODUCT_TRUST, SITE } from '@/data/site';
+import { INSTALMENTS_AVAILABLE, PAYMENT_OPTIONS } from '@/data/checkout';
+import { BRANDS, PRODUCT_TRUST, SITE } from '@/data/site';
 import { keySpecsOf, type SpecGroup } from '@/data/specs';
 import { loadCatalog, loadProductDetails, loadProducts } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
@@ -241,34 +245,51 @@ function sheetOf(product: Product, own: SpecGroup[]): { label: string; value: st
   return cells.length >= 6 ? cells.slice(0, 6) : cells.length >= 3 ? cells.slice(0, 3) : [];
 }
 
+/** The headline specs as tiles: the figure large, what it measures under it. */
 function SpecSheet({ cells }: { cells: { label: string; value: string }[] }) {
   return (
-    <dl className="mt-5 grid grid-cols-2 overflow-hidden rounded-(--panel-radius) border border-line sm:grid-cols-3">
+    <dl className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
       {cells.map((cell) => (
-        <div key={cell.label} className="-mb-px -mr-px border-b border-r border-line px-4 py-3">
+        <div key={cell.label} className="rounded-(--card-radius) border border-line bg-surface-page px-3.5 py-3">
           <dt className="sr-only">{cell.label}</dt>
-          <dd className="text-[16px] font-bold leading-tight sm:text-[20px] tabular-nums text-text-primary">{cell.value}</dd>
-          <dd aria-hidden className="mt-0.5 text-[13px] text-text-secondary">{cell.label}</dd>
+          <dd className="text-[16px] font-extrabold leading-tight tabular-nums tracking-tight text-text-primary dt:text-[20px]">
+            {cell.value}
+          </dd>
+          <dd aria-hidden className="mt-1 text-[12px] font-medium text-text-secondary">
+            {cell.label}
+          </dd>
         </div>
       ))}
     </dl>
   );
 }
 
+/**
+ * Price block.
+ *
+ * The visual parts are `aria-hidden` and a single sr-only sentence carries the
+ * whole meaning, so a screen reader hears "2.849,90 ₺, önceki fiyat 3.238,52 ₺,
+ * %12 indirim" instead of three disconnected numbers. The saving is derived
+ * from the two prices, never authored.
+ */
 function PriceBlock({ product }: { product: Product }) {
   const discount = discountPercent(product);
 
-  /* No price yet: the block says how to get one instead of printing a 0. */
+  /* No price yet: the block says so instead of printing a 0. */
   if (product.price == null) {
     return (
-      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-        <p className="text-[24px] font-extrabold leading-tight tracking-tight text-text-primary">Fiyat teklifle</p>
-        <p className="text-[14px] text-text-secondary">Aynı gün dönüş</p>
+      <div>
+        <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">Fiyat</p>
+        <p className="mt-1 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[32px]">
+          Fiyat için bize ulaşın
+        </p>
+        <p className="mt-1 text-[14px] text-text-secondary">Güncel fiyat ve stok bilgisini aynı gün iletiyoruz.</p>
         <p className="sr-only">{PRICE_ON_REQUEST}</p>
       </div>
     );
   }
 
+  const saving = product.compareAtPrice ? product.compareAtPrice - product.price : 0;
   return (
     <div>
       <p className="sr-only">
@@ -277,24 +298,28 @@ function PriceBlock({ product }: { product: Product }) {
         {discount ? `, %${discount} indirim` : ''}
       </p>
 
-      <div aria-hidden className="flex flex-wrap items-center gap-x-3 gap-y-1">
-        {discount !== null && discount > 0 && (
-          <span className="rounded-full bg-danger px-2.5 py-1 text-[12px] font-extrabold tabular-nums text-white">
-            %{discount}
+      {discount !== null && discount > 0 && product.compareAtPrice ? (
+        <div aria-hidden className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <span className="rounded-(--card-radius) bg-danger px-2 py-1 text-[13px] font-extrabold tabular-nums leading-none text-white">
+            %{discount} İNDİRİM
           </span>
-        )}
-        {product.compareAtPrice && (
-          <span className="text-[16px] font-medium tabular-nums text-text-secondary line-through">
+          <span className="text-[16px] font-medium tabular-nums text-text-secondary line-through decoration-text-secondary/60">
             {formatPrice(product.compareAtPrice)}
           </span>
-        )}
-      </div>
-      <p aria-hidden className="mt-1 flex items-baseline gap-2">
-        <span className="text-[32px] font-extrabold leading-none tracking-tight tabular-nums text-text-primary dt:text-[40px]">
+        </div>
+      ) : null}
+      <p aria-hidden className="mt-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
+        <span className="text-[40px] font-extrabold leading-none tracking-tight tabular-nums text-text-primary">
           {formatPrice(product.price)}
         </span>
-        <span className="text-[12px] font-medium text-text-secondary">KDV dahil</span>
+        <span className="text-[13px] font-medium text-text-secondary">KDV dahil</span>
       </p>
+      {saving > 0 ? (
+        <p aria-hidden className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-success-ink">
+          <BadgePercent size={15} strokeWidth={2.25} />
+          {formatPrice(saving)} tasarruf
+        </p>
+      ) : null}
 
       {INSTALMENTS_AVAILABLE && product.instalment && (
         <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-(--card-radius) border border-highlight/40 bg-surface-instalment px-2.5 py-1.5 text-[12px] font-medium text-white">
@@ -305,36 +330,65 @@ function PriceBlock({ product }: { product: Product }) {
   );
 }
 
-function StockLine({ product }: { product: Product }) {
+/** Availability and delivery as pills under the heading — what an
+ *  electronics shopper scans for first. Stock only for a product on sale. */
+function StatusPills({ product }: { product: Product }) {
+  const pill = 'inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-bold';
+  if (product.price == null) return null;
   if (product.stock === 0) {
     return (
-      <p className="inline-flex items-center gap-2 text-[13px] font-semibold text-danger-ink">
-        <span aria-hidden className="h-2 w-2 rounded-full bg-danger" />
-        Şu anda stokta yok
-      </p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <span className={`${pill} bg-danger/10 text-danger-ink`}>
+          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-danger" />
+          Şu anda stokta yok
+        </span>
+      </div>
     );
   }
-
   const low = product.stock <= 5;
   return (
-    <p className={`inline-flex items-center gap-2 text-[13px] font-semibold ${low ? 'text-danger-ink' : 'text-success-ink'}`}>
-      <span aria-hidden className="relative flex h-2 w-2">
-        <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 motion-reduce:hidden ${low ? 'bg-danger' : 'bg-success'}`} />
-        <span className={`relative inline-flex h-2 w-2 rounded-full ${low ? 'bg-danger' : 'bg-success'}`} />
+    <div className="mt-4 flex flex-wrap gap-2">
+      <span className={`${pill} ${low ? 'bg-warning/15 text-warning' : 'bg-success/10 text-success-ink'}`}>
+        <span aria-hidden className="relative flex h-1.5 w-1.5">
+          <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 motion-reduce:hidden ${low ? 'bg-warning' : 'bg-success'}`} />
+          <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${low ? 'bg-warning' : 'bg-success'}`} />
+        </span>
+        {low ? `Son ${product.stock} adet` : 'Stokta'}
       </span>
-      {low ? `Son ${product.stock} adet` : 'Stokta · hemen kargoda'}
-    </p>
+      <span className={`${pill} bg-surface-page text-text-primary`}>
+        <PackageCheck size={14} strokeWidth={2.25} aria-hidden />
+        Aynı gün kargoya hazırlanır
+      </span>
+      {product.freeShipping || (product.price ?? 0) >= FREE_SHIPPING_FROM ? (
+        <span className={`${pill} bg-surface-page text-text-primary`}>
+          <Truck size={14} strokeWidth={2.25} aria-hidden />
+          Ücretsiz kargo
+        </span>
+      ) : null}
+    </div>
   );
 }
 
-/** What shipping costs this visitor, stated before they reach the cart. */
-function ShippingLine({ product }: { product: Product }) {
-  if (product.stock === 0) return null;
+/** The buy card's foot: delivery, preparation, payment — three facts in a row. */
+function OfferFacts({ product }: { product: Product }) {
+  const free = product.freeShipping || (product.price ?? 0) >= FREE_SHIPPING_FROM;
+  const facts = [
+    { icon: Truck, title: 'Kargo', text: free ? 'Bu ürün ücretsiz kargo' : `${formatPrice(FREE_SHIPPING_FROM)} üzeri ücretsiz` },
+    { icon: PackageCheck, title: 'Hazırlık', text: 'Aynı gün kargoya hazırlanır' },
+    { icon: Wallet, title: 'Ödeme', text: PAYMENT_OPTIONS.map((option) => option.label).join(' · ') },
+  ];
   return (
-    <p className="inline-flex items-center gap-2 text-[13px] font-medium text-text-secondary">
-      <Truck size={15} strokeWidth={2} aria-hidden className="text-text-primary" />
-      {product.freeShipping ? 'Ücretsiz kargo' : `${formatPrice(FREE_SHIPPING_FROM)} üzeri ücretsiz kargo`}
-    </p>
+    <ul className="grid gap-px border-t border-line bg-line sm:grid-cols-3">
+      {facts.map(({ icon: Icon, title, text }) => (
+        <li key={title} className="flex items-start gap-2.5 bg-surface-page px-4 py-3">
+          <Icon size={18} strokeWidth={2} aria-hidden className="mt-0.5 shrink-0 text-text-primary" />
+          <span className="min-w-0">
+            <span className="block text-[12px] font-bold uppercase tracking-[0.08em] text-text-secondary">{title}</span>
+            <span className="block text-[13px] font-semibold leading-snug text-text-primary">{text}</span>
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
@@ -370,6 +424,7 @@ export default async function ProductPage({
         ? { label: 'Uyumlu DVR kayıt cihazları', href: '/arama?q=DVR' }
         : null;
   const category = categoryMeta(product.category);
+  const brandLogo = BRANDS.find((brand) => brand.slug === brandSlug(product.brand))?.image ?? null;
   const { paragraphs, bullets } = partsOf(details.description);
   const lead = summaryOf(details.description, 190);
 
@@ -483,53 +538,75 @@ export default async function ProductPage({
             </div>
 
             <div className="min-w-0">
-              <p className="flex flex-wrap items-center gap-x-2 text-[14px] text-text-secondary">
-                <Link href={`/marka/${brandSlug(product.brand)}`} className="font-bold text-text-primary hover:underline">
-                  {product.brand}
-                </Link>
-                <Link href={category.href} className="hover:text-text-primary hover:underline">
-                  {category.label}
-                </Link>
-              </p>
+              {/* Brand (its logo where the shop has one), category, code. */}
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href={`/marka/${brandSlug(product.brand)}`}
+                    title={`${product.brand} ürünleri`}
+                    className="inline-flex h-8 items-center rounded-full border border-line bg-white px-3 shadow-e1 transition-colors hover:border-line-strong"
+                  >
+                    {brandLogo ? (
+                      <img src={brandLogo} alt={product.brand} className="h-4 w-auto max-w-[96px] object-contain" />
+                    ) : (
+                      <span className="text-[13px] font-extrabold text-ink-fixed">{product.brand}</span>
+                    )}
+                  </Link>
+                  <Link
+                    href={category.href}
+                    className="inline-flex h-8 items-center rounded-full bg-surface-page px-3 text-[13px] font-semibold text-text-secondary transition-colors hover:text-text-primary"
+                  >
+                    {category.label}
+                  </Link>
+                </div>
+                {product.sku ? (
+                  <p className="text-[12px] font-medium text-text-secondary">
+                    Ürün kodu: <span className="font-bold tabular-nums text-text-primary">{product.sku}</span>
+                  </p>
+                ) : null}
+              </div>
 
               {/* The model code leads, the way a datasheet is headed: it is
                   what an installer searches for and quotes. The rest of the
                   name is the second line of the same heading. */}
-              <h1 className="mt-1.5 text-text-primary">
+              <h1 className="mt-4 text-text-primary">
                 <span className="block text-[32px] font-extrabold leading-none tracking-tight tabular-nums dt:text-[40px]">
                   {title.code}
                 </span>
                 {title.rest && (
-                  <span className="mt-2 block text-[20px] font-medium leading-snug text-text-secondary">{title.rest}</span>
+                  <span className="mt-2 block text-[20px] font-semibold leading-snug text-text-secondary">{title.rest}</span>
                 )}
               </h1>
+              <StatusPills product={product} />
               {lead && (
-                <p className="mt-4 max-w-[60ch] text-[14px] leading-relaxed text-text-secondary dt:text-[16px]">{lead}</p>
+                <p className="mt-4 max-w-[62ch] text-[14px] leading-relaxed text-text-secondary">{lead}</p>
               )}
 
               {sheet.length > 0 && <SpecSheet cells={sheet} />}
 
-              {/* The offer: price (or "teklifle"), availability and the one
-                  decision, on a plain plate rather than a shadowed card. */}
-              <div className="mt-5 rounded-(--panel-radius) bg-surface-page p-5 dt:p-6">
-                <PriceBlock product={product} />
-                {product.price != null && (
-                  <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-1.5">
-                    <StockLine product={product} />
-                    <ShippingLine product={product} />
-                  </div>
-                )}
-                <ProductBuy product={product} whatsapp={company.whatsapp || company.phone} />
+              {/* The offer: one card — price, the purchase, and the three
+                  facts that decide it (delivery, preparation, payment). */}
+              <div className="mt-5 overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2">
+                <div className="p-5 dt:p-6">
+                  <PriceBlock product={product} />
+                  <ProductBuy product={product} whatsapp={company.whatsapp || company.phone} />
+                </div>
+                {product.price != null ? <OfferFacts product={product} /> : null}
               </div>
 
               <ProductLinks product={product} datasheet={details.datasheet} related={related} />
 
-              <ul className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 border-t border-line pt-5 sm:grid-cols-3">
-                {PRODUCT_TRUST.map((item) => {
+              <ul className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                {PRODUCT_TRUST.filter((item) => item.icon !== 'truck').map((item) => {
                   const Icon = TRUST_ICONS[item.icon];
                   return (
-                    <li key={item.label} className="flex items-center gap-2 text-[13px] font-medium text-text-primary">
-                      <Icon size={16} strokeWidth={2} aria-hidden className="shrink-0 text-text-secondary" />
+                    <li
+                      key={item.label}
+                      className="flex flex-col items-start gap-2 rounded-(--card-radius) border border-line px-3 py-3 text-[13px] font-semibold leading-snug text-text-primary"
+                    >
+                      <span aria-hidden className="grid h-8 w-8 place-items-center rounded-full bg-surface-page text-text-primary">
+                        <Icon size={16} strokeWidth={2} />
+                      </span>
                       {item.label}
                     </li>
                   );

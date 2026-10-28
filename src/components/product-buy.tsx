@@ -21,7 +21,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FileText, Heart, Minus, MessageSquareQuote, Plus, Scale, ShoppingCart, Zap } from 'lucide-react';
+import { FileText, HardDrive, Heart, Minus, MessageSquareQuote, Plus, Scale, ShoppingCart, Zap } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
@@ -150,25 +150,24 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
                 </span>
               )}
             </button>
-            {/* Beside the cart button from `sm`; below it the row has no
-                room for a third control, so it moves to the secondary row. */}
-            {favouriteButton('hidden sm:grid')}
           </div>
 
-          <button
-            type="button"
-            disabled={blocked}
-            onClick={() => void buyNow()}
-            className="mt-2.5 flex h-12 w-full items-center justify-center gap-2 rounded-full border-2 border-text-primary bg-surface-card text-[16px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card disabled:cursor-not-allowed disabled:opacity-40"
-          >
-            <Zap size={17} strokeWidth={2.25} aria-hidden />
-            Hemen Al
-          </button>
+          {/* Second row: buy now, and the favourite beside it — one layout at
+              every width (the heart used to take a row of its own on phones). */}
+          <div className="mt-2.5 flex items-stretch gap-2.5">
+            <button
+              type="button"
+              disabled={blocked}
+              onClick={() => void buyNow()}
+              className="flex h-13 flex-1 items-center justify-center gap-2 rounded-full border-2 border-text-primary bg-surface-card text-[16px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Zap size={17} strokeWidth={2.25} aria-hidden />
+              Hemen Al
+            </button>
+            {favouriteButton('grid')}
+          </div>
         </>
       )}
-
-      {/* Below `sm` the favourite has no room beside the cart button. */}
-      {!onRequest && <div className="mt-2.5 flex justify-end sm:hidden">{favouriteButton('grid h-11! w-11!')}</div>}
 
       {/* Sticky buy bar, below `dt` only: the desktop buy card stays in view on
           its own. It floats over the page, so it takes the overlay shadow. */}
@@ -224,11 +223,12 @@ export function ProductLinks({
   const { has, toggle, count, ready } = useStore();
   const comparing = ready && has('compare', product.id);
   const compareFull = ready && !comparing && count('compare') >= COMPARE_LIMIT;
+  /* Chips, not a third row of buttons — reference next to the purchase. */
   const link =
-    'inline-flex min-h-9 items-center gap-1.5 text-[14px] font-semibold text-text-primary underline decoration-line-strong underline-offset-4 transition-colors hover:decoration-text-primary';
+    'inline-flex h-9 items-center gap-1.5 rounded-full border border-line bg-surface-card px-3.5 text-[13px] font-semibold text-text-primary transition-colors duration-(--duration-fast) hover:border-text-primary';
 
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1">
+    <div className="mt-4 flex flex-wrap items-center gap-2">
       {datasheet && (
         <a href={datasheet} target="_blank" rel="noopener" className={link}>
           <FileText size={16} strokeWidth={2} aria-hidden />
@@ -253,6 +253,7 @@ export function ProductLinks({
       )}
       {related && (
         <Link href={related.href} className={link}>
+          <HardDrive size={16} strokeWidth={1.9} aria-hidden />
           {related.label}
         </Link>
       )}
