@@ -54,7 +54,8 @@ export const QuickProductBody = z.object({
   new_brand: z.string().nullable().optional(),
   category_id: z.string().min(1, "Bir kategori seçin."),
   sku: z.string().nullable().optional(),
-  price: money,
+  // Empty = no price: the product shows "Fiyat için teklif isteyin".
+  price: money.nullable(),
   sale_price: money.nullable().optional(),
   stock: z.coerce.number().int("Stok tam sayı olmalı.").min(0, "Stok negatif olamaz."),
   images: z.array(z.string()).max(20, "En fazla 20 görsel eklenebilir.").nullable().optional(),
@@ -80,6 +81,24 @@ export const QuickProductBody = z.object({
   badge: z.enum(BADGES).nullable().optional(),
   instalment: z.boolean().default(false),
   list_keys: z.array(z.string()).default([]),
+})
+
+/** Changes made straight in the Ürün Yönetimi list, many products at once. */
+export const ProductBatchBody = z.object({
+  updates: z
+    .array(
+      z.object({
+        id: z.string().startsWith("prod_"),
+        price: money.nullable().optional(),
+        sale_price: money.nullable().optional(),
+        stock: z.coerce.number().int("Stok tam sayı olmalı.").min(0, "Stok negatif olamaz.").optional(),
+        status: z.enum(["published", "draft"]).optional(),
+        category_id: z.string().min(1).optional(),
+        add_image: z.string().min(1).optional(),
+      })
+    )
+    .min(1)
+    .max(200, "Bir seferde en fazla 200 ürün kaydedilebilir."),
 })
 
 /** First zod issue as a single sentence for the admin toast. */

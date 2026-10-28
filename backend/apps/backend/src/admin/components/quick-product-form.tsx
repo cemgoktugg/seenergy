@@ -1,13 +1,16 @@
-import { ArrowUpRightOnBox } from "@medusajs/icons"
-import { Button, Checkbox, Container, Heading, Input, Label, Select, Switch, Text, Textarea, toast } from "@medusajs/ui"
-import { useEffect, useState } from "react"
-import { Link, useNavigate } from "react-router-dom"
+import { ArrowUpRightOnBox, ChevronLeft, ChevronRight, SquareTwoStack } from "@medusajs/icons"
+import { Button, Checkbox, Container, Heading, Input, Label, Select, Switch, Text, Textarea, toast, usePrompt } from "@medusajs/ui"
+import { useEffect, useMemo, useState } from "react"
+import { Link, useNavigate, useSearchParams } from "react-router-dom"
 
 import { LIST_PLACES } from "../lib/blocks"
 import {
   BADGE_LABELS,
   errorText,
   formatTRY,
+  parseMoney,
+  useAllQuickProducts,
+  useQuickProduct,
   useSaveQuickProduct,
   useVitrin,
   useVitrinOptions,
@@ -24,6 +27,13 @@ import { FieldShell, GalleryField, SpecsField } from "./fields"
  * and how many are there, what does it look like, where does it show. Every
  * Medusa concept behind it (variant, price list, inventory level…) is handled
  * by the backend; none of it appears here.
+ *
+ * Working through a category (2026-10-28): opened from Ürün Yönetimi with
+ * ?kategori=, the form steps to the previous / next product of that category,
+ * and "geri" returns to it. Leaving with unsaved changes asks first. A new
+ * product can start in a category (?kategori=) or as a copy of another
+ * (?kopya=<id>: brand, category, price, description and specs carried over;
+ * name, code, pictures and homepage lists left empty).
  */
 
 const NEW_BRAND = "__new__"
@@ -65,22 +75,17 @@ const fromProduct = (p?: QuickProduct): FormState => ({
   list_keys: p?.list_keys ?? [],
 })
 
-/**
- * Accepts "1.249,90", "1249,90", "1249.90" and "1.249" — people type prices
- * every way. A dot followed by exactly three digits is a Turkish thousands
- * separator ("1.249" is 1249, not 1,249).
- */
-const parseMoney = (value: string): number | null => {
-  const v = value.trim().replace(/\s/g, "").replace(/(TL|₺)$/i, "")
-  if (!v) return null
-  const normalised = /,\d{1,2}$/.test(v)
-    ? v.replace(/\./g, "").replace(",", ".")
-    : /^\d{1,3}(\.\d{3})+$/.test(v)
-      ? v.replace(/\./g, "")
-      : v.replace(/,/g, "")
-  const n = Number(normalised)
-  return Number.isFinite(n) ? n : NaN
-}
+/** A new product started from another: what carries over to a sibling model. */
+const copyOf = (p: QuickProduct): FormState => ({
+  ...fromProduct(p),
+  title: "",
+  sku: "",
+  images: [],
+  badge: NO_BADGE,
+  published: true,
+  list_keys: [],
+  stock: "",
+})
 
 function Section({ title, children, aside }: { title: string; children: React.ReactNode; aside?: React.ReactNode }) {
   return (
@@ -96,17 +101,69 @@ function Section({ title, children, aside }: { title: string; children: React.Re
 
 export function QuickProductForm({ product }: { product?: QuickProduct }) {
   const navigate = useNavigate()
+  const prompt = usePrompt()
+  const [params] = useSearchParams()
   const { data: options } = useVitrinOptions()
   const { data: vitrin } = useVitrin()
+  const { data: all } = useAllQuickProducts()
   const save = useSaveQuickProduct()
-  const [form, setForm] = useState<FormState>(() => fromProduct(product))
-  useEffect(() => setForm(fromProduct(product)), [product?.id, product?.updated_at])
+
+  const category = params.get("kategori") ?? ""
+  const copyId = product ? undefined : params.get("kopya") ?? undefined
+  const { data: copy } = useQuickProduct(copyId)
+
+  // The state the form starts from, to tell an edited form from an untouched one.
+  const start = useMemo<FormState>(() => {
+    if (product) return fromProduct(product)
+    if (copy?.product) return copyOf(copy.product)
+    const blank = fromProduct()
+    const known = options?.categories.some((c) => c.id === category)
+    return known ? { ...blank, category_id: category } : blank
+  }, [product?.id, product?.updated_at, copy?.product?.id, category, options?.categories.length])
+  const [form, setForm] = useState<FormState>(start)
+  useEffect(() => setForm(start), [start])
   const set = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((f) => ({ ...f, [key]: value }))
+  const dirty = JSON.stringify(form) !== JSON.stringify(start)
 
   const price = parseMoney(form.price)
   const sale = parseMoney(form.sale_price)
   const discount = price && sale && sale < price ? Math.round(((price - sale) / price) * 100) : null
   const storefront = vitrin?.storefront_url ?? ""
+
+  // The products of the category this form was opened from, in the list's order.
+  const parentOf = new Map((options?.categories ?? []).map((c) => [c.id, c.parent_id]))
+  const siblings = (all?.products ?? [])
+    .filter((p) =>
+      !category
+        ? true
+        : category === "kategorisiz"
+          ? !p.category_id
+          : p.category_id === category || (p.category_id ? parentOf.get(p.category_id) === category : false)
+    )
+    .sort((a, b) => a.title.localeCompare(b.title, "tr"))
+  const at = product ? siblings.findIndex((p) => p.id === product.id) : -1
+  const withCategory = (path: string) => (category ? `${path}?kategori=${category}` : path)
+  const backHref = withCategory("/vitrin/urunler")
+
+  useEffect(() => {
+    if (!dirty) return
+    const warn = (e: BeforeUnloadEvent) => e.preventDefault()
+    window.addEventListener("beforeunload", warn)
+    return () => window.removeEventListener("beforeunload", warn)
+  }, [dirty])
+
+  const leave = async (to: string) => {
+    if (dirty) {
+      const ok = await prompt({
+        title: "Kaydedilmemiş değişiklikler var",
+        description: "Bu üründe yaptığınız değişiklikler kaydedilmedi. Çıkarsanız kaybolur.",
+        confirmText: "Kaydetmeden çık",
+        cancelText: "Geri dön",
+      })
+      if (!ok) return
+    }
+    navigate(to)
+  }
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -114,8 +171,11 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
     if (form.title.trim().length < 3) problems.push("Ürün adı")
     if (!form.brand_id || (form.brand_id === NEW_BRAND && !form.new_brand.trim())) problems.push("Marka")
     if (!form.category_id) problems.push("Kategori")
-    if (!price || Number.isNaN(price) || price <= 0) problems.push("Fiyat")
+    if (Number.isNaN(price) || (price != null && price <= 0)) problems.push("Fiyat")
     if (Number.isNaN(sale)) problems.push("İndirimli fiyat")
+    if (sale != null && price == null) {
+      return toast.error("Fiyatı olmayan ürüne indirimli fiyat girilemez. Önce fiyatı yazın.")
+    }
     if (sale != null && price && sale >= price) {
       return toast.error("İndirimli fiyat, normal fiyattan düşük olmalı.")
     }
@@ -131,8 +191,8 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
       new_brand: form.brand_id === NEW_BRAND ? form.new_brand.trim() : null,
       category_id: form.category_id,
       sku: form.sku.trim() || null,
-      price: price!,
-      sale_price: sale,
+      price,
+      sale_price: price == null ? null : sale,
       stock,
       images: form.images,
       specs: form.specs,
@@ -144,8 +204,10 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
       { id: product?.id, input },
       {
         onSuccess: ({ product: saved }) => {
-          toast.success(product ? "Ürün kaydedildi. Sitede güncellendi." : "Ürün eklendi. Sitede yayında.")
-          if (!product) navigate(`/vitrin/urunler/${saved.id}`, { replace: true })
+          toast.success(
+            product ? "Ürün kaydedildi. Sitede güncellendi." : form.published ? "Ürün eklendi. Sitede yayında." : "Ürün taslak olarak eklendi."
+          )
+          if (!product) navigate(withCategory(`/vitrin/urunler/${saved.id}`), { replace: true })
         },
         onError: (error) => toast.error(errorText(error)),
       }
@@ -155,19 +217,61 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-y-3 pb-20">
       <Container className="flex flex-wrap items-start justify-between gap-4 px-6 py-4">
-        <div>
+        <div className="min-w-0">
           <Text size="small" className="text-ui-fg-subtle">
-            <Link to="/vitrin/urunler" className="hover:underline">Ürün Yönetimi</Link> / {product ? "Düzenle" : "Yeni ürün"}
+            <button type="button" onClick={() => void leave(backHref)} className="hover:underline">
+              Ürün Yönetimi
+            </button>
+            {category ? ` / ${options?.categories.find((c) => c.id === category)?.label ?? "Kategorisiz"}` : ""} /{" "}
+            {product ? "Düzenle" : copy?.product ? `${copy.product.title} ürününün benzeri` : "Yeni ürün"}
           </Text>
           <Heading className="mt-1">{product ? product.title : "Yeni ürün ekle"}</Heading>
           {product ? null : (
             <Text size="small" className="text-ui-fg-subtle mt-1">
               Yıldızlı alanlar zorunlu. Gerisi sonradan da eklenebilir.
+              {copy?.product ? " Marka, kategori, fiyat, açıklama ve teknik özellikler kopyalandı; adı, kodu ve görselleri girin." : ""}
             </Text>
           )}
         </div>
         {product ? (
-          <div className="flex gap-x-2">
+          <div className="flex flex-wrap items-center gap-2">
+            {at >= 0 && siblings.length > 1 ? (
+              <div className="flex items-center gap-1">
+                <Button
+                  type="button"
+                  size="small"
+                  variant="secondary"
+                  disabled={at === 0}
+                  onClick={() => void leave(withCategory(`/vitrin/urunler/${siblings[at - 1]?.id}`))}
+                >
+                  <ChevronLeft />
+                  Önceki
+                </Button>
+                <Text size="xsmall" className="text-ui-fg-subtle px-1 tabular-nums">
+                  {at + 1} / {siblings.length}
+                </Text>
+                <Button
+                  type="button"
+                  size="small"
+                  variant="secondary"
+                  disabled={at === siblings.length - 1}
+                  onClick={() => void leave(withCategory(`/vitrin/urunler/${siblings[at + 1]?.id}`))}
+                >
+                  Sonraki
+                  <ChevronRight />
+                </Button>
+              </div>
+            ) : null}
+            <Button
+              type="button"
+              size="small"
+              variant="secondary"
+              title="Aynı marka, kategori, fiyat ve özelliklerle yeni bir ürün başlatır"
+              onClick={() => void leave(`/vitrin/urunler/yeni?kopya=${product.id}${category ? `&kategori=${category}` : ""}`)}
+            >
+              <SquareTwoStack />
+              Benzerini ekle
+            </Button>
             {storefront ? (
               <Button size="small" variant="secondary" asChild>
                 <a href={`${storefront}/urun/${product.handle}`} target="_blank" rel="noreferrer">
@@ -232,8 +336,16 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
       </Section>
 
       <Section title="2. Fiyat ve stok">
-        <FieldShell label="Satış fiyatı (KDV dahil, TL)" required htmlFor="qp-price">
-          <Input id="qp-price" inputMode="decimal" value={form.price} onChange={(e) => set("price", e.target.value)} placeholder="1.249,90" />
+        <FieldShell
+          label="Satış fiyatı (KDV dahil, TL)"
+          htmlFor="qp-price"
+          hint={
+            price == null
+              ? "Boş: sitede fiyat yerine “Fiyat için teklif isteyin” ve “Teklif İste” butonu görünür; sepete eklenemez."
+              : "Sitede bu fiyat gösterilir ve ürün sepete eklenebilir."
+          }
+        >
+          <Input id="qp-price" inputMode="decimal" value={form.price} onChange={(e) => set("price", e.target.value)} placeholder="Teklifle (boş)" />
         </FieldShell>
         <FieldShell
           label="İndirimli fiyat (TL)"
@@ -244,7 +356,14 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
               : "Doldurursanız normal fiyat üstü çizili gösterilir."
           }
         >
-          <Input id="qp-sale" inputMode="decimal" value={form.sale_price} onChange={(e) => set("sale_price", e.target.value)} />
+          <Input
+            id="qp-sale"
+            inputMode="decimal"
+            disabled={price == null}
+            placeholder={price == null ? "Önce fiyatı yazın" : ""}
+            value={form.sale_price}
+            onChange={(e) => set("sale_price", e.target.value)}
+          />
         </FieldShell>
         <FieldShell label="Stok adedi" required htmlFor="qp-stock" hint="0 yazarsanız ürün 'Tükendi' olarak görünür.">
           <Input id="qp-stock" inputMode="numeric" value={form.stock} onChange={(e) => set("stock", e.target.value)} />
@@ -342,8 +461,13 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
       </Container>
 
       <div className="bg-ui-bg-base shadow-elevation-flyout fixed bottom-4 left-1/2 z-50 flex -translate-x-1/2 items-center gap-x-3 rounded-xl border px-4 py-2.5">
-        <Button size="small" variant="secondary" type="button" onClick={() => navigate("/vitrin/urunler")}>
-          Vazgeç
+        {dirty ? (
+          <Text size="xsmall" className="text-ui-fg-subtle">
+            Kaydedilmemiş değişiklik var
+          </Text>
+        ) : null}
+        <Button size="small" variant="secondary" type="button" onClick={() => void leave(backHref)}>
+          {dirty ? "Vazgeç" : "Listeye dön"}
         </Button>
         <Button size="small" type="submit" isLoading={save.isPending}>
           {product ? "Kaydet" : "Ürünü ekle"}

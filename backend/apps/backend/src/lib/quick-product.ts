@@ -36,7 +36,8 @@ export interface QuickProductInput {
   new_brand?: string | null
   category_id: string
   sku?: string | null
-  price: number
+  /** KDV-inclusive TRY price; null = no price ("Fiyat için teklif isteyin"). */
+  price: number | null
   sale_price?: number | null
   stock: number
   /** Every picture, in display order; the first is the main one. */
@@ -235,7 +236,7 @@ export async function listQuickProducts(
       entity: "product",
       fields: FIELDS,
       filters,
-      pagination: { take, skip, order: { created_at: "DESC" } },
+      pagination: { take, skip, order: { title: "ASC" } },
     }),
     saleListPrices(query),
     vitrin.listVitrinLists({}, { select: ["key", "product_ids"] }),
@@ -252,18 +253,41 @@ export async function getQuickProduct(container: MedusaContainer, id: string): P
   return products[0]
 }
 
+/** Price and sale price, as a person can get them wrong. No price is valid:
+ *  the product is then "Fiyat için teklif isteyin" and can have no sale. */
+function checkPrices(price: number | null, sale: number | null, title?: string) {
+  const who = title ? `${title}: ` : ""
+  if (price != null && !(price > 0)) {
+    throw new MedusaError(MedusaError.Types.INVALID_DATA, `${who}Fiyat 0'dan büyük olmalı (fiyatsız ürün için boş bırakın).`)
+  }
+  if (sale != null && price == null) {
+    throw new MedusaError(MedusaError.Types.INVALID_DATA, `${who}Fiyatı olmayan ürüne indirimli fiyat girilemez.`)
+  }
+  if (sale != null && price != null && !(sale > 0 && sale < price)) {
+    throw new MedusaError(MedusaError.Types.INVALID_DATA, `${who}İndirimli fiyat, normal fiyattan düşük ve 0'dan büyük olmalı.`)
+  }
+}
+
+/** The variant's TRY price as an update: replaced, created, or — for no
+ *  price — removed (variant prices are replaced as a whole set). */
+function priceUpdate(base: any, price: number | null) {
+  if (price == null) return []
+  return [base ? { id: base.id, currency_code: "try", amount: price } : { currency_code: "try", amount: price }]
+}
+
+/** A variant's price set, once it has a price (a new one has just been made). */
+async function priceSetOf(container: MedusaContainer, variantId: string): Promise<string | null> {
+  const query = container.resolve(ContainerRegistrationKeys.QUERY) as unknown as Query
+  const { data } = await query.graph({ entity: "product_variant", fields: ["prices.price_set_id"], filters: { id: variantId } })
+  return data[0]?.prices?.[0]?.price_set_id ?? null
+}
+
 /** Validate the numbers a person can get wrong, in their language. */
 function checkInput(input: QuickProductInput) {
   if (input.title.trim().length < 3) {
     throw new MedusaError(MedusaError.Types.INVALID_DATA, "Ürün adı en az 3 karakter olmalı.")
   }
-  if (!(input.price > 0)) throw new MedusaError(MedusaError.Types.INVALID_DATA, "Fiyat 0'dan büyük olmalı.")
-  if (input.sale_price != null && !(input.sale_price > 0 && input.sale_price < input.price)) {
-    throw new MedusaError(
-      MedusaError.Types.INVALID_DATA,
-      "İndirimli fiyat, normal fiyattan düşük ve 0'dan büyük olmalı."
-    )
-  }
+  checkPrices(input.price, input.sale_price ?? null)
   if (!Number.isInteger(input.stock) || input.stock < 0) {
     throw new MedusaError(MedusaError.Types.INVALID_DATA, "Stok 0 veya daha büyük bir tam sayı olmalı.")
   }
@@ -376,7 +400,7 @@ export async function createQuickProduct(container: MedusaContainer, input: Quic
               sku,
               manage_inventory: true,
               options: { Model: "Standart" },
-              prices: [{ currency_code: "try", amount: input.price }],
+              prices: input.price != null ? [{ currency_code: "try", amount: input.price }] : [],
             },
           ],
           sales_channels: [{ id: salesChannelId }],
@@ -461,17 +485,18 @@ export async function updateQuickProduct(
         selector: { id: variant.id },
         update: {
           ...(input.sku?.trim() ? { sku: input.sku.trim() } : {}),
-          prices: [
-            base
-              ? { id: base.id, currency_code: "try", amount: input.price }
-              : { currency_code: "try", amount: input.price },
-          ],
+          prices: priceUpdate(base, input.price),
         } as any,
       },
     })
 
-    if (base?.price_set_id) {
-      await setSalePrice(container, { variantId: variant.id, priceSetId: base.price_set_id, salePrice: input.sale_price })
+    const priceSetId = base?.price_set_id ?? (input.price != null ? await priceSetOf(container, variant.id) : null)
+    if (priceSetId) {
+      await setSalePrice(container, {
+        variantId: variant.id,
+        priceSetId,
+        salePrice: input.price == null ? null : input.sale_price,
+      })
     }
 
     const item = variant.inventory_items?.[0]
@@ -498,4 +523,78 @@ export async function updateQuickProduct(
 
   await syncLists(container, id, input.list_keys)
   return getQuickProduct(container, id)
+}
+
+/**
+ * A change made straight in the product list (Ürün Yönetimi): only the fields
+ * given are touched. `add_image` puts a new picture in front, as the main one.
+ */
+export interface QuickPatch {
+  id: string
+  price?: number | null
+  sale_price?: number | null
+  stock?: number
+  status?: "published" | "draft"
+  category_id?: string
+  add_image?: string
+}
+
+export async function patchQuickProduct(container: MedusaContainer, patch: QuickPatch): Promise<void> {
+  const query = container.resolve(ContainerRegistrationKeys.QUERY) as unknown as Query
+  const { data } = await query.graph({ entity: "product", fields: FIELDS, filters: { id: patch.id } })
+  const current = data[0]
+  if (!current) throw new MedusaError(MedusaError.Types.NOT_FOUND, "Ürün bulunamadı.")
+  const variant = current.variants?.[0]
+  const base = (variant?.prices ?? []).find((p: any) => p.currency_code === "try")
+
+  const touchesPrice = patch.price !== undefined || patch.sale_price !== undefined
+  const sale = touchesPrice ? await saleListPrices(query) : null
+  const price = patch.price !== undefined ? patch.price : base ? Number(base.amount) : null
+  const salePrice =
+    patch.sale_price !== undefined ? patch.sale_price : base ? sale?.bySet.get(base.price_set_id)?.amount ?? null : null
+  // A price removed takes its sale price with it; a sale price sent for a
+  // product left without one is refused, not silently dropped.
+  const effectiveSale = price == null ? null : salePrice
+  if (touchesPrice) checkPrices(price, patch.sale_price != null ? patch.sale_price : effectiveSale, current.title)
+  if (patch.stock !== undefined && (!Number.isInteger(patch.stock) || patch.stock < 0)) {
+    throw new MedusaError(MedusaError.Types.INVALID_DATA, `${current.title}: Stok 0 veya daha büyük bir tam sayı olmalı.`)
+  }
+
+  const productUpdate: Record<string, unknown> = {}
+  if (patch.status) productUpdate.status = patch.status === "draft" ? ProductStatus.DRAFT : ProductStatus.PUBLISHED
+  if (patch.category_id) productUpdate.category_ids = [patch.category_id]
+  if (patch.add_image?.trim()) {
+    const url = patch.add_image.trim()
+    const pictures = [url, ...picturesOf(current).filter((p) => p !== url)]
+    productUpdate.thumbnail = url
+    productUpdate.images = pictures.map((p) => ({ url: p }))
+  }
+  if (Object.keys(productUpdate).length) {
+    await updateProductsWorkflow(container).run({ input: { selector: { id: patch.id }, update: productUpdate as any } })
+  }
+
+  if (!variant) return
+  if (patch.price !== undefined) {
+    await updateProductVariantsWorkflow(container).run({
+      input: { selector: { id: variant.id }, update: { prices: priceUpdate(base, price) } as any },
+    })
+  }
+  if (touchesPrice) {
+    const priceSetId = base?.price_set_id ?? (price != null ? await priceSetOf(container, variant.id) : null)
+    if (priceSetId) await setSalePrice(container, { variantId: variant.id, priceSetId, salePrice: effectiveSale })
+  }
+  if (patch.stock !== undefined) {
+    const item = variant.inventory_items?.[0]
+    const level = item?.inventory?.location_levels?.[0]
+    if (item && level) {
+      await updateInventoryLevelsWorkflow(container).run({
+        input: { updates: [{ inventory_item_id: item.inventory_item_id, location_id: level.location_id, stocked_quantity: patch.stock }] },
+      })
+    } else if (item) {
+      const { data: locations } = await query.graph({ entity: "stock_location", fields: ["id"] })
+      await createInventoryLevelsWorkflow(container).run({
+        input: { inventory_levels: [{ inventory_item_id: item.inventory_item_id, location_id: locations[0].id, stocked_quantity: patch.stock }] },
+      })
+    }
+  }
 }

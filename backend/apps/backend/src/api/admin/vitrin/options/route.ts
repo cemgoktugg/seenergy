@@ -27,6 +27,8 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
         id: c.id,
         name: c.name,
         handle: c.handle,
+        parent_id: c.parent_category_id && names.has(c.parent_category_id) ? (c.parent_category_id as string) : null,
+        rank: Number(c.rank ?? 0),
         label: c.parent_category_id && names.has(c.parent_category_id) ? `${names.get(c.parent_category_id)} › ${c.name}` : c.name,
       }))
       .sort((a, b) => a.label.localeCompare(b.label, "tr")),

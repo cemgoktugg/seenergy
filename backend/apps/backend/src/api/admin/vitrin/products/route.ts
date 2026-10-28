@@ -12,7 +12,9 @@ import { QuickProductBody, firstIssue } from "../validators"
 export async function GET(req: MedusaRequest, res: MedusaResponse) {
   const q = typeof req.query.q === "string" && req.query.q.trim() ? req.query.q.trim() : undefined
   const ids = typeof req.query.ids === "string" && req.query.ids ? req.query.ids.split(",") : undefined
-  const take = Math.min(Number(req.query.limit) || 20, 100)
+  // all=1: the whole catalogue in one answer, for Ürün Yönetimi's instant
+  // category tree, counts and filters (the shop has hundreds, not millions).
+  const take = req.query.all === "1" ? 2000 : Math.min(Number(req.query.limit) || 20, 100)
   const skip = Number(req.query.offset) || 0
   res.json(await listQuickProducts(req.scope, { q, ids, take: ids ? ids.length : take, skip: ids ? 0 : skip }))
 }

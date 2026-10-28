@@ -92,7 +92,8 @@ export interface QuickProductInput {
   new_brand: string | null
   category_id: string
   sku: string | null
-  price: number
+  /** null = no price ("Fiyat için teklif isteyin"). */
+  price: number | null
   sale_price: number | null
   stock: number
   /** Every picture in display order; the first is the main one. */
@@ -131,7 +132,7 @@ export function useVitrinOptions() {
       sdk.client.fetch<{
         brands: { id: string; title: string; handle: string }[]
         /** Active only; `label` names the parent of a subcategory. */
-        categories: { id: string; name: string; handle: string; label: string }[]
+        categories: VitrinCategory[]
       }>("/admin/vitrin/options"),
     staleTime: 60_000,
   })
@@ -149,6 +150,39 @@ export function useQuickProducts(params: { q?: string; limit?: number; offset?: 
       sdk.client.fetch<{ products: QuickProduct[]; count: number }>("/admin/vitrin/products", { query }),
     enabled: params.ids ? params.ids.length > 0 : true,
     placeholderData: (previous) => previous,
+  })
+}
+
+/** The whole catalogue at once — Ürün Yönetimi filters, counts and pages it
+ *  in the browser, so switching category or filter is instant. */
+export function useAllQuickProducts() {
+  return useQuery({
+    queryKey: vitrinKeys.products({ all: 1 }),
+    queryFn: () =>
+      sdk.client.fetch<{ products: QuickProduct[]; count: number }>("/admin/vitrin/products", { query: { all: 1 } }),
+  })
+}
+
+/** A change made straight in the list; only the fields given are saved. */
+export interface QuickPatch {
+  id: string
+  price?: number | null
+  sale_price?: number | null
+  stock?: number
+  status?: "published" | "draft"
+  category_id?: string
+  add_image?: string
+}
+
+export function useBatchUpdate() {
+  const invalidate = useInvalidate()
+  return useMutation({
+    mutationFn: (updates: QuickPatch[]) =>
+      sdk.client.fetch<{ saved: string[]; failed: { id: string; message: string }[] }>("/admin/vitrin/product-batch", {
+        method: "POST",
+        body: { updates },
+      }),
+    onSuccess: invalidate,
   })
 }
 
@@ -254,6 +288,38 @@ export const formatTRY = (value: number | null | undefined) =>
  */
 export const mediaUrl = (src: string | null | undefined, storefront: string) =>
   !src ? "" : src.startsWith("/") ? `${storefront}${src}` : src
+
+/** An active category; `label` names the parent of a subcategory. */
+export interface VitrinCategory {
+  id: string
+  name: string
+  handle: string
+  /** null for a top-level category. */
+  parent_id: string | null
+  rank: number
+  label: string
+}
+
+/**
+ * Accepts "1.249,90", "1249,90", "1249.90" and "1.249" — people type prices
+ * every way. A dot followed by exactly three digits is a Turkish thousands
+ * separator ("1.249" is 1249, not 1,249). Empty = null; nonsense = NaN.
+ */
+export const parseMoney = (value: string): number | null => {
+  const v = value.trim().replace(/\s/g, "").replace(/(TL|₺)$/i, "")
+  if (!v) return null
+  const normalised = /,\d{1,2}$/.test(v)
+    ? v.replace(/\./g, "").replace(",", ".")
+    : /^\d{1,3}(\.\d{3})+$/.test(v)
+      ? v.replace(/\./g, "")
+      : v.replace(/,/g, "")
+  const n = Number(normalised)
+  return Number.isFinite(n) ? n : NaN
+}
+
+/** A price as it is typed back into a field: "1.249,90", "" for none. */
+export const moneyInput = (value: number | null | undefined) =>
+  value == null ? "" : new Intl.NumberFormat("tr-TR", { minimumFractionDigits: 0, maximumFractionDigits: 2 }).format(value)
 
 export const BADGE_LABELS: Record<NonNullable<QuickProduct["badge"]>, string> = {
   "yeni": "Yeni",

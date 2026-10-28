@@ -132,6 +132,20 @@ metadata.
 
 ### SEENERGY Vitrin (admin extension)
 
+**Ürün Yönetimi** (2026-10-28, the client: "kategori kategori, görseller,
+metinler, fiyatlar çok kolay"): a category tree with counts on the left, the
+whole catalogue loaded once (`GET /admin/vitrin/products?all=1`) and filtered
+in the browser; price, sale price, stock and published are edited in the
+table and saved together through `POST /admin/vitrin/product-batch`
+(`patchQuickProduct` — only the fields sent; per-product errors come back and
+keep those rows unsaved); bulk % price / % discount / publish / move
+category on ticked rows; a picture dropped on a thumbnail becomes the main
+one. **An empty price is valid**: the variant then has no TRY price and the
+storefront shows "Fiyat için teklif isteyin" (the 25 CCTV models) — the form
+used to force a price on them. The product form steps through its category
+(?kategori=, Önceki/Sonraki), warns before leaving unsaved, and "Benzerini
+ekle" (?kopya=<id>) starts a sibling model.
+
 The homepage's content is edited in the Medusa admin, not in code: admin →
 **Vitrin** shows the homepage as a top-to-bottom map, and **Vitrin → Ürün
 Yönetimi** is a one-page product form (name, brand, category, price, sale
