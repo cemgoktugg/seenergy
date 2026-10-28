@@ -16,6 +16,34 @@ export type BlockGroup =
   | "tech-band"
   | "trust"
   | "staff"
+  | "section"
+  | "own-brand"
+  | "brand-wall"
+  | "company-card"
+
+/**
+ * One homepage band's own settings (`section`, keyed by band: hero, rails,
+ * deals, featured, brands, brand-wall, company, trust): whether it is shown
+ * and its headings, links and pictures. Fields vary by band; missing ones
+ * fall back to what the storefront shipped with.
+ */
+export type SectionData = { visible?: "on" | "off" } & Record<string, unknown>
+
+/** A logo tile: the registered brands (`own-brand`) and the brand wall. */
+export interface BrandTileData {
+  name: string
+  href: string
+  logo: string
+}
+
+/** Referanslar / Çözüm Ortaklarımız / Projelerimiz (`company-card`, keyed). */
+export interface CompanyCardData {
+  title: string
+  text: string
+  href: string
+  /** Projelerimiz only: the picture on its plate. */
+  image?: string
+}
 
 export interface HeroSlideData {
   eyebrow: string
@@ -49,8 +77,13 @@ export interface BrandBandData {
 
 /** One square of the brand board under the hero (the first four are shown). */
 export interface BrandBoardData {
-  /** Collection (brand) handle — hovering the square lists its models. */
+  /** Collection (brand) handle — the square links to its brand page. */
   brand_handle: string
+  /** The square's banner artwork (3 : 1). */
+  banner?: string
+  /** The light running round the frame, e.g. "#e60012". */
+  accent?: string
+  /** The logo, shown on the "Markalarımız" authorised-brands card. */
   logo: string
 }
 

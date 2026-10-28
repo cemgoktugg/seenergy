@@ -72,7 +72,7 @@ export default async function BrandsPage() {
       </p>
 
       <div className="pt-5 dt:pt-7">
-        <BrandShowcase own={own} partners={partners} brands={partnerBrands} />
+        <BrandShowcase own={own} ownBrands={vitrin.ownBrands} partners={partners} brands={partnerBrands} />
       </div>
 
       <section aria-labelledby="tum-markalar" className="pt-(--space-section)">

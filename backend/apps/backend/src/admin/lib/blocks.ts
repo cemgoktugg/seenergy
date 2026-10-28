@@ -41,8 +41,15 @@ export interface GroupDef {
   /** Heading for each item, from its data. */
   itemTitle: (data: Record<string, any>, index: number, key: string | null) => string
   fields: FieldDef[]
+  /** Keyed groups whose slots differ (the homepage bands): fields per key. */
+  fieldsFor?: (key: string | null) => FieldDef[]
+  /** Keyed groups: the slots the site still uses, in page order. Other
+   *  blocks of the group stay in the database but are not offered. */
+  slots?: string[]
   newItem?: () => Record<string, unknown>
 }
+
+export const fieldsOf = (def: GroupDef, key: string | null) => def.fieldsFor?.(key) ?? def.fields
 
 const link: FieldDef = {
   name: "href",
@@ -85,8 +92,8 @@ const SLOT_NAMES: Record<string, string> = {
   "hero-side-1": "Sağ üst kart",
   "hero-side-2": "Sağ alt kart",
   wide: "Marka panosu başlığı (dört marka karesinin üstündeki şerit)",
-  "dual-1": "Markalarımız — sol kart: Tescilli markalarımız (SEENERGY logosu sabit)",
-  "dual-2": "Markalarımız — sağ kart: Yetkili satıcılık (logolar Marka panosundan gelir)",
+  "dual-1": "Sol kart: Tescilli markalarımız (logolar 'Tescilli markalarımız'dan gelir)",
+  "dual-2": "Sağ kart: Yetkili satıcılık (logolar 'Marka panosu'ndan gelir)",
   "super-firsat-promo": "Süper Fırsat kartı (mor kart)",
 }
 
@@ -97,6 +104,94 @@ export const DEPARTMENT_NAMES: Record<string, string> = {
   satis: "Satış Departmanı",
   muhasebe: "Muhasebe",
   "insan-kaynaklari": "İnsan Kaynakları",
+}
+
+/* --- homepage bands (`section`) ------------------------------------------- */
+
+const visible: FieldDef = {
+  name: "visible",
+  label: "Sitede",
+  type: "choice",
+  options: [
+    { value: "on", label: "Gösteriliyor" },
+    { value: "off", label: "Gizli" },
+  ],
+  hint: "Gizli seçerseniz bölüm ana sayfadan kalkar; içeriği silinmez, istediğiniz zaman geri açabilirsiniz.",
+}
+
+function brandTileFields(logoHint: string): FieldDef[] {
+  return [
+    { name: "name", label: "Marka adı", type: "text", required: true, hint: "Logonun üzerine gelince ve ekran okuyucularda söylenir." },
+    { ...link, hint: "Logo tıklanınca açılacak sayfa. Örn. /marka/dahua" },
+    { name: "logo", label: "Logo", type: "image", required: true, hint: `Şeffaf (PNG/WebP) veya beyaz arka planlı logo. ${logoHint}` },
+  ]
+}
+
+/** The bands, in page order (the `section` slots). */
+export const SECTION_KEYS = ["hero", "brand-board", "rails", "deals", "featured", "brands", "brand-wall", "company", "trust"]
+
+export const SECTION_NAMES: Record<string, string> = {
+  hero: "Ana slayt",
+  "brand-board": "Marka panosu",
+  rails: "Haftanın Ürünleri ve Yeni Gelenler",
+  deals: "Fırsat Ürünleri",
+  featured: "Öne Çıkanlar",
+  brands: "Markalarımız",
+  "brand-wall": "Marka duvarı",
+  company: "Referanslar ve Projeler",
+  trust: "Güven satırı",
+}
+
+const COMPANY_CARD_NAMES: Record<string, string> = {
+  referanslar: "Referanslarımız kartı",
+  "cozum-ortaklari": "Çözüm Ortaklarımız kartı",
+  projeler: "Projelerimiz kartı",
+}
+
+const heading = (eyebrow: string, title: string): FieldDef[] => [
+  { name: "eyebrow", label: "Üst etiket", type: "text", placeholder: eyebrow, hint: "Başlığın üstündeki küçük, büyük harfli yazı." },
+  { name: "title", label: "Başlık", type: "text", placeholder: title, required: true },
+]
+
+const SECTION_FIELDS: Record<string, FieldDef[]> = {
+  hero: [
+    {
+      name: "background",
+      label: "Koyu alanın arka plan fotoğrafı",
+      type: "image",
+      hint: "Slaytların yazı tarafındaki koyu alanın arkasında, bütün slaytlarda görünür; üzerine yazılar okunsun diye koyu bir gölge gelir. Görselin sağ tarafı gösterilir. Boş bırakırsanız düz koyu zemin olur.",
+    },
+  ],
+  rails: [
+    { name: "left_eyebrow", label: "Sol raf — üst etiket", type: "text", placeholder: "Bu hafta öne çıkanlar" },
+    { name: "left_title", label: "Sol raf — başlık", type: "text", placeholder: "Haftanın Ürünleri", required: true },
+    { name: "left_href", label: "Sol raf — 'Tümü' bağlantısı", type: "link", placeholder: "/kampanyalar/haftanin-urunleri" },
+    { name: "right_eyebrow", label: "Sağ raf — üst etiket", type: "text", placeholder: "Rafa yeni girenler" },
+    { name: "right_title", label: "Sağ raf — başlık", type: "text", placeholder: "Yeni Gelenler", required: true },
+    { name: "right_href", label: "Sağ raf — 'Tümü' bağlantısı", type: "link", placeholder: "/yeni-gelenler" },
+  ],
+  deals: [
+    {
+      name: "image",
+      label: "Bölüm görseli",
+      type: "image",
+      hint: "Dört ürünün solundaki dikey görsel; bölümün başlığı da bu görselin üzerinde yazar. Telefonda ürünlerin üstünde 2 : 1 bir şerit olarak gösterilir.",
+    },
+    { name: "href", label: "Görselin bağlantısı", type: "link", placeholder: "/kampanyalar/super-firsat" },
+    { name: "button", label: "Görselin üzerindeki buton", type: "text", placeholder: "Hemen incele" },
+    { name: "chip", label: "Ürünlerin üzerindeki etiket", type: "text", placeholder: "Fırsat Ürünü", hint: "Bu bölümdeki her ürün kartının sol üstünde yazar." },
+  ],
+  featured: heading("Keşfet", "Öne Çıkanlar"),
+  brands: [
+    ...heading("Markalar", "Markalarımız"),
+    { name: "action_label", label: "Sağdaki bağlantının yazısı", type: "text", placeholder: "Tüm markalar" },
+    { name: "action_href", label: "Sağdaki bağlantı", type: "link", placeholder: "/markalar" },
+  ],
+  "brand-wall": [
+    { name: "button", label: "Buton yazısı", type: "text", placeholder: "Tümünü gör" },
+    { name: "href", label: "Buton bağlantısı", type: "link", placeholder: "/markalar" },
+  ],
+  company: heading("Kurumsal", "Referanslar ve Projeler"),
 }
 
 export const GROUPS: Record<BlockGroup, GroupDef> = {
@@ -168,19 +263,17 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
     ],
   },
   banner: {
-    title: "Bannerlar",
-    where: "Ana sayfa boyunca yer alan kampanya görselleri.",
+    title: "Markalarımız kartları",
+    where: "Öne Çıkanlar'ın altındaki 'Markalarımız' bölümünün iki kartı: soldaki koyu kart (Tescilli markalarımız) ve sağdaki açık kart (Yetkili satıcılık). Kartlardaki logolar ayrı düzenlenir.",
     repeatable: false,
-    itemName: "banner",
+    itemName: "kart",
     itemTitle: (_d, _i, key) => slotName(key),
+    slots: ["dual-1", "dual-2"],
     fields: [
       { name: "eyebrow", label: "Üst etiket", type: "text" },
       { name: "title", label: "Başlık", type: "text", required: true },
-      { name: "subtitle", label: "Alt başlık", type: "text" },
-      link,
-      tone,
-      productImage,
-      backgroundPhoto,
+      { name: "subtitle", label: "Alt başlık", type: "text", hint: "Yalnızca soldaki koyu kartta, başlığın altında gösterilir." },
+      { ...link, hint: "Kartın 'İncele' butonu tıklanınca açılacak sayfa." },
     ],
   },
   company: {
@@ -228,7 +321,7 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
   "brand-board": {
     title: "Marka panosu",
     where:
-      "Ana slaytın hemen altındaki dört kare. Her karede bir markanın logosu durur; üzerine gelince o markanın modelleri listelenir. Buradaki sırayla ilk dört marka gösterilir.",
+      "Ana slaytın hemen altındaki ikişer ikişer dört marka bannerı; tıklanınca markanın sayfası açılır. Buradaki sırayla ilk dört marka gösterilir. Logoları ayrıca 'Markalarımız' bölümündeki Yetkili satıcılık kartında görünür.",
     repeatable: true,
     itemName: "marka",
     itemTitle: (d, i) => `${i + 1}. ${d.brand_handle || "marka seçilmedi"}`,
@@ -238,17 +331,31 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
         label: "Marka",
         type: "brand",
         required: true,
-        hint: "Karenin üzerine gelince bu markanın ürünleri listelenir. Ürünlerin markasını Ürün Yönetimi'nden seçersiniz.",
+        hint: "Banner tıklanınca bu markanın sayfası açılır. Ürünlerin markasını Ürün Yönetimi'nden seçersiniz.",
+      },
+      {
+        name: "banner",
+        label: "Banner görseli",
+        type: "image",
+        required: true,
+        hint: "Yatay görsel, 3 : 1 oranında gösterilir (örn. 1800 × 600 piksel). Önemli yazı ve ürünleri ortada tutun; kenarlardan az bir pay kırpılabilir.",
+      },
+      {
+        name: "accent",
+        label: "Çerçeve ışığının rengi",
+        type: "text",
+        placeholder: "#e60012",
+        hint: "Bannerın çevresinde dolaşan ışığın rengi; markanın kendi rengi. # ile başlayan renk kodu.",
       },
       {
         name: "logo",
         label: "Logo",
         type: "image",
         required: true,
-        hint: "Şeffaf (PNG/WebP) veya beyaz arka planlı logo. Karenin ortasında gösterilir.",
+        hint: "Şeffaf (PNG/WebP) veya beyaz arka planlı logo. 'Markalarımız' bölümündeki Yetkili satıcılık kartında gösterilir.",
       },
     ],
-    newItem: () => ({ brand_handle: "", logo: "" }),
+    newItem: () => ({ brand_handle: "", banner: "", accent: "", logo: "" }),
   },
   "brand-band": {
     title: "Marka vitrinleri",
@@ -341,7 +448,62 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
     ],
     newItem: () => ({ department: "satis", name: "", title: "", email: "", phone: "", photo: "" }),
   },
+  section: {
+    title: "Bölüm ayarları",
+    where: "Ana sayfadaki bölümlerin başlıkları, bağlantıları, görselleri ve sitede gösterilip gösterilmeyeceği.",
+    repeatable: false,
+    itemName: "bölüm",
+    itemTitle: (_d, _i, key) => SECTION_NAMES[key ?? ""] ?? key ?? "",
+    slots: SECTION_KEYS,
+    fields: [visible],
+    fieldsFor: (key) => [visible, ...(SECTION_FIELDS[key ?? ""] ?? [])],
+  },
+  "own-brand": {
+    title: "Tescilli markalarımız",
+    where:
+      "'Markalarımız' bölümündeki soldaki koyu kartın logoları (SEENERGY, SEENERGY Home, Racksan). Buradaki sırayla, yan yana üç tane sığar.",
+    repeatable: true,
+    itemName: "marka",
+    itemTitle: (d, i) => `${i + 1}. ${d.name || "isimsiz"}`,
+    fields: brandTileFields("Beyaz bir kutunun içinde gösterilir."),
+    newItem: () => ({ name: "", href: "/marka/", logo: "" }),
+  },
+  "brand-wall": {
+    title: "Marka duvarı",
+    where:
+      "'Markalarımız' bölümünün altında iki sıra halinde kayan marka logoları. Markalar sırayla ikiye bölünür: ilk yarısı üst sırada, ikinci yarısı alt sırada.",
+    repeatable: true,
+    itemName: "marka",
+    itemTitle: (d, i) => `${i + 1}. ${d.name || "isimsiz"}`,
+    fields: brandTileFields("Bütün logolar aynı 120 × 32 kutuya, sığdığı kadar büyük çizilir."),
+    newItem: () => ({ name: "", href: "/marka/", logo: "" }),
+  },
+  "company-card": {
+    title: "Referanslar ve Projeler kartları",
+    where: "Ana sayfanın altındaki üç kart: Referanslarımız, Çözüm Ortaklarımız, Projelerimiz.",
+    repeatable: false,
+    itemName: "kart",
+    itemTitle: (_d, _i, key) => COMPANY_CARD_NAMES[key ?? ""] ?? key ?? "",
+    slots: ["referanslar", "cozum-ortaklari", "projeler"],
+    fields: [],
+    fieldsFor: (key) => [
+      { name: "title", label: "Başlık", type: "text", required: true },
+      { name: "text", label: "Açıklama", type: "textarea" },
+      { ...link, hint: "Kart tıklanınca açılacak sayfa." },
+      ...(key === "projeler"
+        ? [
+            {
+              name: "image",
+              label: "Kart görseli",
+              type: "image" as const,
+              hint: "Kartın üstündeki açık zeminde, tamamı görünecek şekilde gösterilir. Şeffaf veya beyaz arka planlı görsel en iyi sonucu verir.",
+            },
+          ]
+        : []),
+    ],
+  },
 }
+
 
 export const TRUST_ICONS: { value: string; label: string }[] = [
   { value: "truck", label: "Kargo aracı" },

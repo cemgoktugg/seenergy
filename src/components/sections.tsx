@@ -17,7 +17,6 @@ import { ProductCard } from '@/components/product-card';
 import type { Product } from '@/data/catalog';
 import {
   BLOG_POSTS,
-  BRANDS,
   type CategoryTile,
   type NavItem,
 } from '@/data/site';
@@ -507,7 +506,8 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
 
 /**
  * Brand wall — the client's real brand logos (2026-10-27), each on a white
- * tile, all in one 120 × 32 box (see BRANDS in data/site.ts). Before that
+ * tile, all in one 120 × 32 box — edited in admin → Vitrin → Marka duvarı
+ * since 2026-10-28 (BRANDS in data/site.ts is the fallback). Before that
  * it showed monogram chips of 45 generated placeholder names.
  * Two rows run the panel's full width in opposite directions (the fixed
  * "Marka ağı · 33" label on their left was removed on 2026-10-28 at the
@@ -519,11 +519,20 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
  * Touch (`@media (hover: none)` in globals.css): no animation — a finger
  * cannot pause it — and the rows become swipeable instead.
  */
-export function BrandGrid() {
+export function BrandGrid({
+  brands,
+  button = 'Tümünü gör',
+  href = '/markalar',
+}: {
+  /** admin → Vitrin → Marka duvarı, in its order. */
+  brands: { name: string; href: string; logo: string }[];
+  button?: string;
+  href?: string;
+}) {
   // Two rows running opposite ways. Split rather than duplicated, so every
   // brand appears exactly once per row-pair.
-  const half = Math.ceil(BRANDS.length / 2);
-  const rows = [BRANDS.slice(0, half), BRANDS.slice(half)];
+  const half = Math.ceil(brands.length / 2);
+  const rows = [brands.slice(0, half), brands.slice(half)];
 
   return (
     <div
@@ -572,7 +581,7 @@ export function BrandGrid() {
                           browser noticed some tiles too late and left them
                           blank; all 33 logos together are ~316 KB. */}
                       <img
-                        src={brand.image}
+                        src={brand.logo}
                         alt=""
                         width={120}
                         height={32}
@@ -588,10 +597,10 @@ export function BrandGrid() {
         ))}
         <div className="flex justify-end px-5 pb-4">
           <Link
-            href="/markalar"
+            href={href}
             className="inline-flex h-9 items-center gap-1.5 rounded-full bg-brand px-4 text-[13px] font-bold text-white transition-colors duration-(--duration-fast) hover:bg-brand-dark"
           >
-            Tümünü gör
+            {button}
             <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
           </Link>
         </div>

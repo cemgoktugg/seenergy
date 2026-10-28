@@ -49,7 +49,7 @@ const RISE = 'animate-[hero-rise_600ms_var(--ease-out)_both]';
  */
 const isVector = (src: string) => /\.svg(\?|$)/i.test(src);
 
-export function Hero({ slides }: { slides: HeroSlide[] }) {
+export function Hero({ slides, background = '' }: { slides: HeroSlide[]; background?: string }) {
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -100,19 +100,22 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
           light stage covers the rest — and is set to its right side, where
           the facade and its lettering are; the artwork's left side is a
           bright abstract that white copy could not stand on. A chrome
-          gradient, heaviest under the copy, keeps the text legible. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0 sm:right-[40%]">
-        <Image
-          src="/hero/seenergy-bina.webp"
-          alt=""
-          fill
-          priority
-          sizes="(min-width: 640px) 60vw, 100vw"
-          className="object-cover object-[85%_45%]"
-        />
-        <span className="absolute inset-0 bg-linear-to-r from-chrome/90 via-chrome/70 to-chrome/35" />
-        <span className="absolute inset-0 bg-linear-to-t from-chrome/60 to-transparent to-50%" />
-      </div>
+          gradient, heaviest under the copy, keeps the text legible. The
+          picture is set in admin → Vitrin → Ana slayt; empty = plain chrome. */}
+      {background ? (
+        <div aria-hidden className="pointer-events-none absolute inset-0 sm:right-[40%]">
+          <Image
+            src={background}
+            alt=""
+            fill
+            priority
+            sizes="(min-width: 640px) 60vw, 100vw"
+            className="object-cover object-[85%_45%]"
+          />
+          <span className="absolute inset-0 bg-linear-to-r from-chrome/90 via-chrome/70 to-chrome/35" />
+          <span className="absolute inset-0 bg-linear-to-t from-chrome/60 to-transparent to-50%" />
+        </div>
+      ) : null}
 
       {/* A faint technical grid over the dark panel, so it is not flat black. */}
       <span

@@ -12,22 +12,16 @@
  *   - Resmi Yetkili Satıcısı Olduğumuz Markalar: a light steel card with the
  *     authorised brands' logos as tiles, each linking to that brand.
  *
- * Copy and links come from admin → Vitrin → Bannerlar (the `dual-1` / `dual-2`
- * slots); the brand tiles from admin → Vitrin → Marka panosu, so a brand added
- * there appears here too. A server component.
+ * Copy and links come from admin → Vitrin → Markalarımız kartları (the
+ * `dual-1` / `dual-2` slots); the left card's tiles from Tescilli markalarımız,
+ * the right card's from Marka panosu, so a brand added there appears here too.
+ * A server component.
  */
 
 import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 import type { Banner } from '@/lib/medusa/vitrin';
-
-/** The client's registered brands, in their order (src/markalarr 1, 2, 3). */
-const OWN_BRANDS = [
-  { name: 'SEENERGY', href: '/marka/seenergy', logo: '/brands/seenergy.webp' },
-  { name: 'SEENERGY Home', href: '/marka/seenergy-home', logo: '/brands/seenergy-home.webp' },
-  { name: 'Racksan', href: '/marka/racksan', logo: '/brands/racksan.webp' },
-];
 
 const TILE =
   'group/tile flex h-full min-h-[76px] items-center justify-center rounded-(--card-radius) border border-line bg-white px-4 py-3 shadow-e1 transition-[transform,box-shadow,border-color] duration-(--duration-base) ease-(--ease-out) hover:-translate-y-1 hover:border-line-strong hover:shadow-e2 dt:min-h-[96px]';
@@ -62,7 +56,18 @@ function Eyebrow({ text, dark }: { text?: string; dark?: boolean }) {
   );
 }
 
-export function BrandShowcase({ own, partners, brands }: { own: Banner; partners: Banner; brands: PartnerBrand[] }) {
+export function BrandShowcase({
+  own,
+  ownBrands,
+  partners,
+  brands,
+}: {
+  own: Banner;
+  /** The registered brands' tiles (admin → Vitrin → Tescilli markalarımız). */
+  ownBrands: PartnerBrand[];
+  partners: Banner;
+  brands: PartnerBrand[];
+}) {
   return (
     <div className="grid gap-(--space-grid-gap) lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]">
       {/* --- own brands: brushed steel, logo tiles ------------------------ */}
@@ -83,7 +88,7 @@ export function BrandShowcase({ own, partners, brands }: { own: Banner; partners
           </Link>
         </div>
         <ul className="relative mt-5 grid flex-1 grid-cols-3 gap-2.5 dt:gap-3">
-          {OWN_BRANDS.map((brand) => (
+          {ownBrands.map((brand) => (
             <li key={brand.href}>
               <Link href={brand.href} title={brand.name} aria-label={brand.name} className={TILE}>
                 <img src={brand.logo} alt="" loading="lazy" className={TILE_IMG} />

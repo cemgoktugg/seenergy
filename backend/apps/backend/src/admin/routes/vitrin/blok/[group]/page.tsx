@@ -1,10 +1,10 @@
 import { ArrowDownMini, ArrowUpMini, Plus, Trash } from "@medusajs/icons"
 import { Badge, Button, Container, Heading, IconButton, Switch, Text, toast, usePrompt } from "@medusajs/ui"
 import { useEffect, useState } from "react"
-import { Link, useParams } from "react-router-dom"
+import { Link, useParams, useSearchParams } from "react-router-dom"
 
 import { BlockField } from "../../../../components/fields"
-import { GROUPS, type GroupDef } from "../../../../lib/blocks"
+import { fieldsOf, GROUPS, type GroupDef } from "../../../../lib/blocks"
 import {
   errorText,
   useCreateBlock,
@@ -46,9 +46,10 @@ function BlockCard({
   const saved = JSON.stringify(block.data)
   useEffect(() => setData(JSON.parse(saved)), [saved])
   const dirty = JSON.stringify(data) !== saved
+  const fields = fieldsOf(def, block.key)
 
   const onSave = () => {
-    const missing = def.fields.filter((f) => f.required && !String(data[f.name] ?? "").trim())
+    const missing = fields.filter((f) => f.required && !String(data[f.name] ?? "").trim())
     if (missing.length) return toast.error(`Lütfen doldurun: ${missing.map((f) => f.label).join(", ")}`)
     save.mutate(
       { id: block.id, data },
@@ -108,7 +109,7 @@ function BlockCard({
         ) : null}
       </div>
       <div className="grid gap-5 px-6 py-5 lg:grid-cols-2">
-        {def.fields.map((field) => (
+        {fields.map((field) => (
           <div
             key={field.name}
             className={["textarea", "image", "tags", "stats", "products"].includes(field.type) ? "lg:col-span-2" : ""}
@@ -139,6 +140,8 @@ function BlockCard({
 
 const BlockGroupPage = () => {
   const { group = "" } = useParams()
+  const [search] = useSearchParams()
+  const only = search.get("bolum")
   const { data } = useVitrin()
   const create = useCreateBlock()
   const reorder = useReorderBlocks()
@@ -147,7 +150,13 @@ const BlockGroupPage = () => {
   if (!def) return <Container className="px-6 py-4"><Text>Bölüm bulunamadı.</Text></Container>
   if (!data) return <Container className="px-6 py-4"><Text>Yükleniyor…</Text></Container>
 
-  const blocks = data.blocks.filter((b) => b.group === group).sort((a, b) => a.rank - b.rank)
+  // Keyed groups list only the slots the site still uses, in page order;
+  // ?bolum=<key> narrows to one (the Vitrin map links each band to its own).
+  const blocks = data.blocks
+    .filter((b) => b.group === group)
+    .filter((b) => !def.slots || def.slots.includes(b.key ?? ""))
+    .filter((b) => !only || b.key === only)
+    .sort((a, b) => (def.slots ? def.slots.indexOf(a.key ?? "") - def.slots.indexOf(b.key ?? "") : a.rank - b.rank))
 
   const onMove = (from: number, to: number) => {
     const ids = blocks.map((b) => b.id)
@@ -176,7 +185,7 @@ const BlockGroupPage = () => {
           <Text size="small" className="text-ui-fg-subtle">
             <Link to="/vitrin" className="hover:underline">Vitrin</Link> / {def.title}
           </Text>
-          <Heading className="mt-1">{def.title}</Heading>
+          <Heading className="mt-1">{only ? def.itemTitle({}, 0, only) : def.title}</Heading>
           <Text size="small" className="text-ui-fg-subtle mt-1 max-w-2xl">
             Sitede nerede: {def.where}
           </Text>

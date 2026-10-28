@@ -1,6 +1,6 @@
 import { cache } from 'react';
 
-import { BRAND_SECTIONS, HERO_SIDE, HERO_SLIDES, SITE, TRUST_ITEMS } from '@/data/site';
+import { BRAND_SECTIONS, BRANDS, HERO_SIDE, HERO_SLIDES, SITE, TRUST_ITEMS } from '@/data/site';
 import { medusa } from '@/lib/medusa/client';
 
 /**
@@ -72,14 +72,131 @@ export interface TrustItem {
 
 export interface BrandBoardItem {
   brandHandle: string;
+  /** The square's banner (3 : 1); empty = not on the board. */
+  banner: string;
+  /** The light running round the frame. */
+  accent: string;
+  /** Shown on the Markalarımız authorised-brands card. */
   logo: string;
 }
+
+/** The board's artwork and frame colour until the admin sets its own
+ *  (vitrin-upgrade-homepage-sections writes the same). */
+const BOARD_PRESETS: Record<string, { banner: string; accent: string }> = {
+  dahua: { banner: '/brand-board/dahua.jpg', accent: '#e60012' },
+  hikvision: { banner: '/brand-board/hikvision.jpg', accent: '#e1251b' },
+  unv: { banner: '/brand-board/unv.jpg', accent: '#0068b7' },
+  neutron: { banner: '/brand-board/neutron.jpg', accent: '#1b8fe0' },
+};
 
 /** The board's first content, as the migration seeds it (vitrin-upgrade-brand-board). */
 const BRAND_BOARD: BrandBoardItem[] = ['dahua', 'hikvision', 'unv', 'neutron'].map((handle) => ({
   brandHandle: handle,
+  ...BOARD_PRESETS[handle],
   logo: `/brand-logos/${handle}.webp`,
 }));
+
+/** A logo tile: Markalarımız' registered brands and the brand wall. */
+export interface BrandTile {
+  name: string;
+  href: string;
+  logo: string;
+}
+
+/** Referanslarımız / Çözüm Ortaklarımız / Projelerimiz. */
+export interface CompanyCard {
+  key: 'referanslar' | 'cozum-ortaklari' | 'projeler';
+  title: string;
+  text: string;
+  href: string;
+  image: string;
+}
+
+/**
+ * The homepage bands' own settings (admin → Vitrin → each band's "Düzenle").
+ * Every value has the default the page shipped with, so a band whose block
+ * is missing, or a field left empty, looks exactly as before.
+ */
+export const SECTION_DEFAULTS = {
+  hero: { visible: true, background: '/hero/seenergy-bina.webp' },
+  'brand-board': { visible: true },
+  rails: {
+    visible: true,
+    left_eyebrow: 'Bu hafta öne çıkanlar',
+    left_title: 'Haftanın Ürünleri',
+    left_href: '/kampanyalar/haftanin-urunleri',
+    right_eyebrow: 'Rafa yeni girenler',
+    right_title: 'Yeni Gelenler',
+    right_href: '/yeni-gelenler',
+  },
+  deals: {
+    visible: true,
+    image: '/campaign/firsat-urunleri.webp',
+    href: '/kampanyalar/super-firsat',
+    button: 'Hemen incele',
+    chip: 'Fırsat Ürünü',
+  },
+  featured: { visible: true, eyebrow: 'Keşfet', title: 'Öne Çıkanlar' },
+  brands: { visible: true, eyebrow: 'Markalar', title: 'Markalarımız', action_label: 'Tüm markalar', action_href: '/markalar' },
+  'brand-wall': { visible: true, button: 'Tümünü gör', href: '/markalar' },
+  company: { visible: true, eyebrow: 'Kurumsal', title: 'Referanslar ve Projeler' },
+  trust: { visible: true },
+};
+
+export type Sections = typeof SECTION_DEFAULTS;
+
+/** Merge a band's saved data over its defaults: `visible` from "on"/"off",
+ *  every other field a non-empty string or the default. */
+function toSections(blocks: Block<Record<string, unknown>>[] | undefined): Sections {
+  const out = structuredClone(SECTION_DEFAULTS) as Record<string, Record<string, string | boolean>>;
+  for (const block of blocks ?? []) {
+    const target = out[block.key ?? ''];
+    if (!target) continue;
+    for (const field of Object.keys(target)) {
+      const value = block.data[field];
+      if (field === 'visible') target.visible = value !== 'off';
+      else if (typeof value === 'string' && value.trim()) target[field] = value.trim();
+    }
+  }
+  return out as unknown as Sections;
+}
+
+const OWN_BRANDS: BrandTile[] = [
+  { name: 'SEENERGY', href: '/marka/seenergy', logo: '/brands/seenergy.webp' },
+  { name: 'SEENERGY Home', href: '/marka/seenergy-home', logo: '/brands/seenergy-home.webp' },
+  { name: 'Racksan', href: '/marka/racksan', logo: '/brands/racksan.webp' },
+];
+
+const COMPANY_CARDS: CompanyCard[] = [
+  {
+    key: 'referanslar',
+    title: 'Referanslarımız',
+    text: 'Fabrikadan siteye, okuldan otoparka; farklı sektörlerde güvenlik altyapısı kuran firmalara ürün ve çözüm sağlıyoruz.',
+    href: '/referanslar',
+    image: '',
+  },
+  {
+    key: 'cozum-ortaklari',
+    title: 'Çözüm Ortaklarımız',
+    text: "Dahua, Hikvision, UNV, Neutron ve 30'dan fazla markayla birlikte çalışıyor; doğru ürünü yetkili kanaldan sunuyoruz.",
+    href: '/cozum-ortaklarimiz',
+    image: '',
+  },
+  {
+    key: 'projeler',
+    title: 'Projelerimiz',
+    text: 'Keşiften kuruluma kadar yanınızdayız: kamera, kayıt, network ve uzak saha (4G, solar) projeleri için çözüm üretiyoruz.',
+    href: '/projeler',
+    image: '/hero/seenergy-cctv.webp',
+  },
+];
+
+const toTiles = (blocks: Block<Record<string, unknown>>[] | undefined, fallback: BrandTile[]): BrandTile[] =>
+  blocks
+    ? blocks
+        .map((block) => ({ name: str(block.data.name).trim(), href: str(block.data.href).trim() || '/markalar', logo: str(block.data.logo) }))
+        .filter((tile) => tile.name && tile.logo)
+    : fallback;
 
 /** Şirket bilgileri (admin → Vitrin → Şirket bilgileri). Empty = not shown. */
 export interface Company {
@@ -155,6 +272,13 @@ export interface Vitrin {
   brandBands: BrandBand[];
   /** The four squares under the hero (admin → Vitrin → Marka panosu). */
   brandBoard: BrandBoardItem[];
+  /** Each homepage band's settings: shown, headings, links, pictures. */
+  sections: Sections;
+  /** Markalarımız, left card. */
+  ownBrands: BrandTile[];
+  /** The moving logo wall. */
+  brandWall: BrandTile[];
+  companyCards: CompanyCard[];
   techBand: TechBandContent | null;
   trust: TrustItem[];
   /** List key → product ids, in the order the shop set. */
@@ -171,7 +295,11 @@ interface StoreVitrin {
     'hero-side': Block<RawBanner>[];
     banner: Block<RawBanner>[];
     'brand-band': Block<{ brand_handle: string; tagline: string; logo: string; banner?: string; product_ids?: string[] }>[];
-    'brand-board': Block<{ brand_handle: string; logo: string }>[];
+    'brand-board': Block<{ brand_handle: string; logo: string; banner?: string; accent?: string }>[];
+    section: Block<Record<string, unknown>>[];
+    'own-brand': Block<Record<string, unknown>>[];
+    'brand-wall': Block<Record<string, unknown>>[];
+    'company-card': Block<Record<string, unknown>>[];
     'tech-band': Block<{
       eyebrow: string;
       title: string;
@@ -263,6 +391,10 @@ const FALLBACK: Vitrin = {
     productIds: [],
   })),
   brandBoard: BRAND_BOARD,
+  sections: SECTION_DEFAULTS,
+  ownBrands: OWN_BRANDS,
+  brandWall: BRANDS.map(({ name, href, image }) => ({ name, href, logo: image })),
+  companyCards: COMPANY_CARDS,
   techBand: null,
   trust: TRUST_ITEMS.map((item) => ({ ...item })),
   company: COMPANY_FALLBACK,
@@ -314,9 +446,32 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
       }))
       .filter((band) => band.brandHandle),
     brandBoard: (b['brand-board'] ?? [])
-      .map((block) => ({ brandHandle: str(block.data.brand_handle), logo: str(block.data.logo) }))
+      .map((block) => {
+        const brandHandle = str(block.data.brand_handle);
+        const preset = BOARD_PRESETS[brandHandle];
+        return {
+          brandHandle,
+          banner: str(block.data.banner) || preset?.banner || '',
+          accent: str(block.data.accent) || preset?.accent || '#8a93a3',
+          logo: str(block.data.logo),
+        };
+      })
       .filter((item) => item.brandHandle)
       .slice(0, 4),
+    sections: toSections(b.section),
+    ownBrands: toTiles(b['own-brand'], OWN_BRANDS),
+    brandWall: toTiles(b['brand-wall'], FALLBACK.brandWall),
+    companyCards: COMPANY_CARDS.map((card) => {
+      const data = b['company-card']?.find((block) => block.key === card.key)?.data;
+      if (!data) return card;
+      return {
+        key: card.key,
+        title: str(data.title).trim() || card.title,
+        text: str(data.text).trim(),
+        href: str(data.href).trim() || card.href,
+        image: str(data.image) || card.image,
+      };
+    }),
     techBand: tech
       ? {
           eyebrow: str(tech.eyebrow),

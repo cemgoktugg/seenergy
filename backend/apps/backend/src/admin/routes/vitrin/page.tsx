@@ -7,7 +7,9 @@ import { DEPARTMENT_NAMES, GROUPS, LIST_PLACES } from "../../lib/blocks"
 import { mediaUrl, useQuickProducts, useVitrin, type VitrinBlock, type VitrinList } from "../../lib/vitrin"
 
 /**
- * Vitrin — the homepage as a map.
+ * Vitrin — the homepage as a map (rebuilt 2026-10-28 to match the page band
+ * for band: stale entries for bands no longer on it were dropped, and every
+ * band links to its own settings — shown / hidden, headings, pictures).
  *
  * Every band of the storefront homepage, top to bottom, in the order a visitor
  * sees it, each with a small preview of what is there now and one button to
@@ -21,49 +23,86 @@ function Band({
   where,
   to,
   external,
+  hidden,
+  links,
   children,
   extra,
 }: {
-  n: number
+  n?: number
   title: string
   where: string
   to: string
   external?: boolean
+  /** The band is switched off (its section block says "Gizli"). */
+  hidden?: boolean
+  /** Further parts of the same band, each with its own editor. */
+  links?: { label: string; to: string }[]
   children?: React.ReactNode
   extra?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col gap-y-3 px-6 py-4">
+    <div className={`flex flex-col gap-y-3 px-6 py-4 ${hidden ? "bg-ui-bg-subtle" : ""}`}>
       <div className="flex items-start gap-x-3">
-        <span className="bg-ui-bg-component txt-compact-xsmall-plus text-ui-fg-subtle mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
-          {n}
-        </span>
+        {n ? (
+          <span className="bg-ui-bg-component txt-compact-xsmall-plus text-ui-fg-subtle mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border">
+            {n}
+          </span>
+        ) : null}
         <div className="min-w-0 flex-1">
-          <Text size="base" weight="plus" leading="compact">
-            {title}
-          </Text>
+          <div className="flex flex-wrap items-center gap-2">
+            <Text size="base" weight="plus" leading="compact">
+              {title}
+            </Text>
+            {hidden ? (
+              <Badge size="2xsmall" color="orange">
+                Sitede gizli
+              </Badge>
+            ) : null}
+          </div>
           <Text size="small" className="text-ui-fg-subtle mt-0.5">
             {where}
           </Text>
+          {links?.length ? (
+            <div className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
+              {links.map((link) => (
+                <Link key={link.to} to={link.to} className="txt-compact-small-plus text-ui-fg-interactive hover:underline">
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          ) : null}
         </div>
         {extra}
-        {external ? (
-          <Button size="small" variant="secondary" asChild>
-            <Link to={to}>
-              <ArrowUpRightOnBox />
-              Aç
-            </Link>
-          </Button>
-        ) : (
-          <Button size="small" variant="secondary" asChild>
-            <Link to={to}>
-              <PencilSquare />
-              Düzenle
-            </Link>
-          </Button>
-        )}
+        <Button size="small" variant="secondary" asChild>
+          <Link to={to}>
+            {external ? <ArrowUpRightOnBox /> : <PencilSquare />}
+            {external ? "Aç" : "Düzenle"}
+          </Link>
+        </Button>
       </div>
-      {children ? <div className="pl-9">{children}</div> : null}
+      {children ? <div className={n ? "pl-9" : ""}>{children}</div> : null}
+    </div>
+  )
+}
+
+/** A row of logo tiles (own brands, brand wall). */
+function LogoPreview({ blocks, storefront, max = 12 }: { blocks: VitrinBlock[]; storefront: string; max?: number }) {
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      {blocks.slice(0, max).map((b) => (
+        <div
+          key={b.id}
+          title={b.data.name}
+          className={`flex h-9 w-20 items-center justify-center overflow-hidden rounded-md border bg-white px-1.5 ${b.is_active ? "" : "opacity-40"}`}
+        >
+          {b.data.logo ? <img src={mediaUrl(b.data.logo, storefront)} alt="" className="max-h-6 w-auto max-w-full object-contain" /> : null}
+        </div>
+      ))}
+      {blocks.length > max ? (
+        <Text size="xsmall" className="text-ui-fg-subtle">
+          +{blocks.length - max} marka
+        </Text>
+      ) : null}
     </div>
   )
 }
@@ -135,11 +174,15 @@ const VitrinPage = () => {
 
   const storefront = data.storefront_url
   const list = (key: string) => data.lists.find((l) => l.key === key)
-  const group = (g: VitrinBlock["group"]) => data.blocks.filter((b) => b.group === g)
+  const group = (g: VitrinBlock["group"]) => data.blocks.filter((b) => b.group === g).sort((a, b) => a.rank - b.rank)
   const banner = (key: string) => data.blocks.filter((b) => b.group === "banner" && b.key === key)
-  const brandBands = group("brand-band")
-  const activeBrands = brandBands.filter((b) => b.is_active)
   const announcement = group("announcement")[0]
+  const section = (key: string) => data.blocks.find((b) => b.group === "section" && b.key === key)
+  const isHidden = (key: string) => section(key)?.data.visible === "off"
+  const settings = (key: string) => `/vitrin/blok/section?bolum=${key}`
+  const companyCards = group("company-card")
+  const heroBackground = section("hero")?.data.background as string | undefined
+  const deals = section("deals")?.data ?? {}
 
   let n = 0
   return (
@@ -148,8 +191,9 @@ const VitrinPage = () => {
         <div>
           <Heading>Vitrin</Heading>
           <Text size="small" className="text-ui-fg-subtle mt-1 max-w-2xl">
-            Ana sayfadaki bölümler, sitedeki sırasıyla. Değiştirmek istediğiniz bölümün “Düzenle”
-            düğmesine basın. Kaydettiğiniz her değişiklik sitede hemen görünür.
+            Ana sayfa, sitedeki sırasıyla yukarıdan aşağı. Her bölümün yazısı, görseli ve ürünleri buradan
+            değişir; bir bölümü kaldırmak için “Düzenle”den “Sitede: Gizli” seçin. Kaydettiğiniz her değişiklik
+            sitede hemen görünür.
           </Text>
         </div>
         <div className="flex gap-x-2">
@@ -170,17 +214,173 @@ const VitrinPage = () => {
 
       <Container className="divide-y p-0">
         <div className="px-6 py-3">
-          <Heading level="h2">Ana sayfa, yukarıdan aşağı</Heading>
+          <Heading level="h2">Her sayfada</Heading>
         </div>
 
-        <Band n={++n} title={GROUPS.company.title} where={GROUPS.company.where} to="/vitrin/blok/company">
+        <Band title={GROUPS.announcement.title} where={GROUPS.announcement.where} to="/vitrin/blok/announcement">
+          <Badge size="small">{announcement?.data.text ?? "—"}</Badge>
+        </Band>
+
+        <Band title={GROUPS.company.title} where={GROUPS.company.where} to="/vitrin/blok/company">
           <Text size="small" className="text-ui-fg-subtle">
             {group("company")[0]?.data.legal_name ?? "—"} · {group("company")[0]?.data.phone || "telefon yok"} ·{" "}
             {group("company")[0]?.data.iban ? "IBAN girildi" : "IBAN girilmedi"}
           </Text>
         </Band>
+      </Container>
 
-        <Band n={++n} title={GROUPS.staff.title} where={GROUPS.staff.where} to="/vitrin/blok/staff">
+      <Container className="divide-y p-0">
+        <div className="px-6 py-3">
+          <Heading level="h2">Ana sayfa, yukarıdan aşağı</Heading>
+        </div>
+
+        <Band
+          n={++n}
+          title="Ana slayt"
+          where="Sayfanın en üstündeki büyük, kayan alan: soldaki koyu alanda yazılar ve butonlar, sağda slaytın görseli. Koyu alanın arkasında bütün slaytlarda aynı arka plan fotoğrafı durur."
+          to="/vitrin/blok/hero-slide"
+          hidden={isHidden("hero")}
+          links={[{ label: "Arka plan fotoğrafı · göster / gizle", to: settings("hero") }]}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            {heroBackground ? (
+              <div className="relative h-14 w-24 overflow-hidden rounded-md border bg-black" title="Koyu alanın arka planı">
+                <img src={mediaUrl(heroBackground, storefront)} alt="" className="h-full w-full object-cover opacity-70" />
+              </div>
+            ) : null}
+            <ImagePreview blocks={group("hero-slide")} storefront={storefront} />
+          </div>
+        </Band>
+
+        <Band
+          n={++n}
+          title={GROUPS["brand-board"].title}
+          where={GROUPS["brand-board"].where}
+          to="/vitrin/blok/brand-board"
+          hidden={isHidden("brand-board")}
+          links={[{ label: "Bölümü göster / gizle", to: settings("brand-board") }]}
+        >
+          <ImagePreview blocks={group("brand-board").slice(0, 4)} storefront={storefront} fields={["banner"]} />
+        </Band>
+
+        <Band
+          n={++n}
+          title="Haftanın Ürünleri ve Yeni Gelenler"
+          where="Marka panosunun altındaki yan yana iki ürün rafı (her birinde ilk 8 ürün, kendi kendine döner). Başlıklar ve 'Tümü' bağlantıları 'Düzenle'den."
+          to={settings("rails")}
+          hidden={isHidden("rails")}
+        >
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="flex flex-col gap-y-2">
+              <ListLink list={list("haftanin")} label={(section("rails")?.data.left_title as string) || "Haftanın Ürünleri"} />
+              <ListPreview list={list("haftanin")} storefront={storefront} />
+            </div>
+            <div className="flex flex-col gap-y-2">
+              <ListLink list={list("yeni")} label={(section("rails")?.data.right_title as string) || "Yeni Gelenler"} />
+              <ListPreview list={list("yeni")} storefront={storefront} />
+            </div>
+          </div>
+        </Band>
+
+        <Band
+          n={++n}
+          title="Fırsat Ürünleri"
+          where="Solda bölümün görseli, yanında dört ürün; her ürünün üstünde 'Fırsat Ürünü' etiketi. Görsel, buton ve etiket 'Düzenle'den; ürünler listeden."
+          to={settings("deals")}
+          hidden={isHidden("deals")}
+          links={[{ label: `Ürünleri seç (${list("super-firsat")?.product_ids.length ?? 0})`, to: "/vitrin/liste/super-firsat" }]}
+        >
+          <div className="flex flex-wrap items-center gap-2">
+            {deals.image ? (
+              <div className="h-12 w-20 overflow-hidden rounded-md border" title="Bölüm görseli">
+                <img src={mediaUrl(deals.image as string, storefront)} alt="" className="h-full w-full object-cover" />
+              </div>
+            ) : null}
+            <ListPreview list={list("super-firsat")} storefront={storefront} count={4} />
+          </div>
+        </Band>
+
+        <Band
+          n={++n}
+          title={(section("featured")?.data.title as string) || "Öne Çıkanlar"}
+          where={`${LIST_PLACES["one-cikan"]} Başlık 'Düzenle'den, ürünler listeden.`}
+          to={settings("featured")}
+          hidden={isHidden("featured")}
+          links={[{ label: `Ürünleri seç (${list("one-cikan")?.product_ids.length ?? 0})`, to: "/vitrin/liste/one-cikan" }]}
+        >
+          <ListPreview list={list("one-cikan")} storefront={storefront} count={20} />
+        </Band>
+
+        <Band
+          n={++n}
+          title={(section("brands")?.data.title as string) || "Markalarımız"}
+          where="İki kart yan yana: solda tescilli markalarımız, sağda yetkili satıcısı olduğumuz markalar. Bölüm başlığı 'Düzenle'den."
+          to={settings("brands")}
+          hidden={isHidden("brands")}
+          links={[
+            { label: "Kartların yazıları", to: "/vitrin/blok/banner" },
+            { label: `Tescilli markalarımız (${group("own-brand").length})`, to: "/vitrin/blok/own-brand" },
+            { label: "Yetkili satıcılık logoları → Marka panosu", to: "/vitrin/blok/brand-board" },
+          ]}
+        >
+          <div className="flex flex-col gap-y-2">
+            <ImagePreview blocks={[...banner("dual-1"), ...banner("dual-2")]} storefront={storefront} />
+            <LogoPreview blocks={group("own-brand")} storefront={storefront} />
+          </div>
+        </Band>
+
+        <Band
+          n={++n}
+          title={GROUPS["brand-wall"].title}
+          where={GROUPS["brand-wall"].where}
+          to="/vitrin/blok/brand-wall"
+          hidden={isHidden("brand-wall")}
+          links={[{ label: "'Tümünü gör' butonu · göster / gizle", to: settings("brand-wall") }]}
+        >
+          <LogoPreview blocks={group("brand-wall")} storefront={storefront} />
+        </Band>
+
+        <Band
+          n={++n}
+          title={(section("company")?.data.title as string) || "Referanslar ve Projeler"}
+          where="Üç kart: Referanslarımız, Çözüm Ortaklarımız, Projelerimiz. Kartların başlığı, yazısı ve bağlantısı 'Kartlar'dan; bölüm başlığı 'Düzenle'den."
+          to={settings("company")}
+          hidden={isHidden("company")}
+          links={[{ label: "Kartlar", to: "/vitrin/blok/company-card" }]}
+        >
+          <div className="flex flex-wrap gap-2">
+            {companyCards.map((b) => (
+              <Badge key={b.id} size="small">
+                {b.data.title || "başlıksız"}
+              </Badge>
+            ))}
+          </div>
+        </Band>
+
+        <Band
+          n={++n}
+          title={GROUPS.trust.title}
+          where={GROUPS.trust.where}
+          to="/vitrin/blok/trust"
+          hidden={isHidden("trust")}
+          links={[{ label: "Bölümü göster / gizle", to: settings("trust") }]}
+        >
+          <div className="flex flex-wrap gap-2">
+            {group("trust").map((b) => (
+              <Badge key={b.id} size="small" color={b.is_active ? "grey" : "orange"}>
+                {b.data.title}
+              </Badge>
+            ))}
+          </div>
+        </Band>
+      </Container>
+
+      <Container className="divide-y p-0">
+        <div className="px-6 py-3">
+          <Heading level="h2">Diğer sayfalar</Heading>
+        </div>
+
+        <Band title={GROUPS.staff.title} where={GROUPS.staff.where} to="/vitrin/blok/staff">
           <div className="flex flex-wrap gap-2">
             {group("staff").map((b) => (
               <Badge key={b.id} size="small" color={b.is_active ? "grey" : "orange"}>
@@ -190,89 +390,12 @@ const VitrinPage = () => {
           </div>
         </Band>
 
-        <Band n={++n} title={GROUPS.announcement.title} where={GROUPS.announcement.where} to="/vitrin/blok/announcement">
-          <Badge size="small">{announcement?.data.text ?? "—"}</Badge>
-        </Band>
-
-        <Band n={++n} title="Ana slayt" where={GROUPS["hero-slide"].where} to="/vitrin/blok/hero-slide">
-          <ImagePreview blocks={group("hero-slide")} storefront={storefront} />
-        </Band>
-
-        {/* "Slayt yanı kartlar" left the homepage on 2026-10-22 (the slider
-            took its width at the client's request), so it left this map too.
-            Its blocks stay in the database, untouched. */}
-
         <Band
-          n={++n}
-          title="Marka panosu başlığı"
-          where="Marka panosunun üstündeki koyu başlık şeridi: üst etiket, başlık, açıklama, buton bağlantısı ve sağdaki ürün görseli. Bannerlar içinde 'Marka panosu başlığı' olarak düzenlenir."
-          to="/vitrin/blok/banner"
-        >
-          <ImagePreview blocks={banner("wide")} storefront={storefront} />
-        </Band>
-
-        <Band n={++n} title={GROUPS["brand-board"].title} where={GROUPS["brand-board"].where} to="/vitrin/blok/brand-board">
-          <ImagePreview blocks={group("brand-board").slice(0, 4)} storefront={storefront} fields={["logo"]} />
-        </Band>
-
-        <Band
-          n={++n}
           title="Kategoriler"
-          where="Üst menü ve kategori sayfaları: 14 ana kategori ve alt kategorileri. Ürünlerin hangi kategoride olduğunu buradan, her ürünün formundan seçersiniz; kategori ağacının kendisi (yeni kategori eklemek, ad değiştirmek) sitenin kodunda tanımlıdır, bu yüzden o değişiklik için geliştiriciye başvurun."
+          where="Üst menü ve kategori sayfaları: 14 ana kategori ve alt kategorileri. Ürünlerin hangi kategoride olduğunu her ürünün formundan seçersiniz; kategori ağacının kendisi (yeni kategori eklemek, ad değiştirmek) sitenin kodunda tanımlıdır, bu yüzden o değişiklik için geliştiriciye başvurun."
           to="/categories"
           external
         />
-
-        <Band n={++n} title="Haftanın Ürünleri ve Yeni Gelenler" where="Marka panosunun altındaki yan yana iki ürün rafı." to="/vitrin/liste/haftanin">
-          <div className="grid gap-4 md:grid-cols-2">
-            <div className="flex flex-col gap-y-2">
-              <ListLink list={list("haftanin")} label="Haftanın Ürünleri" />
-              <ListPreview list={list("haftanin")} storefront={storefront} />
-            </div>
-            <div className="flex flex-col gap-y-2">
-              <ListLink list={list("yeni")} label="Yeni Gelenler" />
-              <ListPreview list={list("yeni")} storefront={storefront} />
-            </div>
-          </div>
-        </Band>
-
-        <Band
-          n={++n}
-          title="Marka vitrinleri"
-          where={GROUPS["brand-band"].where}
-          to="/vitrin/blok/brand-band"
-          extra={<Badge size="2xsmall">{activeBrands.length} yayında</Badge>}
-        >
-          <ImagePreview blocks={brandBands} storefront={storefront} fields={["banner", "logo"]} />
-        </Band>
-
-        <Band n={++n} title={GROUPS["tech-band"].title} where={GROUPS["tech-band"].where} to="/vitrin/blok/tech-band">
-          <Text size="small" className="text-ui-fg-subtle">
-            “{group("tech-band")[0]?.data.title ?? "—"}”
-          </Text>
-        </Band>
-
-        <Band n={++n} title="Fırsat Ürünleri" where={LIST_PLACES["super-firsat"]} to="/vitrin/liste/super-firsat">
-          <ListPreview list={list("super-firsat")} storefront={storefront} count={4} />
-        </Band>
-
-        <Band n={++n} title="Öne Çıkanlar" where={LIST_PLACES["one-cikan"]} to="/vitrin/liste/one-cikan">
-          <ListPreview list={list("one-cikan")} storefront={storefront} count={20} />
-        </Band>
-
-        <Band n={++n} title="Markalarımız" where="Öne Çıkanlar'ın altındaki iki marka kartı: yazıları ve bağlantıları buradan (Bannerlar → Markalarımız). Sol kartta SEENERGY logosu, sağ kartta Marka panosundaki markaların logoları gösterilir; ürün görseli alanı bu iki kartta kullanılmaz." to="/vitrin/blok/banner">
-          <ImagePreview blocks={[...banner("dual-1"), ...banner("dual-2")]} storefront={storefront} />
-        </Band>
-
-        <Band n={++n} title={GROUPS.trust.title} where={GROUPS.trust.where} to="/vitrin/blok/trust">
-          <div className="flex flex-wrap gap-2">
-            {group("trust").map((b) => (
-              <Badge key={b.id} size="small" color={b.is_active ? "grey" : "orange"}>
-                {b.data.title}
-              </Badge>
-            ))}
-          </div>
-        </Band>
       </Container>
     </div>
   )

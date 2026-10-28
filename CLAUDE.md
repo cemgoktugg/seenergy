@@ -179,9 +179,24 @@ Yeni Ürünler / Çok Satanlar) removed: no tabs or such labels there, only the
 featured products. Created by `vitrin-upgrade-featured-list.ts` from what the
 tabs showed.
 
+**The whole homepage is edited in Vitrin (2026-10-28).** The admin map lists
+the bands in page order; nothing on the homepage is hard-coded any more:
+`section` blocks (one per band, keyed hero / brand-board / rails / deals /
+featured / brands / brand-wall / company / trust) hold whether the band is
+shown (`visible: on|off`) and its headings, links and pictures (hero
+background, Fırsat artwork, button, chip…); `own-brand` the three registered
+brand tiles, `brand-wall` the 33 wall logos, `company-card` the three
+Referanslar cards; `brand-board` squares carry their own `banner` and
+`accent`. Seeded by `vitrin-upgrade-homepage-sections` with exactly the old
+hard-coded values (verified 0 changed pixels at 1440 and 390), and
+`SECTION_DEFAULTS` in `src/lib/medusa/vitrin.ts` holds the same values as the
+fallback. The map no longer lists blocks the page does not render (brand-band,
+tech-band, the `wide` banner) — their data stays in the database.
+
 When adding an editable homepage field: add it to the block's `fields` in
-`src/admin/lib/blocks.ts` (the form renders from it), to the seed, and to the
-mapping in `src/lib/medusa/vitrin.ts`. The instant refresh needs the same
+`src/admin/lib/blocks.ts` (the form renders from it; for a band, to
+`SECTION_FIELDS`), to the seed, and to the mapping in `src/lib/medusa/vitrin.ts`
+(for a band, `SECTION_DEFAULTS`). The instant refresh needs the same
 secret in `STOREFRONT_REVALIDATE_SECRET` (backend) and `REVALIDATE_SECRET`
 (storefront).
 

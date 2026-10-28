@@ -6,7 +6,8 @@ import { ArrowRight } from 'lucide-react';
 export interface BrandBoardEntry {
   name: string;
   href: string;
-  image: StaticImageData;
+  /** The banner — admin → Vitrin → Marka panosu (a URL), or a static import. */
+  image: StaticImageData | string;
   /** The brand's own colour, for the light running round the frame. */
   accent: string;
 }

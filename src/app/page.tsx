@@ -34,26 +34,23 @@ import {
 import { discountPercent, type Product } from '@/data/catalog';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
-/* The client's banners as supplied (img/1-4.jpeg, 2026-10-23) — no cut files,
-   no padding, no extension; BrandBoard frames them (see its note). */
-import dahuaBanner from '../../img/1.jpeg';
-import hikvisionBanner from '../../img/2.jpeg';
-import unvBanner from '../../img/3.jpeg';
-import neutronBanner from '../../img/4.jpeg';
 
-/** The client's img/1–4 banners, in reading order. */
-const BRAND_BANNERS = [
-  { handle: 'dahua', name: 'Dahua', image: dahuaBanner, accent: '#e60012' },
-  { handle: 'hikvision', name: 'Hikvision', image: hikvisionBanner, accent: '#e1251b' },
-  { handle: 'unv', name: 'UNV', image: unvBanner, accent: '#0068b7' },
-  { handle: 'neutron', name: 'Neutron', image: neutronBanner, accent: '#1b8fe0' },
-];
+/*
+ * EVERY BAND IS EDITED IN THE ADMIN (2026-10-28): admin → Vitrin lists them in
+ * this order, and each band's settings — shown or hidden, headings, links,
+ * pictures — come from `vitrin.sections` (the `section` blocks); its products,
+ * logos and cards from their own lists. Defaults equal what this page
+ * hard-coded until then. A new band needs its section key in
+ * SECTION_DEFAULTS (src/lib/medusa/vitrin.ts), in the admin's SECTION_KEYS /
+ * SECTION_FIELDS (backend/.../admin/lib/blocks.ts) and in the seed.
+ */
 
 export default async function HomePage() {
   const [{ byId, brandFromSlug, mixed, products }, vitrin] = await Promise.all([
     loadCatalog(),
     loadVitrin(),
   ]);
+  const s = vitrin.sections;
 
   /**
    * A Vitrin list (admin → Vitrin), resolved against the catalogue. Ids of
@@ -80,13 +77,17 @@ export default async function HomePage() {
         .sort((a, b) => (discountPercent(b) ?? 0) - (discountPercent(a) ?? 0))
         .slice(0, 4);
 
-  // Keep the admin's brand visibility; the supplied artwork sets image order.
-  const brandBoard: BrandBoardEntry[] = BRAND_BANNERS
-    .filter(({ handle }) => vitrin.brandBoard.some((item) => item.brandHandle === handle))
-    .map(({ handle, name, image, accent }) => ({
-      name: brandFromSlug(handle) ?? name,
-      href: `/marka/${handle}`,
-      image,
+  const brandName = (handle: string) =>
+    brandFromSlug(handle) ?? (handle.length <= 3 ? handle.toUpperCase() : handle.charAt(0).toUpperCase() + handle.slice(1));
+
+  /* The four banners, in the admin's order (admin → Vitrin → Marka panosu);
+     a square without a banner is left off the board. */
+  const brandBoard: BrandBoardEntry[] = vitrin.brandBoard
+    .filter((item) => item.banner)
+    .map(({ brandHandle, banner, accent }) => ({
+      name: brandName(brandHandle),
+      href: `/marka/${brandHandle}`,
+      image: banner,
       accent,
     }));
 
@@ -108,10 +109,12 @@ export default async function HomePage() {
     tone: 'acik',
   });
   const partnerBrands: PartnerBrand[] = vitrin.brandBoard.map(({ brandHandle, logo }) => ({
-    name: brandFromSlug(brandHandle) ?? (brandHandle.length <= 3 ? brandHandle.toUpperCase() : brandHandle.charAt(0).toUpperCase() + brandHandle.slice(1)),
+    name: brandName(brandHandle),
     href: `/marka/${brandHandle}`,
     logo,
   }));
+
+  const showHero = s.hero.visible && vitrin.slides.length > 0;
 
   return (
     <>
@@ -127,15 +130,16 @@ export default async function HomePage() {
              Ürünleri", "Toptan alım ve bayilik") are gone. An edge-to-edge
              version was tried the same day and taken back — the client
              wanted it aligned with the bands below, not the viewport. */}
-      {vitrin.slides.length > 0 ? (
+      {showHero ? (
         <Section first label="Kampanyalar">
-          <Hero slides={vitrin.slides} />
+          <Hero slides={vitrin.slides} background={s.hero.background} />
         </Section>
       ) : null}
 
-      {/* 04b — four clickable brand banners, in a two-by-two grid. */}
-      {brandBoard.length > 0 ? (
-        <Section label="Markalar" compact>
+      {/* 04b — four clickable brand banners, in a two-by-two grid. With the
+          hero hidden it opens the page, so it takes the first band's offset. */}
+      {s['brand-board'].visible && brandBoard.length > 0 ? (
+        <Section label="Markalar" first={!showHero} compact={showHero}>
           <BrandBoard items={brandBoard} />
         </Section>
       ) : null}
@@ -146,24 +150,26 @@ export default async function HomePage() {
              rather than categories. The tile strip still appears at band 13. */}
       {/* `compact`: tied to the brand banners above — the client asked for
           less air between them (2026-10-23). */}
-      <Section label="Haftanın ürünleri ve yeni gelenler" compact>
-        <div className="grid grid-cols-1 gap-(--space-grid-gap) lg:grid-cols-2">
-          <ProductSlider
-            eyebrow="Bu hafta öne çıkanlar"
-            title="Haftanın Ürünleri"
-            channel="01"
-            href="/kampanyalar/haftanin-urunleri"
-            products={pick('haftanin', 8, 2)}
-          />
-          <ProductSlider
-            eyebrow="Rafa yeni girenler"
-            title="Yeni Gelenler"
-            channel="02"
-            href="/yeni-gelenler"
-            products={pick('yeni', 8, 11)}
-          />
-        </div>
-      </Section>
+      {s.rails.visible ? (
+        <Section label="Haftanın ürünleri ve yeni gelenler" compact>
+          <div className="grid grid-cols-1 gap-(--space-grid-gap) lg:grid-cols-2">
+            <ProductSlider
+              eyebrow={s.rails.left_eyebrow}
+              title={s.rails.left_title}
+              channel="01"
+              href={s.rails.left_href}
+              products={pick('haftanin', 8, 2)}
+            />
+            <ProductSlider
+              eyebrow={s.rails.right_eyebrow}
+              title={s.rails.right_title}
+              channel="02"
+              href={s.rails.right_href}
+              products={pick('yeni', 8, 11)}
+            />
+          </div>
+        </Section>
+      ) : null}
 
       {/* 12 — Keşfet · Öne Çıkanlar: one 4 × 4 grid (2026-10-24). It was a
              tabbed block (Haftanın Ürünleri / Yeni Ürünler / Çok Satanlar);
@@ -181,24 +187,24 @@ export default async function HomePage() {
              is a 2:1 strip over the cards, without the button, which would
              cover its lettering. The artwork carries the heading, so the h2 is for screen
              readers. */}
-      {deals.length > 0 ? (
+      {s.deals.visible && deals.length > 0 ? (
         <Section label="Fırsat ürünleri">
           <h2 className="sr-only">Fırsat Ürünleri</h2>
           <div className="grid gap-(--space-grid-gap) dt:grid-cols-[minmax(0,1.35fr)_repeat(4,minmax(0,1fr))]">
             <Link
-              href="/kampanyalar/super-firsat"
+              href={s.deals.href}
               aria-label="Tüm fırsat ürünleri"
               className="group relative block aspect-[2/1] overflow-hidden rounded-(--card-radius) shadow-e1 dt:aspect-auto dt:h-full"
             >
               <Image
-                src="/campaign/firsat-urunleri.webp"
+                src={s.deals.image}
                 alt=""
                 fill
                 sizes="(min-width: 1200px) 320px, 100vw"
                 className="object-cover transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.03]"
               />
               <span className="absolute bottom-6 left-1/2 hidden h-9 -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full bg-ink-fixed px-4 text-[13px] font-bold text-white shadow-e2 transition-colors duration-(--duration-fast) group-hover:bg-[rgb(195,19,28)] dt:inline-flex">
-                Hemen incele
+                {s.deals.button}
                 <ArrowRight size={15} strokeWidth={2.5} aria-hidden />
               </span>
             </Link>
@@ -206,32 +212,47 @@ export default async function HomePage() {
                 dissolves and the cards join the tile's row. */}
             <div className="grid grid-cols-2 gap-(--space-grid-gap) sm:grid-cols-4 dt:contents">
               {deals.map((product) => (
-                <ProductCard key={product.id} product={product} chip="Fırsat Ürünü" />
+                <ProductCard key={product.id} product={product} chip={s.deals.chip} />
               ))}
             </div>
           </div>
         </Section>
       ) : null}
 
-      <Section label="Öne çıkan ürünler">
-        <SectionHeading eyebrow="Keşfet" title="Öne Çıkanlar" />
-        <div className="pt-3 dt:pt-4">
-          <ProductGrid products={pick('one-cikan', 20, 4)} columns={4} featured />
-        </div>
-      </Section>
+      {s.featured.visible ? (
+        <Section label="Öne çıkan ürünler">
+          <SectionHeading eyebrow={s.featured.eyebrow} title={s.featured.title} />
+          <div className="pt-3 dt:pt-4">
+            <ProductGrid products={pick('one-cikan', 20, 4)} columns={4} featured />
+          </div>
+        </Section>
+      ) : null}
 
       {/* 12b — Markalarımız (2026-10-24): the two brand cards and the brand
              wall, moved up here from the dark blog band at the client's
              request and redesigned (see BrandShowcase). */}
-      <Section label="Markalarımız">
-        <SectionHeading eyebrow="Markalar" title="Markalarımız" action={{ label: 'Tüm markalar', href: '/markalar' }} />
-        <div className="pt-3 dt:pt-4">
-          <BrandShowcase own={ownBrands} partners={partnerCard} brands={partnerBrands} />
-        </div>
-        <div className="pt-(--space-grid-gap)">
-          <BrandGrid />
-        </div>
-      </Section>
+      {/* The brand wall sits in the same band; each can be hidden on its own. */}
+      {s.brands.visible || s['brand-wall'].visible ? (
+        <Section label="Markalarımız">
+          {s.brands.visible ? (
+            <>
+              <SectionHeading
+                eyebrow={s.brands.eyebrow}
+                title={s.brands.title}
+                action={{ label: s.brands.action_label, href: s.brands.action_href }}
+              />
+              <div className="pt-3 dt:pt-4">
+                <BrandShowcase own={ownBrands} ownBrands={vitrin.ownBrands} partners={partnerCard} brands={partnerBrands} />
+              </div>
+            </>
+          ) : null}
+          {s['brand-wall'].visible && vitrin.brandWall.length > 0 ? (
+            <div className={s.brands.visible ? 'pt-(--space-grid-gap)' : ''}>
+              <BrandGrid brands={vitrin.brandWall} button={s['brand-wall'].button} href={s['brand-wall'].href} />
+            </div>
+          ) : null}
+        </Section>
+      ) : null}
 
       {/* 13 — the second campaign-tile strip stood here. Removed when category
              discovery moved up to 04b: four category tiles at 73% depth, under
@@ -251,9 +272,11 @@ export default async function HomePage() {
           the blog itself stays at /blog. The same day it left the black
           full-bleed band for a light panel with a circuit-board ground (see
           CompanyCards), smaller, at the client's request. */}
-      <Section>
-        <CompanyCards />
-      </Section>
+      {s.company.visible ? (
+        <Section>
+          <CompanyCards eyebrow={s.company.eyebrow} title={s.company.title} cards={vitrin.companyCards} />
+        </Section>
+      ) : null}
 
       {/* 18 — Firmamız Hakkında stood here (2026-10-27) and was removed on
              2026-10-28 at the client's request: the statement belongs on
@@ -262,9 +285,11 @@ export default async function HomePage() {
       {/* 19 — trust row. On the 1320 content track like every band above it:
              on the wider 1400 chrome track its boxes stood ~40px proud of the
              column on each side. */}
-      <Section className="pb-6">
-        <TrustRow items={vitrin.trust} />
-      </Section>
+      {s.trust.visible && vitrin.trust.length > 0 ? (
+        <Section className="pb-6">
+          <TrustRow items={vitrin.trust} />
+        </Section>
+      ) : null}
 
       {/* Renders nothing. Arms the band reveal, and only once its observer
           exists — see reveal-on-scroll.tsx for why that order matters. */}

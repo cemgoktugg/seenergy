@@ -22,6 +22,10 @@ export const BLOCK_GROUPS = [
   "tech-band",
   "trust",
   "staff",
+  "section",
+  "own-brand",
+  "brand-wall",
+  "company-card",
 ] as const
 
 export const BlockCreate = z.object({

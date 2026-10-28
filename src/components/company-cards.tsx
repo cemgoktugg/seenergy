@@ -19,6 +19,8 @@ import { ArrowRight, Building2, Car, Factory, GraduationCap, HeartPulse, Store }
 
 import { SectionHeading } from '@/components/section-heading';
 import { SpotlightCards } from '@/components/spotlight-cards';
+import { imageProps } from '@/lib/image';
+import type { CompanyCard } from '@/lib/medusa/vitrin';
 
 const SECTORS = [
   { icon: Factory, label: 'Fabrika ve depo' },
@@ -81,7 +83,61 @@ function Card({
   );
 }
 
-export function CompanyCards() {
+/** Each card's picture, by its slot: built from what the site has. */
+function Visual({ card }: { card: CompanyCard }) {
+  if (card.key === 'referanslar') {
+    return (
+      <div className={`${PLATE} grid grid-cols-3 content-center gap-2 px-4`}>
+        {SECTORS.map(({ icon: Icon, label }) => (
+          <span
+            key={label}
+            className="flex flex-col items-center gap-1 rounded-(--card-radius) border border-[#dadde1] bg-white px-1.5 py-2 text-center text-[12px] font-semibold leading-tight text-ink-fixed shadow-e1 transition-transform duration-(--duration-base) group-hover:-translate-y-0.5"
+          >
+            <Icon size={18} strokeWidth={1.9} aria-hidden />
+            {label}
+          </span>
+        ))}
+      </div>
+    );
+  }
+  if (card.key === 'cozum-ortaklari') {
+    return (
+      <div className={`${PLATE} grid grid-cols-3 content-center gap-2 px-4`}>
+        {PARTNERS.map((slug) => (
+          <span
+            key={slug}
+            className="grid h-[46px] place-items-center rounded-(--card-radius) border border-[#dadde1] bg-white px-2 shadow-e1 transition-transform duration-(--duration-base) group-hover:-translate-y-0.5"
+          >
+            <img src={`/brands/${slug}.webp`} alt="" loading="lazy" className="max-h-6 w-auto max-w-full object-contain" />
+          </span>
+        ))}
+      </div>
+    );
+  }
+  return (
+    <div className={PLATE}>
+      {card.image ? (
+        <img
+          {...imageProps(card.image, 420)}
+          alt=""
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-contain p-3 mix-blend-multiply transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.05]"
+        />
+      ) : null}
+    </div>
+  );
+}
+
+/** Headings and cards from admin → Vitrin → Referanslar ve Projeler. */
+export function CompanyCards({
+  eyebrow = 'Kurumsal',
+  title = 'Referanslar ve Projeler',
+  cards,
+}: {
+  eyebrow?: string;
+  title?: string;
+  cards: CompanyCard[];
+}) {
   return (
     <section
       aria-labelledby="company-cards-title"
@@ -106,58 +162,11 @@ export function CompanyCards() {
       </svg>
       <span aria-hidden className="pointer-events-none absolute -right-24 -top-24 -z-10 h-72 w-72 rounded-full bg-grad-1/20 blur-3xl" />
 
-      <SectionHeading id="company-cards-title" eyebrow="Kurumsal" title="Referanslar ve Projeler" />
+      <SectionHeading id="company-cards-title" eyebrow={eyebrow} title={title} />
       <SpotlightCards className="mt-4 grid gap-(--space-grid-gap) [perspective:1200px] md:grid-cols-3">
-        <Card
-          href="/referanslar"
-          title="Referanslarımız"
-          text="Fabrikadan siteye, okuldan otoparka; farklı sektörlerde güvenlik altyapısı kuran firmalara ürün ve çözüm sağlıyoruz."
-          visual={
-            <div className={`${PLATE} grid grid-cols-3 content-center gap-2 px-4`}>
-              {SECTORS.map(({ icon: Icon, label }) => (
-                <span
-                  key={label}
-                  className="flex flex-col items-center gap-1 rounded-(--card-radius) border border-[#dadde1] bg-white px-1.5 py-2 text-center text-[12px] font-semibold leading-tight text-ink-fixed shadow-e1 transition-transform duration-(--duration-base) group-hover:-translate-y-0.5"
-                >
-                  <Icon size={18} strokeWidth={1.9} aria-hidden />
-                  {label}
-                </span>
-              ))}
-            </div>
-          }
-        />
-        <Card
-          href="/cozum-ortaklarimiz"
-          title="Çözüm Ortaklarımız"
-          text="Dahua, Hikvision, UNV, Neutron ve 30'dan fazla markayla birlikte çalışıyor; doğru ürünü yetkili kanaldan sunuyoruz."
-          visual={
-            <div className={`${PLATE} grid grid-cols-3 content-center gap-2 px-4`}>
-              {PARTNERS.map((slug) => (
-                <span
-                  key={slug}
-                  className="grid h-[46px] place-items-center rounded-(--card-radius) border border-[#dadde1] bg-white px-2 shadow-e1 transition-transform duration-(--duration-base) group-hover:-translate-y-0.5"
-                >
-                  <img src={`/brands/${slug}.webp`} alt="" loading="lazy" className="max-h-6 w-auto max-w-full object-contain" />
-                </span>
-              ))}
-            </div>
-          }
-        />
-        <Card
-          href="/projeler"
-          title="Projelerimiz"
-          text="Keşiften kuruluma kadar yanınızdayız: kamera, kayıt, network ve uzak saha (4G, solar) projeleri için çözüm üretiyoruz."
-          visual={
-            <div className={PLATE}>
-              <img
-                src="/hero/seenergy-cctv.webp"
-                alt=""
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-contain p-3 mix-blend-multiply transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.05]"
-              />
-            </div>
-          }
-        />
+        {cards.map((card) => (
+          <Card key={card.key} href={card.href} title={card.title} text={card.text} visual={<Visual card={card} />} />
+        ))}
       </SpotlightCards>
     </section>
   );
