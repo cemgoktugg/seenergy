@@ -214,7 +214,7 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
         name: "building_image",
         label: "Şirket binası fotoğrafı",
         type: "image",
-        hint: "İletişim sayfasının üstündeki geniş bannerın sol tarafı. Yatay bir fotoğraf (en az 1600 piksel genişlik) en iyi sonucu verir. Boşsa yerinde SEENERGY logosu gösterilir.",
+        hint: "İletişim sayfasının üstündeki bannerın sağ tarafında, iletişim bilgilerinin kavisli beyaz alanının yanında görünür; fotoğrafın sol kenarı bu kavise yaslanır. Binanın sol yarıda olduğu yatay bir fotoğraf (en az 1200 piksel genişlik) en iyi sonucu verir. Boşsa SEENERGY binasının hazır görseli kullanılır.",
       },
       { name: "mersis", label: "MERSİS numarası", type: "text" },
       { name: "tax_office", label: "Vergi dairesi", type: "text" },
