@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 import { ChevronRight, Clock, Mail, MapPin, MessageCircle, Navigation, Phone, UserRound } from 'lucide-react';
 
+import { BrandLogo } from '@/components/brand-mark';
 import { InquiryForm } from '@/components/inquiry-form';
 import { SectionHeading } from '@/components/section-heading';
 import { CONTACT_FIELDS } from '@/data/inquiry-fields';
@@ -141,14 +142,8 @@ const splitHours = (line: string): [string, string] => {
 
 /**
  * The sketch's top box: the building on the left, the details on the right.
- *
- * The photo ends in an oval toward the details (2026-10-28, the client's
- * request) — an ellipse anchored on the banner's left edge, so its right
- * side curves round beside "Bize ulaşın · İletişim"; on a phone, where the
- * two stack, the curve is the photo's bottom edge. The default photo
- * (DEFAULT_BUILDING_IMAGE) is cropped so the big S on the glass sits at that
- * curve, next to the heading; it is anchored left so the S stays there at
- * every width. An admin upload is shown the same way.
+ * Until the admin uploads a building photo the left side is the brushed
+ * steel panel with the logo — a finished surface, not an empty frame.
  */
 function ContactBanner({
   company,
@@ -171,15 +166,30 @@ function ContactBanner({
   return (
     <section
       aria-labelledby="contact-title"
-      className="mt-4 grid overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2 lg:grid-cols-[420px_minmax(0,1fr)] dt:grid-cols-[460px_minmax(0,1fr)]"
+      className="mt-4 grid overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]"
     >
-      {/* --- the building, ending in an oval ------------------------------ */}
-      <div className="relative h-[280px] sm:h-[340px] lg:h-auto lg:min-h-[440px]">
-        <img
-          {...imageProps(company.buildingImage, 460)}
-          alt={`${company.legalName} şirket binası`}
-          className="absolute inset-0 h-full w-full object-cover object-[0%_60%] [clip-path:ellipse(120%_100%_at_50%_0%)] lg:object-left lg:[clip-path:ellipse(100%_96%_at_0%_50%)]"
-        />
+      {/* --- the building ------------------------------------------------ */}
+      <div className="relative min-h-[220px] sm:min-h-[300px] lg:min-h-[440px]">
+        {company.buildingImage ? (
+          <>
+            <img
+              {...imageProps(company.buildingImage, 840)}
+              alt={`${company.legalName} şirket binası`}
+              className="absolute inset-0 h-full w-full object-cover"
+            />
+            <span aria-hidden className="absolute inset-x-0 bottom-0 h-1/2 bg-linear-to-t from-black/70 to-transparent" />
+            <p className="absolute bottom-5 left-5 right-5 text-[16px] font-extrabold tracking-tight text-white dt:bottom-7 dt:left-7 dt:text-[20px]">
+              {company.legalName}
+            </p>
+          </>
+        ) : (
+          <div className="nav-metal absolute inset-0 flex flex-col items-center justify-center gap-4 px-6 text-center text-white">
+            <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 opacity-25" />
+            <span aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/[0.08] blur-3xl" />
+            <BrandLogo tone="light" shine className="relative h-9 w-auto sm:h-11 dt:h-14" />
+            <p className="relative text-[13px] font-bold uppercase tracking-[0.2em] text-white/70">Güvenlik Teknolojileri A.Ş.</p>
+          </div>
+        )}
       </div>
 
       {/* --- address and contact details -------------------------------- */}
