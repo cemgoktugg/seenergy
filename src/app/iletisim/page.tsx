@@ -179,7 +179,7 @@ function ContactBanner({
   return (
     <section
       aria-labelledby="contact-title"
-      className="mt-4 grid overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2 lg:grid-cols-[minmax(0,1.45fr)_minmax(0,1fr)]"
+      className="mt-4 grid overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
     >
       {/* --- the black SEENERGY panel ------------------------------------ */}
       <div className="relative min-h-[220px] sm:min-h-[300px] lg:min-h-[440px]">
@@ -192,20 +192,23 @@ function ContactBanner({
       </div>
 
       {/* --- address and contact details, over the building -------------- */}
-      <div className="relative isolate flex flex-col overflow-hidden px-5 py-6 dt:px-8 dt:py-8">
+      <div className="relative isolate flex flex-col overflow-hidden px-5 pb-6 pt-[204px] sm:pt-[264px] lg:py-6 dt:px-8 dt:py-8">
+        {/* The building: a wide band on a phone; from `lg` the panel's whole
+            right side, full height, anchored left so the lettering and the S
+            land just past the veil's curve. Its left edge fades out. */}
         <div
           aria-hidden
-          className="absolute left-[64%] top-[-8%] -z-20 aspect-[1284/762] w-[76%] [mask-image:linear-gradient(to_right,transparent,#000_14%),linear-gradient(to_bottom,#000_70%,transparent)] [mask-composite:intersect]"
+          className="absolute inset-x-0 top-0 -z-20 h-[230px] sm:h-[290px] lg:inset-y-0 lg:left-[44%] lg:h-auto dt:left-[46%] lg:[mask-image:linear-gradient(to_right,transparent,#000_18%)]"
         >
-          <Image src={photo} alt="" fill sizes="(min-width: 1024px) 420px, 76vw" className="object-cover" />
+          <Image src={photo} alt="" fill sizes="(min-width: 1024px) 420px, 100vw" className="object-cover object-[30%_40%] lg:object-left" />
         </div>
         <span
           aria-hidden
-          className="absolute inset-0 -z-10 bg-surface-card/40 [clip-path:ellipse(94%_81%_at_0%_55%)]"
+          className="absolute inset-0 -z-10 hidden bg-surface-card/40 lg:block lg:[clip-path:ellipse(68%_122%_at_0%_100%)] dt:[clip-path:ellipse(70%_122%_at_0%_100%)]"
         />
         <span
           aria-hidden
-          className="absolute inset-0 -z-10 bg-surface-card/90 [clip-path:ellipse(88%_75%_at_0%_55%)]"
+          className="absolute inset-x-0 bottom-0 top-[170px] -z-10 bg-surface-card/90 [clip-path:ellipse(150%_100%_at_50%_100%)] sm:top-[230px] lg:inset-0 lg:[clip-path:ellipse(62%_115%_at_0%_100%)] dt:[clip-path:ellipse(64%_115%_at_0%_100%)]"
         />
 
         <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
@@ -219,7 +222,9 @@ function ContactBanner({
         <dl className="relative mt-5 space-y-4">
           {company.address ? (
             <Detail icon={MapPin} label="Adres">
-              <span className="whitespace-pre-line">{company.address}</span>
+              {/* Narrower on the 1024–1199 panel, so the long first line
+                  wraps before it reaches the photo's curve. */}
+              <span className="block whitespace-pre-line lg:max-w-[225px] dt:max-w-none">{company.address}</span>
             </Detail>
           ) : null}
           {company.phone ? (
