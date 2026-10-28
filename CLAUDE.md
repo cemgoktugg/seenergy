@@ -198,7 +198,14 @@ the file module — fill-only, it never overwrites an admin edit. The PDF link i
 **Şirket bilgileri** (Vitrin block `company`): legal name, phone, WhatsApp,
 e-mail, address, hours, MERSİS, tax, KEP, bank / IBAN. Footer, contact card,
 contracts and the order page's havale details read it — change contact data
-there, never in code.
+there, never in code. Its `building_image` is the /iletisim banner's photo.
+
+**/iletisim** (2026-10-28, from the client's sketch): a wide banner — building
+photo left, address / phone / hours right — then Satış Departmanı, Muhasebe,
+İnsan Kaynakları as rows of people (photo, name, e-mail, phone), then the
+form (moved under the banner in `?konu=teklif` mode). People are the Vitrin
+`staff` group (admin → Vitrin → Ekibimiz), seeded by `vitrin-upgrade-contact`
+as role-named slots until the client sends names — never invented people.
 
 **Talepler** (`inquiry` module, admin → Talepler): every storefront form —
 iletişim / teklif (`/iletisim?konu=teklif&urun=<SKU>`, which every quote

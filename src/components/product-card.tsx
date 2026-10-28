@@ -79,16 +79,23 @@ function displayName(product: Product): string {
  * step per card via `index`), and on hover a lift and a metallic shine across
  * the stage. Listing pages keep the plain card.
  */
+/**
+ * `chip`: a band's own label in the top-left chip, in place of the product's
+ * badge — the homepage's "Fırsat Ürünleri" band marks each of its cards
+ * "Fırsat Ürünü" (2026-10-28, the client's request), in the artwork's red.
+ */
 export function ProductCard({
   product,
   compact = false,
   featured = false,
   index = 0,
+  chip,
 }: {
   product: Product;
   compact?: boolean;
   featured?: boolean;
   index?: number;
+  chip?: string;
 }) {
   /* Stock speaks only for a product that can be bought now. A price-on-request
      model reports its stock in the quote, so its 0 is not "Tükendi" — that
@@ -109,7 +116,11 @@ export function ProductCard({
   const compareFull = ready && !comparing && count('compare') >= COMPARE_LIMIT;
   // Derived, never authored, so it cannot disagree with the prices beside it.
   const discount = discountPercent(product);
-  const badge = product.badge && !soldOut ? BADGES[product.badge] : null;
+  const badge = chip
+    ? { label: chip, className: 'bg-danger text-white shadow-e1' }
+    : product.badge && !soldOut
+      ? BADGES[product.badge]
+      : null;
   const href = `/urun/${product.slug}`;
   /* Featured stages carry a soft spotlight, on which the mock catalogue's
      plated files show their white plate as a box; their transparent cutouts

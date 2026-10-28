@@ -20,7 +20,6 @@ import { ArrowRight } from 'lucide-react';
 import { Hero } from '@/components/hero';
 import { ProductCard } from '@/components/product-card';
 import { BrandBoard, type BrandBoardEntry } from '@/components/brand-board';
-import { AboutCompany } from '@/components/about-company';
 import { BrandShowcase, type PartnerBrand } from '@/components/brand-showcase';
 import { CompanyCards } from '@/components/company-cards';
 import { ProductSlider } from '@/components/product-slider';
@@ -116,6 +115,10 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* The homepage's only h1, visually hidden — it rode in the about block
+          until that left the page. */}
+      <h1 className="sr-only">SEENERGY Güvenlik Teknolojileri — güvenlik kameraları, kayıt cihazları ve network ürünleri</h1>
+
       {/* 04 — hero band. `first`: nothing precedes it, so it keeps the tight
              offset instead of being pushed down the fold.
 
@@ -203,7 +206,7 @@ export default async function HomePage() {
                 dissolves and the cards join the tile's row. */}
             <div className="grid grid-cols-2 gap-(--space-grid-gap) sm:grid-cols-4 dt:contents">
               {deals.map((product) => (
-                <ProductCard key={product.id} product={product} />
+                <ProductCard key={product.id} product={product} chip="Fırsat Ürünü" />
               ))}
             </div>
           </div>
@@ -252,11 +255,9 @@ export default async function HomePage() {
         <CompanyCards />
       </Section>
 
-      {/* 18 — Firmamız Hakkında (2026-10-27): the company's own statement,
-             replacing the "Güvenlik Teknolojileri Tedariki" SEO block. */}
-      <Section>
-        <AboutCompany />
-      </Section>
+      {/* 18 — Firmamız Hakkında stood here (2026-10-27) and was removed on
+             2026-10-28 at the client's request: the statement belongs on
+             /hakkimizda, where it now lives. */}
 
       {/* 19 — trust row. On the 1320 content track like every band above it:
              on the wider 1400 chrome track its boxes stood ~40px proud of the

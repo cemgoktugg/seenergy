@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { ChevronRight, Mail, MessageCircle, Phone } from 'lucide-react';
 
 import { telHref, waHref } from '@/lib/contact';
-import type { Company } from '@/lib/medusa/vitrin';
+import { hoursLines, type Company } from '@/lib/medusa/vitrin';
 
 /** The side menu: every page the shell serves, grouped. */
 export const INFO_NAV = [
@@ -149,7 +149,11 @@ export function ContactCard({ company }: { company: Company }) {
     <div className="nav-metal relative overflow-hidden rounded-(--panel-radius) p-5 text-white shadow-e2">
       <p className="relative text-[12px] font-bold uppercase tracking-[0.16em] text-white/60">Yardım mı lazım?</p>
       <p className="relative mt-1.5 text-[16px] font-extrabold tracking-tight">Bize ulaşın</p>
-      {company.hours ? <p className="relative mt-1 text-[13px] text-white/65">{company.hours}</p> : null}
+      {hoursLines(company.hours).map((line) => (
+        <p key={line} className="relative mt-1 text-[13px] text-white/65">
+          {line}
+        </p>
+      ))}
       <ul className="relative mt-4 space-y-2">
         {company.phone ? (
           <li>

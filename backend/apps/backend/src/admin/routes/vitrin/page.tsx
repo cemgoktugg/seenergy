@@ -3,7 +3,7 @@ import { ArrowUpRightOnBox, PencilSquare, Plus, Swatch } from "@medusajs/icons"
 import { Badge, Button, Container, Heading, Text } from "@medusajs/ui"
 import { Link } from "react-router-dom"
 
-import { GROUPS, LIST_PLACES } from "../../lib/blocks"
+import { DEPARTMENT_NAMES, GROUPS, LIST_PLACES } from "../../lib/blocks"
 import { mediaUrl, useQuickProducts, useVitrin, type VitrinBlock, type VitrinList } from "../../lib/vitrin"
 
 /**
@@ -178,6 +178,16 @@ const VitrinPage = () => {
             {group("company")[0]?.data.legal_name ?? "—"} · {group("company")[0]?.data.phone || "telefon yok"} ·{" "}
             {group("company")[0]?.data.iban ? "IBAN girildi" : "IBAN girilmedi"}
           </Text>
+        </Band>
+
+        <Band n={++n} title={GROUPS.staff.title} where={GROUPS.staff.where} to="/vitrin/blok/staff">
+          <div className="flex flex-wrap gap-2">
+            {group("staff").map((b) => (
+              <Badge key={b.id} size="small" color={b.is_active ? "grey" : "orange"}>
+                {DEPARTMENT_NAMES[b.data.department] ?? "—"}: {b.data.name || "isim girilmedi"}
+              </Badge>
+            ))}
+          </div>
         </Band>
 
         <Band n={++n} title={GROUPS.announcement.title} where={GROUPS.announcement.where} to="/vitrin/blok/announcement">

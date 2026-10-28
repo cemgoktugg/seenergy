@@ -28,6 +28,43 @@ export default async function AboutPage() {
         sunarız.
       </p>
 
+      {/* The client's own statement (2026-10-27). It stood on the homepage as
+          "Firmamız Hakkında" until 2026-10-28, when the client asked for it
+          here only. */}
+      <h2>Firmamız hakkında</h2>
+      <p>
+        Zengin dijital deneyimlerle dolu daha iyi bir dünya oluşturma arzumuza katılan tüm dünyadaki topluluklara
+        ilham veren teknoloji, ürün ve çözümler konusunda yeniliklere öncülük etme sorumluluğumuzun merkezinde
+        bulunmaktadır.
+      </p>
+      <p>
+        Küresel toplumdaki yaratıcı bir firma olma sorumluluğumuzu bilerek çalışanlarımızın ve ortaklarımızın
+        paylaştığı değerleri karşılarken ayrıca çaba ve kaynaklarımızı endüstri ve müşterilere yeni değerler sunmaya
+        adamış bulunmaktayız. <strong>Seenergy Güvenlik Teknolojileri A.Ş.</strong> olarak hep birlikte heyecan ve
+        ümit verici bir gelecek oluşturmak istiyoruz.
+      </p>
+      <p>
+        Operasyonel mükemmellik ve yenilik cesareti sayesinde Türkiye&apos;nin en iyi ürünlerini sunma konusunda
+        kendimizle gurur duymaktayız. Seenergy Güvenlik Teknolojileri A.Ş. olarak mevcut başarılarını, rekabet
+        gücünü ve kalite konusundaki geçmişini daha ileriye taşıyıp uzman ekiplerimizle üst düzeyde hizmet vermeye
+        devam edeceğiz.
+      </p>
+      <p>Kültürümüzün, iş faaliyetlerimizin ve yönetimimizin parçası olan üç ana stratejik dayanak:</p>
+      <ul>
+        <li>
+          <strong>Yaratıcılık:</strong> teknoloji, ürün ve çözümlerde yeniliklere öncülük etmek.
+        </li>
+        <li>
+          <strong>Ortaklık:</strong> çalışanlarımız ve ortaklarımızla paylaştığımız değerler.
+        </li>
+        <li>
+          <strong>İnsan gücü:</strong> uzman ekiplerimizle üst düzeyde hizmet.
+        </li>
+      </ul>
+      <p>
+        <strong>Bugün Türkiye&apos;de, yarın Dünya&apos;da...</strong>
+      </p>
+
       <h2>Markalarımız</h2>
       <p>
         <strong>SEENERGY</strong> tescilli markamızdır: AHD ve IP kameralar, DVR/NVR kayıt cihazları, Wi-Fi ve 4G

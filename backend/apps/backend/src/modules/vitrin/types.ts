@@ -15,6 +15,7 @@ export type BlockGroup =
   | "company"
   | "tech-band"
   | "trust"
+  | "staff"
 
 export interface HeroSlideData {
   eyebrow: string
@@ -66,6 +67,19 @@ export interface TrustData {
   title: string
   subtitle: string
   icon: "truck" | "badge" | "lock" | "refresh" | "support"
+}
+
+/** The /iletisim departments, in the order the page shows them. */
+export const STAFF_DEPARTMENTS = ["satis", "muhasebe", "insan-kaynaklari"] as const
+
+/** One person on /iletisim, under their department. */
+export interface StaffData {
+  department: (typeof STAFF_DEPARTMENTS)[number]
+  name: string
+  title: string
+  email: string
+  phone: string
+  photo: string
 }
 
 export interface AnnouncementData {

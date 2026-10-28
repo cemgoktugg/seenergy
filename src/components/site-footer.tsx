@@ -53,32 +53,17 @@ const SocialPhoto: Glyph = ({ size = 18 }) => (
   </svg>
 );
 
-const SocialVideo: Glyph = ({ size = 18 }) => (
-  <svg {...svgProps(size)}>
-    <rect x="2" y="5" width="20" height="14" rx="4" />
-    <path d="M10 9.5l5 2.5-5 2.5z" />
-  </svg>
-);
-
 const SocialMessage: Glyph = ({ size = 18 }) => (
   <svg {...svgProps(size)}>
     <path d="M21 11.5a8.4 8.4 0 01-9 8.4 9 9 0 01-4-.9L3 21l1.9-4.9A8.4 8.4 0 0112 3a8.4 8.4 0 019 8.5z" />
   </svg>
 );
 
-const SocialWork: Glyph = ({ size = 18 }) => (
-  <svg {...svgProps(size)}>
-    <rect x="3" y="3" width="18" height="18" rx="4" />
-    <path d="M7 10v7M7 7.2v.1M11.5 17v-4a2.5 2.5 0 015 0v4" />
-  </svg>
-);
-
-/** Measured: five circular marks on the strip, not four. */
+/** Five on the reference; the video channel (YouTube) and the professional
+ *  network (LinkedIn) were removed on 2026-10-28 at the client's request. */
 const SOCIAL: { label: string; href: string; Icon: Glyph }[] = [
   { label: 'Sosyal medya', href: 'https://example.com', Icon: SocialShare },
   { label: 'Fotoğraf paylaşımı', href: 'https://example.com', Icon: SocialPhoto },
-  { label: 'Video kanalı', href: 'https://example.com', Icon: SocialVideo },
-  { label: 'Kurumsal ağ', href: 'https://example.com', Icon: SocialWork },
   { label: 'Mesajlaşma', href: 'https://example.com', Icon: SocialMessage },
 ];
 

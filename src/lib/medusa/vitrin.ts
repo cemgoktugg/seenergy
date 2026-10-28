@@ -97,16 +97,26 @@ export interface Company {
   bankName: string;
   bankHolder: string;
   iban: string;
+  /** The /iletisim banner's photo; empty = the logo stands in. */
+  buildingImage: string;
 }
 
-/** Until the block exists: what the footer showed, and the old BANK_* env. */
+/** "Hafta içi … · Hafta sonu …" → one line each (the admin separates with ·). */
+export const hoursLines = (hours: string) =>
+  hours
+    .split(/\s*[·\n]\s*/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+/** Until the block exists: the client's details (2026-10-28) and the old BANK_* env. */
 const COMPANY_FALLBACK: Company = {
   legalName: 'SEENERGY Güvenlik Teknolojileri A.Ş.',
-  phone: '0850 000 00 00',
+  phone: '(0312) 480 1 490',
   whatsapp: '',
   email: '',
-  address: 'Organize Sanayi Bölgesi, 4. Cadde No: 12\nBaşakşehir / İstanbul',
-  hours: 'Hafta içi 09:00 – 18:00',
+  address: 'İvedik OSB Mahallesi, Melih Gökçek Bulvarı Köşe\nİvedik İş Merkezi 4BJ No: 85\nYenimahalle / Ankara',
+  hours: 'Hafta içi 08:00 – 18:00 · Hafta sonu 08:00 – 15:00',
+  buildingImage: '',
   mapUrl: '',
   mersis: '',
   taxOffice: '',
@@ -117,9 +127,27 @@ const COMPANY_FALLBACK: Company = {
   iban: process.env.BANK_IBAN ?? '',
 };
 
+/** The /iletisim departments, in page order (admin → Vitrin → Ekibimiz). */
+export const DEPARTMENTS = [
+  { key: 'satis', title: 'Satış Departmanı' },
+  { key: 'muhasebe', title: 'Muhasebe' },
+  { key: 'insan-kaynaklari', title: 'İnsan Kaynakları' },
+] as const;
+
+export interface StaffMember {
+  department: (typeof DEPARTMENTS)[number]['key'];
+  name: string;
+  title: string;
+  email: string;
+  phone: string;
+  photo: string;
+}
+
 export interface Vitrin {
   announcement: string;
   company: Company;
+  /** /iletisim's people, in the admin's order. */
+  staff: StaffMember[];
   slides: HeroSlide[];
   heroSide: Banner[];
   banners: Partial<Record<'wide' | 'dual-1' | 'dual-2' | 'super-firsat-promo', Banner>>;
@@ -153,6 +181,7 @@ interface StoreVitrin {
     }>[];
     trust: Block<TrustItem>[];
     company: Block<Record<string, unknown>>[];
+    staff: Block<Record<string, unknown>>[];
   }>;
 }
 
@@ -196,8 +225,23 @@ function toCompany(data: Record<string, unknown> | undefined): Company {
     bankName: str(data.bank_name) || (process.env.BANK_NAME ?? ''),
     bankHolder: str(data.bank_holder) || (process.env.BANK_HOLDER ?? ''),
     iban: str(data.iban) || (process.env.BANK_IBAN ?? ''),
+    buildingImage: str(data.building_image),
   };
 }
+
+const toStaff = (data: Record<string, unknown>): StaffMember | null => {
+  const department = DEPARTMENTS.find((d) => d.key === data.department)?.key;
+  const name = str(data.name).trim();
+  if (!department || !name) return null;
+  return {
+    department,
+    name,
+    title: str(data.title).trim(),
+    email: str(data.email).trim(),
+    phone: str(data.phone).trim(),
+    photo: str(data.photo),
+  };
+};
 
 /** What the site showed before the Vitrin module existed. */
 const FALLBACK: Vitrin = {
@@ -221,6 +265,7 @@ const FALLBACK: Vitrin = {
   techBand: null,
   trust: TRUST_ITEMS.map((item) => ({ ...item })),
   company: COMPANY_FALLBACK,
+  staff: [],
   lists: {},
 };
 
@@ -244,6 +289,7 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
   return {
     announcement: str(b.announcement?.[0]?.data.text),
     company: toCompany(b.company?.[0]?.data),
+    staff: (b.staff ?? []).map((block) => toStaff(block.data)).filter((m): m is StaffMember => m !== null),
     slides: (b['hero-slide'] ?? [])
       .map((block) => ({
         ...block.data,

@@ -92,6 +92,13 @@ const SLOT_NAMES: Record<string, string> = {
 
 export const slotName = (key: string | null) => (key ? SLOT_NAMES[key] ?? key : "")
 
+/** The /iletisim departments (staff blocks' `department`). */
+export const DEPARTMENT_NAMES: Record<string, string> = {
+  satis: "Satış Departmanı",
+  muhasebe: "Muhasebe",
+  "insan-kaynaklari": "İnsan Kaynakları",
+}
+
 export const GROUPS: Record<BlockGroup, GroupDef> = {
   announcement: {
     title: "Duyuru çubuğu",
@@ -189,8 +196,20 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       { name: "whatsapp", label: "WhatsApp hattı", type: "text", placeholder: "0532 000 00 00", hint: "Doldurulursa iletişim sayfasında ve ürün sayfalarındaki teklif kutusunda WhatsApp düğmesi çıkar." },
       { name: "email", label: "E-posta", type: "text", placeholder: "info@ornek.com.tr" },
       { name: "address", label: "Adres", type: "textarea" },
-      { name: "hours", label: "Çalışma saatleri", type: "text", placeholder: "Hafta içi 09:00 – 18:00, Cumartesi 09:00 – 14:00" },
+      {
+        name: "hours",
+        label: "Çalışma saatleri",
+        type: "text",
+        placeholder: "Hafta içi 08:00 – 18:00 · Hafta sonu 08:00 – 15:00",
+        hint: "Satırları · işaretiyle ayırın; İletişim sayfasında her biri ayrı satırda gösterilir.",
+      },
       { name: "map_url", label: "Harita bağlantısı", type: "text", hint: "Google Haritalar'daki 'Paylaş' bağlantısı. İletişim sayfasında 'Yol tarifi al' düğmesi olur." },
+      {
+        name: "building_image",
+        label: "Şirket binası fotoğrafı",
+        type: "image",
+        hint: "İletişim sayfasının üstündeki geniş bannerın sol tarafı. Yatay bir fotoğraf (en az 1600 piksel genişlik) en iyi sonucu verir. Boşsa yerinde SEENERGY logosu gösterilir.",
+      },
       { name: "mersis", label: "MERSİS numarası", type: "text" },
       { name: "tax_office", label: "Vergi dairesi", type: "text" },
       { name: "tax_number", label: "Vergi numarası", type: "text" },
@@ -278,6 +297,43 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       { name: "icon", label: "Simge", type: "icon", required: true },
     ],
     newItem: () => ({ title: "", subtitle: "", icon: "badge" }),
+  },
+  staff: {
+    title: "Ekibimiz (İletişim sayfası)",
+    where:
+      "İletişim sayfasında, şirket bannerının altında departman departman gösterilen çalışanlar: Satış Departmanı, Muhasebe, İnsan Kaynakları. Her departmanda buradaki sırayla dizilir. E-posta veya telefon boşsa o satır gösterilmez; telefon boşsa şirketin telefonu yazılır.",
+    repeatable: true,
+    itemName: "çalışan",
+    itemTitle: (d, i) => `${i + 1}. ${DEPARTMENT_NAMES[d.department] ?? "Departman seçilmedi"} — ${d.name || "isim girilmedi"}`,
+    fields: [
+      {
+        name: "department",
+        label: "Departman",
+        type: "choice",
+        options: [
+          { value: "satis", label: "Satış Departmanı" },
+          { value: "muhasebe", label: "Muhasebe" },
+          { value: "insan-kaynaklari", label: "İnsan Kaynakları" },
+        ],
+      },
+      { name: "name", label: "İsim Soyisim", type: "text", required: true },
+      { name: "title", label: "Unvan (isteğe bağlı)", type: "text", placeholder: "Satış Temsilcisi" },
+      { name: "email", label: "E-posta", type: "text", placeholder: "isim@seenergy.com.tr" },
+      {
+        name: "phone",
+        label: "Telefon",
+        type: "text",
+        placeholder: "0532 000 00 00",
+        hint: "Yalnızca numara; tıklanınca aranır. Boşsa şirketin telefonu yazılır.",
+      },
+      {
+        name: "photo",
+        label: "Fotoğraf",
+        type: "image",
+        hint: "Yatay ya da kare, yüzü ortada bir fotoğraf. Kart 4:3 oranında, üstten hizalı kırpar. Boşsa bir kişi simgesi gösterilir.",
+      },
+    ],
+    newItem: () => ({ department: "satis", name: "", title: "", email: "", phone: "", photo: "" }),
   },
 }
 

@@ -34,6 +34,14 @@ const TILE =
 const TILE_IMG =
   'max-h-[38px] w-auto max-w-full object-contain transition-transform duration-(--duration-base) group-hover/tile:scale-105 dt:max-h-[46px]';
 
+/**
+ * Optical centring. UNV's thin arch fills the top fifth of its box, so a
+ * centred box leaves the letters visibly low (their centre sits ~16% below
+ * the box's); 11% of its own height lifts the mark to its visual centre
+ * (2026-10-28, the client's request). Also used by the brand wall.
+ */
+export const LOGO_NUDGE: Record<string, string> = { unv: '-translate-y-[11%]' };
+
 export interface PartnerBrand {
   name: string;
   href: string;
@@ -107,7 +115,12 @@ export function BrandShowcase({ own, partners, brands }: { own: Banner; partners
           {brands.map((brand) => (
             <li key={brand.href}>
               <Link href={brand.href} title={brand.name} aria-label={brand.name} className={TILE}>
-                <img src={brand.logo} alt="" loading="lazy" className={TILE_IMG} />
+                <img
+                  src={brand.logo}
+                  alt=""
+                  loading="lazy"
+                  className={`${TILE_IMG} ${LOGO_NUDGE[brand.href.split('/').pop() ?? ''] ?? ''}`}
+                />
               </Link>
             </li>
           ))}

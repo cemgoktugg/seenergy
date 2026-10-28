@@ -35,6 +35,7 @@ export type BlockGroup =
   | "company"
   | "tech-band"
   | "trust"
+  | "staff"
 
 /** One group of the product page's "Teknik Özellikler" table. */
 export interface SpecGroup {

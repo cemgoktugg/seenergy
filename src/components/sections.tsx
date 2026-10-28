@@ -12,6 +12,7 @@
 import Link from 'next/link';
 import { ArrowRight, BadgeCheck, Headphones, Lock, RefreshCcw, Truck } from 'lucide-react';
 
+import { LOGO_NUDGE } from '@/components/brand-showcase';
 import { ProductCard } from '@/components/product-card';
 import type { Product } from '@/data/catalog';
 import {
@@ -508,8 +509,10 @@ export function BlogCards({ tone = 'light' }: { tone?: 'light' | 'dark' }) {
  * Brand wall — the client's real brand logos (2026-10-27), each on a white
  * tile, all in one 120 × 32 box (see BRANDS in data/site.ts). Before that
  * it showed monogram chips of 45 generated placeholder names.
- * A fixed label on the left gives the count and the way to /markalar; two
- * rows run opposite ways behind it, fading in and out at the edges, paused
+ * Two rows run the panel's full width in opposite directions (the fixed
+ * "Marka ağı · 33" label on their left was removed on 2026-10-28 at the
+ * client's request; only "Tümünü gör" stays, bottom right), fading in and
+ * out at the edges, paused
  * while the pointer or focus is on the wall. The chips follow the theme, so
  * the panel no longer needs `brand-wall-plate` to pin it light.
  *
@@ -530,27 +533,8 @@ export function BrandGrid() {
     >
       <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 -z-10 opacity-60" />
 
-      {/* --- the fixed label ------------------------------------------- */}
-      <div className="relative z-10 hidden w-[230px] shrink-0 flex-col justify-center border-r border-line bg-surface-card/80 px-6 py-6 backdrop-blur lg:flex">
-        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-          <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
-          Marka ağı
-        </p>
-        <p className="mt-2 text-[40px] font-extrabold leading-none tracking-tight text-text-primary tabular-nums">
-          {BRANDS.length}
-        </p>
-        <p className="mt-1.5 text-[13px] leading-snug text-text-secondary">marka, tek çatı altında</p>
-        <Link
-          href="/markalar"
-          className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-brand px-4 h-9 text-[13px] font-bold text-white transition-colors duration-(--duration-fast) hover:bg-brand-dark"
-        >
-          Tümünü gör
-          <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
-        </Link>
-      </div>
-
       {/* --- the moving rows --------------------------------------------- */}
-      <div className="min-w-0 flex-1 space-y-3 py-5">
+      <div className="min-w-0 flex-1 space-y-3 pt-5">
         {rows.map((row, index) => (
           <div
             key={index}
@@ -593,7 +577,7 @@ export function BrandGrid() {
                         width={120}
                         height={32}
                         decoding="async"
-                        className="h-8 w-[120px] object-contain"
+                        className={`h-8 w-[120px] object-contain ${LOGO_NUDGE[brand.href.split('/').pop() ?? ''] ?? ''}`}
                       />
                     </Link>
                   </li>
@@ -602,6 +586,15 @@ export function BrandGrid() {
             </ul>
           </div>
         ))}
+        <div className="flex justify-end px-5 pb-4">
+          <Link
+            href="/markalar"
+            className="inline-flex h-9 items-center gap-1.5 rounded-full bg-brand px-4 text-[13px] font-bold text-white transition-colors duration-(--duration-fast) hover:bg-brand-dark"
+          >
+            Tümünü gör
+            <ArrowRight size={14} strokeWidth={2.5} aria-hidden />
+          </Link>
+        </div>
       </div>
     </div>
   );
