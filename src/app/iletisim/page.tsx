@@ -141,26 +141,31 @@ const splitHours = (line: string): [string, string] => {
   return match && match[1] ? [match[1], match[2]] : ['', line];
 };
 
-/** Until the admin uploads a building photo: the client's photo of the
- *  SEENERGY building (1175 × 812). */
+/** Phones: the client's photo of the SEENERGY building (1175 × 812), unless
+ *  the admin uploads another. */
 const DEFAULT_BUILDING_PHOTO = '/contact/seenergy-bina.webp';
+
+/** From `lg`: the client's own design for this panel (2026-10-28) with its
+ *  text, icons and buttons taken out — white on the left, the building on
+ *  the right behind a feathered curve, the big S near the top. The page
+ *  draws the details over the white. */
+const DESIGN_BACKGROUND = '/contact/iletisim-bg.webp';
 
 /**
  * The top box: the black SEENERGY panel on the left, the details on the
  * right.
  *
- * The details panel carries the client's building photo with the big S on
- * its glass right beside the "İletişim" heading (2026-10-28, the client's
- * request). The geometry hangs off that S, which sits at 33.6% × 72% of the
- * photo (its ring spans 28.5–38.7% across, 58–86% down):
- *   - the photo is as wide as the panel, its top at the heading's centre and
- *     pulled up 72% of its own height, so the S's centre lands on the
- *     heading's centre line at every width;
- *   - it starts 0% / 21% (phone) from the left, so the S's ring begins just
- *     after the word; with the longer quote title it moves further right;
- *   - left of the ring it fades out (the dark building would swallow the
- *     heading), and it fades away just under the S, where the details
- *     begin.
+ * From `lg` the details panel is the client's design exactly: its artwork
+ * as the background, anchored left so the white side stays under the text
+ * and the S sits up by the heading.
+ *
+ * On a phone the panel is too narrow for that artwork, so the building photo
+ * runs as a band beside the heading instead, hung off the big S (33.6% ×
+ * 72% of the photo, its ring 28.5–38.7% across): as wide as the panel, its
+ * top on the heading's centre line and pulled up 72% of its own height, so
+ * the S's centre lands on that line; it starts 21% in so the S follows the
+ * word (further for the quote title), fades out left of the S and just
+ * under it.
  */
 function ContactBanner({
   company,
@@ -198,39 +203,34 @@ function ContactBanner({
 
       {/* --- address and contact details, over the building -------------- */}
       <div className="relative isolate flex flex-col overflow-hidden px-5 py-6 dt:px-8 dt:py-8">
-        {/* From `lg`: the building runs on down the right side to the
-            bottom corner, its edge an oval curve (2026-10-28, the client's
-            request). The photo has nothing below the S, so this is the
-            building's right flank — the corner with the vertical SEENERGY
-            sign — from the same photo; the S band above fades into it. */}
-        <div
-          aria-hidden
-          className="absolute inset-y-0 left-[56%] right-0 -z-20 hidden lg:block [clip-path:ellipse(100%_80%_at_100%_45%)]"
-        >
-          <Image src={photo} alt="" fill sizes="320px" className="object-cover object-[90%_55%]" />
+        {/* From `lg`: the client's design as the background. */}
+        <div aria-hidden className="absolute inset-0 -z-10 hidden lg:block">
+          <Image src={DESIGN_BACKGROUND} alt="" fill priority sizes="(min-width: 1200px) 720px, 580px" className="object-cover object-left" />
         </div>
+        {/* Phones: the building band, its S beside the heading. */}
         <div
           aria-hidden
-          className={`absolute top-[66px] -z-10 aspect-[1175/812] w-full -translate-y-[72%] [mask-composite:intersect] [mask-image:linear-gradient(to_right,transparent_25%,#000_28.5%),linear-gradient(to_bottom,#000_82%,transparent_91%)] dt:top-[78px] ${
-            quote ? 'left-[48%] lg:left-[26%]' : 'left-[21%] lg:left-[4%] dt:left-0'
+          className={`absolute top-[66px] -z-10 aspect-[1175/812] w-full -translate-y-[72%] [mask-composite:intersect] [mask-image:linear-gradient(to_right,transparent_25%,#000_28.5%),linear-gradient(to_bottom,#000_82%,transparent_91%)] lg:hidden ${
+            quote ? 'left-[48%]' : 'left-[21%]'
           }`}
         >
-          <Image src={photo} alt="" fill priority sizes="(min-width: 1024px) 720px, 100vw" className="object-cover" />
+          <Image src={photo} alt="" fill priority sizes="100vw" className="object-cover" />
         </div>
 
         <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
           <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
           {quote ? 'Fiyat teklifi' : 'Bize ulaşın'}
         </p>
-        <h1 id="contact-title" className="mt-2 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[32px]">
+        <h1 id="contact-title" className="mt-2 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary lg:max-w-[260px] dt:text-[32px]">
           {title}
         </h1>
 
         <dl className="relative mt-10 space-y-4 lg:mt-12 dt:mt-[76px]">
           {company.address ? (
             <Detail icon={MapPin} label="Adres">
-              {/* Kept clear of the photo running down the right side. */}
-              <span className="block whitespace-pre-line lg:max-w-[230px] dt:max-w-[300px]">{company.address}</span>
+              {/* On the narrower 1024–1199 panel the artwork's curve comes
+                  further in; the long first line wraps before it. */}
+              <span className="block whitespace-pre-line lg:max-w-[230px] dt:max-w-none">{company.address}</span>
             </Detail>
           ) : null}
           {company.phone ? (
