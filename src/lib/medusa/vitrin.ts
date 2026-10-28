@@ -102,6 +102,11 @@ export interface Company {
   mapQuery: string;
 }
 
+/** The client's building photo (2026-10-28), cropped so the big S on the
+ *  glass sits at its right edge — next to the /iletisim details. Used until
+ *  the admin uploads its own (Şirket bilgileri → Şirket binası fotoğrafı). */
+export const DEFAULT_BUILDING_IMAGE = '/contact/seenergy-bina.webp';
+
 /** "Hafta içi … · Hafta sonu …" → one line each (the admin separates with ·). */
 export const hoursLines = (hours: string) =>
   hours
@@ -117,7 +122,7 @@ const COMPANY_FALLBACK: Company = {
   email: '',
   address: 'İvedik OSB Mahallesi, Melih Gökçek Bulvarı Köşe\nİvedik İş Merkezi 4BJ No: 85\nYenimahalle / Ankara',
   hours: 'Hafta içi 08:00 – 18:00 · Hafta sonu 08:00 – 15:00',
-  buildingImage: '',
+  buildingImage: DEFAULT_BUILDING_IMAGE,
   mapQuery: '',
   mersis: '',
   taxOffice: '',
@@ -225,7 +230,7 @@ function toCompany(data: Record<string, unknown> | undefined): Company {
     bankName: str(data.bank_name) || (process.env.BANK_NAME ?? ''),
     bankHolder: str(data.bank_holder) || (process.env.BANK_HOLDER ?? ''),
     iban: str(data.iban) || (process.env.BANK_IBAN ?? ''),
-    buildingImage: str(data.building_image),
+    buildingImage: str(data.building_image) || DEFAULT_BUILDING_IMAGE,
     mapQuery: str(data.map_query),
   };
 }
