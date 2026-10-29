@@ -99,6 +99,10 @@ services:
       STOREFRONT_REVALIDATE_SECRET: ${REVALIDATE_SECRET}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-}
       ADMIN_PASSWORD: ${ADMIN_PASSWORD:-}
+      # TicariCore ERP (backend src/lib/ticaricore): all three unset = off.
+      TICARICORE_URL: ${TICARICORE_URL:-}
+      TICARICORE_API_KEY: ${TICARICORE_API_KEY:-}
+      TICARICORE_CHANNEL_UID: ${TICARICORE_CHANNEL_UID:-}
     volumes:
       - backend_static:/server/static
     networks:
@@ -207,7 +211,7 @@ services:
 volumes:
   pgdata:
   redisdata:
-  backend_static:
+   backend_static:
   db_backups:
 
 networks:
