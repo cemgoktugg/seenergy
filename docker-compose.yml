@@ -211,7 +211,7 @@ services:
 volumes:
   pgdata:
   redisdata:
-   backend_static:
+  backend_static:
   db_backups:
 
 networks:
