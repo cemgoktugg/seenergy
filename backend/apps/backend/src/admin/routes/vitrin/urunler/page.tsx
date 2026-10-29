@@ -1,5 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
-import { MagnifyingGlass, PencilSquare, Photo, Plus, XMark } from "@medusajs/icons"
+import { ArrowPath, MagnifyingGlass, PencilSquare, Photo, Plus, XMark } from "@medusajs/icons"
 import {
   Badge,
   Button,
@@ -26,6 +26,7 @@ import {
   uploadImage,
   useAllQuickProducts,
   useBatchUpdate,
+  useTicariCoreSync,
   useVitrin,
   useVitrinOptions,
   type QuickPatch,
@@ -202,6 +203,7 @@ const ProductsPage = () => {
   const { data: options } = useVitrinOptions()
   const { data, isLoading } = useAllQuickProducts()
   const batch = useBatchUpdate()
+  const ticari = useTicariCoreSync()
 
   const storefront = vitrin?.storefront_url ?? ""
   const categories = options?.categories ?? []
@@ -308,6 +310,21 @@ const ProductsPage = () => {
     if (field === "status") return e.status !== p.status
     return e.category_id !== p.category_id
   }
+
+  const pullFromTicariCore = () =>
+    ticari.mutate(undefined, {
+      onSuccess: ({ report: r }) => {
+        const added = [...r.brands.created.map((b) => `marka ${b}`), ...r.categories.created.map((c) => `kategori ${c}`)]
+        const summary =
+          `${r.items} ürün: ${r.products.created.length} yeni, ${r.products.updated.length} güncellendi, ` +
+          `${r.products.unchanged} değişmedi` +
+          (r.products.unpublished.length ? `, ${r.products.unpublished.length} yayından kalktı` : "") +
+          (added.length ? `. Eklenen: ${added.join(", ")}` : "")
+        if (r.failed.length) toast.error(`${summary}. Aktarılamayan: ${r.failed.map((f) => `${f.code} — ${f.message}`).join("; ")}`)
+        else toast.success(`TicariCore: ${summary}.`)
+      },
+      onError: (error) => toast.error(errorText(error)),
+    })
 
   const save = () => {
     const bad = pending.filter((x) => x.error)
@@ -417,10 +434,22 @@ const ProductsPage = () => {
             teknik özellikleri için “Düzenle”.
           </Text>
         </div>
-        <Button size="small" onClick={() => void leave(newHref)}>
-          <Plus />
-          Yeni ürün ekle
-        </Button>
+        <div className="flex items-center gap-2">
+          <Button
+            size="small"
+            variant="secondary"
+            isLoading={ticari.isPending}
+            onClick={pullFromTicariCore}
+            title="Markalar, kategoriler, ürünler, fiyat ve stok TicariCore'daki 'websitesi' kanalından alınır. Her 15 dakikada kendiliğinden de çalışır."
+          >
+            <ArrowPath />
+            TicariCore'dan çek
+          </Button>
+          <Button size="small" onClick={() => void leave(newHref)}>
+            <Plus />
+            Yeni ürün ekle
+          </Button>
+        </div>
       </Container>
 
       <div className="grid items-start gap-3 lg:grid-cols-[260px_minmax(0,1fr)]">

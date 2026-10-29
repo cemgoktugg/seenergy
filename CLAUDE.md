@@ -251,6 +251,28 @@ side menu `INFO_NAV`). Account: `/hesabim` (orders), `/hesabim/adresler`
 `POST /store/customers/me/password`). Checkout offers the saved addresses and
 can save a new one. `/siparis-takibi` uses `GET /store/order-lookup`.
 
+### TicariCore (ERP) → Medusa (2026-10-29)
+
+The client's ERP, TicariCore (NetHesap), is the source of truth for what is
+sold; Medusa is the sales channel. `backend/.../src/lib/ticaricore/`:
+`client.ts` (REST `<TICARICORE_URL>/api/v1`, Bearer key, env only) and
+`catalog-sync.ts`, run every 15 minutes by `src/jobs/ticaricore-catalog.ts`,
+by "TicariCore'dan çek" in Ürün Yönetimi (`POST /admin/ticaricore/sync`) and
+by `npx medusa exec ./src/scripts/ticaricore-sync.ts`. One pass: snapshot of
+the `TICARICORE_CHANNEL_UID` channel ("websitesi") → brands (collection handle
+= slugify(name)) → categories (metadata.ticaricore_id, else handle =
+slugify(name) — the ERP's "AHD sistem" is our `ahd-sistem`) → products
+(metadata.ticaricore_uid, else SKU = product code). Only brands/categories the
+channel's products use come over; the tenant also holds unrelated ones.
+TicariCore owns price, sale price (compareAtPrice above the price), stock
+(sellableQuantity), published, category, brand — an admin edit to those on a
+linked product is overwritten on the next pass. Medusa keeps title,
+description, pictures, specs and datasheet, filled from the ERP only when
+empty. A linked product that leaves the channel goes to draft; an empty
+channel unpublishes nothing. The change feed (`/catalog/changes`) needs the
+channel assigned to an integrator connection in TicariCore; until then every
+pass is a full snapshot. Orders out and invoices in are not built yet.
+
 Not built yet: online card payment (iyzico/PayTR), transactional e-mail (no
 notification provider — nothing is e-mailed automatically), self-service
 password reset (needs e-mail; the sign-in form points to the contact form).

@@ -382,7 +382,8 @@ export async function createQuickProduct(container: MedusaContainer, input: Quic
           handle,
           description: input.description?.trim() || undefined,
           status: input.status === "draft" ? ProductStatus.DRAFT : ProductStatus.PUBLISHED,
-          category_ids: [input.category_id],
+          // Empty only from the TicariCore sync, for an uncategorised ERP product.
+          category_ids: input.category_id ? [input.category_id] : [],
           collection_id: brand.id,
           shipping_profile_id: profiles[0].id,
           thumbnail: picturesIn(input)[0],

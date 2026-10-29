@@ -200,6 +200,25 @@ function useInvalidate() {
   return () => client.invalidateQueries({ queryKey: vitrinKeys.all })
 }
 
+/** What one TicariCore pass did (backend lib/ticaricore/catalog-sync.ts). */
+export interface TicariCoreReport {
+  items: number
+  brands: { linked: number; created: string[] }
+  categories: { linked: number; created: string[] }
+  products: { created: string[]; updated: string[]; unchanged: number; unpublished: string[] }
+  skipped: { code: string; reason: string }[]
+  failed: { code: string; message: string }[]
+}
+
+/** "TicariCore'dan çek": brands, categories and products from the ERP, now. */
+export function useTicariCoreSync() {
+  const client = useQueryClient()
+  return useMutation({
+    mutationFn: () => sdk.client.fetch<{ report: TicariCoreReport }>("/admin/ticaricore/sync", { method: "POST" }),
+    onSuccess: () => client.invalidateQueries({ queryKey: ["vitrin"] }),
+  })
+}
+
 export function useSaveList() {
   const invalidate = useInvalidate()
   return useMutation({
