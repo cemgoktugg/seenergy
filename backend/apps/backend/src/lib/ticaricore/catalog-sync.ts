@@ -69,7 +69,7 @@ let running: Promise<CatalogSyncReport> | null = null
 /** One pass at a time: the scheduled job and the admin button share it. */
 export function syncCatalogFromTicariCore(container: MedusaContainer): Promise<CatalogSyncReport> {
   const config = ticaricoreConfig()
-  if (!config) return Promise.reject(new Error("TicariCore bağlantısı ayarlı değil (TICARICORE_URL / _API_KEY / _CHANNEL_UID)."))
+  if (!config) return Promise.reject(new Error("NetHesap Online bağlantısı ayarlı değil (TICARICORE_URL / _API_KEY / _CHANNEL_UID)."))
   running ??= run(container, config).finally(() => {
     running = null
   })
@@ -83,7 +83,7 @@ async function loadChannelItems(config: TicariCoreConfig): Promise<CatalogItem[]
   })
   for (let wait = 0; snapshot.status !== "ready"; wait++) {
     if (snapshot.status === "failed" || wait >= 60) {
-      throw new Error(`TicariCore ürün listesi hazırlanamadı: ${snapshot.error || snapshot.status}`)
+      throw new Error(`NetHesap Online ürün listesi hazırlanamadı: ${snapshot.error || snapshot.status}`)
     }
     await new Promise((resolve) => setTimeout(resolve, 1000))
     snapshot = await ticaricore(config, `${base}/${snapshot.snapshotUid}`)
@@ -272,7 +272,7 @@ async function run(container: MedusaContainer, config: TicariCoreConfig): Promis
 
       if (!product) {
         if (!brandId) {
-          report.skipped.push({ code: item.code, reason: "TicariCore'da markası yok." })
+          report.skipped.push({ code: item.code, reason: "NetHesap Online'da markası yok." })
           continue
         }
         const images = await uploadPictures(container, item)
@@ -367,7 +367,7 @@ async function run(container: MedusaContainer, config: TicariCoreConfig): Promis
 export function describeReport(r: CatalogSyncReport): string {
   const list = (label: string, names: string[]) => (names.length ? `; ${label}: ${names.join(", ")}` : "")
   return (
-    `TicariCore: ${r.items} ürün kanalda — ${r.products.created.length} yeni, ${r.products.updated.length} güncellendi, ` +
+    `NetHesap Online: ${r.items} ürün kanalda — ${r.products.created.length} yeni, ${r.products.updated.length} güncellendi, ` +
     `${r.products.unchanged} değişmedi, ${r.products.unpublished.length} yayından kalktı` +
     list("yeni marka", r.brands.created) +
     list("yeni kategori", r.categories.created) +

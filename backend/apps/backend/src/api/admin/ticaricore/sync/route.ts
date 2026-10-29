@@ -11,7 +11,7 @@ import { ticaricoreConfig } from "../../../../lib/ticaricore/client"
  */
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   if (!ticaricoreConfig()) {
-    throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "TicariCore bağlantısı bu sunucuda ayarlı değil.")
+    throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "NetHesap Online bağlantısı bu sunucuda ayarlı değil.")
   }
   const report = await syncCatalogFromTicariCore(req.scope)
   req.scope.resolve(ContainerRegistrationKeys.LOGGER).info(describeReport(report))

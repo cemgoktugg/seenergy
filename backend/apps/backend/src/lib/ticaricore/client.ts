@@ -66,7 +66,7 @@ export async function ticaricore<T>(
     throw new TicariCoreError(
       response.status,
       data?.code ?? "unknown",
-      `TicariCore ${path}: ${data?.message ?? response.statusText}`
+      `NetHesap Online ${path}: ${data?.message ?? response.statusText}`
     )
   }
   return data as T

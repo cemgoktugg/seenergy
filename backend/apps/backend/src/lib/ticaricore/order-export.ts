@@ -71,7 +71,7 @@ async function salesChannel(config: TicariCoreConfig) {
     "/integration/context"
   )
   const found = context.channels.find((c) => c.uid === config.channelUid)
-  if (!found) throw new Error("TicariCore satış kanalı bu bağlantıya atanmamış.")
+  if (!found) throw new Error("NetHesap Online satış kanalı bu bağlantıya atanmamış.")
   channel = { id: found.id, code: found.code }
   return channel
 }
@@ -161,7 +161,7 @@ const inFlight = new Set<string>()
 
 export async function exportOrderToTicariCore(container: MedusaContainer, orderId: string): Promise<ExportResult> {
   const config = ticaricoreConfig()
-  if (!config) return { status: "skipped", message: "TicariCore bağlantısı ayarlı değil." }
+  if (!config) return { status: "skipped", message: "NetHesap Online bağlantısı ayarlı değil." }
   if (inFlight.has(orderId)) return { status: "skipped", message: "Bu sipariş şu anda gönderiliyor." }
   inFlight.add(orderId)
   try {
@@ -187,7 +187,7 @@ export async function exportOrderToTicariCore(container: MedusaContainer, orderI
         throw new TicariCoreError(
           422,
           "amount_mismatch",
-          `Tutar tutmuyor: sitede ${money(order.total)} TL, TicariCore ${totals.payableAmount} TL hesapladı.`
+          `Tutar tutmuyor: sitede ${money(order.total)} TL, NetHesap Online ${totals.payableAmount} TL hesapladı.`
         )
       }
       const result = await ticaricore<{ uid: string; existing?: boolean }>(config, "/orders/import", {

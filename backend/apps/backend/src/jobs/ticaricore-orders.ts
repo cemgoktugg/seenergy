@@ -13,7 +13,7 @@ export default async function ticaricoreOrdersJob(container: MedusaContainer) {
   const sent = results.filter((r) => r.status === "sent").length
   container
     .resolve(ContainerRegistrationKeys.LOGGER)
-    .info(`TicariCore: ${results.length} bekleyen siparişten ${sent} tanesi aktarıldı.`)
+    .info(`NetHesap Online: ${results.length} bekleyen siparişten ${sent} tanesi aktarıldı.`)
 }
 
 export const config = {

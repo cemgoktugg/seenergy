@@ -11,8 +11,8 @@ import { exportOrderToTicariCore } from "../lib/ticaricore/order-export"
 export default async function ticaricoreOrder({ event, container }: SubscriberArgs<{ id: string }>) {
   const result = await exportOrderToTicariCore(container, event.data.id)
   const logger = container.resolve(ContainerRegistrationKeys.LOGGER)
-  if (result.status === "sent") logger.info(`TicariCore: sipariş ${event.data.id} aktarıldı (${result.uid}).`)
-  else if (result.status === "failed") logger.warn(`TicariCore: sipariş ${event.data.id} aktarılamadı — ${result.message}`)
+  if (result.status === "sent") logger.info(`NetHesap Online: sipariş ${event.data.id} aktarıldı (${result.uid}).`)
+  else if (result.status === "failed") logger.warn(`NetHesap Online: sipariş ${event.data.id} aktarılamadı — ${result.message}`)
 }
 
 export const config: SubscriberConfig = {

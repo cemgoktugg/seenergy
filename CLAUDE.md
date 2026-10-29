@@ -253,11 +253,13 @@ can save a new one. `/siparis-takibi` uses `GET /store/order-lookup`.
 
 ### TicariCore (ERP) → Medusa (2026-10-29)
 
-The client's ERP, TicariCore (NetHesap), is the source of truth for what is
+The client's ERP, TicariCore — shown as "NetHesap Online" everywhere a person
+reads it (admin, messages; code, env vars and metadata keys keep ticaricore) —
+is the source of truth for what is
 sold; Medusa is the sales channel. `backend/.../src/lib/ticaricore/`:
 `client.ts` (REST `<TICARICORE_URL>/api/v1`, Bearer key, env only) and
 `catalog-sync.ts`, run every 15 minutes by `src/jobs/ticaricore-catalog.ts`,
-by "TicariCore'dan çek" in Ürün Yönetimi (`POST /admin/ticaricore/sync`) and
+by "NetHesap Online'dan çek" in Ürün Yönetimi (`POST /admin/ticaricore/sync`) and
 by `npx medusa exec ./src/scripts/ticaricore-sync.ts`. One pass: snapshot of
 the `TICARICORE_CHANNEL_UID` channel ("websitesi") → brands (collection handle
 = slugify(name)) → categories (metadata.ticaricore_id, else handle =

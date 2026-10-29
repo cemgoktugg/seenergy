@@ -321,7 +321,7 @@ const ProductsPage = () => {
           (r.products.unpublished.length ? `, ${r.products.unpublished.length} yayından kalktı` : "") +
           (added.length ? `. Eklenen: ${added.join(", ")}` : "")
         if (r.failed.length) toast.error(`${summary}. Aktarılamayan: ${r.failed.map((f) => `${f.code} — ${f.message}`).join("; ")}`)
-        else toast.success(`TicariCore: ${summary}.`)
+        else toast.success(`NetHesap Online: ${summary}.`)
       },
       onError: (error) => toast.error(errorText(error)),
     })
@@ -440,10 +440,10 @@ const ProductsPage = () => {
             variant="secondary"
             isLoading={ticari.isPending}
             onClick={pullFromTicariCore}
-            title="Markalar, kategoriler, ürünler, fiyat ve stok TicariCore'daki 'websitesi' kanalından alınır. Her 15 dakikada kendiliğinden de çalışır."
+            title="Markalar, kategoriler, ürünler, fiyat ve stok NetHesap Online'daki 'websitesi' kanalından alınır. Her 15 dakikada kendiliğinden de çalışır."
           >
             <ArrowPath />
-            TicariCore'dan çek
+            NetHesap Online'dan çek
           </Button>
           <Button size="small" onClick={() => void leave(newHref)}>
             <Plus />

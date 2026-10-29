@@ -24,7 +24,7 @@ export async function GET(req: MedusaRequest, res: MedusaResponse) {
  *  retries of an order that used them up. */
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
   if (!ticaricoreConfig()) {
-    throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "TicariCore bağlantısı bu sunucuda ayarlı değil.")
+    throw new MedusaError(MedusaError.Types.NOT_ALLOWED, "NetHesap Online bağlantısı bu sunucuda ayarlı değil.")
   }
   const query = req.scope.resolve(ContainerRegistrationKeys.QUERY)
   const { data } = await query.graph({ entity: "order", fields: ["id", "metadata"], filters: { id: req.params.id } })

@@ -15,7 +15,7 @@ export default async function ticaricoreCatalogJob(container: MedusaContainer) {
   try {
     logger.info(describeReport(await syncCatalogFromTicariCore(container)))
   } catch (error) {
-    logger.error(`TicariCore ürün aktarımı başarısız: ${error instanceof Error ? error.message : String(error)}`)
+    logger.error(`NetHesap Online ürün aktarımı başarısız: ${error instanceof Error ? error.message : String(error)}`)
   }
 }
 

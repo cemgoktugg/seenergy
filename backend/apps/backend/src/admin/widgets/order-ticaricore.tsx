@@ -29,7 +29,7 @@ const OrderTicariCoreWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) =
   const send = useMutation({
     mutationFn: () => sdk.client.fetch<{ uid?: string }>(`/admin/ticaricore/orders/${order.id}`, { method: "POST" }),
     onSuccess: () => {
-      toast.success("Sipariş TicariCore'a aktarıldı.")
+      toast.success("Sipariş NetHesap Online'a aktarıldı.")
       client.invalidateQueries({ queryKey: key })
     },
     onError: (error) => {
@@ -42,7 +42,7 @@ const OrderTicariCoreWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) =
   return (
     <Container className="flex flex-col gap-3 px-6 py-4">
       <div className="flex items-center justify-between">
-        <Heading level="h2">TicariCore</Heading>
+        <Heading level="h2">NetHesap Online</Heading>
         {data.status === "sent" ? (
           <Badge color="green">Aktarıldı</Badge>
         ) : data.status === "failed" ? (
@@ -53,7 +53,7 @@ const OrderTicariCoreWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) =
       </div>
       {data.status === "sent" ? (
         <Text size="small" className="text-ui-fg-subtle">
-          Fatura ve sevkiyat TicariCore'dan yapılır.
+          Fatura ve sevkiyat NetHesap Online'dan yapılır.
           {data.sent_at ? ` Gönderim: ${new Date(data.sent_at).toLocaleString("tr-TR")}.` : ""}
         </Text>
       ) : (
@@ -73,7 +73,7 @@ const OrderTicariCoreWidget = ({ data: order }: DetailWidgetProps<AdminOrder>) =
             </Text>
           ) : null}
           <Button size="small" variant="secondary" isLoading={send.isPending} onClick={() => send.mutate()}>
-            TicariCore'a gönder
+            NetHesap Online'a gönder
           </Button>
         </>
       )}
