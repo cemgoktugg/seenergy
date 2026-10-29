@@ -33,7 +33,7 @@ const TOPICS: Record<string, string> = {
  *
  *   one wide banner   the black SEENERGY panel on the left; on the right the
  *                     address, phone and hours on the client's own design
- *                     (2026-10-29: the building under a frosted arc)
+ *                     (2026-10-29: their building photo under a frosted arc)
  *   then, per department (Satış Departmanı, Muhasebe, İnsan Kaynakları)
  *                     a row of people: photo, name, e-mail, phone
  *
@@ -142,12 +142,12 @@ const splitHours = (line: string): [string, string] => {
   return match && match[1] ? [match[1], match[2]] : ['', line];
 };
 
-/** The client's design for the details panel (2026-10-29, 1423 × 1105):
- *  the SEENERGY TEKNOLOJİ A.Ş. building under a frosted white arc, taken
- *  out of their mockup with its text, icons and buttons removed. The page
- *  sets the details on the arc. An image uploaded in Vitrin → Şirket
+/** The details panel's background, built to the client's design (2026-10-29,
+ *  1423 × 1105): their photo of the SEENERGY building (img/seenergy-bina-gercek.jpeg),
+ *  the sign and the big S on the right, under a frosted white arc on the
+ *  left that the details sit on. An image uploaded in Vitrin → Şirket
  *  bilgileri replaces it. */
-const DESIGN_BACKGROUND = '/contact/iletisim-tasarim.webp';
+const DESIGN_BACKGROUND = '/contact/iletisim-bina.webp';
 
 /**
  * The top box: the black SEENERGY panel on the left, the details on the

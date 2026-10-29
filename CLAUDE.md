@@ -231,8 +231,9 @@ there, never in code. Its `building_image` replaces the /iletisim details panel'
 
 **/iletisim** (2026-10-28, from the client's sketch): a wide banner — the black
 SEENERGY panel left; address / phone / hours right, set on the client's design
-(2026-10-29, `public/contact/iletisim-tasarim.webp`: their mockup with its
-text inpainted out; padding in % of width keeps the text on the arc) — then Satış Departmanı, Muhasebe,
+(2026-10-29, `public/contact/iletisim-bina.webp`: their building photo, sign
+and S on the right, a frosted arc on the left; padding in % of width keeps the
+text on the arc) — then Satış Departmanı, Muhasebe,
 İnsan Kaynakları as rows of people (photo, name, e-mail, phone), then the
 form (moved under the banner in `?konu=teklif` mode). People are the Vitrin
 `staff` group (admin → Vitrin → Ekibimiz), seeded by `vitrin-upgrade-contact`
