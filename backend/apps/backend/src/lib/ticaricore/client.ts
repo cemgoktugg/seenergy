@@ -38,7 +38,12 @@ export class TicariCoreError extends Error {
 export async function ticaricore<T>(
   config: TicariCoreConfig,
   path: string,
-  init: { method?: string; body?: unknown; query?: Record<string, string | number | undefined> } = {}
+  init: {
+    method?: string
+    body?: unknown
+    query?: Record<string, string | number | undefined>
+    headers?: Record<string, string>
+  } = {}
 ): Promise<T> {
   const url = new URL(`${config.url}/api/v1${path}`)
   for (const [name, value] of Object.entries(init.query ?? {})) {
@@ -50,6 +55,7 @@ export async function ticaricore<T>(
       authorization: `Bearer ${config.key}`,
       accept: "application/json",
       ...(init.body !== undefined ? { "content-type": "application/json" } : {}),
+      ...init.headers,
     },
     body: init.body !== undefined ? JSON.stringify(init.body) : undefined,
     signal: AbortSignal.timeout(30_000),

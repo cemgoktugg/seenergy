@@ -271,7 +271,22 @@ description, pictures, specs and datasheet, filled from the ERP only when
 empty. A linked product that leaves the channel goes to draft; an empty
 channel unpublishes nothing. The change feed (`/catalog/changes`) needs the
 channel assigned to an integrator connection in TicariCore; until then every
-pass is a full snapshot. Orders out and invoices in are not built yet.
+pass is a full snapshot.
+
+Orders out (2026-10-29, `order-export.ts`): `order.placed` → POST
+/orders/import on the same channel (code from /integration/context). Lines by
+SKU = productCode, KDV-inclusive; shipping as a document charge (entryMode 2),
+a promotion as an allowance; bireysel buyers get TCKN 11111111111 (e-Arşiv
+placeholder), kurumsal ones VKN + vergi dairesi. TicariCore prices the body
+(/orders/import/calculate) and it is sent only if its payable equals the
+order total. State on order metadata (ticaricore_status / _order_uid /
+_error / _attempts); failures retry every 10 min (`jobs/ticaricore-orders.ts`,
+12 tries), and the admin order page has a TicariCore widget with a send
+button. Orders from before the integration are never sent on their own.
+customerRef = TICARICORE_ORDER_PREFIX + display_id (WEB- live, TEST- local —
+they share the demo tenant). TicariCore has no cancel endpoint: an order
+cancelled in Medusa must be cancelled in TicariCore by hand. A product the
+ERP does not know rejects the whole order. Invoices in are not built yet.
 
 Not built yet: online card payment (iyzico/PayTR), transactional e-mail (no
 notification provider — nothing is e-mailed automatically), self-service

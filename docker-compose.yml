@@ -103,6 +103,7 @@ services:
       TICARICORE_URL: ${TICARICORE_URL:-}
       TICARICORE_API_KEY: ${TICARICORE_API_KEY:-}
       TICARICORE_CHANNEL_UID: ${TICARICORE_CHANNEL_UID:-}
+      TICARICORE_ORDER_PREFIX: ${TICARICORE_ORDER_PREFIX:-WEB-}
     volumes:
       - backend_static:/server/static
     networks:
