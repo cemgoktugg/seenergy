@@ -10,7 +10,7 @@
  */
 
 /* Where the API calls go. On the server the storefront and the backend share
-   the compose's internal network, so MEDUSA_INTERNAL_URL (http://backend:9000)
+   the compose's internal network, so MEDUSA_INTERNAL_URL (http://seenergy-backend:9000)
    is used and the calls never leave the machine — no public DNS, TLS or Traefik
    round trip. MEDUSA_BACKEND_URL stays the PUBLIC address: it is what image
    URLs carry and what next.config allows for next/image. */

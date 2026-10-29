@@ -107,8 +107,15 @@ services:
     volumes:
       - backend_static:/server/static
     networks:
-      - internal
-      - dokploy-network
+      # The store reaches this container as seenergy-backend, never as plain
+      # "backend": the store also sits on the shared dokploy-network, where
+      # the other Medusa store on this server has a service called backend
+      # too, and that name can resolve to its container instead — every
+      # server-side call then fails (2026-10-29: /odeme answered 500).
+      internal:
+        aliases:
+          - seenergy-backend
+      dokploy-network:
     healthcheck:
       test: ["CMD-SHELL", "node -e \"fetch('http://localhost:9000/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\""]
       interval: 15s
@@ -140,7 +147,7 @@ services:
     environment:
       MEDUSA_BACKEND_URL: ${MEDUSA_BACKEND_URL:-https://${API_DOMAIN}}
       # Server-side API calls stay on the internal network (src/lib/medusa/client.ts).
-      MEDUSA_INTERNAL_URL: http://backend:9000
+      MEDUSA_INTERNAL_URL: http://seenergy-backend:9000
       MEDUSA_PUBLISHABLE_KEY: ${MEDUSA_PUBLISHABLE_KEY}
       REVALIDATE_SECRET: ${REVALIDATE_SECRET}
       BANK_NAME: ${BANK_NAME:-}
