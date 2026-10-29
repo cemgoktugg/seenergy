@@ -305,9 +305,9 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       },
       {
         name: "building_image",
-        label: "Şirket binası fotoğrafı",
+        label: "İletişim kutusunun arka planı",
         type: "image",
-        hint: "İletişim sayfasında, 'İletişim' başlığının hemen yanında görünür. Boşsa SEENERGY binasının fotoğrafı kullanılır; yerleşim o fotoğraftaki büyük S'ye göre ayarlıdır (S başlığın yanına gelir). Başka bir fotoğraf yüklerseniz yerleşimi geliştiriciye ayarlatın.",
+        hint: "İletişim sayfasındaki adres / telefon / çalışma saatleri kutusunun arka planı. Boşsa SEENERGY'nin kendi tasarımı kullanılır (bina, solda yarı saydam beyaz kavis). Yeni bir görsel yüklerseniz sol yarısı açık renkli olmalı ve yaklaşık 1423 × 1105 oranında olmalı; yazılar o açık alanın üstüne gelir.",
       },
       { name: "mersis", label: "MERSİS numarası", type: "text" },
       { name: "tax_office", label: "Vergi dairesi", type: "text" },

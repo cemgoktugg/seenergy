@@ -2,13 +2,13 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ChevronRight, Clock, Mail, MapPin, MessageCircle, Navigation, Phone, UserRound } from 'lucide-react';
+import { ChevronRight, Clock, Mail, MapPin, Navigation, Phone, UserRound } from 'lucide-react';
 
 import { BrandLogo } from '@/components/brand-mark';
 import { InquiryForm } from '@/components/inquiry-form';
 import { SectionHeading } from '@/components/section-heading';
 import { CONTACT_FIELDS } from '@/data/inquiry-fields';
-import { directionsHref, telHref, waHref } from '@/lib/contact';
+import { directionsHref, telHref } from '@/lib/contact';
 import { imageProps } from '@/lib/image';
 import { DEPARTMENTS, hoursLines, loadVitrin, type Company, type StaffMember } from '@/lib/medusa/vitrin';
 
@@ -31,8 +31,9 @@ const TOPICS: Record<string, string> = {
 /**
  * /iletisim — laid out from the client's own sketch (2026-10-28):
  *
- *   one wide banner   the company building's photo on the left, the address
- *                     and contact details on the right
+ *   one wide banner   the black SEENERGY panel on the left; on the right the
+ *                     address, phone and hours on the client's own design
+ *                     (2026-10-29: the building under a frosted arc)
  *   then, per department (Satış Departmanı, Muhasebe, İnsan Kaynakları)
  *                     a row of people: photo, name, e-mail, phone
  *
@@ -107,7 +108,7 @@ export default async function ContactPage({
         <span className="font-medium text-text-primary">{title}</span>
       </nav>
 
-      <ContactBanner company={company} title={title} quote={quote} whatsappText={urun ? `Merhaba, ${urun} için fiyat teklifi almak istiyorum.` : undefined} />
+      <ContactBanner company={company} title={title} quote={quote} />
 
       {quote ? form : null}
 
@@ -141,55 +142,37 @@ const splitHours = (line: string): [string, string] => {
   return match && match[1] ? [match[1], match[2]] : ['', line];
 };
 
-/** Phones: the client's photo of the SEENERGY building (1175 × 812), unless
- *  the admin uploads another. */
-const DEFAULT_BUILDING_PHOTO = '/contact/seenergy-bina.webp';
-
-/** From `lg`: the client's own design for this panel (2026-10-28) with its
- *  text, icons and buttons taken out — white on the left, the building on
- *  the right behind a feathered curve, the big S near the top. The page
- *  draws the details over the white. */
-const DESIGN_BACKGROUND = '/contact/iletisim-bg.webp';
+/** The client's design for the details panel (2026-10-29, 1423 × 1105):
+ *  the SEENERGY TEKNOLOJİ A.Ş. building under a frosted white arc, taken
+ *  out of their mockup with its text, icons and buttons removed. The page
+ *  sets the details on the arc. An image uploaded in Vitrin → Şirket
+ *  bilgileri replaces it. */
+const DESIGN_BACKGROUND = '/contact/iletisim-tasarim.webp';
 
 /**
  * The top box: the black SEENERGY panel on the left, the details on the
- * right.
+ * right, laid out as the client's design draws them — eyebrow, a large
+ * "İletişim", address, phone and hours beside black icon tiles, then
+ * "Hemen arayın" / "Yol tarifi al".
  *
- * From `lg` the details panel is the client's design exactly: its artwork
- * as the background, anchored left so the white side stays under the text
- * and the S sits up by the heading.
- *
- * On a phone the panel is too narrow for that artwork, so the building photo
- * runs as a band beside the heading instead, hung off the big S (33.6% ×
- * 72% of the photo, its ring 28.5–38.7% across): as wide as the panel, its
- * top on the heading's centre line and pulled up 72% of its own height, so
- * the S's centre lands on that line; it starts 21% in so the S follows the
- * word (further for the quote title), fades out left of the S and just
- * under it.
+ * The details panel keeps the artwork's proportion (it only grows when the
+ * text needs more room) and its padding is in percent of its width, so the
+ * text keeps its place on the arc at every width; the picture is anchored
+ * top-left, so a taller panel crops the building's right edge, never the arc.
  */
-function ContactBanner({
-  company,
-  title,
-  quote,
-  whatsappText,
-}: {
-  company: Company;
-  title: string;
-  quote: boolean;
-  whatsappText?: string;
-}) {
+function ContactBanner({ company, title, quote }: { company: Company; title: string; quote: boolean }) {
   const mapHref = directionsHref({
     query: company.mapQuery,
     legalName: company.legalName,
     address: company.address,
   });
   const hours = hoursLines(company.hours);
-  const photo = company.buildingImage || DEFAULT_BUILDING_PHOTO;
+  const background = company.buildingImage || DESIGN_BACKGROUND;
 
   return (
     <section
       aria-labelledby="contact-title"
-      className="mt-4 grid overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
+      className="mt-4 grid grid-cols-[minmax(0,1fr)] overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.2fr)]"
     >
       {/* --- the black SEENERGY panel ------------------------------------ */}
       <div className="relative min-h-[220px] sm:min-h-[300px] lg:min-h-[440px]">
@@ -201,68 +184,55 @@ function ContactBanner({
         </div>
       </div>
 
-      {/* --- address and contact details, over the building -------------- */}
-      <div className="relative isolate flex flex-col overflow-hidden px-5 py-6 dt:px-8 dt:py-8">
-        {/* From `lg`: the client's design as the background. */}
-        <div aria-hidden className="absolute inset-0 -z-10 hidden lg:block">
-          <Image src={DESIGN_BACKGROUND} alt="" fill priority sizes="(min-width: 1200px) 720px, 580px" className="object-cover object-left" />
-        </div>
-        {/* Phones: the building band, its S beside the heading. */}
+      {/* --- the details, on the design's arc ---------------------------- */}
+      <div className="relative isolate flex flex-col bg-surface-card px-5 pb-6 pt-[190px] sm:aspect-[1423/1105] sm:px-[4.5%] sm:pb-[4%] sm:pt-[18%]">
+        {/* A phone is too narrow for the arc to hold the text: there the
+            building runs as a band across the top, fading into the white
+            the details sit on. */}
         <div
           aria-hidden
-          className={`absolute top-[66px] -z-10 aspect-[1175/812] w-full -translate-y-[72%] [mask-composite:intersect] [mask-image:linear-gradient(to_right,transparent_25%,#000_28.5%),linear-gradient(to_bottom,#000_82%,transparent_91%)] lg:hidden ${
-            quote ? 'left-[48%]' : 'left-[21%]'
-          }`}
+          className="absolute inset-x-0 top-0 -z-10 h-[230px] [mask-image:linear-gradient(to_bottom,#000_45%,transparent)] sm:inset-0 sm:h-auto sm:[mask-image:none]"
         >
-          <Image src={photo} alt="" fill priority sizes="100vw" className="object-cover" />
+          <Image
+            src={background}
+            alt=""
+            fill
+            priority
+            sizes="(min-width: 1024px) 720px, 100vw"
+            className="object-cover object-[80%_30%] sm:object-left-top"
+          />
         </div>
 
-        <p className="flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-text-secondary">
-          <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
+        <p className="flex items-center gap-3 text-[12px] font-bold uppercase tracking-[0.24em] text-text-secondary sm:text-[13px]">
+          <span aria-hidden className="h-[3px] w-8 rounded-full bg-linear-to-r from-brand-nav to-brand-dark/40" />
           {quote ? 'Fiyat teklifi' : 'Bize ulaşın'}
         </p>
-        <h1 id="contact-title" className="mt-2 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary lg:max-w-[260px] dt:text-[32px]">
+        <h1 id="contact-title" className="mt-1.5 text-[32px] font-extrabold leading-[1.1] tracking-tight text-brand-nav sm:max-w-[300px] sm:text-[40px]">
           {title}
         </h1>
 
-        <dl className="relative mt-10 space-y-4 lg:mt-12 dt:mt-[76px]">
+        <dl className="mt-6 space-y-5 sm:mt-9">
           {company.address ? (
             <Detail icon={MapPin} label="Adres">
-              {/* On the narrower 1024–1199 panel the artwork's curve comes
-                  further in; the long first line wraps before it. */}
-              <span className="block whitespace-pre-line lg:max-w-[230px] dt:max-w-none">{company.address}</span>
+              <span className="block whitespace-pre-line text-[14px] lg:max-w-[280px] dt:max-w-none">{company.address}</span>
             </Detail>
           ) : null}
           {company.phone ? (
             <Detail icon={Phone} label="Telefon">
-              <a href={telHref(company.phone)} className="font-bold hover:underline">
+              <a href={telHref(company.phone)} className="text-[20px] font-extrabold tabular-nums hover:underline">
                 {company.phone}
-              </a>
-            </Detail>
-          ) : null}
-          {company.whatsapp ? (
-            <Detail icon={MessageCircle} label="WhatsApp">
-              <a href={waHref(company.whatsapp, whatsappText)} target="_blank" rel="noopener" className="font-bold hover:underline">
-                {company.whatsapp}
-              </a>
-            </Detail>
-          ) : null}
-          {company.email ? (
-            <Detail icon={Mail} label="E-posta">
-              <a href={`mailto:${company.email}`} className="break-all font-bold hover:underline">
-                {company.email}
               </a>
             </Detail>
           ) : null}
           {hours.length > 0 ? (
             <Detail icon={Clock} label="Çalışma saatleri">
-              <span className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5">
+              <span className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-0.5 text-[16px]">
                 {hours.map((line) => {
                   const [day, time] = splitHours(line);
                   return (
                     <span key={line} className="contents">
                       <span className="text-text-secondary">{day}</span>
-                      <span className="font-semibold tabular-nums">{time}</span>
+                      <span className="font-bold tabular-nums">{time}</span>
                     </span>
                   );
                 })}
@@ -271,13 +241,13 @@ function ContactBanner({
           ) : null}
         </dl>
 
-        <div className="relative mt-6 flex flex-wrap gap-2.5 lg:mt-auto lg:pt-6">
+        <div className="mt-7 flex flex-wrap gap-3 sm:mt-auto sm:pt-7">
           {company.phone ? (
             <a
               href={telHref(company.phone)}
-              className="inline-flex h-11 items-center gap-2 rounded-full bg-brand px-5 text-[14px] font-bold text-white shadow-e1 transition-colors duration-(--duration-fast) hover:bg-brand-dark"
+              className="inline-flex h-13 flex-1 items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-brand-nav px-6 text-[16px] font-bold text-white shadow-e2 transition-colors duration-(--duration-fast) hover:bg-brand sm:flex-none sm:px-8"
             >
-              <Phone size={16} strokeWidth={2.25} aria-hidden />
+              <Phone size={19} strokeWidth={2} aria-hidden />
               Hemen arayın
             </a>
           ) : null}
@@ -286,9 +256,9 @@ function ContactBanner({
               href={mapHref}
               target="_blank"
               rel="noopener"
-              className="inline-flex h-11 items-center gap-2 rounded-full border border-line-strong bg-surface-card px-5 text-[14px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:border-text-primary"
+              className="inline-flex h-13 flex-1 items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-line-strong bg-surface-card px-6 text-[16px] font-bold text-brand-nav shadow-e1 transition-colors duration-(--duration-fast) hover:border-brand-nav sm:flex-none sm:px-8"
             >
-              <Navigation size={16} strokeWidth={2.25} aria-hidden />
+              <Navigation size={19} strokeWidth={2} aria-hidden />
               Yol tarifi al
             </a>
           ) : null}
@@ -298,15 +268,19 @@ function ContactBanner({
   );
 }
 
+/** One line of the details: a black tile with the icon, a spaced label, the value. */
 function Detail({ icon: Icon, label, children }: { icon: typeof Phone; label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start gap-3.5">
-      <span aria-hidden className="grid h-10 w-10 shrink-0 place-items-center rounded-(--card-radius) bg-linear-to-br from-grad-2 to-grad-4 text-white shadow-e1">
-        <Icon size={18} strokeWidth={2} />
+    <div className="flex items-start gap-4">
+      <span
+        aria-hidden
+        className="grid h-11 w-11 shrink-0 place-items-center rounded-(--card-radius) bg-linear-to-br from-brand-dark to-brand-nav text-white shadow-e2"
+      >
+        <Icon size={20} strokeWidth={1.9} />
       </span>
       <div className="min-w-0">
-        <dt className="text-[12px] font-bold uppercase tracking-[0.1em] text-text-secondary">{label}</dt>
-        <dd className="mt-0.5 text-[14px] leading-relaxed text-text-primary">{children}</dd>
+        <dt className="text-[13px] font-bold uppercase tracking-[0.18em] text-text-secondary">{label}</dt>
+        <dd className="mt-1 text-[14px] leading-relaxed text-brand-nav sm:text-[16px]">{children}</dd>
       </div>
     </div>
   );
