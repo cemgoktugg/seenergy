@@ -217,6 +217,7 @@ const VitrinPage = () => {
   const sectionsOf = (page: string) => group("page-section").filter((b) => b.data.page === page)
   const companyCards = group("company-card")
   const heroBackground = section("hero")?.data.background as string | undefined
+  const heroLight = section("hero")?.data.design === "acik"
   const deals = section("deals")?.data ?? {}
 
   let n = 0
@@ -272,12 +273,18 @@ const VitrinPage = () => {
         <Band
           n={++n}
           title="Ana slayt"
-          where="Sayfanın en üstündeki büyük, kayan alan: soldaki koyu alanda yazılar ve butonlar, sağda slaytın görseli. Koyu alanın arkasında bütün slaytlarda aynı arka plan fotoğrafı durur."
+          where="Sayfanın en üstündeki büyük, kayan alan. İki tasarımı var: koyu oval panel (yazılar koyu alanda, görsel sağda) veya açık tasarım (geniş fotoğraf, kırmızı vurgu). Tasarımı “Düzenle”nin en üstünden seçersiniz."
           to="/vitrin/blok/hero-slide"
           hidden={isHidden("hero")}
-          links={[{ label: "Arka plan fotoğrafı · göster / gizle", to: settings("hero") }]}
+          links={[
+            { label: "Tasarımı değiştir", to: "/vitrin/blok/hero-slide" },
+            { label: "Arka plan fotoğrafı · göster / gizle", to: settings("hero") },
+          ]}
         >
           <div className="flex flex-wrap items-center gap-2">
+            <Badge size="small" color={heroLight ? "blue" : "grey"}>
+              Tasarım: {heroLight ? "Açık" : "Koyu oval"}
+            </Badge>
             {heroBackground ? (
               <div className="relative h-14 w-24 overflow-hidden rounded-md border bg-black" title="Koyu alanın arka planı">
                 <img src={mediaUrl(heroBackground, storefront)} alt="" className="h-full w-full object-cover opacity-70" />

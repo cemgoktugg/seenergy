@@ -138,6 +138,62 @@ function BlockCard({
   )
 }
 
+/**
+ * The slider's two looks (2026-10-30), switched right above its slides — the
+ * setting lives on the hero band's `section` block, where nobody looking at
+ * the slides found it. One click saves; the site follows at once.
+ */
+const HERO_DESIGNS = [
+  { value: "oval", label: "Koyu oval panel", note: "Mevcut tasarım: koyu panel solda, ürün görseli sağda." },
+  { value: "acik", label: "Açık tasarım", note: "Geniş fotoğraf, beyaz zemin üzerinde koyu yazı, kırmızı vurgu." },
+]
+
+function HeroDesignSwitch({ section }: { section: VitrinBlock | undefined }) {
+  const save = useSaveBlock()
+  const current = section?.data.design === "acik" ? "acik" : "oval"
+  const choose = (design: string) => {
+    if (!section || design === current) return
+    save.mutate(
+      { id: section.id, data: { ...section.data, design } },
+      {
+        onSuccess: () => toast.success(design === "acik" ? "Açık tasarım sitede." : "Koyu oval tasarım sitede."),
+        onError: (error) => toast.error(errorText(error)),
+      }
+    )
+  }
+  return (
+    <Container className="px-6 py-4">
+      <Heading level="h2">Tasarım</Heading>
+      <Text size="small" className="text-ui-fg-subtle mt-1 max-w-2xl">
+        Aşağıdaki slaytlar iki tasarımda da aynıdır; yalnızca görünüm değişir. Açık tasarımda her slaytın
+        “Geniş fotoğraf (açık tasarım)” ve “Başlığın kırmızı satırı” alanları kullanılır.
+      </Text>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {HERO_DESIGNS.map((design) => (
+          <button
+            key={design.value}
+            type="button"
+            disabled={!section || save.isPending}
+            onClick={() => choose(design.value)}
+            aria-pressed={current === design.value}
+            className={`max-w-xs rounded-lg border px-4 py-3 text-left transition-colors ${
+              current === design.value
+                ? "border-ui-border-interactive bg-ui-bg-highlight"
+                : "border-ui-border-base hover:bg-ui-bg-base-hover"
+            }`}
+          >
+            <span className="flex items-center gap-2">
+              <Text size="small" weight="plus">{design.label}</Text>
+              {current === design.value ? <Badge size="2xsmall" color="green">Sitede</Badge> : null}
+            </span>
+            <Text size="small" className="text-ui-fg-subtle mt-0.5">{design.note}</Text>
+          </button>
+        ))}
+      </div>
+    </Container>
+  )
+}
+
 const BlockGroupPage = () => {
   const { group = "" } = useParams()
   const [search] = useSearchParams()
@@ -202,6 +258,10 @@ const BlockGroupPage = () => {
           </Button>
         ) : null}
       </Container>
+
+      {group === "hero-slide" ? (
+        <HeroDesignSwitch section={data.blocks.find((b) => b.group === "section" && b.key === "hero")} />
+      ) : null}
 
       {blocks.map((block, index) => (
         <BlockCard
