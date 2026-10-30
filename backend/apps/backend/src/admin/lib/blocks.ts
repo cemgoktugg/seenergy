@@ -160,12 +160,12 @@ const SECTION_FIELDS: Record<string, FieldDef[]> = {
       label: "Tasarım",
       type: "choice",
       options: [
-        // "oval" is the stored value of the default since 2026-10-30; the
-        // dark oval it named was replaced by the studio design that day.
-        { value: "oval", label: "Stüdyo — gri zemin, kırmızı buton sağ altta (varsayılan)" },
+        // "oval" is the stored value of the default; since 2026-10-30 it is
+        // the photo design (the dark oval it named was replaced that day).
+        { value: "oval", label: "Fotoğraf — resim alanı kaplar, yazı tarafı bulanıklaşır (varsayılan)" },
         { value: "acik", label: "Açık tasarım — beyaz zemin, kırmızı vurgulu başlık" },
       ],
-      hint: "Slaytların içeriği iki tasarımda da aynıdır; yalnızca görünüm değişir. İki tasarım da slaytın 'Geniş fotoğraf' alanını kullanır; fotoğrafı olmayan slaytta ürün görseli gösterilir. İstediğiniz zaman geri dönebilirsiniz.",
+      hint: "Slaytların içeriği iki tasarımda da aynıdır; yalnızca görünüm değişir. İki tasarım da önce slaytın 'Geniş fotoğraf'ını, yoksa 'Görsel'ini kullanır. İstediğiniz zaman geri dönebilirsiniz.",
     },
   ],
   rails: [
@@ -337,7 +337,7 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
         label: "Başlığın kırmızı satırı",
         type: "text",
         placeholder: "güçlü teknoloji.",
-        hint: "Başlığın altındaki ikinci satır — açık tasarımda kırmızı, stüdyo tasarımında başlıkla aynı renkte. Boş bırakılabilir.",
+        hint: "Başlığın altındaki ikinci satır — açık tasarımda kırmızı, fotoğraf tasarımında başlıkla aynı renkte. Boş bırakılabilir.",
       },
       { name: "description", label: "Açıklama", type: "textarea" },
       { name: "chips", label: "Öne çıkan maddeler", type: "tags", hint: "En fazla 3 kısa madde." },
@@ -358,7 +358,7 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
         name: "wide_image",
         label: "Geniş fotoğraf",
         type: "image",
-        hint: "Slaytın tamamını kaplayan fotoğraf; sol tarafı yazıların altında açık renge karışır, ürünü sağ yarıya yerleştirin. Önerilen 1920 × 840 piksel (yatay). Boş bırakırsanız yukarıdaki ürün görseli gri stüdyo zemininde gösterilir.",
+        hint: "Slaytın tamamını kaplayan fotoğraf; yazıların olduğu sol tarafı bulanıklaşır, ürünü sağ yarıya yerleştirin. Önerilen 1920 × 840 piksel (yatay). Boş bırakırsanız yukarıdaki görsel alanı kaplar — kare bir ürün fotoğrafı o zaman çok yakından kırpılır.",
       },
     ],
     newItem: () => ({

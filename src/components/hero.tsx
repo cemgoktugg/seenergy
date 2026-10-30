@@ -5,20 +5,19 @@
  * 2026-10-22 (the two campaign tiles beside it were removed at the client's
  * request; an edge-to-edge version was tried and taken back the same day).
  *
- * THE STUDIO DESIGN (2026-10-30, the client's mock — "tamamen bunun gibi")
+ * THE PHOTO DESIGN (2026-10-30)
  *
- * One continuous scene instead of two panels: a grey studio, light on the
- * left where the copy stands in dark ink, darker to the right where the
- * products stand on a black plinth with a red light behind them. The action
- * is a red button at the bottom right, beside round arrows. It replaced the
- * dark oval design (building photo + frosted rim), which is in git history
- * before this date; the light design (hero-light.tsx) is still the other
- * choice in admin → Vitrin → Ana slayt → Tasarım.
+ * Each slide's picture fills the whole panel — its wide photo, else its
+ * product picture — and from the side the copy stands on it blurs, a little
+ * at first and more towards the edge (the client: "yazı yazılan kısımdan
+ * resim yavaş yavaş bulanıklaşsın"): the left from `sm`, the bottom on a
+ * phone. Dark title and text on that frosted side, the red button and round
+ * arrows bottom right (the layout of the client's second mock).
  *
- * A slide with a wide photo (`wide_image`) shows the photo, washed light on
- * the left under the copy; without one, its product picture is set into the
- * CSS studio — so the product shots the shop uploads (cut-outs on white,
- * multiplied away on the grey) get the mock's look without a photo shoot.
+ * The same day it went through a dark oval (building photo + frosted rim,
+ * git history up to a9f0392) and a grey CSS studio with the product
+ * multiplied onto it (up to feb750d). The light design (hero-light.tsx) is
+ * still the other choice in admin → Vitrin → Ana slayt → Tasarım.
  *
  * Kept from before, and still load-bearing:
  *   - a pause control (WCAG 2.2.2) and no autoplay under reduced motion;
@@ -113,31 +112,36 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
         >
           {slides.map((slide, i) => {
             const active = i === index;
-            const photo = slide.wide_image;
+            const picture = slide.wide_image || slide.image;
             return (
               <div key={`${i}-${slide.title}`} className="relative h-full w-full shrink-0 overflow-hidden">
-                {photo ? (
-                  <>
-                    <Image
-                      src={photo}
-                      alt=""
-                      fill
-                      priority={i === 0}
-                      unoptimized={isVector(photo)}
-                      sizes="(min-width: 1400px) 1320px, 100vw"
-                      className={`object-cover object-[78%_40%] sm:object-[70%_50%] ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`}
-                    />
-                    {/* Light on the left, where the copy stands; on a phone,
-                        light along the bottom. */}
-                    <span className="absolute inset-0 bg-[linear-gradient(to_top,#eceef0_0%,#eceef0_45%,rgb(236_238_240/0.7)_58%,transparent_75%)] sm:bg-[linear-gradient(to_right,#eceef0_0%,rgb(236_238_240/0.92)_28%,rgb(236_238_240/0.55)_45%,transparent_62%)]" />
-                  </>
-                ) : (
-                  <Studio slide={slide} active={active} first={i === 0} />
-                )}
+                <Image
+                  src={picture}
+                  alt=""
+                  fill
+                  priority={i === 0}
+                  unoptimized={isVector(picture)}
+                  sizes="(min-width: 1400px) 1320px, 100vw"
+                  className={`object-cover object-[70%_40%] sm:object-[65%_50%] ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`}
+                />
               </div>
             );
           })}
         </div>
+      </div>
+
+      {/* --- the blur ------------------------------------------------------ */}
+      {/* A progressive blur over the copy's side, fixed while the pictures
+          move under it: three backdrop blurs, each stronger and each masked
+          to a narrower band from the edge, so the picture goes soft step by
+          step instead of at a line. A light frost over the same side keeps
+          the dark copy readable on a dark photo. Left from `sm`, the bottom
+          on a phone, where the copy sits. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        <span className="absolute inset-0 backdrop-blur-[3px] [mask-image:linear-gradient(to_top,#000_42%,transparent_72%)] sm:[mask-image:linear-gradient(to_right,#000_30%,transparent_64%)]" />
+        <span className="absolute inset-0 backdrop-blur-[8px] [mask-image:linear-gradient(to_top,#000_34%,transparent_60%)] sm:[mask-image:linear-gradient(to_right,#000_22%,transparent_52%)]" />
+        <span className="absolute inset-0 backdrop-blur-[18px] [mask-image:linear-gradient(to_top,#000_26%,transparent_48%)] sm:[mask-image:linear-gradient(to_right,#000_12%,transparent_40%)]" />
+        <span className="absolute inset-0 bg-[linear-gradient(to_top,rgb(241_243_246/0.72)_0%,rgb(241_243_246/0.5)_38%,transparent_64%)] sm:bg-[linear-gradient(to_right,rgb(241_243_246/0.6)_0%,rgb(241_243_246/0.4)_34%,transparent_62%)]" />
       </div>
 
       {/* --- copy ---------------------------------------------------------- */}
@@ -227,40 +231,5 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
         </div>
       ) : null}
     </section>
-  );
-}
-
-/**
- * A slide without a photo: its product picture in a CSS studio — the grey
- * sweep, a darker wall to the right, a red light behind, a soft floor and a
- * contact shadow. No dark plinth: the shop's product shots are cut-outs on
- * white, multiplied onto the grey, and multiply over a dark plinth would
- * sink the product into it (tried 2026-10-30).
- */
-function Studio({ slide, active, first }: { slide: HeroSlide; active: boolean; first: boolean }) {
-  return (
-    <>
-      <span className="absolute inset-0 bg-[linear-gradient(100deg,#eef0f2_0%,#e2e5e8_38%,#a7abb2_70%,#5d6168_100%)]" />
-      {/* The red light: a soft glow low on the right and two thin streaks. */}
-      <span className="absolute inset-0 bg-[radial-gradient(40%_70%_at_96%_88%,rgb(214_22_32/0.55),transparent_70%)]" />
-      <span className="absolute -right-[4%] top-[-10%] hidden h-[130%] w-[3px] rotate-[24deg] bg-hero-accent shadow-[0_0_18px_4px_rgb(214_22_32/0.55)] sm:block" />
-      <span className="absolute right-[10%] top-[-10%] hidden h-[130%] w-px rotate-[24deg] bg-hero-accent/70 shadow-[0_0_12px_2px_rgb(214_22_32/0.4)] sm:block" />
-      {/* Floor, darkening softly towards the front. */}
-      <span className="absolute inset-x-0 bottom-0 h-[40%] bg-linear-to-b from-transparent to-black/[0.10]" />
-
-      <div className="absolute inset-x-0 top-0 h-[200px] sm:inset-y-0 sm:left-[42%] sm:right-[4%] sm:h-auto">
-        {/* Contact shadow under the product. */}
-        <span className="absolute bottom-[4%] left-1/2 h-[10%] w-[60%] -translate-x-1/2 rounded-full bg-black/20 blur-xl sm:bottom-[14%] sm:h-[8%] sm:w-[50%]" />
-        <Image
-          src={slide.image}
-          alt=""
-          fill
-          priority={first}
-          unoptimized={isVector(slide.image)}
-          sizes="(min-width: 640px) 54vw, 100vw"
-          className={`object-contain object-bottom p-5 mix-blend-multiply sm:px-[8%] sm:pb-[16%] sm:pt-[8%] ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`}
-        />
-      </div>
-    </>
   );
 }

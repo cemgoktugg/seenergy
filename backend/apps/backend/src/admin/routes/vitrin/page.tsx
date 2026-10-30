@@ -272,7 +272,7 @@ const VitrinPage = () => {
         <Band
           n={++n}
           title="Ana slayt"
-          where="Sayfanın en üstündeki büyük, kayan alan. İki tasarımı var: stüdyo (gri zemin, kırmızı buton sağ altta) veya açık tasarım (beyaz zemin, kırmızı vurgu). Tasarımı “Düzenle”nin en üstünden seçersiniz."
+          where="Sayfanın en üstündeki büyük, kayan alan. İki tasarımı var: fotoğraf (resim alanı kaplar, yazı tarafı bulanık) veya açık tasarım (beyaz zemin, kırmızı vurgu). Tasarımı “Düzenle”nin en üstünden seçersiniz."
           to="/vitrin/blok/hero-slide"
           hidden={isHidden("hero")}
           links={[
@@ -282,7 +282,7 @@ const VitrinPage = () => {
         >
           <div className="flex flex-wrap items-center gap-2">
             <Badge size="small" color={heroLight ? "blue" : "grey"}>
-              Tasarım: {heroLight ? "Açık" : "Stüdyo"}
+              Tasarım: {heroLight ? "Açık" : "Fotoğraf"}
             </Badge>
             <ImagePreview blocks={group("hero-slide")} storefront={storefront} />
           </div>
