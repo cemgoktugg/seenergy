@@ -5,9 +5,10 @@
  * 2026-10-22 (the two campaign tiles beside it were removed at the client's
  * request; an edge-to-edge version was tried and taken back the same day).
  *
- * A split slide: a dark copy panel and a light image stage. From `sm` the
- * stage takes the right ~54% of the panel and fades into the copy; on a
- * phone the stage stacks above the copy.
+ * A split slide: a dark copy panel and a light image stage. Since 2026-10-30
+ * they are divided by an oval with a frosted rim, as on the /iletisim banner
+ * (it replaced a diagonal cut): from `sm` the dark oval bulges from the left
+ * into the picture; on a phone it rises under the picture as an arc.
  *
  * WHY SPLIT
  *
@@ -95,38 +96,15 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
       onFocusCapture={() => setHovered(true)}
       onBlurCapture={() => setHovered(false)}
     >
-      {/* The dark panel's ground (2026-10-28, the client's artwork): the
-          SEENERGY building, under every slide. It spans the left 60% — the
-          light stage covers the rest — and is set to its right side, where
-          the facade and its lettering are; the artwork's left side is a
-          bright abstract that white copy could not stand on. A chrome
-          gradient, heaviest under the copy, keeps the text legible. The
-          picture is set in admin → Vitrin → Ana slayt; empty = plain chrome. */}
-      {background ? (
-        <div aria-hidden className="pointer-events-none absolute inset-0 sm:right-[40%]">
-          <Image
-            src={background}
-            alt=""
-            fill
-            priority
-            sizes="(min-width: 640px) 60vw, 100vw"
-            className="object-cover object-[85%_45%]"
-          />
-          <span className="absolute inset-0 bg-linear-to-r from-chrome/90 via-chrome/70 to-chrome/35" />
-          <span className="absolute inset-0 bg-linear-to-t from-chrome/60 to-transparent to-50%" />
-        </div>
-      ) : null}
+      {/* Three layers, so the oval can stand still while the slides move:
+          the pictures' track, the oval (the dark panel and its frosted rim)
+          above it, and the copy's track on top. Both tracks move together. */}
 
-      {/* A faint technical grid over the dark panel, so it is not flat black. */}
-      <span
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.05)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:linear-gradient(to_right,black,transparent_70%)]"
-      />
-
-      {/* Fixed heights, so every slide in the track is the same size whatever
-          its copy: stacked on a phone, split from `sm`. */}
-      <div className="h-[380px] sm:h-[320px] md:h-[360px] dt:h-[440px]">
-        {/* A carousel advance is page-level motion: 800ms, ease-in-out. */}
+      {/* --- pictures ------------------------------------------------------ */}
+      {/* Fixed heights, so every slide is the same size whatever its copy:
+          stacked on a phone, split from `sm`. A carousel advance is
+          page-level motion: 800ms, ease-in-out. */}
+      <div aria-hidden className="absolute inset-0 overflow-hidden">
         <div
           className="flex h-full w-full transition-transform duration-[800ms] ease-in-out"
           style={{ transform: `translateX(-${index * 100}%)` }}
@@ -134,6 +112,85 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
           {slides.map((slide, i) => {
             const active = i === index;
             const cover = slide.fit === 'cover';
+            return (
+              /* Always light, in both themes: it is the plate the product
+                 stands on, the same idea as the product card's stage. */
+              <div
+                key={`${i}-${slide.title}`}
+                className="relative h-full w-full shrink-0 bg-[radial-gradient(90%_120%_at_75%_40%,#ffffff_0%,#f3f4f7_55%,#e3e5ea_100%)]"
+              >
+                {/* The picture's box starts under the oval, so a `cover`
+                    picture runs into the curve; a contained one keeps clear
+                    of it with its left padding. multiply: a product shot on
+                    white loses its white box and stands on the plate. */}
+                <div className="absolute inset-x-0 top-0 h-[168px] sm:inset-y-0 sm:left-[40%] sm:h-auto">
+                  <Image
+                    src={slide.image}
+                    alt=""
+                    fill
+                    priority={i === 0}
+                    unoptimized={isVector(slide.image)}
+                    sizes="(min-width: 640px) 60vw, 100vw"
+                    className={
+                      cover
+                        ? `object-cover ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`
+                        : `object-contain p-5 mix-blend-multiply sm:py-8 sm:pl-[21%] sm:pr-[4%] dt:py-10 ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
+                    }
+                  />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* --- the oval (2026-10-30, after the /iletisim banner) ------------- */}
+      {/* The dark panel is a large ellipse whose right side bulges into the
+          picture, ringed by a band of frosted glass — the curve the contact
+          banner's artwork draws between its two pictures. Its centre sits
+          below the middle, so the curve is steeper at the bottom, as there.
+          On a phone the same oval rises from below as an arc under the
+          picture. The rim is the same ellipse, 14px larger, blurring the
+          picture under it. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-white/45 backdrop-blur-md [clip-path:ellipse(calc(130%_+_14px)_calc(100%_+_14px)_at_50%_144%)] sm:[clip-path:ellipse(calc(52%_+_14px)_calc(135%_+_14px)_at_-2%_65%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-chrome [clip-path:ellipse(130%_100%_at_50%_144%)] sm:[clip-path:ellipse(52%_135%_at_-2%_65%)]"
+      >
+        {/* The client's artwork (2026-10-28): the SEENERGY building, set to
+            its right side, where the facade and its lettering are. A chrome
+            gradient, heaviest under the copy, keeps the text legible. Set in
+            admin → Vitrin → Ana slayt; empty = plain chrome. */}
+        {background ? (
+          <div className="absolute inset-0 sm:right-[46%]">
+            <Image
+              src={background}
+              alt=""
+              fill
+              priority
+              sizes="(min-width: 640px) 55vw, 100vw"
+              className="object-cover object-[85%_45%]"
+            />
+            <span className="absolute inset-0 bg-linear-to-r from-chrome/90 via-chrome/70 to-chrome/35" />
+            <span className="absolute inset-0 bg-linear-to-t from-chrome/60 to-transparent to-50%" />
+          </div>
+        ) : null}
+
+        {/* A faint technical grid, so the panel is not flat black. */}
+        <span className="absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.05)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:linear-gradient(to_right,black,transparent_70%)]" />
+      </div>
+
+      {/* --- copy ---------------------------------------------------------- */}
+      <div className="relative h-[380px] sm:h-[320px] md:h-[360px] dt:h-[440px]">
+        <div
+          className="flex h-full w-full transition-transform duration-[800ms] ease-in-out"
+          style={{ transform: `translateX(-${index * 100}%)` }}
+        >
+          {slides.map((slide, i) => {
+            const active = i === index;
             return (
               <div
                 key={`${i}-${slide.title}`}
@@ -143,34 +200,6 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
                 aria-hidden={!active}
                 className="relative h-full w-full shrink-0"
               >
-                {/* --- stage ------------------------------------------------ */}
-                {/* Always light, in both themes: it is the plate the product
-                    stands on, the same idea as the product card's stage. Out
-                    to the viewport's right edge from `sm`. */}
-                <div className="absolute inset-x-0 top-0 h-[190px] overflow-hidden bg-[radial-gradient(120%_100%_at_60%_40%,#ffffff_0%,#f3f4f7_55%,#e3e5ea_100%)] sm:inset-y-0 sm:left-auto sm:right-0 sm:h-auto sm:w-[56%] sm:[clip-path:polygon(16%_0,100%_0,100%_100%,0_100%)]">
-                  {/* multiply on the contained picture: a product shot on white
-                      loses its white box and stands on the stage instead of
-                      sitting on it as a pasted rectangle. Safe because the
-                      stage is light in both themes; dark pixels are unchanged. */}
-                  <Image
-                    src={slide.image}
-                    alt=""
-                    fill
-                    priority={i === 0}
-                    unoptimized={isVector(slide.image)}
-                    sizes="(min-width: 640px) 54vw, 100vw"
-                    className={
-                      cover
-                        ? `object-cover ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`
-                        : `object-contain p-5 mix-blend-multiply sm:py-8 sm:pl-24 sm:pr-8 dt:py-10 dt:pl-32 dt:pr-12 ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
-                    }
-                  />
-                  {/* The seam is a clean diagonal cut (the clip-path above). A
-                      dark-to-clear gradient laid over the light stage read as a
-                      grey smear. */}
-                </div>
-
-                {/* --- copy ------------------------------------------------- */}
                 <div className="relative flex h-full flex-col justify-end px-4 pb-16 pt-[200px] sm:justify-center sm:px-8 sm:pb-16 sm:pt-0 dt:px-12 dt:pb-20">
                   {/* Brand light behind the copy, so the panel is not flat black. */}
                   <span

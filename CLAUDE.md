@@ -328,6 +328,9 @@ The hero slider stands alone across the content container since 2026-10-22:
 the two campaign tiles beside it were removed at the client's request. An
 edge-to-edge version was tried the same day and taken back — the client wants
 it aligned with the bands below, not the viewport.
+Its copy panel and picture are divided by an oval with a frosted rim (2026-10-30,
+the client: "like the /iletisim banner") — a fixed layer between the picture
+track and the copy track, so the curve stays still while the slides move.
 The page ground is white with a faint dot grid and a sparse tile of technical
 line icons (`--page-ground`, `--page-dot`, `--page-pattern` in
 `globals.css`; tiles in `public/patterns/`).
