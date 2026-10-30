@@ -194,6 +194,112 @@ const SECTION_FIELDS: Record<string, FieldDef[]> = {
   company: heading("Kurumsal", "Referanslar ve Projeler"),
 }
 
+/* --- corporate pages and İletişim (`page`, `page-section`, …) ---------------- */
+
+/** The pages with their own settings card, in the order the map lists them. */
+export const PAGE_KEYS = ["referanslar", "cozum-ortaklarimiz", "projeler", "iletisim"]
+
+export const PAGE_NAMES: Record<string, string> = {
+  referanslar: "Referanslarımız sayfası",
+  "cozum-ortaklarimiz": "Çözüm Ortaklarımız sayfası",
+  projeler: "Projelerimiz sayfası",
+  iletisim: "İletişim sayfası",
+}
+
+const pageHeader = (eyebrow: string, title: string): FieldDef[] => [
+  { name: "eyebrow", label: "Üst etiket", type: "text", placeholder: eyebrow, hint: "Başlığın üstündeki küçük, büyük harfli yazı." },
+  { name: "title", label: "Sayfa başlığı", type: "text", placeholder: title, hint: "Sayfadaki büyük başlık; tarayıcı sekmesinde ve konum satırında da yazar." },
+  { name: "lede", label: "Giriş yazısı", type: "textarea", hint: "Başlığın altındaki kısa paragraf." },
+  {
+    name: "seo_description",
+    label: "Arama motoru açıklaması",
+    type: "textarea",
+    hint: "Google sonuçlarında başlığın altında görünen 1–2 cümle. Sayfada gösterilmez.",
+  },
+]
+
+const PAGE_FIELDS: Record<string, FieldDef[]> = {
+  referanslar: [
+    ...pageHeader("Kurumsal", "Referanslarımız"),
+    {
+      name: "references_title",
+      label: "Referans kartlarının başlığı",
+      type: "text",
+      placeholder: "Çalıştığımız firmalar",
+      hint: "'Referanslar' listesine en az bir firma eklendiğinde, kartların üstünde yazar.",
+    },
+  ],
+  "cozum-ortaklarimiz": pageHeader("Kurumsal", "Çözüm Ortaklarımız").map((field) =>
+    field.name === "lede"
+      ? {
+          ...field,
+          hint: "Başlığın altındaki kısa paragraf. {sayi} yazdığınız yere marka sayısı gelir. Logolar Vitrin → Marka duvarı'ndan gelir.",
+        }
+      : field
+  ),
+  projeler: [
+    ...pageHeader("Kurumsal", "Projelerimiz"),
+    {
+      name: "projects_title",
+      label: "Proje kartlarının başlığı",
+      type: "text",
+      placeholder: "Tamamlanan projeler",
+      hint: "'Projeler' listesine en az bir proje eklendiğinde, kartların üstünde yazar.",
+    },
+  ],
+  iletisim: [
+    { name: "eyebrow", label: "Kutudaki üst etiket", type: "text", placeholder: "Bize ulaşın" },
+    { name: "title", label: "Kutudaki büyük başlık", type: "text", placeholder: "İletişim" },
+    { name: "quote_eyebrow", label: "Teklif modunda üst etiket", type: "text", placeholder: "Fiyat teklifi", hint: "Ürün sayfalarındaki 'Teklif İste' ile gelindiğinde." },
+    { name: "quote_title", label: "Teklif modunda başlık", type: "text", placeholder: "Fiyat Teklifi İsteyin" },
+    { name: "tagline", label: "Siyah paneldeki logo altı yazısı", type: "text", placeholder: "Güvenlik Teknolojileri A.Ş." },
+    { name: "address_label", label: "'Adres' etiketi", type: "text", placeholder: "Adres" },
+    { name: "phone_label", label: "'Telefon' etiketi", type: "text", placeholder: "Telefon" },
+    { name: "hours_label", label: "'Çalışma saatleri' etiketi", type: "text", placeholder: "Çalışma saatleri" },
+    { name: "call_label", label: "Arama butonu", type: "text", placeholder: "Hemen arayın" },
+    { name: "directions_label", label: "Yol tarifi butonu", type: "text", placeholder: "Yol tarifi al" },
+    { name: "staff_eyebrow", label: "Ekip bölümlerinin üst etiketi", type: "text", placeholder: "Ekibimiz" },
+    { name: "satis_title", label: "Satış ekibinin başlığı", type: "text", placeholder: "Satış Departmanı" },
+    { name: "muhasebe_title", label: "Muhasebe ekibinin başlığı", type: "text", placeholder: "Muhasebe" },
+    { name: "ik_title", label: "İnsan kaynakları ekibinin başlığı", type: "text", placeholder: "İnsan Kaynakları" },
+    { name: "form_eyebrow", label: "Formun üst etiketi", type: "text", placeholder: "Bize yazın" },
+    { name: "form_title", label: "Formun başlığı", type: "text", placeholder: "İletişim formu" },
+    {
+      name: "topics",
+      label: "Konu seçenekleri",
+      type: "tags",
+      hint: "Formdaki 'Konu' listesi. Sitedeki bağlantılar 'Fiyat teklifi', 'Teknik destek', 'Siparişim hakkında', 'İade ve cayma', 'Garanti ve arıza' konularını önceden seçer; bunları silerseniz o bağlantılar konu seçmeden açılır.",
+    },
+    { name: "submit_label", label: "Gönder butonu", type: "text", placeholder: "Mesajı gönder" },
+    { name: "success_title", label: "Gönderilince çıkan başlık", type: "text", placeholder: "Mesajınız alındı" },
+    { name: "quote_form_eyebrow", label: "Teklif formunun üst etiketi", type: "text", placeholder: "Teklif" },
+    { name: "quote_form_title", label: "Teklif formunun başlığı", type: "text", placeholder: "Teklif formu" },
+    { name: "quote_submit_label", label: "Teklif formunun gönder butonu", type: "text", placeholder: "Teklif iste" },
+    { name: "quote_success_title", label: "Teklif gönderilince çıkan başlık", type: "text", placeholder: "Teklif talebiniz alındı" },
+    {
+      name: "success_text",
+      label: "Gönderilince çıkan açıklama",
+      type: "textarea",
+      placeholder: "Mesai saatlerinde aynı gün, en geç bir iş günü içinde dönüş yapıyoruz.",
+    },
+    {
+      name: "seo_description",
+      label: "Arama motoru açıklaması",
+      type: "textarea",
+      hint: "Google sonuçlarında görünen 1–2 cümle. Sayfada gösterilmez.",
+    },
+  ],
+}
+
+/** The pages a text section can belong to. */
+const SECTION_PAGES = [
+  { value: "referanslar", label: "Referanslarımız" },
+  { value: "cozum-ortaklarimiz", label: "Çözüm Ortaklarımız" },
+  { value: "projeler", label: "Projelerimiz" },
+]
+
+export const sectionPageName = (page: string) => SECTION_PAGES.find((p) => p.value === page)?.label ?? "Sayfa seçilmedi"
+
 export const GROUPS: Record<BlockGroup, GroupDef> = {
   announcement: {
     title: "Duyuru çubuğu",
@@ -501,6 +607,79 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
           ]
         : []),
     ],
+  },
+  page: {
+    title: "Sayfa ayarları",
+    where: "Kurumsal sayfaların ve İletişim sayfasının başlıkları, giriş yazıları, etiketleri, butonları ve arama motoru açıklaması. Boş bırakılan alanda sitenin ilk metni kullanılır.",
+    repeatable: false,
+    itemName: "sayfa",
+    itemTitle: (_d, _i, key) => PAGE_NAMES[key ?? ""] ?? key ?? "",
+    slots: PAGE_KEYS,
+    fields: [],
+    fieldsFor: (key) => PAGE_FIELDS[key ?? ""] ?? [],
+  },
+  "page-section": {
+    title: "Sayfa bölümleri",
+    where:
+      "Kurumsal sayfalardaki başlıklı metin bölümleri, buradaki sırayla. Her bölüm bir başlık ve bir metinden oluşur; metin paragraf, madde listesi ya da numaralı adımlar olarak gösterilir.",
+    repeatable: true,
+    itemName: "bölüm",
+    itemTitle: (d, i) => `${i + 1}. ${sectionPageName(d.page)} — ${d.heading || "başlıksız"}`,
+    fields: [
+      { name: "page", label: "Sayfa", type: "choice", options: SECTION_PAGES },
+      { name: "heading", label: "Bölüm başlığı", type: "text", required: true },
+      {
+        name: "style",
+        label: "Görünüm",
+        type: "choice",
+        options: [
+          { value: "paragraf", label: "Paragraf" },
+          { value: "liste", label: "Madde listesi" },
+          { value: "adimlar", label: "Numaralı adımlar" },
+        ],
+      },
+      {
+        name: "text",
+        label: "Metin",
+        type: "textarea",
+        required: true,
+        hint: "Paragraf: boş bir satır yeni paragraf başlatır. Liste ve adımlar: her satır bir madde; 'Etiket: açıklama' yazarsanız etiket kalın olur. Bağlantı için [yazı](/sayfa) yazın, örn. [kurumsal satış](/kurumsal).",
+      },
+    ],
+    newItem: () => ({ page: "referanslar", heading: "", style: "paragraf", text: "" }),
+  },
+  reference: {
+    title: "Referanslar",
+    where:
+      "Referanslarımız sayfasında, giriş yazısının altında kartlar halinde gösterilen firmalar, buradaki sırayla. Liste boşsa bu kısım sayfada hiç görünmez. Yalnızca adını yayınlamaya izin veren müşterileri ekleyin.",
+    repeatable: true,
+    itemName: "referans",
+    itemTitle: (d, i) => `${i + 1}. ${d.name || "isimsiz"}`,
+    fields: [
+      { name: "name", label: "Firma / kurum adı", type: "text", required: true },
+      { name: "logo", label: "Logo", type: "image", hint: "Şeffaf (PNG/WebP) veya beyaz arka planlı logo. Boşsa kartta firmanın adı yazar." },
+      { name: "sector", label: "Sektör", type: "text", placeholder: "Fabrika ve depo" },
+      { name: "text", label: "Kısa açıklama", type: "textarea", placeholder: "64 kameralı IP sistem ve merkezi kayıt" },
+      { name: "href", label: "Bağlantı (isteğe bağlı)", type: "link", hint: "Doldurulursa kart tıklanınca açılır; firmanın sitesi ya da bir proje sayfası." },
+    ],
+    newItem: () => ({ name: "", logo: "", sector: "", text: "", href: "" }),
+  },
+  project: {
+    title: "Projeler",
+    where:
+      "Projelerimiz sayfasında, giriş yazısının altında fotoğraflı kartlar halinde gösterilen projeler, buradaki sırayla. Liste boşsa bu kısım sayfada hiç görünmez.",
+    repeatable: true,
+    itemName: "proje",
+    itemTitle: (d, i) => `${i + 1}. ${d.title || "başlıksız"}`,
+    fields: [
+      { name: "title", label: "Proje adı", type: "text", required: true, placeholder: "Lojistik deposu kamera sistemi" },
+      { name: "image", label: "Fotoğraf", type: "image", hint: "Yatay fotoğraf; kart 4 : 3 oranında, ortadan kırparak gösterir." },
+      { name: "category", label: "Proje türü", type: "text", placeholder: "CCTV ve kayıt" },
+      { name: "location", label: "Yer", type: "text", placeholder: "Ankara" },
+      { name: "year", label: "Yıl", type: "text", placeholder: "2026" },
+      { name: "text", label: "Açıklama", type: "textarea", placeholder: "48 IP kamera, 2 NVR, 30 gün kayıt" },
+    ],
+    newItem: () => ({ title: "", image: "", category: "", location: "", year: "", text: "" }),
   },
 }
 

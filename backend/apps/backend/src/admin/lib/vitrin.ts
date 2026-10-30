@@ -40,6 +40,10 @@ export type BlockGroup =
   | "own-brand"
   | "brand-wall"
   | "company-card"
+  | "page"
+  | "page-section"
+  | "reference"
+  | "project"
 
 /** One group of the product page's "Teknik Özellikler" table. */
 export interface SpecGroup {

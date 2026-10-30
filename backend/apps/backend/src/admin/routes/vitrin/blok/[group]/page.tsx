@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 import { Link, useParams, useSearchParams } from "react-router-dom"
 
 import { BlockField } from "../../../../components/fields"
-import { fieldsOf, GROUPS, type GroupDef } from "../../../../lib/blocks"
+import { fieldsOf, GROUPS, sectionPageName, type GroupDef } from "../../../../lib/blocks"
 import {
   errorText,
   useCreateBlock,
@@ -142,6 +142,8 @@ const BlockGroupPage = () => {
   const { group = "" } = useParams()
   const [search] = useSearchParams()
   const only = search.get("bolum")
+  // ?sayfa=<page>: one corporate page's text sections (page-section).
+  const page = search.get("sayfa")
   const { data } = useVitrin()
   const create = useCreateBlock()
   const reorder = useReorderBlocks()
@@ -156,6 +158,7 @@ const BlockGroupPage = () => {
     .filter((b) => b.group === group)
     .filter((b) => !def.slots || def.slots.includes(b.key ?? ""))
     .filter((b) => !only || b.key === only)
+    .filter((b) => !page || b.data.page === page)
     .sort((a, b) => (def.slots ? def.slots.indexOf(a.key ?? "") - def.slots.indexOf(b.key ?? "") : a.rank - b.rank))
 
   const onMove = (from: number, to: number) => {
@@ -170,7 +173,7 @@ const BlockGroupPage = () => {
 
   const onAdd = () =>
     create.mutate(
-      { group: group as BlockGroup, data: def.newItem?.() ?? {}, is_active: false },
+      { group: group as BlockGroup, data: { ...def.newItem?.(), ...(page ? { page } : {}) }, is_active: false },
       {
         onSuccess: () =>
           toast.success(`Yeni ${def.itemName} eklendi (gizli). Doldurup kaydedin, sonra 'Sitede göster'i açın.`),
@@ -185,7 +188,9 @@ const BlockGroupPage = () => {
           <Text size="small" className="text-ui-fg-subtle">
             <Link to="/vitrin" className="hover:underline">Vitrin</Link> / {def.title}
           </Text>
-          <Heading className="mt-1">{only ? def.itemTitle({}, 0, only) : def.title}</Heading>
+          <Heading className="mt-1">
+            {only ? def.itemTitle({}, 0, only) : page ? `${sectionPageName(page)} — ${def.title.toLocaleLowerCase("tr")}` : def.title}
+          </Heading>
           <Text size="small" className="text-ui-fg-subtle mt-1 max-w-2xl">
             Sitede nerede: {def.where}
           </Text>

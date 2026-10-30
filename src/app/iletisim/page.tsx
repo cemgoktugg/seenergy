@@ -10,15 +10,15 @@ import { SectionHeading } from '@/components/section-heading';
 import { CONTACT_FIELDS } from '@/data/inquiry-fields';
 import { directionsHref, telHref } from '@/lib/contact';
 import { imageProps } from '@/lib/image';
-import { DEPARTMENTS, hoursLines, loadVitrin, type Company, type StaffMember } from '@/lib/medusa/vitrin';
+import { DEPARTMENTS, hoursLines, loadVitrin, type Company, type Pages, type StaffMember } from '@/lib/medusa/vitrin';
 
-export const metadata: Metadata = {
-  title: 'İletişim',
-  description:
-    'SEENERGY Güvenlik Teknolojileri — İvedik OSB, Yenimahalle / Ankara. Telefon, e-posta, çalışma saatleri, satış, muhasebe ve insan kaynakları ekibimiz ve iletişim formu.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { pages } = await loadVitrin();
+  return { title: pages.iletisim.title, description: pages.iletisim.seo_description };
+}
 
-/** ?konu= values the site links with, and the subject each one picks. */
+/** ?konu= values the site links with, and the subject each one picks — when
+ *  that subject is still among the admin's "Konu seçenekleri". */
 const TOPICS: Record<string, string> = {
   teklif: 'Fiyat teklifi',
   teknik: 'Teknik destek',
@@ -27,6 +27,9 @@ const TOPICS: Record<string, string> = {
   garanti: 'Garanti ve arıza',
   genel: 'Genel bilgi',
 };
+
+/** Each department's heading, from the page settings. */
+const DEPARTMENT_TITLE = { satis: 'satis_title', muhasebe: 'muhasebe_title', 'insan-kaynaklari': 'ik_title' } as const;
 
 /**
  * /iletisim — laid out from the client's own sketch (2026-10-28):
@@ -39,7 +42,8 @@ const TOPICS: Record<string, string> = {
  *
  * and the contact form after them. Everything comes from the admin: the
  * details and the building photo from Vitrin → Şirket bilgileri, the people
- * from Vitrin → Ekibimiz. A department without people is not shown.
+ * from Vitrin → Ekibimiz, and every heading, label, button and form text
+ * from Vitrin → İletişim sayfası. A department without people is not shown.
  *
  * The product pages' "Fiyat Teklifi Al" / "Teklif İste" link here with
  * ?konu=teklif&urun=<SKU>; then the form moves up under the banner, since
@@ -53,14 +57,20 @@ export default async function ContactPage({
 }: {
   searchParams: Promise<{ konu?: string; urun?: string }>;
 }) {
-  const [{ konu, urun }, { company, staff }] = await Promise.all([searchParams, loadVitrin()]);
+  const [{ konu, urun }, { company, staff, pages, contactTopics }] = await Promise.all([searchParams, loadVitrin()]);
+  const text = pages.iletisim;
   const quote = konu === 'teklif' || Boolean(urun);
-  const topic = TOPICS[konu ?? ''] ?? (urun ? TOPICS.teklif : '');
-  const title = quote ? 'Fiyat Teklifi İsteyin' : 'İletişim';
+  const wanted = TOPICS[konu ?? ''] ?? (urun ? TOPICS.teklif : '');
+  const topic = contactTopics.includes(wanted) ? wanted : '';
+  const title = quote ? text.quote_title : text.title;
 
   const form = (
     <section aria-labelledby="contact-form-title" className="mt-(--space-section)">
-      <SectionHeading id="contact-form-title" eyebrow={quote ? 'Teklif' : 'Bize yazın'} title={quote ? 'Teklif formu' : 'İletişim formu'} />
+      <SectionHeading
+        id="contact-form-title"
+        eyebrow={quote ? text.quote_form_eyebrow : text.form_eyebrow}
+        title={quote ? text.quote_form_title : text.form_title}
+      />
       <div className="mt-4 rounded-(--panel-radius) border border-line bg-surface-card px-5 py-6 shadow-e1 dt:px-8 dt:py-8">
         <InquiryForm
           type={quote ? 'teklif' : 'iletisim'}
@@ -79,7 +89,7 @@ export default async function ContactPage({
                     label: 'Konu',
                     type: 'select' as const,
                     required: true,
-                    options: Object.values(TOPICS),
+                    options: contactTopics,
                   },
                 ]),
             {
@@ -90,9 +100,9 @@ export default async function ContactPage({
               placeholder: quote ? 'Kurulum yeri, teslim tarihi gibi eklemek istedikleriniz' : '',
             },
           ]}
-          submitLabel={quote ? 'Teklif iste' : 'Mesajı gönder'}
-          successTitle={quote ? 'Teklif talebiniz alındı' : 'Mesajınız alındı'}
-          successText="Mesai saatlerinde aynı gün, en geç bir iş günü içinde dönüş yapıyoruz."
+          submitLabel={quote ? text.quote_submit_label : text.submit_label}
+          successTitle={quote ? text.quote_success_title : text.success_title}
+          successText={text.success_text}
         />
       </div>
     </section>
@@ -108,16 +118,16 @@ export default async function ContactPage({
         <span className="font-medium text-text-primary">{title}</span>
       </nav>
 
-      <ContactBanner company={company} title={title} quote={quote} />
+      <ContactBanner company={company} text={text} title={title} quote={quote} />
 
       {quote ? form : null}
 
-      {DEPARTMENTS.map(({ key, title: department }) => {
+      {DEPARTMENTS.map(({ key }) => {
         const people = staff.filter((member) => member.department === key);
         if (people.length === 0) return null;
         return (
           <section key={key} aria-labelledby={`ekip-${key}`} className="mt-(--space-section)">
-            <SectionHeading id={`ekip-${key}`} eyebrow="Ekibimiz" title={department} />
+            <SectionHeading id={`ekip-${key}`} eyebrow={text.staff_eyebrow} title={text[DEPARTMENT_TITLE[key]]} />
             <ul className="mt-4 grid grid-cols-2 gap-(--space-grid-gap) md:grid-cols-3 lg:grid-cols-4">
               {people.map((member, index) => (
                 <li key={`${member.name}-${index}`}>
@@ -160,7 +170,17 @@ const DESIGN_BACKGROUND = '/contact/iletisim-bina.webp';
  * text keeps its place on the arc at every width; the picture is anchored
  * top-left, so a taller panel crops the building's right edge, never the arc.
  */
-function ContactBanner({ company, title, quote }: { company: Company; title: string; quote: boolean }) {
+function ContactBanner({
+  company,
+  text,
+  title,
+  quote,
+}: {
+  company: Company;
+  text: Pages['iletisim'];
+  title: string;
+  quote: boolean;
+}) {
   const mapHref = directionsHref({
     query: company.mapQuery,
     legalName: company.legalName,
@@ -180,7 +200,7 @@ function ContactBanner({ company, title, quote }: { company: Company; title: str
           <span aria-hidden className="tech-grid pointer-events-none absolute inset-0 opacity-25" />
           <span aria-hidden className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/[0.08] blur-3xl" />
           <BrandLogo tone="light" shine className="relative h-9 w-auto sm:h-11 dt:h-14" />
-          <p className="relative text-[13px] font-bold uppercase tracking-[0.2em] text-white/70">Güvenlik Teknolojileri A.Ş.</p>
+          <p className="relative text-[13px] font-bold uppercase tracking-[0.2em] text-white/70">{text.tagline}</p>
         </div>
       </div>
 
@@ -205,7 +225,7 @@ function ContactBanner({ company, title, quote }: { company: Company; title: str
 
         <p className="flex items-center gap-3 text-[12px] font-bold uppercase tracking-[0.24em] text-text-secondary sm:text-[13px]">
           <span aria-hidden className="h-[3px] w-8 rounded-full bg-linear-to-r from-brand-nav to-brand-dark/40" />
-          {quote ? 'Fiyat teklifi' : 'Bize ulaşın'}
+          {quote ? text.quote_eyebrow : text.eyebrow}
         </p>
         <h1 id="contact-title" className="mt-1.5 text-[32px] font-extrabold leading-[1.1] tracking-tight text-brand-nav sm:max-w-[300px] sm:text-[40px]">
           {title}
@@ -213,19 +233,19 @@ function ContactBanner({ company, title, quote }: { company: Company; title: str
 
         <dl className="mt-6 space-y-5 sm:mt-9">
           {company.address ? (
-            <Detail icon={MapPin} label="Adres">
+            <Detail icon={MapPin} label={text.address_label}>
               <span className="block whitespace-pre-line text-[14px] lg:max-w-[280px] dt:max-w-none">{company.address}</span>
             </Detail>
           ) : null}
           {company.phone ? (
-            <Detail icon={Phone} label="Telefon">
+            <Detail icon={Phone} label={text.phone_label}>
               <a href={telHref(company.phone)} className="text-[20px] font-extrabold tabular-nums hover:underline">
                 {company.phone}
               </a>
             </Detail>
           ) : null}
           {hours.length > 0 ? (
-            <Detail icon={Clock} label="Çalışma saatleri">
+            <Detail icon={Clock} label={text.hours_label}>
               <span className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-0.5 text-[16px]">
                 {hours.map((line) => {
                   const [day, time] = splitHours(line);
@@ -248,7 +268,7 @@ function ContactBanner({ company, title, quote }: { company: Company; title: str
               className="inline-flex h-13 flex-1 items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-brand-nav px-6 text-[16px] font-bold text-white shadow-e2 transition-colors duration-(--duration-fast) hover:bg-brand sm:flex-none sm:px-8"
             >
               <Phone size={19} strokeWidth={2} aria-hidden />
-              Hemen arayın
+              {text.call_label}
             </a>
           ) : null}
           {mapHref ? (
@@ -259,7 +279,7 @@ function ContactBanner({ company, title, quote }: { company: Company; title: str
               className="inline-flex h-13 flex-1 items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-line-strong bg-surface-card px-6 text-[16px] font-bold text-brand-nav shadow-e1 transition-colors duration-(--duration-fast) hover:border-brand-nav sm:flex-none sm:px-8"
             >
               <Navigation size={19} strokeWidth={2} aria-hidden />
-              Yol tarifi al
+              {text.directions_label}
             </a>
           ) : null}
         </div>

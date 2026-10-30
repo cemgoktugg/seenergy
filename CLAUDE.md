@@ -239,6 +239,24 @@ form (moved under the banner in `?konu=teklif` mode). People are the Vitrin
 `staff` group (admin → Vitrin → Ekibimiz), seeded by `vitrin-upgrade-contact`
 as role-named slots until the client sends names — never invented people.
 
+**Kurumsal sayfalar and /iletisim in Vitrin** (2026-10-30, the client: "her
+şeyi değiştirebilecek şekilde"). Admin → Vitrin → "Diğer sayfalar" lists
+İletişim, Referanslarımız, Çözüm Ortaklarımız, Projelerimiz. Groups:
+`page` (keyed per page: eyebrow, title, lede, seo_description; on iletisim
+every label, button, department heading, form text and the Konu options),
+`page-section` (the corporate pages' headed text sections, ordered, each
+paragraf / liste / adimlar; `[yazı](/yol)` is a link, "Etiket: açıklama" in a
+list bolds the label — rendered by `src/components/page-sections.tsx`, no
+HTML from the admin), `reference` (client cards on /referanslar) and
+`project` (photo cards on /projeler) — both empty until the shop adds real
+ones; never seed invented clients or projects. /cozum-ortaklarimiz now shows
+the Marka duvarı list (one list for the homepage and the page; `{sayi}` in
+its lede is the count). Seeded by `vitrin-upgrade-corporate-pages` with the
+exact old texts (0 content pixels changed at 1440 and 390);
+`PAGE_DEFAULTS` / `PAGE_SECTIONS` in `src/lib/medusa/vitrin.ts` hold the
+same as the fallback. The block editor takes `?sayfa=<page>` to show one
+page's sections.
+
 **Talepler** (`inquiry` module, admin → Talepler): every storefront form —
 iletişim / teklif (`/iletisim?konu=teklif&urun=<SKU>`, which every quote
 button opens), kurumsal, toptan, bayi, havale bildirimi, iş başvurusu — goes

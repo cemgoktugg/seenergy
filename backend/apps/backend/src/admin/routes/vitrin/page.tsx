@@ -3,7 +3,7 @@ import { ArrowUpRightOnBox, PencilSquare, Plus, Swatch } from "@medusajs/icons"
 import { Badge, Button, Container, Heading, Text } from "@medusajs/ui"
 import { Link } from "react-router-dom"
 
-import { DEPARTMENT_NAMES, GROUPS, LIST_PLACES } from "../../lib/blocks"
+import { DEPARTMENT_NAMES, GROUPS, LIST_PLACES, PAGE_NAMES } from "../../lib/blocks"
 import { mediaUrl, useQuickProducts, useVitrin, type VitrinBlock, type VitrinList } from "../../lib/vitrin"
 
 /**
@@ -162,6 +162,40 @@ const ListLink = ({ list, label }: { list?: VitrinList; label: string }) =>
     </Link>
   ) : null
 
+/**
+ * A corporate page on the map: its settings (headings, lede, search text)
+ * behind Düzenle, its text sections and its own cards as links, and the
+ * section headings as a preview.
+ */
+function CorporatePage({
+  page,
+  where,
+  extra,
+  sections,
+}: {
+  page: string
+  where: string
+  extra: { label: string; to: string }
+  sections: VitrinBlock[]
+}) {
+  return (
+    <Band
+      title={PAGE_NAMES[page]}
+      where={where}
+      to={`/vitrin/blok/page?bolum=${page}`}
+      links={[extra, { label: `Metin bölümleri (${sections.length})`, to: `/vitrin/blok/page-section?sayfa=${page}` }]}
+    >
+      <div className="flex flex-wrap gap-2">
+        {sections.map((b) => (
+          <Badge key={b.id} size="small" color={b.is_active ? "grey" : "orange"}>
+            {b.data.heading || "başlıksız"}
+          </Badge>
+        ))}
+      </div>
+    </Band>
+  )
+}
+
 const VitrinPage = () => {
   const { data, isLoading } = useVitrin()
   if (isLoading || !data) {
@@ -180,6 +214,7 @@ const VitrinPage = () => {
   const section = (key: string) => data.blocks.find((b) => b.group === "section" && b.key === key)
   const isHidden = (key: string) => section(key)?.data.visible === "off"
   const settings = (key: string) => `/vitrin/blok/section?bolum=${key}`
+  const sectionsOf = (page: string) => group("page-section").filter((b) => b.data.page === page)
   const companyCards = group("company-card")
   const heroBackground = section("hero")?.data.background as string | undefined
   const deals = section("deals")?.data ?? {}
@@ -380,7 +415,15 @@ const VitrinPage = () => {
           <Heading level="h2">Diğer sayfalar</Heading>
         </div>
 
-        <Band title={GROUPS.staff.title} where={GROUPS.staff.where} to="/vitrin/blok/staff">
+        <Band
+          title="İletişim sayfası"
+          where="Adres / telefon kutusundaki etiketler ve butonlar, teklif modu, ekip bölümlerinin başlıkları, formun başlığı, konu seçenekleri ve gönderildi mesajı. Adres, telefon, çalışma saatleri ve kutunun arka planı 'Şirket bilgileri'nden gelir."
+          to="/vitrin/blok/page?bolum=iletisim"
+          links={[
+            { label: `Ekibimiz (${group("staff").length} kişi)`, to: "/vitrin/blok/staff" },
+            { label: "Şirket bilgileri", to: "/vitrin/blok/company" },
+          ]}
+        >
           <div className="flex flex-wrap gap-2">
             {group("staff").map((b) => (
               <Badge key={b.id} size="small" color={b.is_active ? "grey" : "orange"}>
@@ -389,6 +432,25 @@ const VitrinPage = () => {
             ))}
           </div>
         </Band>
+
+        <CorporatePage
+          page="referanslar"
+          where="Başlık ve giriş yazısı, firma kartları (referanslar) ve altındaki başlıklı metin bölümleri."
+          extra={{ label: `Referanslar (${group("reference").length} firma)`, to: "/vitrin/blok/reference" }}
+          sections={sectionsOf("referanslar")}
+        />
+        <CorporatePage
+          page="cozum-ortaklarimiz"
+          where="Başlık ve giriş yazısı, marka logoları ve altındaki metin bölümleri. Logolar ana sayfadaki Marka duvarı ile aynıdır."
+          extra={{ label: `Marka logoları → Marka duvarı (${group("brand-wall").length})`, to: "/vitrin/blok/brand-wall" }}
+          sections={sectionsOf("cozum-ortaklarimiz")}
+        />
+        <CorporatePage
+          page="projeler"
+          where="Başlık ve giriş yazısı, fotoğraflı proje kartları ve altındaki başlıklı metin bölümleri."
+          extra={{ label: `Projeler (${group("project").length} proje)`, to: "/vitrin/blok/project" }}
+          sections={sectionsOf("projeler")}
+        />
 
         <Band
           title="Kategoriler"

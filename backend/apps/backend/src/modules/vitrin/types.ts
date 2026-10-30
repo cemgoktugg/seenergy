@@ -20,6 +20,10 @@ export type BlockGroup =
   | "own-brand"
   | "brand-wall"
   | "company-card"
+  | "page"
+  | "page-section"
+  | "reference"
+  | "project"
 
 /**
  * One homepage band's own settings (`section`, keyed by band: hero, rails,
@@ -43,6 +47,43 @@ export interface CompanyCardData {
   href: string
   /** Projelerimiz only: the picture on its plate. */
   image?: string
+}
+
+/**
+ * A corporate page's own settings (`page`, keyed: referanslar,
+ * cozum-ortaklarimiz, projeler, iletisim): headings, the lede, the search
+ * description, and on /iletisim every label, button and form text. Missing
+ * or empty fields fall back to what the storefront shipped with.
+ */
+export type PageData = Record<string, unknown>
+
+/** One text section of a corporate page (`page-section`, repeatable). */
+export interface PageSectionData {
+  page: "referanslar" | "cozum-ortaklarimiz" | "projeler"
+  heading: string
+  /** paragraf: blank line = new paragraph; liste / adimlar: one item per line,
+   *  "Etiket: açıklama" sets the label in bold. [yazı](/yol) is a link. */
+  style: "paragraf" | "liste" | "adimlar"
+  text: string
+}
+
+/** One client on /referanslar (`reference`, repeatable). */
+export interface ReferenceData {
+  name: string
+  logo: string
+  sector: string
+  text: string
+  href: string
+}
+
+/** One finished project on /projeler (`project`, repeatable). */
+export interface ProjectData {
+  title: string
+  image: string
+  location: string
+  year: string
+  category: string
+  text: string
 }
 
 export interface HeroSlideData {

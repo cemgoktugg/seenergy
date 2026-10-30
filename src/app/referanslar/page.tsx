@@ -1,67 +1,26 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
 
 import { InfoPage } from '@/components/info-page';
+import { PageSections, ReferenceGrid } from '@/components/page-sections';
 import { loadVitrin } from '@/lib/medusa/vitrin';
 
-export const metadata: Metadata = {
-  title: 'Referanslarımız',
-  description:
-    'SEENERGY Güvenlik Teknolojileri; fabrika, site, mağaza, okul, sağlık ve otopark projelerinde güvenlik altyapısı kuran firmalara ürün ve çözüm sağlar.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { pages } = await loadVitrin();
+  return { title: pages.referanslar.title, description: pages.referanslar.seo_description };
+}
 
 /**
- * The sectors the shop supplies, not a list of client names: those are shared
- * during a quote, with the clients' consent, rather than published here.
+ * /referanslar — everything from admin → Vitrin → Referanslarımız sayfası:
+ * the heading and lede, the client cards (Referanslar; none until the shop
+ * adds clients who agreed to be named) and the headed text sections.
  */
 export default async function ReferencesPage() {
-  const { company } = await loadVitrin();
+  const { company, pages, pageSections, references } = await loadVitrin();
+  const page = pages.referanslar;
   return (
-    <InfoPage
-      path="/referanslar"
-      eyebrow="Kurumsal"
-      title="Referanslarımız"
-      lede="Farklı sektörlerde güvenlik altyapısı kuran firmalara, kurulumculara ve proje ekiplerine ürün ve çözüm sağlıyoruz."
-      company={company}
-    >
-      <h2>Hizmet verdiğimiz alanlar</h2>
-      <ul>
-        <li>
-          <strong>Fabrika ve depo:</strong> geniş alan ve çevre güvenliği, giriş-çıkış kontrolü, gece görüşlü
-          kamera ve uzun süreli kayıt.
-        </li>
-        <li>
-          <strong>Site ve konut:</strong> ortak alan, otopark ve giriş kameraları, interkom ve geçiş kontrol
-          sistemleri.
-        </li>
-        <li>
-          <strong>Mağaza ve AVM:</strong> kasa ve satış alanı izleme, renkli gece görüşü, uzaktan izleme.
-        </li>
-        <li>
-          <strong>Okul ve kamu binaları:</strong> bina çevresi, koridor ve giriş güvenliği, yangın algılama.
-        </li>
-        <li>
-          <strong>Sağlık:</strong> kesintisiz kayıt, network altyapısı ve alarm sistemleri.
-        </li>
-        <li>
-          <strong>Otopark ve uzak saha:</strong> plaka ve araç izleme, elektrik ve internet hattı olmayan
-          noktalar için 4G solar kameralar.
-        </li>
-      </ul>
-
-      <h2>Referans listemiz</h2>
-      <p>
-        Tamamladığımız projelerin ve çalıştığımız firmaların listesini, müşterilerimizin onayıyla, teklif
-        sürecinde paylaşıyoruz. Benzer bir proje için örnek ve referans talep etmek isterseniz{' '}
-        <Link href="/kurumsal">kurumsal satış ve proje</Link> formundan bize yazabilirsiniz.
-      </p>
-
-      <h2>Birlikte çalıştığımız markalar</h2>
-      <p>
-        Kendi markamız SEENERGY&apos;nin yanında Dahua, Hikvision, UNV ve Neutron gibi markaların ürünlerini
-        sunuyoruz. Tüm markalar için <Link href="/cozum-ortaklarimiz">Çözüm Ortaklarımız</Link> sayfasına göz
-        atabilirsiniz.
-      </p>
+    <InfoPage path="/referanslar" eyebrow={page.eyebrow} title={page.title} lede={page.lede} company={company}>
+      <ReferenceGrid title={page.references_title} references={references} />
+      <PageSections sections={pageSections.filter((section) => section.page === 'referanslar')} />
     </InfoPage>
   );
 }

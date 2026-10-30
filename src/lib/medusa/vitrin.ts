@@ -191,6 +191,187 @@ const COMPANY_CARDS: CompanyCard[] = [
   },
 ];
 
+/**
+ * The corporate pages' and /iletisim's own settings (admin → Vitrin → each
+ * page's "Düzenle"). Every value is what the page shipped with, so a missing
+ * block or an empty field shows exactly what it did before
+ * (vitrin-upgrade-corporate-pages seeds the same values).
+ */
+export const PAGE_DEFAULTS = {
+  referanslar: {
+    eyebrow: 'Kurumsal',
+    title: 'Referanslarımız',
+    lede: 'Farklı sektörlerde güvenlik altyapısı kuran firmalara, kurulumculara ve proje ekiplerine ürün ve çözüm sağlıyoruz.',
+    seo_description:
+      'SEENERGY Güvenlik Teknolojileri; fabrika, site, mağaza, okul, sağlık ve otopark projelerinde güvenlik altyapısı kuran firmalara ürün ve çözüm sağlar.',
+    references_title: 'Çalıştığımız firmalar',
+  },
+  'cozum-ortaklarimiz': {
+    eyebrow: 'Kurumsal',
+    title: 'Çözüm Ortaklarımız',
+    /** {sayi} = the number of brands on the wall. */
+    lede: 'Kendi markamız SEENERGY ile birlikte {sayi} markanın ürünlerini sunuyoruz. Bir markaya tıklayarak ürünlerine ulaşabilirsiniz.',
+    seo_description:
+      'SEENERGY Güvenlik Teknolojileri olarak birlikte çalıştığımız markalar: Dahua, Hikvision, UNV, Neutron, Ruijie, TP-Link ve daha fazlası.',
+  },
+  projeler: {
+    eyebrow: 'Kurumsal',
+    title: 'Projelerimiz',
+    lede: 'Tek bir kameradan yüzlerce kanallı kayıt sistemine kadar, projenize uygun ürünleri seçiyor ve proje boyunca yanınızda oluyoruz.',
+    seo_description:
+      'Kamera, kayıt, network ve uzak saha (4G, solar) güvenlik projeleri: keşiften kuruluma kadar ürün ve çözüm desteği.',
+    projects_title: 'Tamamlanan projeler',
+  },
+  iletisim: {
+    eyebrow: 'Bize ulaşın',
+    title: 'İletişim',
+    quote_eyebrow: 'Fiyat teklifi',
+    quote_title: 'Fiyat Teklifi İsteyin',
+    tagline: 'Güvenlik Teknolojileri A.Ş.',
+    address_label: 'Adres',
+    phone_label: 'Telefon',
+    hours_label: 'Çalışma saatleri',
+    call_label: 'Hemen arayın',
+    directions_label: 'Yol tarifi al',
+    staff_eyebrow: 'Ekibimiz',
+    satis_title: 'Satış Departmanı',
+    muhasebe_title: 'Muhasebe',
+    ik_title: 'İnsan Kaynakları',
+    form_eyebrow: 'Bize yazın',
+    form_title: 'İletişim formu',
+    submit_label: 'Mesajı gönder',
+    success_title: 'Mesajınız alındı',
+    quote_form_eyebrow: 'Teklif',
+    quote_form_title: 'Teklif formu',
+    quote_submit_label: 'Teklif iste',
+    quote_success_title: 'Teklif talebiniz alındı',
+    success_text: 'Mesai saatlerinde aynı gün, en geç bir iş günü içinde dönüş yapıyoruz.',
+    seo_description:
+      'SEENERGY Güvenlik Teknolojileri — İvedik OSB, Yenimahalle / Ankara. Telefon, e-posta, çalışma saatleri, satış, muhasebe ve insan kaynakları ekibimiz ve iletişim formu.',
+  },
+};
+
+export type Pages = typeof PAGE_DEFAULTS;
+
+/** /iletisim's "Konu" options; the site's ?konu= links pick the first five. */
+export const CONTACT_TOPICS = ['Fiyat teklifi', 'Teknik destek', 'Siparişim hakkında', 'İade ve cayma', 'Garanti ve arıza', 'Genel bilgi'];
+
+/** Saved page settings over their defaults: a non-empty string wins. */
+function toPages(blocks: Block<Record<string, unknown>>[] | undefined): Pages {
+  const out = structuredClone(PAGE_DEFAULTS) as Record<string, Record<string, string>>;
+  for (const block of blocks ?? []) {
+    const target = out[block.key ?? ''];
+    if (!target) continue;
+    for (const field of Object.keys(target)) {
+      const value = block.data[field];
+      if (typeof value === 'string' && value.trim()) target[field] = value.trim();
+    }
+  }
+  return out as unknown as Pages;
+}
+
+/** One headed text section of a corporate page (admin → Vitrin → Metin bölümleri). */
+export interface PageSection {
+  page: 'referanslar' | 'cozum-ortaklarimiz' | 'projeler';
+  heading: string;
+  /** paragraf: blank line = new paragraph; liste / adimlar: one item a line. */
+  style: 'paragraf' | 'liste' | 'adimlar';
+  text: string;
+}
+
+/** What the pages carried before their sections moved to Vitrin. */
+const PAGE_SECTIONS: PageSection[] = [
+  {
+    page: 'referanslar',
+    heading: 'Hizmet verdiğimiz alanlar',
+    style: 'liste',
+    text: [
+      'Fabrika ve depo: geniş alan ve çevre güvenliği, giriş-çıkış kontrolü, gece görüşlü kamera ve uzun süreli kayıt.',
+      'Site ve konut: ortak alan, otopark ve giriş kameraları, interkom ve geçiş kontrol sistemleri.',
+      'Mağaza ve AVM: kasa ve satış alanı izleme, renkli gece görüşü, uzaktan izleme.',
+      'Okul ve kamu binaları: bina çevresi, koridor ve giriş güvenliği, yangın algılama.',
+      'Sağlık: kesintisiz kayıt, network altyapısı ve alarm sistemleri.',
+      'Otopark ve uzak saha: plaka ve araç izleme, elektrik ve internet hattı olmayan noktalar için 4G solar kameralar.',
+    ].join('\n'),
+  },
+  {
+    page: 'referanslar',
+    heading: 'Referans listemiz',
+    style: 'paragraf',
+    text: 'Tamamladığımız projelerin ve çalıştığımız firmaların listesini, müşterilerimizin onayıyla, teklif sürecinde paylaşıyoruz. Benzer bir proje için örnek ve referans talep etmek isterseniz [kurumsal satış ve proje](/kurumsal) formundan bize yazabilirsiniz.',
+  },
+  {
+    page: 'referanslar',
+    heading: 'Birlikte çalıştığımız markalar',
+    style: 'paragraf',
+    text: "Kendi markamız SEENERGY'nin yanında Dahua, Hikvision, UNV ve Neutron gibi markaların ürünlerini sunuyoruz. Tüm markalar için [Çözüm Ortaklarımız](/cozum-ortaklarimiz) sayfasına göz atabilirsiniz.",
+  },
+  {
+    page: 'cozum-ortaklarimiz',
+    heading: 'Neden önemli?',
+    style: 'paragraf',
+    text: 'Ürünleri yetkili kanallardan, faturalı ve garantili olarak tedarik ediyoruz. Projenize uygun markayı ve modeli birlikte seçmek için [kurumsal satış ve proje](/kurumsal) formundan bize ulaşabilirsiniz.',
+  },
+  {
+    page: 'projeler',
+    heading: 'Proje türleri',
+    style: 'liste',
+    text: [
+      'CCTV ve kayıt sistemleri: AHD ve IP kameralar, DVR/NVR kayıt cihazları, disk ve depolama planlaması.',
+      'Network altyapısı: PoE ve ethernet switch, access point, router ve rack kabinet.',
+      'Uzak saha: elektrik ve internet hattı olmayan noktalar için 4G SIM kartlı, solar panelli kameralar.',
+      'Alarm, yangın ve geçiş kontrol: bina güvenliğini tamamlayan sistemler.',
+    ].join('\n'),
+  },
+  {
+    page: 'projeler',
+    heading: 'Bir proje nasıl ilerler?',
+    style: 'adimlar',
+    text: [
+      'İhtiyacı konuşuruz: alanı, kamera noktalarını, kayıt süresini ve bütçeyi birlikte belirleriz.',
+      'Teklif hazırlarız: uyumlu ürünleri, adetleri ve fiyatları tek bir teklifte sunarız.',
+      'Tedarik ederiz: ürünleri faturalı ve garantili olarak hızla sevk ederiz.',
+      'Kurulumda destek oluruz: kurulum ve ayar aşamasında teknik destek veririz.',
+    ].join('\n'),
+  },
+  {
+    page: 'projeler',
+    heading: 'Projeniz için teklif alın',
+    style: 'paragraf',
+    text: 'Proje detaylarını [kurumsal satış ve proje](/kurumsal) formundan iletin; size aynı gün dönüş yapalım. Daha önce yaptığımız benzer projeler için [Referanslarımız](/referanslar) sayfasına göz atabilirsiniz.',
+  },
+];
+
+const SECTION_STYLES = ['paragraf', 'liste', 'adimlar'] as const;
+
+const toPageSection = (data: Record<string, unknown>): PageSection | null => {
+  const page = str(data.page);
+  const heading = str(data.heading).trim();
+  const text = str(data.text).trim();
+  if (!(page in PAGE_DEFAULTS) || page === 'iletisim' || (!heading && !text)) return null;
+  const style = (SECTION_STYLES as readonly string[]).includes(str(data.style)) ? (data.style as PageSection['style']) : 'paragraf';
+  return { page: page as PageSection['page'], heading, style, text };
+};
+
+/** A client card on /referanslar (admin → Vitrin → Referanslar). */
+export interface Reference {
+  name: string;
+  logo: string;
+  sector: string;
+  text: string;
+  href: string;
+}
+
+/** A project card on /projeler (admin → Vitrin → Projeler). */
+export interface Project {
+  title: string;
+  image: string;
+  category: string;
+  location: string;
+  year: string;
+  text: string;
+}
+
 const toTiles = (blocks: Block<Record<string, unknown>>[] | undefined, fallback: BrandTile[]): BrandTile[] =>
   blocks
     ? blocks
@@ -279,6 +460,16 @@ export interface Vitrin {
   /** The moving logo wall. */
   brandWall: BrandTile[];
   companyCards: CompanyCard[];
+  /** The corporate pages' and /iletisim's settings: headings, labels, texts. */
+  pages: Pages;
+  /** /iletisim's "Konu" options. */
+  contactTopics: string[];
+  /** The corporate pages' headed text sections, in the admin's order. */
+  pageSections: PageSection[];
+  /** /referanslar's client cards; empty = that part is not shown. */
+  references: Reference[];
+  /** /projeler's project cards; empty = that part is not shown. */
+  projects: Project[];
   techBand: TechBandContent | null;
   trust: TrustItem[];
   /** List key → product ids, in the order the shop set. */
@@ -300,6 +491,10 @@ interface StoreVitrin {
     'own-brand': Block<Record<string, unknown>>[];
     'brand-wall': Block<Record<string, unknown>>[];
     'company-card': Block<Record<string, unknown>>[];
+    page: Block<Record<string, unknown>>[];
+    'page-section': Block<Record<string, unknown>>[];
+    reference: Block<Record<string, unknown>>[];
+    project: Block<Record<string, unknown>>[];
     'tech-band': Block<{
       eyebrow: string;
       title: string;
@@ -395,6 +590,11 @@ const FALLBACK: Vitrin = {
   ownBrands: OWN_BRANDS,
   brandWall: BRANDS.map(({ name, href, image }) => ({ name, href, logo: image })),
   companyCards: COMPANY_CARDS,
+  pages: PAGE_DEFAULTS,
+  contactTopics: CONTACT_TOPICS,
+  pageSections: PAGE_SECTIONS,
+  references: [],
+  projects: [],
   techBand: null,
   trust: TRUST_ITEMS.map((item) => ({ ...item })),
   company: COMPANY_FALLBACK,
@@ -472,6 +672,36 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
         image: str(data.image) || card.image,
       };
     }),
+    pages: toPages(b.page),
+    contactTopics: (() => {
+      const topics = b.page?.find((block) => block.key === 'iletisim')?.data.topics;
+      const clean = Array.isArray(topics) ? topics.map((t) => str(t).trim()).filter(Boolean) : [];
+      return clean.length ? clean : CONTACT_TOPICS;
+    })(),
+    // No block at all (before the seed ran) keeps the shipped sections; once
+    // the group exists, an empty page is what the admin chose.
+    pageSections: b['page-section']
+      ? b['page-section'].map((block) => toPageSection(block.data)).filter((x): x is PageSection => x !== null)
+      : PAGE_SECTIONS,
+    references: (b.reference ?? [])
+      .map((block) => ({
+        name: str(block.data.name).trim(),
+        logo: str(block.data.logo),
+        sector: str(block.data.sector).trim(),
+        text: str(block.data.text).trim(),
+        href: str(block.data.href).trim(),
+      }))
+      .filter((ref) => ref.name),
+    projects: (b.project ?? [])
+      .map((block) => ({
+        title: str(block.data.title).trim(),
+        image: str(block.data.image),
+        category: str(block.data.category).trim(),
+        location: str(block.data.location).trim(),
+        year: str(block.data.year).trim(),
+        text: str(block.data.text).trim(),
+      }))
+      .filter((project) => project.title),
     techBand: tech
       ? {
           eyebrow: str(tech.eyebrow),
