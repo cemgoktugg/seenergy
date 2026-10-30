@@ -331,6 +331,15 @@ it aligned with the bands below, not the viewport.
 Its copy panel and picture are divided by an oval with a frosted rim (2026-10-30,
 the client: "like the /iletisim banner") — a fixed layer between the picture
 track and the copy track, so the curve stays still while the slides move.
+A second look, the **light design** (`src/components/hero-light.tsx`, 2026-10-30,
+the client's mock): a wide photo per slide washed white under dark copy, one
+red accent (`--color-hero-accent`) — eyebrow line, the title's second line
+(`title_accent`), button, active dot. Chosen in Vitrin → Ana slayt → Tasarım
+(`section` hero `design`: `oval` default | `acik`); both share `useCarousel`.
+A slide's `wide_image` is read only by the light design (without one, its
+product picture on a light plate). `vitrin-upgrade-hero-light` gives the
+first slide `public/hero/acik-guvenlik.webp`, cut from the mock. The oval
+design was verified unchanged (0 changed pixels at 1440, 768, 390).
 The page ground is white with a faint dot grid and a sparse tile of technical
 line icons (`--page-ground`, `--page-dot`, `--page-pattern` in
 `globals.css`; tiles in `public/patterns/`).

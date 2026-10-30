@@ -94,6 +94,11 @@ export interface HeroSlideData {
   cta: string
   href: string
   image: string
+  fit?: "contain" | "cover"
+  /** Light design only: the second title line, in the accent red. */
+  title_accent?: string
+  /** Light design only: the wide photo behind the slide. */
+  wide_image?: string
 }
 
 /** Hero side tiles, the wide banner and the two dual banners. */

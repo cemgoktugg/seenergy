@@ -18,6 +18,7 @@ import Link from 'next/link';
 import { ArrowRight } from 'lucide-react';
 
 import { Hero } from '@/components/hero';
+import { HeroLight } from '@/components/hero-light';
 import { ProductCard } from '@/components/product-card';
 import { BrandBoard, type BrandBoardEntry } from '@/components/brand-board';
 import { BrandShowcase, type PartnerBrand } from '@/components/brand-showcase';
@@ -132,7 +133,13 @@ export default async function HomePage() {
              wanted it aligned with the bands below, not the viewport. */}
       {showHero ? (
         <Section first label="Kampanyalar">
-          <Hero slides={vitrin.slides} background={s.hero.background} />
+          {/* Two looks for the same slides (admin → Vitrin → Ana slayt →
+              Tasarım): the dark oval, the default, or the light photo design. */}
+          {s.hero.design === 'acik' ? (
+            <HeroLight slides={vitrin.slides} />
+          ) : (
+            <Hero slides={vitrin.slides} background={s.hero.background} />
+          )}
         </Section>
       ) : null}
 

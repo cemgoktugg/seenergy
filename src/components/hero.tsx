@@ -38,19 +38,26 @@ import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react
 
 import type { HeroSlide } from '@/lib/medusa/vitrin';
 
-const AUTOPLAY_MS = 5000;
+export const AUTOPLAY_MS = 5000;
 
 /** Staggered entrance for the active slide's copy. */
-const RISE = 'animate-[hero-rise_600ms_var(--ease-out)_both]';
+export const RISE = 'animate-[hero-rise_600ms_var(--ease-out)_both]';
 
 /**
  * next/image resizes uploads (a 3.7 MB, 2000×2000 photo arrived as the second
  * slide) to the stage and serves WebP. SVG artwork needs no resizing and is
  * passed through untouched.
  */
-const isVector = (src: string) => /\.svg(\?|$)/i.test(src);
+export const isVector = (src: string) => /\.svg(\?|$)/i.test(src);
 
-export function Hero({ slides, background = '' }: { slides: HeroSlide[]; background?: string }) {
+/**
+ * The slider's state, shared by both designs (admin → Vitrin → Ana slayt →
+ * "Tasarım"): the current slide, autoplay, the pause control and the motion
+ * preference. `pauseOn` goes on the carousel's root — pointer and focus pause
+ * it, so autoplay cannot pull a slide out from under someone reading or
+ * tabbing through it.
+ */
+export function useCarousel(count: number) {
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -67,18 +74,28 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
     () => false,
   );
 
-  const go = useCallback(
-    (next: number) => setIndex(((next % slides.length) + slides.length) % slides.length),
-    [slides.length],
-  );
+  const go = useCallback((next: number) => setIndex(((next % count) + count) % count), [count]);
 
-  const running = !paused && !hovered && !reduced && slides.length > 1;
+  const running = !paused && !hovered && !reduced && count > 1;
 
   useEffect(() => {
     if (!running) return;
     const timer = setInterval(() => go(index + 1), AUTOPLAY_MS);
     return () => clearInterval(timer);
   }, [running, index, go]);
+
+  const pauseOn = {
+    onMouseEnter: () => setHovered(true),
+    onMouseLeave: () => setHovered(false),
+    onFocusCapture: () => setHovered(true),
+    onBlurCapture: () => setHovered(false),
+  };
+
+  return { index, go, paused, setPaused, reduced, running, pauseOn };
+}
+
+export function Hero({ slides, background = '' }: { slides: HeroSlide[]; background?: string }) {
+  const { index, go, paused, setPaused, reduced, running, pauseOn } = useCarousel(slides.length);
 
   /* 32px discs in the control row; `before` lifts each target to 44. */
   const control =
@@ -89,12 +106,7 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
       aria-roledescription="carousel"
       aria-label="Öne çıkan kampanyalar"
       className="relative overflow-hidden rounded-(--panel-radius) bg-chrome shadow-e1"
-      // Pause on pointer and focus so autoplay cannot pull a slide out from
-      // under someone reading or tabbing through it.
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocusCapture={() => setHovered(true)}
-      onBlurCapture={() => setHovered(false)}
+      {...pauseOn}
     >
       {/* Three layers, so the oval can stand still while the slides move:
           the pictures' track, the oval (the dark panel and its frosted rim)

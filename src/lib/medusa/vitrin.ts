@@ -27,6 +27,11 @@ export interface HeroSlide {
    * cover: a wide campaign photo that fills the stage edge to edge.
    */
   fit: 'contain' | 'cover';
+  /** The light design only: a second title line, set in the accent red. */
+  title_accent: string;
+  /** The light design only: a wide photo behind the slide, its left side
+   *  washed white under the copy. Empty: the slide's `image` on a light plate. */
+  wide_image: string;
 }
 
 /** Campaign-card surface colours, chosen per card in the admin. */
@@ -118,7 +123,9 @@ export interface CompanyCard {
  * is missing, or a field left empty, looks exactly as before.
  */
 export const SECTION_DEFAULTS = {
-  hero: { visible: true, background: '/hero/seenergy-bina.webp' },
+  // design: oval = the dark oval panel (2026-10-30); acik = the light,
+  // full-photo design (2026-10-30, the client's mock). Oval until switched.
+  hero: { visible: true, design: 'oval', background: '/hero/seenergy-bina.webp' },
   'brand-board': { visible: true },
   rails: {
     visible: true,
@@ -575,6 +582,8 @@ const FALLBACK: Vitrin = {
     ...slide,
     chips: [...slide.chips],
     fit: slide.fit === 'contain' ? ('contain' as const) : ('cover' as const),
+    title_accent: '',
+    wide_image: '',
   })),
   heroSide: HERO_SIDE.map((item) => ({ ...item })),
   banners: {},
@@ -628,6 +637,8 @@ export const loadVitrin = cache(async (): Promise<Vitrin> => {
         ...block.data,
         chips: Array.isArray(block.data.chips) ? block.data.chips : [],
         fit: block.data.fit === 'cover' ? ('cover' as const) : ('contain' as const),
+        title_accent: str(block.data.title_accent).trim(),
+        wide_image: str(block.data.wide_image),
       }))
       // A slide without a picture would render a blank frame; skip it.
       .filter((slide) => slide.image && slide.title),

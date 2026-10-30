@@ -156,10 +156,20 @@ const heading = (eyebrow: string, title: string): FieldDef[] => [
 const SECTION_FIELDS: Record<string, FieldDef[]> = {
   hero: [
     {
+      name: "design",
+      label: "Tasarım",
+      type: "choice",
+      options: [
+        { value: "oval", label: "Koyu oval panel (mevcut tasarım)" },
+        { value: "acik", label: "Açık tasarım — geniş fotoğraf, kırmızı vurgu" },
+      ],
+      hint: "Slaytların içeriği iki tasarımda da aynıdır; yalnızca görünüm değişir. Açık tasarım için her slayta 'Geniş fotoğraf' ve isterseniz 'Başlığın kırmızı satırı' ekleyin. İstediğiniz zaman geri dönebilirsiniz.",
+    },
+    {
       name: "background",
       label: "Koyu alanın arka plan fotoğrafı",
       type: "image",
-      hint: "Slaytların yazı tarafındaki koyu alanın arkasında, bütün slaytlarda görünür; üzerine yazılar okunsun diye koyu bir gölge gelir. Görselin sağ tarafı gösterilir. Boş bırakırsanız düz koyu zemin olur.",
+      hint: "Yalnızca koyu oval tasarımda kullanılır. Slaytların yazı tarafındaki koyu alanın arkasında, bütün slaytlarda görünür; üzerine yazılar okunsun diye koyu bir gölge gelir. Görselin sağ tarafı gösterilir. Boş bırakırsanız düz koyu zemin olur.",
     },
   ],
   rails: [
@@ -326,6 +336,13 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
     fields: [
       { name: "eyebrow", label: "Üst etiket", type: "text", placeholder: "Akıllı ev ve güvenlik" },
       { name: "title", label: "Başlık", type: "text", required: true },
+      {
+        name: "title_accent",
+        label: "Başlığın kırmızı satırı",
+        type: "text",
+        placeholder: "güçlü teknoloji.",
+        hint: "Yalnızca açık tasarımda: başlığın altında, kırmızıyla yazılan ikinci satır. Boş bırakılabilir.",
+      },
       { name: "description", label: "Açıklama", type: "textarea" },
       { name: "chips", label: "Öne çıkan maddeler", type: "tags", hint: "En fazla 3 kısa madde." },
       { name: "cta", label: "Buton yazısı", type: "text", required: true, placeholder: "Alışverişe Başla" },
@@ -341,6 +358,12 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
         ],
         hint: "Ürün fotoğrafı veya logo için 'tamamı görünsün'. Kenarları kırpılabilecek geniş bir kampanya fotoğrafı için 'alanı kaplasın'.",
       },
+      {
+        name: "wide_image",
+        label: "Geniş fotoğraf (açık tasarım)",
+        type: "image",
+        hint: "Yalnızca açık tasarımda: slaytın tamamını kaplayan fotoğraf; sol tarafı yazıların altında beyaza karışır, ürünü sağ yarıya yerleştirin. Önerilen 1920 × 840 piksel (yatay). Boş bırakırsanız yukarıdaki görsel açık zeminde gösterilir.",
+      },
     ],
     newItem: () => ({
       eyebrow: "",
@@ -351,6 +374,8 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       href: "/",
       image: "",
       fit: "contain",
+      title_accent: "",
+      wide_image: "",
     }),
   },
   "hero-side": {

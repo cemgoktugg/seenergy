@@ -165,6 +165,11 @@
      visually today; it only gives the dark block below something to move. */
   --color-danger: rgb(186 28 58);
   --color-danger-ink: rgb(186 28 58);
+  /* The hero's light design (2026-10-30, the client's mock): its red line,
+     title accent, button and active dot. Used nowhere else. White on it and
+     it on white both read 5.26:1. */
+  --color-hero-accent: rgb(214 22 32);
+  --color-hero-accent-strong: rgb(178 14 22);
   --color-success: rgb(13 115 90);
   --color-success-ink: rgb(13 115 90);
   /* Low stock ("Son 3 ürün"). Used only on the product card's image stage,
