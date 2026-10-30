@@ -21,7 +21,7 @@
 
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
-import { imageProps } from '@/lib/image';
+import { imageProps, imageUrl } from '@/lib/image';
 import type { Callout } from '@/lib/medusa/catalog';
 
 const prefersReducedMotion = () =>
@@ -256,6 +256,21 @@ export function ProductGallery({
     if (event.pointerType !== 'mouse') return;
     const img = event.currentTarget.querySelector('img');
     if (!img) return;
+    /* At 2× the 640px source went soft. On the first zoom a sharper one is
+       fetched — the optimizer's largest (1200) on a standard screen, the
+       uploaded original on a sharp one — and swapped in only once loaded, so
+       the picture never blanks. Only a picture someone zooms pays for it. */
+    const original = img.dataset.original;
+    if (original && !img.dataset.zoomSource) {
+      const sharp = window.devicePixelRatio > 1.5 ? original : imageUrl(original, 1200);
+      img.dataset.zoomSource = sharp;
+      const next = new Image();
+      next.onload = () => {
+        img.removeAttribute('srcset');
+        img.src = sharp;
+      };
+      next.src = sharp;
+    }
     const box = event.currentTarget.getBoundingClientRect();
     img.style.transformOrigin = `${((event.clientX - box.left) / box.width) * 100}% ${((event.clientY - box.top) / box.height) * 100}%`;
     img.style.transform = 'scale(2)';
@@ -302,6 +317,7 @@ export function ProductGallery({
               >
                 <img
                   {...imageProps(src, 640)}
+                  data-original={src}
                   alt={index === 0 ? alt : `${alt} — ${index + 1}. görsel`}
                   width={800}
                   height={800}
