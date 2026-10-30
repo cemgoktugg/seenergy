@@ -137,7 +137,7 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
                     picture runs into the curve; a contained one keeps clear
                     of it with its left padding. multiply: a product shot on
                     white loses its white box and stands on the plate. */}
-                <div className="absolute inset-x-0 top-0 h-[168px] sm:inset-y-0 sm:right-[40%] sm:h-auto">
+                <div className="absolute inset-x-0 top-0 h-[168px] sm:inset-y-0 sm:right-[34%] sm:h-auto dt:right-[32%] min-[87.5rem]:right-[30%]">
                   <Image
                     src={slide.image}
                     alt=""
@@ -148,7 +148,7 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
                     className={
                       cover
                         ? `object-cover ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`
-                        : `object-contain p-5 mix-blend-multiply sm:py-8 sm:pl-[4%] sm:pr-[21%] dt:py-10 ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
+                        : `object-contain p-5 mix-blend-multiply sm:py-8 sm:pl-[4%] sm:pr-[17%] dt:py-10 dt:pr-[14%] ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
                     }
                   />
                 </div>
@@ -171,22 +171,22 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
           ellipse as a radial gradient, fading out 40px past the curve. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(ellipse_calc(130%_+_44px)_calc(100%_+_44px)_at_50%_144%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)] sm:[background-image:radial-gradient(ellipse_calc(52%_+_44px)_calc(135%_+_44px)_at_102%_65%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)]"
+        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(ellipse_calc(130%_+_44px)_calc(100%_+_44px)_at_50%_144%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)] sm:[background-image:radial-gradient(ellipse_calc(46%_+_44px)_calc(135%_+_44px)_at_102%_65%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)] dt:[background-image:radial-gradient(ellipse_calc(44%_+_44px)_calc(135%_+_44px)_at_102%_65%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)] min-[87.5rem]:[background-image:radial-gradient(ellipse_calc(39%_+_44px)_calc(135%_+_44px)_at_102%_65%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/55 to-white/35 backdrop-blur-md [clip-path:ellipse(calc(130%_+_14px)_calc(100%_+_14px)_at_50%_144%)] sm:[clip-path:ellipse(calc(52%_+_14px)_calc(135%_+_14px)_at_102%_65%)]"
+        className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/55 to-white/35 backdrop-blur-md [clip-path:ellipse(calc(130%_+_14px)_calc(100%_+_14px)_at_50%_144%)] sm:[clip-path:ellipse(calc(46%_+_14px)_calc(135%_+_14px)_at_102%_65%)] dt:[clip-path:ellipse(calc(44%_+_14px)_calc(135%_+_14px)_at_102%_65%)] min-[87.5rem]:[clip-path:ellipse(calc(39%_+_14px)_calc(135%_+_14px)_at_102%_65%)]"
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-chrome [clip-path:ellipse(130%_100%_at_50%_144%)] sm:[clip-path:ellipse(52%_135%_at_102%_65%)]"
+        className="pointer-events-none absolute inset-0 bg-chrome [clip-path:ellipse(130%_100%_at_50%_144%)] sm:[clip-path:ellipse(46%_135%_at_102%_65%)] dt:[clip-path:ellipse(44%_135%_at_102%_65%)] min-[87.5rem]:[clip-path:ellipse(39%_135%_at_102%_65%)]"
       >
         {/* The client's artwork (2026-10-28): the SEENERGY building, set to
             its right side, where the facade and its lettering are. A chrome
             gradient, heaviest under the copy, keeps the text legible. Set in
             admin → Vitrin → Ana slayt; empty = plain chrome. */}
         {background ? (
-          <div className="absolute inset-0 sm:left-[46%]">
+          <div className="absolute inset-0 sm:left-[52%] dt:left-[56%] min-[87.5rem]:left-[60%]">
             <Image
               src={background}
               alt=""
@@ -212,7 +212,7 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
           a span, not a picture, so remounting costs nothing. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 overflow-hidden [clip-path:ellipse(130%_100%_at_50%_144%)] [mask-image:radial-gradient(ellipse_130%_100%_at_50%_144%,transparent_calc(100%_-_70px),#000_100%)] sm:[clip-path:ellipse(52%_135%_at_102%_65%)] sm:[mask-image:radial-gradient(ellipse_52%_135%_at_102%_65%,transparent_calc(100%_-_70px),#000_100%)]"
+        className="pointer-events-none absolute inset-0 overflow-hidden [clip-path:ellipse(130%_100%_at_50%_144%)] [mask-image:radial-gradient(ellipse_130%_100%_at_50%_144%,transparent_calc(100%_-_70px),#000_100%)] sm:[clip-path:ellipse(46%_135%_at_102%_65%)] dt:[clip-path:ellipse(44%_135%_at_102%_65%)] min-[87.5rem]:[clip-path:ellipse(39%_135%_at_102%_65%)] sm:[mask-image:radial-gradient(ellipse_46%_135%_at_102%_65%,transparent_calc(100%_-_70px),#000_100%)] dt:[mask-image:radial-gradient(ellipse_44%_135%_at_102%_65%,transparent_calc(100%_-_70px),#000_100%)] min-[87.5rem]:[mask-image:radial-gradient(ellipse_39%_135%_at_102%_65%,transparent_calc(100%_-_70px),#000_100%)]"
       >
         <span
           key={`x-${index}`}
@@ -248,7 +248,7 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
                     className="pointer-events-none absolute -bottom-24 -left-10 h-72 w-72 sm:left-auto sm:-right-10 rounded-full bg-grad-1/20 blur-3xl"
                   />
 
-                  <div className="relative sm:ml-auto sm:max-w-[44%] dt:max-w-[42%]">
+                  <div className="relative sm:ml-auto sm:max-w-[38%] dt:max-w-[36%] min-[87.5rem]:max-w-[31%]">
                     {slide.eyebrow ? (
                       <p
                         className={`flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-white/65 ${active ? RISE : ''}`}
@@ -319,7 +319,7 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
                       <Link
                         href="/iletisim?konu=teklif"
                         tabIndex={active ? 0 : -1}
-                        className="hidden h-11 items-center rounded-full border border-white/30 px-5 text-[14px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:border-white hover:bg-white/10 sm:inline-flex dt:h-[52px] dt:px-7 dt:text-[16px]"
+                        className="hidden h-11 items-center rounded-full border border-white/30 px-5 text-[14px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:border-white hover:bg-white/10 lg:inline-flex dt:h-[52px] dt:px-7 dt:text-[16px]"
                       >
                         Teklif Al
                       </Link>
