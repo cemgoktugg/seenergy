@@ -5,19 +5,25 @@
  * 2026-10-22 (the two campaign tiles beside it were removed at the client's
  * request; an edge-to-edge version was tried and taken back the same day).
  *
- * THE PHOTO DESIGN (2026-10-30)
+ * THE POSTER DESIGN (2026-10-30) — show the artwork as it was made
  *
- * Each slide's picture fills the whole panel — its wide photo, else its
- * product picture — and from the side the copy stands on it blurs, a little
- * at first and more towards the edge (the client: "yazı yazılan kısımdan
- * resim yavaş yavaş bulanıklaşsın"): the left from `sm`, the bottom on a
- * phone. Dark title and text on that frosted side, the red button and round
- * arrows bottom right (the layout of the client's second mock).
+ * What the shop uploads as slide pictures are finished posters: logo,
+ * headline, feature icons and phone numbers already drawn in (square
+ * Instagram-style posts, ~1:1, and the odd wide banner, ~2.75:1). Every
+ * design that treated them as photos broke them: cropped to fill, blurred
+ * under copy, or with our own title and button laid over their words. So
+ * the picture is shown whole and untouched; the same picture, enlarged and
+ * blurred, fills whatever the artwork leaves free (a square poster's sides),
+ * and the whole slide is one link. The slide's title and description are
+ * not drawn — the poster has its own — but name the link for screen
+ * readers. "Görsel yerleşimi: alanı kaplasın" (`fit: cover`) still fills
+ * the panel edge to edge, for artwork made at the panel's 3:1.
  *
- * The same day it went through a dark oval (building photo + frosted rim,
- * git history up to a9f0392) and a grey CSS studio with the product
- * multiplied onto it (up to feb750d). The light design (hero-light.tsx) is
- * still the other choice in admin → Vitrin → Ana slayt → Tasarım.
+ * The same day this panel went through a dark oval (to a9f0392), a grey CSS
+ * studio (to feb750d) and a full-bleed photo blurred towards the copy (to
+ * f4b7dbf) — each looked right with a clean photo and wrong with the posters
+ * actually uploaded. The light design (hero-light.tsx) is still the other
+ * choice in admin → Vitrin → Ana slayt → Tasarım.
  *
  * Kept from before, and still load-bearing:
  *   - a pause control (WCAG 2.2.2) and no autoplay under reduced motion;
@@ -29,7 +35,7 @@
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowRight, ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
 
 import type { HeroSlide } from '@/lib/medusa/vitrin';
 
@@ -93,58 +99,17 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
   const { index, go, paused, setPaused, reduced, pauseOn } = useCarousel(slides.length);
   const many = slides.length > 1;
 
-  /* Round 36px controls on the scene; `before` lifts each target to 44. */
+  /* Round 40px controls on the picture's edges; `before` lifts each to 44. */
   const control =
-    "relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/50 bg-black/35 text-white backdrop-blur transition-colors duration-(--duration-fast) before:absolute before:-inset-1 before:content-[''] hover:bg-black/55";
+    "grid h-10 w-10 shrink-0 place-items-center rounded-full border border-white/40 bg-black/40 text-white shadow-e2 backdrop-blur transition-colors duration-(--duration-fast) before:absolute before:-inset-0.5 before:content-[''] hover:bg-black/60";
 
   return (
     <section
       aria-roledescription="carousel"
       aria-label="Öne çıkan kampanyalar"
-      className="relative overflow-hidden rounded-(--panel-radius) bg-[#e6e8eb] shadow-e1"
+      className="relative overflow-hidden rounded-(--panel-radius) bg-chrome shadow-e1"
       {...pauseOn}
     >
-      {/* --- scenes -------------------------------------------------------- */}
-      <div aria-hidden className="absolute inset-0 overflow-hidden">
-        <div
-          className="flex h-full w-full transition-transform duration-[800ms] ease-in-out"
-          style={{ transform: `translateX(-${index * 100}%)` }}
-        >
-          {slides.map((slide, i) => {
-            const active = i === index;
-            const picture = slide.wide_image || slide.image;
-            return (
-              <div key={`${i}-${slide.title}`} className="relative h-full w-full shrink-0 overflow-hidden">
-                <Image
-                  src={picture}
-                  alt=""
-                  fill
-                  priority={i === 0}
-                  unoptimized={isVector(picture)}
-                  sizes="(min-width: 1400px) 1320px, 100vw"
-                  className={`object-cover object-[70%_40%] sm:object-[65%_50%] ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`}
-                />
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* --- the blur ------------------------------------------------------ */}
-      {/* A progressive blur over the copy's side, fixed while the pictures
-          move under it: three backdrop blurs, each stronger and each masked
-          to a narrower band from the edge, so the picture goes soft step by
-          step instead of at a line. A light frost over the same side keeps
-          the dark copy readable on a dark photo. Left from `sm`, the bottom
-          on a phone, where the copy sits. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        <span className="absolute inset-0 backdrop-blur-[3px] [mask-image:linear-gradient(to_top,#000_42%,transparent_72%)] sm:[mask-image:linear-gradient(to_right,#000_30%,transparent_64%)]" />
-        <span className="absolute inset-0 backdrop-blur-[8px] [mask-image:linear-gradient(to_top,#000_34%,transparent_60%)] sm:[mask-image:linear-gradient(to_right,#000_22%,transparent_52%)]" />
-        <span className="absolute inset-0 backdrop-blur-[18px] [mask-image:linear-gradient(to_top,#000_26%,transparent_48%)] sm:[mask-image:linear-gradient(to_right,#000_12%,transparent_40%)]" />
-        <span className="absolute inset-0 bg-[linear-gradient(to_top,rgb(241_243_246/0.72)_0%,rgb(241_243_246/0.5)_38%,transparent_64%)] sm:bg-[linear-gradient(to_right,rgb(241_243_246/0.6)_0%,rgb(241_243_246/0.4)_34%,transparent_62%)]" />
-      </div>
-
-      {/* --- copy ---------------------------------------------------------- */}
       <div className="relative h-[380px] sm:h-[320px] md:h-[360px] dt:h-[440px]">
         <div
           className="flex h-full w-full transition-transform duration-[800ms] ease-in-out"
@@ -152,6 +117,8 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
         >
           {slides.map((slide, i) => {
             const active = i === index;
+            const cover = slide.fit === 'cover';
+            const label = [slide.title, slide.title_accent, slide.description].filter(Boolean).join(' — ');
             return (
               <div
                 key={`${i}-${slide.title}`}
@@ -159,76 +126,107 @@ export function Hero({ slides }: { slides: HeroSlide[] }) {
                 aria-roledescription="slayt"
                 aria-label={`${i + 1} / ${slides.length}`}
                 aria-hidden={!active}
-                className="relative h-full w-full shrink-0"
+                className="relative h-full w-full shrink-0 overflow-hidden"
               >
-                <div className="absolute inset-x-0 bottom-[76px] px-5 sm:inset-y-0 sm:flex sm:flex-col sm:justify-center sm:px-10 md:px-14 dt:px-16">
-                  <div className="sm:max-w-[46%] dt:max-w-[40%]">
-                    {/* As authored, not uppercased; a light weight, as drawn. */}
-                    <h2
-                      className={`line-clamp-3 text-[24px] font-medium leading-[1.12] tracking-[-0.025em] text-[#18202e] sm:text-[32px] dt:text-[40px] ${active ? RISE : ''}`}
-                      style={{ animationDelay: '60ms' }}
-                    >
-                      {slide.title}
-                      {slide.title_accent ? <span className="block">{slide.title_accent}</span> : null}
-                    </h2>
-                    {slide.description ? (
-                      <p
-                        className={`mt-2 line-clamp-2 max-w-[44ch] text-[13px] leading-relaxed text-[#4a5262] sm:mt-3 sm:text-[14px] dt:text-[16px] ${active ? RISE : ''}`}
-                        style={{ animationDelay: '140ms' }}
-                      >
-                        {slide.description}
-                      </p>
-                    ) : null}
+                {/* The whole slide is the link: the artwork carries its own
+                    words, so they are the link's name for a screen reader. */}
+                <Link href={slide.href} tabIndex={active ? 0 : -1} aria-label={label} className="absolute inset-0 block">
+                  {cover ? null : (
+                    /* The same picture, enlarged and blurred, fills what the
+                       artwork leaves free — a square poster's sides, a wide
+                       banner's thin edges — so the panel is never bare. A
+                       small rendition is enough for a blur. */
+                    <>
+                      <Image
+                        src={slide.image}
+                        alt=""
+                        fill
+                        unoptimized={isVector(slide.image)}
+                        sizes="256px"
+                        className="scale-125 object-cover opacity-90 blur-2xl saturate-150"
+                      />
+                      <span className="absolute inset-0 bg-black/15" />
+                    </>
+                  )}
+                  {/* On a phone the artwork stops 40px short of the bottom: the
+                      dots sit in that strip, never on the poster's own words. */}
+                  <div className={cover ? 'absolute inset-0' : `absolute inset-x-0 top-0 ${many ? 'bottom-10' : 'bottom-0'} sm:bottom-0`}>
+                  <Image
+                    src={slide.image}
+                    alt=""
+                    fill
+                    priority={i === 0}
+                    unoptimized={isVector(slide.image)}
+                    sizes="(min-width: 1400px) 1320px, 100vw"
+                    className={
+                      cover
+                        ? 'object-cover'
+                        : `object-contain drop-shadow-[0_12px_32px_rgb(0_0_0/0.35)] ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
+                    }
+                  />
                   </div>
-                </div>
-
-                {/* The action, bottom right as drawn, left of the arrows; on a
-                    phone it leads the bottom row. */}
-                <div
-                  className={`absolute bottom-4 left-5 sm:bottom-6 sm:left-auto ${many ? 'sm:right-[164px] dt:right-[172px]' : 'sm:right-6 dt:right-8'} dt:bottom-7 ${active ? RISE : ''}`}
-                  style={{ animationDelay: '220ms' }}
-                >
-                  <Link
-                    href={slide.href}
-                    tabIndex={active ? 0 : -1}
-                    className="group/cta inline-flex h-11 items-center gap-2.5 rounded-(--card-radius) bg-hero-accent px-6 text-[14px] font-semibold text-white shadow-[0_8px_24px_-8px_rgb(214_22_32/0.6)] transition-colors duration-(--duration-fast) hover:bg-hero-accent-strong"
-                  >
-                    {slide.cta}
-                    <ArrowRight
-                      size={16}
-                      strokeWidth={2}
-                      aria-hidden
-                      className="transition-transform duration-(--duration-base) ease-out group-hover/cta:translate-x-1"
-                    />
-                  </Link>
-                </div>
+                </Link>
               </div>
             );
           })}
         </div>
       </div>
 
-      {/* --- controls: bottom right, as drawn ------------------------------ */}
+      {/* --- controls: on the edges, where a poster leaves room ----------- */}
       {many ? (
-        <div className="absolute bottom-[18px] right-4 z-10 flex items-center gap-2 sm:bottom-[30px] sm:right-6 dt:bottom-[34px] dt:right-8">
-          <button type="button" onClick={() => go(index - 1)} aria-label="Önceki kampanya" className={control}>
-            <ChevronLeft size={18} strokeWidth={2} aria-hidden />
+        <>
+          <button
+            type="button"
+            onClick={() => go(index - 1)}
+            aria-label="Önceki kampanya"
+            className={`${control} absolute left-2.5 top-1/2 z-10 hidden -translate-y-1/2 sm:grid`}
+          >
+            <ChevronLeft size={20} strokeWidth={2} aria-hidden />
           </button>
-          <button type="button" onClick={() => go(index + 1)} aria-label="Sonraki kampanya" className={control}>
-            <ChevronRight size={18} strokeWidth={2} aria-hidden />
+          <button
+            type="button"
+            onClick={() => go(index + 1)}
+            aria-label="Sonraki kampanya"
+            className={`${control} absolute right-2.5 top-1/2 z-10 hidden -translate-y-1/2 sm:grid`}
+          >
+            <ChevronRight size={20} strokeWidth={2} aria-hidden />
           </button>
-          {/* Withdrawn under reduced motion: autoplay never starts there. */}
-          {!reduced && (
-            <button
-              type="button"
-              onClick={() => setPaused((value) => !value)}
-              aria-label={paused ? 'Otomatik geçişi başlat' : 'Otomatik geçişi durdur'}
-              className={control}
-            >
-              {paused ? <Play size={13} strokeWidth={2.5} aria-hidden /> : <Pause size={13} strokeWidth={2.5} aria-hidden />}
-            </button>
-          )}
-        </div>
+
+          {/* Position dots and the pause control on a small dark pill: in the
+              strip under the artwork on a phone; from `sm` standing upright
+              in the right margin under the arrow, where a poster leaves room.
+              The pause control is withdrawn under reduced motion, where
+              autoplay never starts. */}
+          <div className="absolute bottom-1.5 left-1/2 z-10 flex -translate-x-1/2 items-center gap-1 rounded-full bg-black/40 px-1.5 py-0.5 backdrop-blur sm:bottom-4 sm:left-auto sm:right-[18px] sm:translate-x-0 sm:flex-col sm:px-0.5 sm:py-1.5">
+            {slides.map((slide, i) => (
+              <button
+                key={`${i}-${slide.title}`}
+                type="button"
+                onClick={() => go(i)}
+                aria-label={`${i + 1}. kampanyaya git`}
+                aria-current={i === index}
+                className="group/dot grid h-7 w-6 place-items-center sm:h-6 sm:w-7"
+              >
+                <span
+                  aria-hidden
+                  className={`h-2 rounded-full transition-all duration-(--duration-base) ${
+                    i === index ? 'w-5 bg-white sm:h-5 sm:w-2' : 'w-2 bg-white/50 group-hover/dot:bg-white/80'
+                  }`}
+                />
+              </button>
+            ))}
+            {!reduced && (
+              <button
+                type="button"
+                onClick={() => setPaused((value) => !value)}
+                aria-label={paused ? 'Otomatik geçişi başlat' : 'Otomatik geçişi durdur'}
+                className="grid h-7 w-7 place-items-center text-white/80 hover:text-white"
+              >
+                {paused ? <Play size={12} strokeWidth={2.5} aria-hidden /> : <Pause size={12} strokeWidth={2.5} aria-hidden />}
+              </button>
+            )}
+          </div>
+        </>
       ) : null}
     </section>
   );

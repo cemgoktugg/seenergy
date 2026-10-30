@@ -144,7 +144,7 @@ function BlockCard({
  * the slides found it. One click saves; the site follows at once.
  */
 const HERO_DESIGNS = [
-  { value: "oval", label: "Fotoğraf", note: "Resim alanı kaplar, yazı tarafı yavaşça bulanıklaşır; kırmızı buton ve oklar sağ altta." },
+  { value: "oval", label: "Afiş", note: "Görseliniz olduğu gibi, kırpılmadan; üstüne yazı konmaz. Hazır afişler için." },
   { value: "acik", label: "Açık tasarım", note: "Beyaz zemin, kalın koyu başlık, kırmızı vurgulu ikinci satır." },
 ]
 
@@ -156,7 +156,7 @@ function HeroDesignSwitch({ section }: { section: VitrinBlock | undefined }) {
     save.mutate(
       { id: section.id, data: { ...section.data, design } },
       {
-        onSuccess: () => toast.success(design === "acik" ? "Açık tasarım sitede." : "Fotoğraf tasarımı sitede."),
+        onSuccess: () => toast.success(design === "acik" ? "Açık tasarım sitede." : "Afiş tasarımı sitede."),
         onError: (error) => toast.error(errorText(error)),
       }
     )

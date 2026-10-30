@@ -134,7 +134,7 @@ export default async function HomePage() {
       {showHero ? (
         <Section first label="Kampanyalar">
           {/* Two looks for the same slides (admin → Vitrin → Ana slayt →
-              Tasarım): the photo design, the default, or the light design. */}
+              Tasarım): the poster design, the default, or the light design. */}
           {s.hero.design === 'acik' ? (
             <HeroLight slides={vitrin.slides} />
           ) : (

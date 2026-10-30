@@ -161,11 +161,11 @@ const SECTION_FIELDS: Record<string, FieldDef[]> = {
       type: "choice",
       options: [
         // "oval" is the stored value of the default; since 2026-10-30 it is
-        // the photo design (the dark oval it named was replaced that day).
-        { value: "oval", label: "Fotoğraf — resim alanı kaplar, yazı tarafı bulanıklaşır (varsayılan)" },
+        // the poster design (the dark oval it named was replaced that day).
+        { value: "oval", label: "Afiş — görsel olduğu gibi, kırpılmadan gösterilir (varsayılan)" },
         { value: "acik", label: "Açık tasarım — beyaz zemin, kırmızı vurgulu başlık" },
       ],
-      hint: "Slaytların içeriği iki tasarımda da aynıdır; yalnızca görünüm değişir. İki tasarım da önce slaytın 'Geniş fotoğraf'ını, yoksa 'Görsel'ini kullanır. İstediğiniz zaman geri dönebilirsiniz.",
+      hint: "Afiş: hazır tasarlanmış görselleriniz (logo, başlık, özellikler üzerinde) hiç kırpılmadan, üstüne yazı konmadan gösterilir; slaytın tamamı tıklanır. Açık tasarım: sitenin kendi başlığı ve butonu geniş bir fotoğrafın üstünde. İstediğiniz zaman geri dönebilirsiniz.",
     },
   ],
   rails: [
@@ -325,25 +325,37 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
   },
   "hero-slide": {
     title: "Ana slayt",
-    where: "Ana sayfanın en üstündeki büyük, kayan görsel alanı (sol taraf).",
+    where: "Ana sayfanın en üstündeki büyük, kayan görsel alanı.",
     repeatable: true,
     itemName: "slayt",
     itemTitle: (d, i) => `${i + 1}. slayt — ${d.title || "başlıksız"}`,
     fields: [
       { name: "eyebrow", label: "Üst etiket", type: "text", placeholder: "Akıllı ev ve güvenlik" },
-      { name: "title", label: "Başlık", type: "text", required: true },
+      {
+        name: "title",
+        label: "Başlık",
+        type: "text",
+        required: true,
+        hint: "Afiş tasarımında sayfada yazılmaz (afişin kendi yazısı var); görme engelli ziyaretçilerin ekran okuyucusu bunu okur. Açık tasarımda başlık olarak görünür.",
+      },
       {
         name: "title_accent",
         label: "Başlığın kırmızı satırı",
         type: "text",
         placeholder: "güçlü teknoloji.",
-        hint: "Başlığın altındaki ikinci satır — açık tasarımda kırmızı, fotoğraf tasarımında başlıkla aynı renkte. Boş bırakılabilir.",
+        hint: "Yalnızca açık tasarımda: başlığın altında kırmızıyla yazılan ikinci satır. Boş bırakılabilir.",
       },
       { name: "description", label: "Açıklama", type: "textarea" },
       { name: "chips", label: "Öne çıkan maddeler", type: "tags", hint: "En fazla 3 kısa madde." },
       { name: "cta", label: "Buton yazısı", type: "text", required: true, placeholder: "Alışverişe Başla" },
       link,
-      { name: "image", label: "Görsel", type: "image", required: true },
+      {
+        name: "image",
+        label: "Görsel",
+        type: "image",
+        required: true,
+        hint: "Afiş tasarımında olduğu gibi gösterilir. En iyisi alanın oranında, yatay 3 : 1 bir afiş (ör. 1980 × 660 piksel): alanı tam doldurur. Kare afiş de olur — iki yanı görselin bulanık hâliyle dolar, hiçbir yeri kırpılmaz.",
+      },
       {
         name: "fit",
         label: "Görsel yerleşimi",
@@ -352,13 +364,13 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
           { value: "contain", label: "Ürün görseli — tamamı görünsün (önerilen)" },
           { value: "cover", label: "Fotoğraf — alanı kaplasın" },
         ],
-        hint: "Ürün fotoğrafı veya logo için 'tamamı görünsün'. Kenarları kırpılabilecek geniş bir kampanya fotoğrafı için 'alanı kaplasın'.",
+        hint: "Afiş ve ürün görselleri için 'tamamı görünsün'. 'Alanı kaplasın' görseli kenarlarından kırpar — yalnızca tam 3 : 1 hazırlanmış görseller için.",
       },
       {
         name: "wide_image",
-        label: "Geniş fotoğraf",
+        label: "Geniş fotoğraf (açık tasarım)",
         type: "image",
-        hint: "Slaytın tamamını kaplayan fotoğraf; yazıların olduğu sol tarafı bulanıklaşır, ürünü sağ yarıya yerleştirin. Önerilen 1920 × 840 piksel (yatay). Boş bırakırsanız yukarıdaki görsel alanı kaplar — kare bir ürün fotoğrafı o zaman çok yakından kırpılır.",
+        hint: "Yalnızca açık tasarımda: yazısız, slaytı kaplayan bir fotoğraf; ürünü sağ yarıya yerleştirin. Önerilen 1920 × 840 piksel. Afiş tasarımı bu alanı kullanmaz.",
       },
     ],
     newItem: () => ({

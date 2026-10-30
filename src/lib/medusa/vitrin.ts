@@ -123,7 +123,7 @@ export interface CompanyCard {
  * is missing, or a field left empty, looks exactly as before.
  */
 export const SECTION_DEFAULTS = {
-  // design: 'oval' (the stored name of the default) = the photo design,
+  // design: 'oval' (the stored name of the default) = the poster design,
   // which replaced the dark oval on 2026-10-30; 'acik' = the light design.
   // The oval's building photo (`background`) stays in the database, unread.
   hero: { visible: true, design: 'oval' },
