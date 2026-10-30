@@ -166,9 +166,16 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
           On a phone the same oval rises from below as an arc under the
           picture. The rim is the same ellipse, 14px larger, blurring the
           picture under it. */}
+      {/* A soft shadow the glass casts on the light picture side — on the
+          near-white stage a white rim alone has no edge. The oval's own
+          ellipse as a radial gradient, fading out 40px past the curve. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-white/45 backdrop-blur-md [clip-path:ellipse(calc(130%_+_14px)_calc(100%_+_14px)_at_50%_144%)] sm:[clip-path:ellipse(calc(52%_+_14px)_calc(135%_+_14px)_at_102%_65%)]"
+        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(ellipse_calc(130%_+_44px)_calc(100%_+_44px)_at_50%_144%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)] sm:[background-image:radial-gradient(ellipse_calc(52%_+_44px)_calc(135%_+_44px)_at_102%_65%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)]"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/55 to-white/35 backdrop-blur-md [clip-path:ellipse(calc(130%_+_14px)_calc(100%_+_14px)_at_50%_144%)] sm:[clip-path:ellipse(calc(52%_+_14px)_calc(135%_+_14px)_at_102%_65%)]"
       />
       <div
         aria-hidden
@@ -195,6 +202,26 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
 
         {/* A faint technical grid, so the panel is not flat black. */}
         <span className="absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.05)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:linear-gradient(to_right,black,transparent_70%)] sm:[mask-image:linear-gradient(to_left,black,transparent_70%)]" />
+      </div>
+
+      {/* The curve's light (2026-10-30), on the dark side of the edge where
+          it shows (on the light side a white glint vanishes): a glint that
+          runs along the curve each time a slide turns — down it from `sm`,
+          across the arc on a phone. A mask keeps it to a 70px band inside
+          the edge, fading inwards. Keyed on the slide so the glint reruns;
+          a span, not a picture, so remounting costs nothing. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 overflow-hidden [clip-path:ellipse(130%_100%_at_50%_144%)] [mask-image:radial-gradient(ellipse_130%_100%_at_50%_144%,transparent_calc(100%_-_70px),#000_100%)] sm:[clip-path:ellipse(52%_135%_at_102%_65%)] sm:[mask-image:radial-gradient(ellipse_52%_135%_at_102%_65%,transparent_calc(100%_-_70px),#000_100%)]"
+      >
+        <span
+          key={`x-${index}`}
+          className="absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-transparent via-white/90 to-transparent animate-[hero-glint-x_2000ms_ease-in-out_150ms_both] motion-reduce:hidden sm:hidden"
+        />
+        <span
+          key={`y-${index}`}
+          className="absolute inset-x-0 top-0 hidden h-1/2 bg-linear-to-b from-transparent via-white/90 to-transparent animate-[hero-glint-y_2000ms_ease-in-out_150ms_both] motion-reduce:hidden sm:block"
+        />
       </div>
 
       {/* --- copy ---------------------------------------------------------- */}
