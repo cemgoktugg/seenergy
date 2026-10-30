@@ -5,29 +5,23 @@
  * 2026-10-22 (the two campaign tiles beside it were removed at the client's
  * request; an edge-to-edge version was tried and taken back the same day).
  *
- * A split slide: a dark copy panel and a light image stage. Since 2026-10-30
- * they are divided by an oval with a frosted rim, as on the /iletisim banner
- * (it replaced a diagonal cut): from `sm` the dark oval, with the building
- * and the copy, bulges from the RIGHT into the picture on the left (sides
- * swapped 2026-10-30 at the client's request); on a phone it rises under the
- * picture as an arc, unchanged.
+ * THE STUDIO DESIGN (2026-10-30, the client's mock — "tamamen bunun gibi")
  *
- * WHY SPLIT
+ * One continuous scene instead of two panels: a grey studio, light on the
+ * left where the copy stands in dark ink, darker to the right where the
+ * products stand on a black plinth with a red light behind them. The action
+ * is a red button at the bottom right, beside round arrows. It replaced the
+ * dark oval design (building photo + frosted rim), which is in git history
+ * before this date; the light design (hero-light.tsx) is still the other
+ * choice in admin → Vitrin → Ana slayt → Tasarım.
  *
- * The earlier hero laid the copy over a full-bleed image darkened on the left.
- * That assumes moody, wide campaign art with empty space on its left half. What
- * the shop actually uploads is product photography and its logo, on white:
- * under the dark scrim a white photo turned into a muddy grey, and the logo's
- * own lettering sat directly under the headline. A split slide makes that
- * collision impossible — the copy and the picture never share pixels.
- *
- * Each slide picks how its picture sits (admin → Vitrin → Ana slayt →
- * "Görsel yerleşimi"): `contain` shows it whole with room around it (products,
- * logos — the default), `cover` fills the stage (a wide campaign photo).
+ * A slide with a wide photo (`wide_image`) shows the photo, washed light on
+ * the left under the copy; without one, its product picture is set into the
+ * CSS studio — so the product shots the shop uploads (cut-outs on white,
+ * multiplied away on the grey) get the mock's look without a photo shoot.
  *
  * Kept from before, and still load-bearing:
  *   - a pause control (WCAG 2.2.2) and no autoplay under reduced motion;
- *   - the progress segments, 44px wide below `dt` for touch;
  *   - active-state animations applied by class, never by `key` — remounting an
  *     <img> re-requests it every dwell and the network never idles;
  *   - no carousel library: a transformed flex track.
@@ -96,28 +90,22 @@ export function useCarousel(count: number) {
   return { index, go, paused, setPaused, reduced, running, pauseOn };
 }
 
-export function Hero({ slides, background = '' }: { slides: HeroSlide[]; background?: string }) {
-  const { index, go, paused, setPaused, reduced, running, pauseOn } = useCarousel(slides.length);
+export function Hero({ slides }: { slides: HeroSlide[] }) {
+  const { index, go, paused, setPaused, reduced, pauseOn } = useCarousel(slides.length);
+  const many = slides.length > 1;
 
-  /* 32px discs in the control row; `before` lifts each target to 44. */
+  /* Round 36px controls on the scene; `before` lifts each target to 44. */
   const control =
-    "relative grid h-8 w-8 shrink-0 place-items-center rounded-full border border-white/20 bg-white/5 text-white transition-colors duration-(--duration-fast) before:absolute before:-inset-1.5 before:content-[''] hover:border-white/40 hover:bg-white/15";
+    "relative grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/50 bg-black/35 text-white backdrop-blur transition-colors duration-(--duration-fast) before:absolute before:-inset-1 before:content-[''] hover:bg-black/55";
 
   return (
     <section
       aria-roledescription="carousel"
       aria-label="Öne çıkan kampanyalar"
-      className="relative overflow-hidden rounded-(--panel-radius) bg-chrome shadow-e1"
+      className="relative overflow-hidden rounded-(--panel-radius) bg-[#e6e8eb] shadow-e1"
       {...pauseOn}
     >
-      {/* Three layers, so the oval can stand still while the slides move:
-          the pictures' track, the oval (the dark panel and its frosted rim)
-          above it, and the copy's track on top. Both tracks move together. */}
-
-      {/* --- pictures ------------------------------------------------------ */}
-      {/* Fixed heights, so every slide is the same size whatever its copy:
-          stacked on a phone, split from `sm`. A carousel advance is
-          page-level motion: 800ms, ease-in-out. */}
+      {/* --- scenes -------------------------------------------------------- */}
       <div aria-hidden className="absolute inset-0 overflow-hidden">
         <div
           className="flex h-full w-full transition-transform duration-[800ms] ease-in-out"
@@ -125,103 +113,31 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
         >
           {slides.map((slide, i) => {
             const active = i === index;
-            const cover = slide.fit === 'cover';
+            const photo = slide.wide_image;
             return (
-              /* Always light, in both themes: it is the plate the product
-                 stands on, the same idea as the product card's stage. */
-              <div
-                key={`${i}-${slide.title}`}
-                className="relative h-full w-full shrink-0 bg-[radial-gradient(90%_120%_at_75%_40%,#ffffff_0%,#f3f4f7_55%,#e3e5ea_100%)] sm:bg-[radial-gradient(90%_120%_at_25%_40%,#ffffff_0%,#f3f4f7_55%,#e3e5ea_100%)]"
-              >
-                {/* The picture's box starts under the oval, so a `cover`
-                    picture runs into the curve; a contained one keeps clear
-                    of it with its left padding. multiply: a product shot on
-                    white loses its white box and stands on the plate. */}
-                <div className="absolute inset-x-0 top-0 h-[168px] sm:inset-y-0 sm:right-[34%] sm:h-auto dt:right-[32%] min-[87.5rem]:right-[30%]">
-                  <Image
-                    src={slide.image}
-                    alt=""
-                    fill
-                    priority={i === 0}
-                    unoptimized={isVector(slide.image)}
-                    sizes="(min-width: 640px) 60vw, 100vw"
-                    className={
-                      cover
-                        ? `object-cover ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`
-                        : `object-contain p-5 mix-blend-multiply sm:py-8 sm:pl-[4%] sm:pr-[17%] dt:py-10 dt:pr-[14%] ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`
-                    }
-                  />
-                </div>
+              <div key={`${i}-${slide.title}`} className="relative h-full w-full shrink-0 overflow-hidden">
+                {photo ? (
+                  <>
+                    <Image
+                      src={photo}
+                      alt=""
+                      fill
+                      priority={i === 0}
+                      unoptimized={isVector(photo)}
+                      sizes="(min-width: 1400px) 1320px, 100vw"
+                      className={`object-cover object-[78%_40%] sm:object-[70%_50%] ${active ? 'animate-[hero-zoom_7000ms_ease-out_both]' : ''}`}
+                    />
+                    {/* Light on the left, where the copy stands; on a phone,
+                        light along the bottom. */}
+                    <span className="absolute inset-0 bg-[linear-gradient(to_top,#eceef0_0%,#eceef0_45%,rgb(236_238_240/0.7)_58%,transparent_75%)] sm:bg-[linear-gradient(to_right,#eceef0_0%,rgb(236_238_240/0.92)_28%,rgb(236_238_240/0.55)_45%,transparent_62%)]" />
+                  </>
+                ) : (
+                  <Studio slide={slide} active={active} first={i === 0} />
+                )}
               </div>
             );
           })}
         </div>
-      </div>
-
-      {/* --- the oval (2026-10-30, after the /iletisim banner) ------------- */}
-      {/* The dark panel is a large ellipse whose left side bulges into the
-          picture (its centre is past the right edge), ringed by a band of frosted glass — the curve the contact
-          banner's artwork draws between its two pictures. Its centre sits
-          below the middle, so the curve is steeper at the bottom, as there.
-          On a phone the same oval rises from below as an arc under the
-          picture. The rim is the same ellipse, 14px larger, blurring the
-          picture under it. */}
-      {/* A soft shadow the glass casts on the light picture side — on the
-          near-white stage a white rim alone has no edge. The oval's own
-          ellipse as a radial gradient, fading out 40px past the curve. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 [background-image:radial-gradient(ellipse_calc(130%_+_44px)_calc(100%_+_44px)_at_50%_144%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)] sm:[background-image:radial-gradient(ellipse_calc(46%_+_44px)_calc(135%_+_44px)_at_102%_65%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)] dt:[background-image:radial-gradient(ellipse_calc(44%_+_44px)_calc(135%_+_44px)_at_102%_65%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)] min-[87.5rem]:[background-image:radial-gradient(ellipse_calc(39%_+_44px)_calc(135%_+_44px)_at_102%_65%,rgb(0_0_0/0.16)_calc(100%_-_30px),transparent_100%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-linear-to-b from-white/55 to-white/35 backdrop-blur-md [clip-path:ellipse(calc(130%_+_14px)_calc(100%_+_14px)_at_50%_144%)] sm:[clip-path:ellipse(calc(46%_+_14px)_calc(135%_+_14px)_at_102%_65%)] dt:[clip-path:ellipse(calc(44%_+_14px)_calc(135%_+_14px)_at_102%_65%)] min-[87.5rem]:[clip-path:ellipse(calc(39%_+_14px)_calc(135%_+_14px)_at_102%_65%)]"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 bg-chrome [clip-path:ellipse(130%_100%_at_50%_144%)] sm:[clip-path:ellipse(46%_135%_at_102%_65%)] dt:[clip-path:ellipse(44%_135%_at_102%_65%)] min-[87.5rem]:[clip-path:ellipse(39%_135%_at_102%_65%)]"
-      >
-        {/* The client's artwork (2026-10-28): the SEENERGY building, set to
-            its right side, where the facade and its lettering are. A chrome
-            gradient, heaviest under the copy, keeps the text legible. Set in
-            admin → Vitrin → Ana slayt; empty = plain chrome. */}
-        {background ? (
-          <div className="absolute inset-0 sm:left-[52%] dt:left-[56%] min-[87.5rem]:left-[60%]">
-            <Image
-              src={background}
-              alt=""
-              fill
-              priority
-              sizes="(min-width: 640px) 55vw, 100vw"
-              className="object-cover object-[85%_45%]"
-            />
-            <span className="absolute inset-0 bg-linear-to-r from-chrome/90 via-chrome/70 to-chrome/35 sm:bg-linear-to-l sm:from-chrome/85 sm:via-chrome/80 sm:to-chrome/45" />
-            <span className="absolute inset-0 bg-linear-to-t from-chrome/60 to-transparent to-50%" />
-          </div>
-        ) : null}
-
-        {/* A faint technical grid, so the panel is not flat black. */}
-        <span className="absolute inset-0 bg-[linear-gradient(to_right,rgb(255_255_255/0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgb(255_255_255/0.05)_1px,transparent_1px)] bg-[size:44px_44px] [mask-image:linear-gradient(to_right,black,transparent_70%)] sm:[mask-image:linear-gradient(to_left,black,transparent_70%)]" />
-      </div>
-
-      {/* The curve's light (2026-10-30), on the dark side of the edge where
-          it shows (on the light side a white glint vanishes): a glint that
-          runs along the curve each time a slide turns — down it from `sm`,
-          across the arc on a phone. A mask keeps it to a 70px band inside
-          the edge, fading inwards. Keyed on the slide so the glint reruns;
-          a span, not a picture, so remounting costs nothing. */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 overflow-hidden [clip-path:ellipse(130%_100%_at_50%_144%)] [mask-image:radial-gradient(ellipse_130%_100%_at_50%_144%,transparent_calc(100%_-_70px),#000_100%)] sm:[clip-path:ellipse(46%_135%_at_102%_65%)] dt:[clip-path:ellipse(44%_135%_at_102%_65%)] min-[87.5rem]:[clip-path:ellipse(39%_135%_at_102%_65%)] sm:[mask-image:radial-gradient(ellipse_46%_135%_at_102%_65%,transparent_calc(100%_-_70px),#000_100%)] dt:[mask-image:radial-gradient(ellipse_44%_135%_at_102%_65%,transparent_calc(100%_-_70px),#000_100%)] min-[87.5rem]:[mask-image:radial-gradient(ellipse_39%_135%_at_102%_65%,transparent_calc(100%_-_70px),#000_100%)]"
-      >
-        <span
-          key={`x-${index}`}
-          className="absolute inset-y-0 left-0 w-1/3 bg-linear-to-r from-transparent via-white/90 to-transparent animate-[hero-glint-x_2000ms_ease-in-out_150ms_both] motion-reduce:hidden sm:hidden"
-        />
-        <span
-          key={`y-${index}`}
-          className="absolute inset-x-0 top-0 hidden h-1/2 bg-linear-to-b from-transparent via-white/90 to-transparent animate-[hero-glint-y_2000ms_ease-in-out_150ms_both] motion-reduce:hidden sm:block"
-        />
       </div>
 
       {/* --- copy ---------------------------------------------------------- */}
@@ -241,90 +157,46 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
                 aria-hidden={!active}
                 className="relative h-full w-full shrink-0"
               >
-                <div className="relative flex h-full flex-col justify-end px-4 pb-16 pt-[200px] sm:justify-center sm:px-8 sm:pb-16 sm:pt-0 dt:px-12 dt:pb-20">
-                  {/* Brand light behind the copy, so the panel is not flat black. */}
-                  <span
-                    aria-hidden
-                    className="pointer-events-none absolute -bottom-24 -left-10 h-72 w-72 sm:left-auto sm:-right-10 rounded-full bg-grad-1/20 blur-3xl"
-                  />
-
-                  <div className="relative sm:ml-auto sm:max-w-[38%] dt:max-w-[36%] min-[87.5rem]:max-w-[31%]">
-                    {slide.eyebrow ? (
-                      <p
-                        className={`flex items-center gap-2 text-[12px] font-bold uppercase tracking-[0.18em] text-white/65 ${active ? RISE : ''}`}
-                        style={{ animationDelay: '40ms' }}
-                      >
-                        <span aria-hidden className="h-[3px] w-6 rounded-full bg-linear-to-r from-grad-1 to-grad-4" />
-                        {slide.eyebrow}
-                      </p>
-                    ) : null}
-
-                    {/* As authored, not uppercased: a sentence-case headline
-                        reads faster, and the shop's own capitalisation stays. */}
+                <div className="absolute inset-x-0 bottom-[76px] px-5 sm:inset-y-0 sm:flex sm:flex-col sm:justify-center sm:px-10 md:px-14 dt:px-16">
+                  <div className="sm:max-w-[46%] dt:max-w-[40%]">
+                    {/* As authored, not uppercased; a light weight, as drawn. */}
                     <h2
-                      className={`mt-2 line-clamp-2 text-[24px] font-extrabold leading-[1.08] tracking-[-0.02em] text-white sm:line-clamp-3 sm:text-[32px] md:text-[32px] dt:mt-3 dt:text-[40px] ${active ? RISE : ''}`}
-                      style={{ animationDelay: '110ms' }}
+                      className={`line-clamp-3 text-[24px] font-medium leading-[1.12] tracking-[-0.025em] text-[#18202e] sm:text-[32px] dt:text-[40px] ${active ? RISE : ''}`}
+                      style={{ animationDelay: '60ms' }}
                     >
                       {slide.title}
+                      {slide.title_accent ? <span className="block">{slide.title_accent}</span> : null}
                     </h2>
-
                     {slide.description ? (
                       <p
-                        className={`mt-2 hidden max-w-[46ch] text-[13px] leading-relaxed text-white/70 sm:line-clamp-2 sm:block dt:mt-4 dt:text-[16px] ${active ? RISE : ''}`}
-                        style={{ animationDelay: '180ms' }}
+                        className={`mt-2 line-clamp-2 max-w-[44ch] text-[13px] leading-relaxed text-[#4a5262] sm:mt-3 sm:text-[14px] dt:text-[16px] ${active ? RISE : ''}`}
+                        style={{ animationDelay: '140ms' }}
                       >
                         {slide.description}
                       </p>
                     ) : null}
-
-                    {slide.chips.length > 0 ? (
-                      /* One row only: chips that do not fit are clipped rather
-                         than wrapping into a second row of pills. */
-                      <ul
-                        className={`mt-5 hidden h-[28px] flex-wrap gap-1.5 overflow-hidden dt:flex ${active ? RISE : ''}`}
-                        style={{ animationDelay: '240ms' }}
-                      >
-                        {slide.chips.slice(0, 3).map((chip) => (
-                          <li
-                            key={chip}
-                            className="rounded-full border border-white/15 bg-white/5 px-3 py-1 text-[12px] font-medium text-white/80"
-                          >
-                            {chip}
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-
-                    {/* Two actions: the slide's own, and a quote — most of this
-                        range sells by project, so "Teklif Al" is offered on
-                        every slide rather than left to the footer. The arrow
-                        travels on hover: motion that says "this goes somewhere". */}
-                    <div
-                      className={`mt-4 flex flex-wrap items-center gap-2.5 sm:mt-5 dt:mt-7 dt:gap-3 ${active ? RISE : ''}`}
-                      style={{ animationDelay: '300ms' }}
-                    >
-                      <Link
-                        href={slide.href}
-                        tabIndex={active ? 0 : -1}
-                        className="group/cta inline-flex h-11 items-center gap-2 rounded-full bg-white px-5 text-[14px] font-bold text-ink-fixed shadow-lg shadow-black/30 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand hover:text-white dt:h-[52px] dt:px-7 dt:text-[16px]"
-                      >
-                        {slide.cta}
-                        <ArrowRight
-                          size={16}
-                          strokeWidth={2.25}
-                          aria-hidden
-                          className="transition-transform duration-(--duration-base) ease-out group-hover/cta:translate-x-1"
-                        />
-                      </Link>
-                      <Link
-                        href="/iletisim?konu=teklif"
-                        tabIndex={active ? 0 : -1}
-                        className="hidden h-11 items-center rounded-full border border-white/30 px-5 text-[14px] font-bold text-white transition-colors duration-(--duration-fast) ease-in-out hover:border-white hover:bg-white/10 lg:inline-flex dt:h-[52px] dt:px-7 dt:text-[16px]"
-                      >
-                        Teklif Al
-                      </Link>
-                    </div>
                   </div>
+                </div>
+
+                {/* The action, bottom right as drawn, left of the arrows; on a
+                    phone it leads the bottom row. */}
+                <div
+                  className={`absolute bottom-4 left-5 sm:bottom-6 sm:left-auto ${many ? 'sm:right-[164px] dt:right-[172px]' : 'sm:right-6 dt:right-8'} dt:bottom-7 ${active ? RISE : ''}`}
+                  style={{ animationDelay: '220ms' }}
+                >
+                  <Link
+                    href={slide.href}
+                    tabIndex={active ? 0 : -1}
+                    className="group/cta inline-flex h-11 items-center gap-2.5 rounded-(--card-radius) bg-hero-accent px-6 text-[14px] font-semibold text-white shadow-[0_8px_24px_-8px_rgb(214_22_32/0.6)] transition-colors duration-(--duration-fast) hover:bg-hero-accent-strong"
+                  >
+                    {slide.cta}
+                    <ArrowRight
+                      size={16}
+                      strokeWidth={2}
+                      aria-hidden
+                      className="transition-transform duration-(--duration-base) ease-out group-hover/cta:translate-x-1"
+                    />
+                  </Link>
                 </div>
               </div>
             );
@@ -332,70 +204,63 @@ export function Hero({ slides, background = '' }: { slides: HeroSlide[]; backgro
         </div>
       </div>
 
-      {/* --- control row ------------------------------------------------
-          Under the copy, on the dark panel, where white controls read and
-          cover no part of the picture. */}
-      {slides.length > 1 ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-3.5 z-10 px-4 sm:bottom-5 sm:px-8 dt:bottom-7 dt:px-12">
-          <div>
-            <div className="pointer-events-auto flex w-fit items-center gap-3 sm:ml-auto">
-              <button type="button" onClick={() => go(index - 1)} aria-label="Önceki kampanya" className={`${control} hidden md:grid`}>
-                <ChevronLeft size={16} strokeWidth={2.25} aria-hidden />
-              </button>
-
-              {/* Below `dt` each segment is its own 44px target with an 8px gap;
-                  from `dt` a pointer drives, the idle segments shrink to dots and
-                  only the height is extended. */}
-              <ul className="flex items-center gap-2 dt:gap-1.5">
-                {slides.map((slide, i) => (
-                  <li key={`${i}-${slide.title}`}>
-                    <button
-                      type="button"
-                      onClick={() => go(i)}
-                      aria-label={`${i + 1}. kampanyaya git`}
-                      aria-current={i === index}
-                      /* No overflow-hidden here: it would clip this button's own
-                         ::before hit area. The fill's clip is on the inner span. */
-                      className={`relative block h-1.5 rounded-full transition-all duration-(--duration-base) ease-out before:absolute before:inset-x-0 before:-inset-y-5 before:content-[''] ${
-                        i === index ? 'w-11 bg-white/25 dt:w-12' : 'w-11 bg-white/35 hover:bg-white/70 dt:w-2.5'
-                      }`}
-                    >
-                      {i === index && (
-                        <span aria-hidden className="absolute inset-0 overflow-hidden rounded-full">
-                          {/* Keyed on slide and run state so the fill restarts from
-                              zero on every advance and on resume. */}
-                          <span
-                            key={`${index}-${running ? 'run' : 'hold'}`}
-                            className={`absolute inset-y-0 left-0 w-full origin-left rounded-full bg-white ${
-                              running ? 'animate-[hero-progress_5000ms_linear_forwards]' : ''
-                            }`}
-                          />
-                        </span>
-                      )}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-
-              <button type="button" onClick={() => go(index + 1)} aria-label="Sonraki kampanya" className={`${control} hidden md:grid`}>
-                <ChevronRight size={16} strokeWidth={2.25} aria-hidden />
-              </button>
-
-              {/* Withdrawn under reduced motion: autoplay never starts there. */}
-              {!reduced && (
-                <button
-                  type="button"
-                  onClick={() => setPaused((value) => !value)}
-                  aria-label={paused ? 'Otomatik geçişi başlat' : 'Otomatik geçişi durdur'}
-                  className={control}
-                >
-                  {paused ? <Play size={12} strokeWidth={2.5} aria-hidden /> : <Pause size={12} strokeWidth={2.5} aria-hidden />}
-                </button>
-              )}
-            </div>
-          </div>
+      {/* --- controls: bottom right, as drawn ------------------------------ */}
+      {many ? (
+        <div className="absolute bottom-[18px] right-4 z-10 flex items-center gap-2 sm:bottom-[30px] sm:right-6 dt:bottom-[34px] dt:right-8">
+          <button type="button" onClick={() => go(index - 1)} aria-label="Önceki kampanya" className={control}>
+            <ChevronLeft size={18} strokeWidth={2} aria-hidden />
+          </button>
+          <button type="button" onClick={() => go(index + 1)} aria-label="Sonraki kampanya" className={control}>
+            <ChevronRight size={18} strokeWidth={2} aria-hidden />
+          </button>
+          {/* Withdrawn under reduced motion: autoplay never starts there. */}
+          {!reduced && (
+            <button
+              type="button"
+              onClick={() => setPaused((value) => !value)}
+              aria-label={paused ? 'Otomatik geçişi başlat' : 'Otomatik geçişi durdur'}
+              className={control}
+            >
+              {paused ? <Play size={13} strokeWidth={2.5} aria-hidden /> : <Pause size={13} strokeWidth={2.5} aria-hidden />}
+            </button>
+          )}
         </div>
       ) : null}
     </section>
+  );
+}
+
+/**
+ * A slide without a photo: its product picture in a CSS studio — the grey
+ * sweep, a darker wall to the right, a red light behind, a soft floor and a
+ * contact shadow. No dark plinth: the shop's product shots are cut-outs on
+ * white, multiplied onto the grey, and multiply over a dark plinth would
+ * sink the product into it (tried 2026-10-30).
+ */
+function Studio({ slide, active, first }: { slide: HeroSlide; active: boolean; first: boolean }) {
+  return (
+    <>
+      <span className="absolute inset-0 bg-[linear-gradient(100deg,#eef0f2_0%,#e2e5e8_38%,#a7abb2_70%,#5d6168_100%)]" />
+      {/* The red light: a soft glow low on the right and two thin streaks. */}
+      <span className="absolute inset-0 bg-[radial-gradient(40%_70%_at_96%_88%,rgb(214_22_32/0.55),transparent_70%)]" />
+      <span className="absolute -right-[4%] top-[-10%] hidden h-[130%] w-[3px] rotate-[24deg] bg-hero-accent shadow-[0_0_18px_4px_rgb(214_22_32/0.55)] sm:block" />
+      <span className="absolute right-[10%] top-[-10%] hidden h-[130%] w-px rotate-[24deg] bg-hero-accent/70 shadow-[0_0_12px_2px_rgb(214_22_32/0.4)] sm:block" />
+      {/* Floor, darkening softly towards the front. */}
+      <span className="absolute inset-x-0 bottom-0 h-[40%] bg-linear-to-b from-transparent to-black/[0.10]" />
+
+      <div className="absolute inset-x-0 top-0 h-[200px] sm:inset-y-0 sm:left-[42%] sm:right-[4%] sm:h-auto">
+        {/* Contact shadow under the product. */}
+        <span className="absolute bottom-[4%] left-1/2 h-[10%] w-[60%] -translate-x-1/2 rounded-full bg-black/20 blur-xl sm:bottom-[14%] sm:h-[8%] sm:w-[50%]" />
+        <Image
+          src={slide.image}
+          alt=""
+          fill
+          priority={first}
+          unoptimized={isVector(slide.image)}
+          sizes="(min-width: 640px) 54vw, 100vw"
+          className={`object-contain object-bottom p-5 mix-blend-multiply sm:px-[8%] sm:pb-[16%] sm:pt-[8%] ${active ? 'animate-[hero-settle_900ms_var(--ease-out)_both]' : ''}`}
+        />
+      </div>
+    </>
   );
 }

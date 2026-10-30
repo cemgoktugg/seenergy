@@ -628,42 +628,6 @@ html {
   }
 }
 
-/* The oval hero's glint: a band of light run along the glass rim once per
-   slide turn (hero.tsx). Down the curve from `sm`, across the arc on a phone;
-   it fades in and out so it never starts or stops at a hard edge. */
-@keyframes hero-glint-y {
-  from {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-  25% {
-    opacity: 1;
-  }
-  75% {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    transform: translateY(200%);
-  }
-}
-@keyframes hero-glint-x {
-  from {
-    opacity: 0;
-    transform: translateX(-100%);
-  }
-  25% {
-    opacity: 1;
-  }
-  75% {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    transform: translateX(300%);
-  }
-}
-
 /* Mobile drawer. It arrives from the edge it is anchored to, which is what
    tells you where it came from and where dismissing it will send it back. */
 @keyframes drawer-in {

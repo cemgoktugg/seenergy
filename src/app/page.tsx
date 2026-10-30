@@ -138,7 +138,7 @@ export default async function HomePage() {
           {s.hero.design === 'acik' ? (
             <HeroLight slides={vitrin.slides} />
           ) : (
-            <Hero slides={vitrin.slides} background={s.hero.background} />
+            <Hero slides={vitrin.slides} />
           )}
         </Section>
       ) : null}

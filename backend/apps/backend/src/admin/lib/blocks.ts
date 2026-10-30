@@ -160,16 +160,12 @@ const SECTION_FIELDS: Record<string, FieldDef[]> = {
       label: "Tasarım",
       type: "choice",
       options: [
-        { value: "oval", label: "Koyu oval panel (mevcut tasarım)" },
-        { value: "acik", label: "Açık tasarım — geniş fotoğraf, kırmızı vurgu" },
+        // "oval" is the stored value of the default since 2026-10-30; the
+        // dark oval it named was replaced by the studio design that day.
+        { value: "oval", label: "Stüdyo — gri zemin, kırmızı buton sağ altta (varsayılan)" },
+        { value: "acik", label: "Açık tasarım — beyaz zemin, kırmızı vurgulu başlık" },
       ],
-      hint: "Slaytların içeriği iki tasarımda da aynıdır; yalnızca görünüm değişir. Açık tasarım için her slayta 'Geniş fotoğraf' ve isterseniz 'Başlığın kırmızı satırı' ekleyin. İstediğiniz zaman geri dönebilirsiniz.",
-    },
-    {
-      name: "background",
-      label: "Koyu alanın arka plan fotoğrafı",
-      type: "image",
-      hint: "Yalnızca koyu oval tasarımda kullanılır. Slaytların yazı tarafındaki koyu alanın arkasında, bütün slaytlarda görünür; üzerine yazılar okunsun diye koyu bir gölge gelir. Görselin sağ tarafı gösterilir. Boş bırakırsanız düz koyu zemin olur.",
+      hint: "Slaytların içeriği iki tasarımda da aynıdır; yalnızca görünüm değişir. İki tasarım da slaytın 'Geniş fotoğraf' alanını kullanır; fotoğrafı olmayan slaytta ürün görseli gösterilir. İstediğiniz zaman geri dönebilirsiniz.",
     },
   ],
   rails: [
@@ -341,7 +337,7 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
         label: "Başlığın kırmızı satırı",
         type: "text",
         placeholder: "güçlü teknoloji.",
-        hint: "Yalnızca açık tasarımda: başlığın altında, kırmızıyla yazılan ikinci satır. Boş bırakılabilir.",
+        hint: "Başlığın altındaki ikinci satır — açık tasarımda kırmızı, stüdyo tasarımında başlıkla aynı renkte. Boş bırakılabilir.",
       },
       { name: "description", label: "Açıklama", type: "textarea" },
       { name: "chips", label: "Öne çıkan maddeler", type: "tags", hint: "En fazla 3 kısa madde." },
@@ -360,9 +356,9 @@ export const GROUPS: Record<BlockGroup, GroupDef> = {
       },
       {
         name: "wide_image",
-        label: "Geniş fotoğraf (açık tasarım)",
+        label: "Geniş fotoğraf",
         type: "image",
-        hint: "Yalnızca açık tasarımda: slaytın tamamını kaplayan fotoğraf; sol tarafı yazıların altında beyaza karışır, ürünü sağ yarıya yerleştirin. Önerilen 1920 × 840 piksel (yatay). Boş bırakırsanız yukarıdaki görsel açık zeminde gösterilir.",
+        hint: "Slaytın tamamını kaplayan fotoğraf; sol tarafı yazıların altında açık renge karışır, ürünü sağ yarıya yerleştirin. Önerilen 1920 × 840 piksel (yatay). Boş bırakırsanız yukarıdaki ürün görseli gri stüdyo zemininde gösterilir.",
       },
     ],
     newItem: () => ({

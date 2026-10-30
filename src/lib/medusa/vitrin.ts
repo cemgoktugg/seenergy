@@ -123,9 +123,10 @@ export interface CompanyCard {
  * is missing, or a field left empty, looks exactly as before.
  */
 export const SECTION_DEFAULTS = {
-  // design: oval = the dark oval panel (2026-10-30); acik = the light,
-  // full-photo design (2026-10-30, the client's mock). Oval until switched.
-  hero: { visible: true, design: 'oval', background: '/hero/seenergy-bina.webp' },
+  // design: 'oval' (the stored name of the default) = the studio design,
+  // which replaced the dark oval on 2026-10-30; 'acik' = the light design.
+  // The oval's building photo (`background`) stays in the database, unread.
+  hero: { visible: true, design: 'oval' },
   'brand-board': { visible: true },
   rails: {
     visible: true,
