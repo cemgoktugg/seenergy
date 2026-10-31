@@ -21,36 +21,46 @@
  *   - The trust statements come from `PRODUCT_TRUST`, marked in the data as
  *     configurable placeholders that assert nothing.
  *
- * Layout (2026-10-21 redesign, the client found the page "sönük"): one white
- * hero band holding the gallery and a sales-first buy column — title, a lead
- * line, headline specs as icon tiles, then ONE purchase card (price, stock,
- * quantity, "Sepete Ekle"); quote and compare are secondary, below the cart
- * button. A sticky section bar follows the hero. The brand's other models
- * moved from a narrow third column into a four-up grid under the specs:
- * the third column squeezed the gallery and buy box into two thin columns,
- * which is most of why the page read as flat.
+ * Layout (2026-10-31, from the client's mock): compact, on white, drawn with
+ * hairlines rather than shadows. Gallery and buy column side by side; one
+ * offer box holding price, purchase and the assurances; tabs; then the
+ * description and the sheet side by side on a light band; then the shelves.
+ * Red marks only what leads: the price, the add-to-cart button, the active tab
+ * and the band's accent line. Every value on it comes from the product.
  */
 
-/* eslint-disable @next/next/no-img-element */
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import {
+  Aperture,
   BadgeCheck,
   BadgePercent,
   Check,
   ChevronRight,
-  Download,
+  Film,
+  HardDrive,
   Headphones,
+  Home,
+  Image as ImageIcon,
+  Layers,
+  Moon,
   PackageCheck,
   ReceiptText,
   RefreshCcw,
+  ScanEye,
+  ShieldCheck,
+  SlidersHorizontal,
+  Sun,
   Truck,
-  Wallet,
+  Wifi,
+  Zap,
+  type LucideIcon,
 } from 'lucide-react';
 
 import { ProductBuy, ProductLinks } from '@/components/product-buy';
 import { ProductGallery } from '@/components/product-gallery';
+import { ProductSectionNav } from '@/components/product-section-nav';
 import { ProductSpecs } from '@/components/product-specs';
 import { SectionHeading } from '@/components/section-heading';
 import { ProductGrid } from '@/components/sections';
@@ -64,7 +74,7 @@ import {
   type Product,
 } from '@/data/catalog';
 import { INSTALMENTS_AVAILABLE, PAYMENT_OPTIONS } from '@/data/checkout';
-import { BRANDS, PRODUCT_TRUST, SITE } from '@/data/site';
+import { PRODUCT_TRUST, SITE } from '@/data/site';
 import { keySpecsOf, type SpecGroup } from '@/data/specs';
 import { loadCatalog, loadProductDetails, loadProducts } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
@@ -76,6 +86,28 @@ const TRUST_ICONS = {
   refresh: RefreshCcw,
   support: Headphones,
 };
+
+/**
+ * A spec or a description line's mark, read from its words so any product gets
+ * one; a line nothing matches takes the plain tick. First match wins: "2,8 mm
+ * sabit · 3 MP" is a lens before it is a resolution.
+ */
+const FEATURE_ICONS: [RegExp, LucideIcon][] = [
+  [/ir cut|gürültü/i, SlidersHorizontal],
+  [/gece|ir led/i, Moon],
+  [/lens/i, Aperture],
+  [/kanal/i, Layers],
+  [/\bmp\b|megapiksel|çözünürlük|1080p/i, ImageIcon],
+  [/hareket|algılama|maskeleme/i, ScanEye],
+  [/wi-?fi|kablosuz|bağlantı|\bpoe\b/i, Wifi],
+  [/solar|güneş/i, Sun],
+  [/voltaj|güç|besleme|v dc/i, Zap],
+  [/disk|depolama|hdd|sd kart/i, HardDrive],
+  [/sıkıştırma|kodlama|h\.26/i, Film],
+  [/koruma/i, ShieldCheck],
+];
+const iconFor = (text: string): LucideIcon =>
+  FEATURE_ICONS.find(([pattern]) => pattern.test(text))?.[1] ?? Check;
 
 /**
  * Every product known at build time is prerendered. One added in the Medusa
@@ -139,6 +171,17 @@ function summaryOf(description: string, max = 160): string {
   return `${first.slice(0, max - 3).replace(/\s+\S*$/, '')}…`;
 }
 
+/** The buy column's lead: whole sentences that fit, not a line cut mid-figure. */
+function leadOf(description: string, max = 240): string {
+  const first = partsOf(description).paragraphs[0]?.replace(/\s+/g, ' ').trim() ?? '';
+  let lead = '';
+  for (const sentence of first.split(/(?<=[.!?])\s+/)) {
+    if ((lead + ' ' + sentence).length > max) break;
+    lead = lead ? `${lead} ${sentence}` : sentence;
+  }
+  return lead || summaryOf(description, max);
+}
+
 /** Uploaded pictures carry an absolute URL; the mock files do not. */
 const absoluteUrl = (src: string): string | null => (/^https?:\/\//.test(src) ? src : null);
 
@@ -158,8 +201,9 @@ function trailFor(product: Product) {
   ];
 }
 
-/** The visible trail is the short one — the category path and the code; the
- *  brand step stays in the structured data, and in the brand chip below. */
+/** The visible trail: small and in the background — home as an icon, the
+ *  category path, the name (its code on a phone). The brand step stays in the
+ *  structured data, and in the line over the title. */
 function Breadcrumb({ product }: { product: Product }) {
   const trail = trailFor(product).filter((step) => !step.href.startsWith('/marka/'));
 
@@ -168,14 +212,15 @@ function Breadcrumb({ product }: { product: Product }) {
       <ol className="flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] text-text-secondary">
         {trail.map((step) => (
           <li key={step.href} className="flex items-center gap-1.5">
-            <Link href={step.href} className="transition-colors hover:text-text-primary">
-              {step.label}
+            <Link href={step.href} aria-label={step.href === '/' ? step.label : undefined} className="transition-colors hover:text-text-primary">
+              {step.href === '/' ? <Home size={14} strokeWidth={1.5} aria-hidden /> : step.label}
             </Link>
-            <ChevronRight size={13} strokeWidth={2} className="text-line-strong" aria-hidden />
+            <ChevronRight size={13} strokeWidth={1.5} className="text-line-strong" aria-hidden />
           </li>
         ))}
-        <li aria-current="page" className="truncate font-medium text-text-primary">
-          {product.sku || product.name}
+        <li aria-current="page" className="min-w-0 truncate">
+          <span className="sm:hidden">{product.sku || product.name}</span>
+          <span className="hidden sm:inline">{product.name}</span>
         </li>
       </ol>
     </nav>
@@ -183,17 +228,10 @@ function Breadcrumb({ product }: { product: Product }) {
 }
 
 /**
- * Price block.
- *
- * The visual parts are `aria-hidden` and a single sr-only sentence carries the
- * whole meaning, so a screen reader hears "2.849,90 ₺, önceki fiyat 3.238,52 ₺,
- * %12 indirim" instead of three disconnected numbers.
- */
-/**
- * The heading as a datasheet heads a model: its code, then what it is.
- * "SEENERGY SE-IPC5083LD 5MP IP Dome Kamera" becomes SE-IPC5083LD over
- * "5MP IP Dome Kamera". A name without a leading code (a token with a digit)
- * stays whole.
+ * The heading is the model and what it is, without the brand the line above
+ * already names: "SEENERGY SE-IPC5083LD 5MP IP Dome Kamera" becomes
+ * "SE-IPC5083LD 5MP IP Dome Kamera". A name without a leading code (a token
+ * with a digit) stays whole.
  */
 function titleOf(product: Product): { code: string; rest: string } {
   const brand = product.brand.toLocaleLowerCase('tr');
@@ -203,6 +241,8 @@ function titleOf(product: Product): { code: string; rest: string } {
   const match = bare.match(/^([A-Z0-9][A-Z0-9.-]*\d[A-Z0-9.-]*)\s+(.+)$/);
   return match ? { code: match[1], rest: match[2] } : { code: bare, rest: '' };
 }
+
+type SheetCell = { label: string; value: string; detail?: string };
 
 /** Which rows a buyer decides on, most decisive first. */
 const SHEET_ORDER = [
@@ -227,7 +267,7 @@ const SHEET_ORDER = [
  * the category template, which is a guess about another product. Three or
  * six cells, so the grid has no hole.
  */
-function sheetOf(product: Product, own: SpecGroup[]): { label: string; value: string }[] {
+function sheetOf(product: Product, own: SpecGroup[]): SheetCell[] {
   const rows = own.length
     ? own.flatMap((group) => group.rows).filter((row) => !/ürün tipi/i.test(row.label))
     : keySpecsOf({ ...product, price: null }, 6, []);
@@ -237,33 +277,45 @@ function sheetOf(product: Product, own: SpecGroup[]): { label: string; value: st
     if (row) picked.push(row);
   }
   const cells = picked.map((row) => {
-    let value = row.value.split(' · ')[0].replace(/^En çok /, '');
+    const clauses = row.value.split(' · ');
+    let value = clauses[0].replace(/^En çok /, '');
     /* A long first clause keeps its figure and unit: "8 W monokristal
        silikon" wrapped to three lines in a cell meant for "8 W". */
     const figure = value.length > 14 ? value.match(/^[\d.,]+(?:\s?[–-]\s?[\d.,]+)?\s?[A-Za-z°%]+/) : null;
     if (figure) value = figure[0];
-    return { label: row.label.charAt(0).toLocaleLowerCase('tr') + row.label.slice(1), value };
+    return {
+      label: row.label.charAt(0).toLocaleLowerCase('tr') + row.label.slice(1),
+      value,
+      /* A resolution's second clause says which system ("AHD 1080p"); a lens's
+         ("3 MP") is the glass's rating and would read as the camera's. */
+      detail: /^çözünürlük/i.test(row.label) ? clauses[1] : undefined,
+    };
   });
   return cells.length >= 6 ? cells.slice(0, 6) : cells.length >= 3 ? cells.slice(0, 3) : [];
 }
 
-/** The headline specs as tiles: the figure large, what it measures under it. */
-function SpecSheet({ cells }: { cells: { label: string; value: string }[] }) {
+/** The headline specs as tiles on hairlines: mark, figure, what it measures. */
+function SpecSheet({ cells }: { cells: SheetCell[] }) {
   return (
     /* Three cells stay one row at every width (two-up left the third alone
        under the others on a phone); six run 2 × 3, then 3 × 2. */
-    <dl className={`mt-5 grid gap-2 ${cells.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'}`}>
-      {cells.map((cell) => (
-        <div key={cell.label} className="min-w-0 rounded-(--card-radius) border border-line bg-surface-page px-2.5 py-3 sm:px-3.5">
-          <dt className="sr-only">{cell.label}</dt>
-          <dd className="text-[14px] font-extrabold leading-tight tabular-nums tracking-tight text-text-primary sm:text-[16px] dt:text-[20px]">
-            {cell.value}
-          </dd>
-          <dd aria-hidden className="mt-1 text-[12px] font-medium text-text-secondary">
-            {cell.label}
-          </dd>
-        </div>
-      ))}
+    <dl className={`mt-4 grid gap-2 ${cells.length === 3 ? 'grid-cols-3' : 'grid-cols-2 sm:grid-cols-3'}`}>
+      {cells.map((cell) => {
+        const Icon = iconFor(cell.label);
+        return (
+          <div key={cell.label} className="flex min-w-0 flex-col items-center rounded-(--card-radius) border border-line px-2 py-3 text-center">
+            <Icon size={24} strokeWidth={1.5} aria-hidden className="text-text-primary" />
+            <dt className="sr-only">{cell.label}</dt>
+            <dd className="mt-1.5 text-[14px] font-extrabold leading-tight tabular-nums tracking-tight text-text-primary sm:text-[16px] dt:text-[20px]">
+              {cell.value}
+            </dd>
+            <dd aria-hidden className="mt-1 text-[12px] leading-snug text-text-secondary sm:text-[13px]">
+              {cell.label}
+            </dd>
+            {cell.detail && <dd className="mt-0.5 text-[12px] leading-snug text-text-secondary">{cell.detail}</dd>}
+          </div>
+        );
+      })}
     </dl>
   );
 }
@@ -274,7 +326,8 @@ function SpecSheet({ cells }: { cells: { label: string; value: string }[] }) {
  * The visual parts are `aria-hidden` and a single sr-only sentence carries the
  * whole meaning, so a screen reader hears "2.849,90 ₺, önceki fiyat 3.238,52 ₺,
  * %12 indirim" instead of three disconnected numbers. The saving is derived
- * from the two prices, never authored.
+ * from the two prices, never authored. `pr-12` keeps the words clear of the
+ * favourite button in the box's corner.
  */
 function PriceBlock({ product }: { product: Product }) {
   const discount = discountPercent(product);
@@ -282,9 +335,8 @@ function PriceBlock({ product }: { product: Product }) {
   /* No price yet: the block says so instead of printing a 0. */
   if (product.price == null) {
     return (
-      <div>
-        <p className="text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">Fiyat</p>
-        <p className="mt-1 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[32px]">
+      <div className="pr-12">
+        <p className="text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[32px]">
           Fiyat için bize ulaşın
         </p>
         <p className="mt-1 text-[14px] text-text-secondary">Güncel fiyat ve stok bilgisini aynı gün iletiyoruz.</p>
@@ -295,7 +347,7 @@ function PriceBlock({ product }: { product: Product }) {
 
   const saving = product.compareAtPrice ? product.compareAtPrice - product.price : 0;
   return (
-    <div>
+    <div className="pr-12">
       <p className="sr-only">
         {formatPrice(product.price)}
         {product.compareAtPrice ? `, önceki fiyat ${formatPrice(product.compareAtPrice)}` : ''}
@@ -303,95 +355,62 @@ function PriceBlock({ product }: { product: Product }) {
       </p>
 
       {discount !== null && discount > 0 && product.compareAtPrice ? (
-        <div aria-hidden className="flex flex-wrap items-center gap-x-2.5 gap-y-1">
-          <span className="rounded-(--card-radius) bg-danger px-2 py-1 text-[13px] font-extrabold tabular-nums leading-none text-white">
-            %{discount} İNDİRİM
-          </span>
-          <span className="text-[16px] font-medium tabular-nums text-text-secondary line-through decoration-text-secondary/60">
+        <div aria-hidden className="mb-1 flex flex-wrap items-center gap-x-2.5 gap-y-1">
+          <span className="text-[13px] font-extrabold tabular-nums text-signal">%{discount} indirim</span>
+          <span className="text-[14px] font-medium tabular-nums text-text-secondary line-through decoration-text-secondary/60">
             {formatPrice(product.compareAtPrice)}
           </span>
         </div>
       ) : null}
-      <p aria-hidden className="mt-1.5 flex flex-wrap items-baseline gap-x-2.5 gap-y-1">
-        <span className="text-[40px] font-extrabold leading-none tracking-tight tabular-nums text-text-primary">
-          {formatPrice(product.price)}
-        </span>
-        <span className="text-[13px] font-medium text-text-secondary">KDV dahil</span>
+      <p aria-hidden className="text-[32px] font-extrabold leading-none tracking-tight tabular-nums text-signal dt:text-[40px]">
+        {formatPrice(product.price)}
+      </p>
+      <p className="mt-1.5 text-[13px] text-text-secondary">
+        KDV dahil · {PAYMENT_OPTIONS.map((option) => option.label).join(' · ')}
       </p>
       {saving > 0 ? (
-        <p aria-hidden className="mt-2 inline-flex items-center gap-1.5 text-[13px] font-semibold text-success-ink">
-          <BadgePercent size={15} strokeWidth={2.25} />
+        <p aria-hidden className="mt-1 inline-flex items-center gap-1.5 text-[13px] font-semibold text-success-ink">
+          <BadgePercent size={15} strokeWidth={1.75} />
           {formatPrice(saving)} tasarruf
         </p>
       ) : null}
 
       {INSTALMENTS_AVAILABLE && product.instalment && (
-        <p className="mt-2.5 inline-flex items-center gap-1.5 rounded-(--card-radius) border border-highlight/40 bg-surface-instalment px-2.5 py-1.5 text-[12px] font-medium text-white">
-          PEŞİN FİYATINA <span className="font-extrabold text-highlight">3 TAKSİT</span>
-        </p>
+        <p className="mt-1 text-[13px] font-semibold text-text-primary">Peşin fiyatına 3 taksit</p>
       )}
     </div>
   );
 }
 
-/** Availability and delivery as pills under the heading — what an
+/** Availability and delivery on one line, hairlines between — what an
  *  electronics shopper scans for first. Stock only for a product on sale. */
-function StatusPills({ product }: { product: Product }) {
-  const pill = 'inline-flex h-7 items-center gap-1.5 rounded-full px-2.5 text-[12px] font-bold';
+function StatusLine({ product }: { product: Product }) {
   if (product.price == null) return null;
+  const item = 'inline-flex items-center gap-2 text-[13px] font-medium text-text-primary sm:border-l sm:border-line sm:pl-4';
   if (product.stock === 0) {
     return (
-      <div className="mt-4 flex flex-wrap gap-2">
-        <span className={`${pill} bg-danger/10 text-danger-ink`}>
-          <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-danger" />
-          Şu anda stokta yok
-        </span>
-      </div>
+      <p className="mt-3 inline-flex items-center gap-2 text-[13px] font-semibold text-danger-ink">
+        <span aria-hidden className="h-2 w-2 rounded-full bg-danger" />
+        Şu anda stokta yok
+      </p>
     );
   }
   const low = product.stock <= 5;
+  const free = product.freeShipping || product.price >= FREE_SHIPPING_FROM;
   return (
-    <div className="mt-4 flex flex-wrap gap-2">
-      <span className={`${pill} ${low ? 'bg-warning/15 text-warning' : 'bg-success/10 text-success-ink'}`}>
-        <span aria-hidden className="relative flex h-1.5 w-1.5">
-          <span className={`absolute inline-flex h-full w-full animate-ping rounded-full opacity-60 motion-reduce:hidden ${low ? 'bg-warning' : 'bg-success'}`} />
-          <span className={`relative inline-flex h-1.5 w-1.5 rounded-full ${low ? 'bg-warning' : 'bg-success'}`} />
-        </span>
+    <ul className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+      <li className={`inline-flex items-center gap-2 text-[13px] font-semibold ${low ? 'text-warning' : 'text-success-ink'}`}>
+        <span aria-hidden className={`h-2 w-2 rounded-full ${low ? 'bg-warning' : 'bg-success'}`} />
         {low ? `Son ${product.stock} adet` : 'Stokta'}
-      </span>
-      <span className={`${pill} bg-surface-page text-text-primary`}>
-        <PackageCheck size={14} strokeWidth={2.25} aria-hidden />
+      </li>
+      <li className={item}>
+        <Truck size={17} strokeWidth={1.5} aria-hidden />
         Aynı gün kargoya hazırlanır
-      </span>
-      {product.freeShipping || (product.price ?? 0) >= FREE_SHIPPING_FROM ? (
-        <span className={`${pill} bg-surface-page text-text-primary`}>
-          <Truck size={14} strokeWidth={2.25} aria-hidden />
-          Ücretsiz kargo
-        </span>
-      ) : null}
-    </div>
-  );
-}
-
-/** The buy card's foot: delivery, preparation, payment — three facts in a row. */
-function OfferFacts({ product }: { product: Product }) {
-  const free = product.freeShipping || (product.price ?? 0) >= FREE_SHIPPING_FROM;
-  const facts = [
-    { icon: Truck, title: 'Kargo', text: free ? 'Bu ürün ücretsiz kargo' : `${formatPrice(FREE_SHIPPING_FROM)} üzeri ücretsiz` },
-    { icon: PackageCheck, title: 'Hazırlık', text: 'Aynı gün kargoya hazırlanır' },
-    { icon: Wallet, title: 'Ödeme', text: PAYMENT_OPTIONS.map((option) => option.label).join(' · ') },
-  ];
-  return (
-    <ul className="grid gap-px border-t border-line bg-line sm:grid-cols-3">
-      {facts.map(({ icon: Icon, title, text }) => (
-        <li key={title} className="flex items-start gap-2.5 bg-surface-page px-4 py-3">
-          <Icon size={18} strokeWidth={2} aria-hidden className="mt-0.5 shrink-0 text-text-primary" />
-          <span className="min-w-0">
-            <span className="block text-[12px] font-bold uppercase tracking-[0.08em] text-text-secondary">{title}</span>
-            <span className="block text-[13px] font-semibold leading-snug text-text-primary">{text}</span>
-          </span>
-        </li>
-      ))}
+      </li>
+      <li className={item}>
+        <PackageCheck size={17} strokeWidth={1.5} aria-hidden />
+        {free ? 'Ücretsiz kargo' : `${formatPrice(FREE_SHIPPING_FROM)} üzeri ücretsiz kargo`}
+      </li>
     </ul>
   );
 }
@@ -447,9 +466,11 @@ export default async function ProductPage({
       }
     : null;
   const category = categoryMeta(product.category);
-  const brandLogo = BRANDS.find((brand) => brand.slug === brandSlug(product.brand))?.image ?? null;
   const { paragraphs, bullets } = partsOf(details.description);
-  const lead = summaryOf(details.description, 190);
+  const lead = leadOf(details.description);
+  /* The small feature boxes: the description's own bullet lines, or, for a
+     description without any, the summary's figures. */
+  const features = bullets.length ? bullets : sheet.map((cell) => `${cell.value} · ${cell.label}`);
 
   /* The CUTOUT, not the plated render, for the mock catalogue's own files. The
      flat files carry an opaque white plate that shows up as a white rectangle
@@ -470,8 +491,9 @@ export default async function ProductPage({
   ];
 
   return (
-    /* Bottom padding clears the mobile sticky buy bar. */
-    <div className="pb-24 dt:pb-0">
+    /* White over the page's dot ground. Bottom padding clears the mobile sticky
+       buy bar. */
+    <div className="bg-surface-card pb-24 dt:pb-10">
       {/* Structured data.
           Product + BreadcrumbList, and deliberately NO aggregateRating or
           review: docs/PRODUCT_MODEL rules a review surface out of the data, the
@@ -524,14 +546,12 @@ export default async function ProductPage({
         }}
       />
 
-      {/* --- hero: gallery + buy column ----------------------------------
-          One white band over the grey page, so the product and its purchase
-          read as the page's subject and everything below as reference. */}
-      <section aria-label="Ürün bilgileri" className="relative overflow-hidden border-b border-line bg-surface-card">
-        <div className="container-main relative pb-8 pt-3 dt:pb-14 dt:pt-5">
+      {/* --- gallery + buy column --------------------------------------- */}
+      <section aria-label="Ürün bilgileri">
+        <div className="container-main pb-5 pt-3 dt:pb-6 dt:pt-3.5">
           <Breadcrumb product={product} />
 
-          <div className="mt-4 grid gap-6 lg:grid-cols-[minmax(0,1.08fr)_minmax(0,1fr)] dt:mt-6 dt:gap-12">
+          <div className="mt-3 grid gap-5 lg:grid-cols-2 dt:gap-8">
             {/* `max-w-[520px]` only while the page is a single column, so the
                 picture does not take a whole tablet screen before the price.
                 Keyed by product: client navigation between two products reuses
@@ -541,198 +561,126 @@ export default async function ProductPage({
                 key={product.id}
                 images={gallery}
                 alt={product.name}
-                callouts={details.callouts}
                 badges={
-                  product.stock > 0 && (product.badge === 'super-firsat' || product.freeShipping) ? (
-                    <>
-                      {product.badge === 'super-firsat' && (
-                        <span className="w-fit rounded-full bg-signal px-2.5 py-1 text-[12px] font-medium text-white">
-                          Süper Fırsat
-                        </span>
-                      )}
-                      {product.freeShipping && (
-                        <span className="w-fit rounded-full bg-success px-2.5 py-1 text-[12px] font-medium text-white">
-                          Ücretsiz Kargo
-                        </span>
-                      )}
-                    </>
+                  product.stock > 0 && product.badge === 'super-firsat' ? (
+                    <span className="w-fit rounded-full bg-signal px-2.5 py-1 text-[12px] font-medium text-white">
+                      Süper Fırsat
+                    </span>
                   ) : undefined
                 }
               />
             </div>
 
             <div className="min-w-0">
-              {/* Brand (its logo where the shop has one), category, code. */}
-              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-                <div className="flex flex-wrap items-center gap-2">
+              {/* Brand, category; the code only when the title does not carry it. */}
+              <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
+                <div className="flex items-center gap-3 text-[13px]">
                   <Link
                     href={`/marka/${brandSlug(product.brand)}`}
                     title={`${product.brand} ürünleri`}
-                    className="inline-flex h-8 items-center rounded-full border border-line bg-white px-3 shadow-e1 transition-colors hover:border-line-strong"
+                    className="font-extrabold text-signal transition-colors hover:text-signal-dark"
                   >
-                    {brandLogo ? (
-                      <img src={brandLogo} alt={product.brand} className="h-4 w-auto max-w-[96px] object-contain" />
-                    ) : (
-                      <span className="text-[13px] font-extrabold text-ink-fixed">{product.brand}</span>
-                    )}
+                    {product.brand}
                   </Link>
-                  {/* The category is the page's one red accent above the offer. */}
-                  <Link
-                    href={category.href}
-                    className="inline-flex h-8 items-center gap-1.5 rounded-full bg-signal/[0.08] px-3 text-[13px] font-bold text-signal transition-colors hover:bg-signal/[0.14]"
-                  >
-                    <span aria-hidden className="h-1.5 w-1.5 rounded-full bg-signal" />
+                  <span aria-hidden className="h-3.5 w-px bg-line-strong" />
+                  <Link href={category.href} className="text-text-secondary transition-colors hover:text-text-primary">
                     {category.label}
                   </Link>
                 </div>
-                {product.sku ? (
-                  <p className="text-[12px] font-medium text-text-secondary">
-                    Ürün kodu: <span className="font-bold tabular-nums text-text-primary">{product.sku}</span>
+                {product.sku && title.code !== product.sku ? (
+                  <p className="text-[12px] text-text-secondary">
+                    Ürün kodu: <span className="font-semibold tabular-nums text-text-primary">{product.sku}</span>
                   </p>
                 ) : null}
               </div>
 
-              {/* The model code leads, the way a datasheet is headed: it is
-                  what an installer searches for and quotes. The rest of the
-                  name is the second line of the same heading. */}
-              <h1 className="mt-4 text-text-primary">
-                <span className="block text-[32px] font-extrabold leading-none tracking-tight tabular-nums dt:text-[40px]">
-                  {title.code}
-                </span>
-                {title.rest && (
-                  <span className="mt-2 block text-[20px] font-semibold leading-snug text-text-secondary">{title.rest}</span>
-                )}
+              <h1 className="mt-1.5 text-[24px] font-extrabold leading-tight tracking-tight text-text-primary dt:text-[32px]">
+                {title.code}
+                {title.rest ? ` ${title.rest}` : ''}
               </h1>
-              <StatusPills product={product} />
-              {lead && (
-                <p className="mt-4 max-w-[62ch] text-[14px] leading-relaxed text-text-secondary">{lead}</p>
-              )}
+              {lead && <p className="mt-2 text-[14px] leading-relaxed text-text-secondary dt:text-[16px]">{lead}</p>}
+              <StatusLine product={product} />
 
               {sheet.length > 0 && <SpecSheet cells={sheet} />}
 
-              {/* The offer: one card — price, the purchase, and the three
-                  facts that decide it (delivery, preparation, payment). */}
-              <div className="relative mt-5 overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e2">
-                <span aria-hidden className="absolute inset-x-0 top-0 h-1 bg-signal" />
-                <div className="p-5 dt:p-6">
+              {/* The offer: one box — price, the purchase, then the assurances
+                  on a hairline row, two by two on a phone. `relative` places the
+                  favourite button ProductBuy puts in its corner. */}
+              <div className="relative mt-3 overflow-hidden rounded-(--card-radius) border border-line-strong bg-surface-card">
+                <div className="p-4 dt:p-5">
                   <PriceBlock product={product} />
                   <ProductBuy product={product} whatsapp={company.whatsapp || company.phone} />
                 </div>
-                {product.price != null ? <OfferFacts product={product} /> : null}
+                <ul aria-label="Alışveriş güvenceleri" className="grid grid-cols-2 gap-px border-t border-line bg-line sm:grid-cols-4">
+                  {PRODUCT_TRUST.filter((item) => item.icon !== 'truck').map((item) => {
+                    const Icon = TRUST_ICONS[item.icon];
+                    return (
+                      <li
+                        key={item.label}
+                        className="flex items-center gap-2 bg-surface-card px-3 py-2.5 text-[12px] font-medium leading-snug text-text-primary"
+                      >
+                        <Icon size={18} strokeWidth={1.5} aria-hidden className="shrink-0" />
+                        {item.label}
+                      </li>
+                    );
+                  })}
+                </ul>
               </div>
 
               <ProductLinks product={product} datasheet={details.datasheet} related={related} />
-
-              {/* The four assurances as one plain strip: a row of four with
-                  hairline dividers, two by two on a phone. */}
-              <ul
-                aria-label="Alışveriş güvenceleri"
-                className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-(--card-radius) border border-line bg-line sm:grid-cols-4"
-              >
-                {PRODUCT_TRUST.filter((item) => item.icon !== 'truck').map((item) => {
-                  const Icon = TRUST_ICONS[item.icon];
-                  return (
-                    <li
-                      key={item.label}
-                      className="flex items-center gap-2 bg-surface-card px-3 py-3 text-[13px] font-semibold leading-snug text-text-primary"
-                    >
-                      <Icon size={17} strokeWidth={2} aria-hidden className="shrink-0 text-text-secondary" />
-                      {item.label}
-                    </li>
-                  );
-                })}
-              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      {/* --- section bar -------------------------------------------------
-          Sticks under the condensed header (h-14), so the long reference half
-          of the page stays navigable. Plain anchors: no state, no script. */}
-      <nav
-        aria-label="Ürün bölümleri"
-        className="sticky top-14 z-30 border-b border-line bg-surface-card/90 backdrop-blur"
-      >
-        <div className="container-main">
-          <ul className="flex gap-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-            {sections.map((section) => (
-              <li key={section.id} className="shrink-0">
-                <a
-                  href={`#${section.id}`}
-                  className="relative flex h-12 items-center px-3 text-[14px] font-semibold text-text-secondary transition-colors duration-(--duration-fast) after:absolute after:inset-x-3 after:bottom-0 after:h-0.5 after:origin-left after:scale-x-0 after:bg-signal after:transition-transform after:duration-(--duration-fast) hover:text-text-primary hover:after:scale-x-100 focus-visible:text-text-primary focus-visible:after:scale-x-100"
-                >
-                  {section.label}
-                </a>
-              </li>
-            ))}
-            {details.datasheet && (
-              <li className="ml-auto shrink-0">
-                <a
-                  href={details.datasheet}
-                  target="_blank"
-                  rel="noopener"
-                  className="flex h-12 items-center gap-1.5 px-3 text-[13px] font-semibold text-text-primary"
-                >
-                  <Download size={15} strokeWidth={2.25} aria-hidden />
-                  Teknik föy
-                </a>
-              </li>
-            )}
-          </ul>
-        </div>
-      </nav>
+      <ProductSectionNav sections={sections} datasheet={details.datasheet} />
 
-      {/* --- description: the write-up beside its highlights ------------ */}
-      {details.description && (
-        <section id="aciklama" className="container-main pt-8 dt:pt-12" aria-label="Ürün açıklaması">
-          <SectionHeading eyebrow="Ürün detayları" title="Ürün Açıklaması" />
-          <div className="mt-4 grid items-start gap-(--space-grid-gap) lg:grid-cols-[minmax(0,1fr)_400px]">
-            <div className="rounded-(--panel-radius) border border-line bg-surface-card px-5 py-5 shadow-e1 dt:px-7 dt:py-6">
-              <div className="max-w-[72ch] space-y-4 text-[14px] leading-[1.75] text-text-primary dt:text-[16px]">
+      {/* --- description and sheet, side by side on a light band --------- */}
+      <div className="border-b border-line bg-surface-page">
+        <div className={`container-main grid items-start gap-4 py-5 dt:py-6 ${details.description ? 'lg:grid-cols-2' : ''}`}>
+          {details.description && (
+            <section
+              id="aciklama"
+              aria-labelledby="aciklama-baslik"
+              className="min-w-0 rounded-(--card-radius) border border-line bg-surface-card p-4 dt:p-5"
+            >
+              <h2 id="aciklama-baslik" className="text-[20px] font-extrabold tracking-tight text-text-primary">
+                Ürün Açıklaması
+              </h2>
+              <div className="mt-3 space-y-3 border-l-2 border-signal pl-4 text-[14px] leading-relaxed text-text-primary">
                 {paragraphs.map((paragraph) => (
                   <p key={paragraph} className="whitespace-pre-line">
                     {paragraph}
                   </p>
                 ))}
               </div>
-            </div>
-            {bullets.length > 0 && (
-              <aside
-                aria-label="Öne çıkan özellikler"
-                className="relative overflow-hidden rounded-(--panel-radius) bg-chrome px-5 py-5 text-white shadow-e2 dt:px-6 dt:py-6"
-              >
-                <span
-                  aria-hidden
-                  className="pointer-events-none absolute -right-16 -top-16 h-52 w-52 rounded-full bg-grad-1/25 blur-3xl"
-                />
-                <p className="relative text-[12px] font-bold uppercase tracking-[0.18em] text-white/55">
-                  Öne çıkan özellikler
-                </p>
-                <ul className="relative mt-4 space-y-3">
-                  {bullets.map((line) => (
-                    <li key={line} className="flex items-start gap-3 text-[14px] leading-snug">
-                      <span
-                        aria-hidden
-                        className="mt-px grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white text-chrome"
-                      >
-                        <Check size={12} strokeWidth={3} />
-                      </span>
-                      {line}
-                    </li>
-                  ))}
+              {features.length > 0 && (
+                <ul aria-label="Öne çıkan özellikler" className="mt-4 grid gap-2 sm:grid-cols-2">
+                  {features.map((line) => {
+                    const Icon = iconFor(line);
+                    const [head, ...tail] = line.split(' · ');
+                    return (
+                      <li key={line} className="flex items-start gap-2.5 rounded-(--card-radius) border border-line px-3 py-2.5">
+                        <Icon size={22} strokeWidth={1.5} aria-hidden className="mt-px shrink-0 text-signal" />
+                        <span className="min-w-0 text-[13px] leading-snug">
+                          <span className="block font-bold text-text-primary">{head}</span>
+                          {tail.length > 0 && <span className="block text-text-secondary">{tail.join(' · ')}</span>}
+                        </span>
+                      </li>
+                    );
+                  })}
                 </ul>
-              </aside>
-            )}
-          </div>
-        </section>
-      )}
+              )}
+            </section>
+          )}
 
-      <ProductSpecs product={product} specs={details.specs} />
+          <ProductSpecs product={product} specs={details.specs} />
+        </div>
+      </div>
 
       {/* --- recorders of the same system -------------------------------- */}
       {recorders.length > 0 && recorderPattern && (
-        <section id="uyumlu-kayit-cihazlari" className="container-main scroll-mt-32 pt-8 dt:pt-12" aria-label="Uyumlu kayıt cihazları">
+        <section id="uyumlu-kayit-cihazlari" className="container-main pt-6 dt:pt-8" aria-label="Uyumlu kayıt cihazları">
           <SectionHeading
             eyebrow={`${category.label} · ${recorderPattern.label}`}
             title="Uyumlu Kayıt Cihazları"
@@ -746,7 +694,7 @@ export default async function ProductPage({
 
       {/* --- the brand's other models ------------------------------------ */}
       {siblings.length > 0 && (
-        <section id="diger-modeller" className="container-main pt-8 dt:pt-12">
+        <section id="diger-modeller" className="container-main pt-6 dt:pt-8">
           <SectionHeading
             eyebrow="Aynı marka"
             title={`${product.brand} Diğer Modeller`}
@@ -763,7 +711,7 @@ export default async function ProductPage({
           that failed to load. The category stays one click away from the
           spec section's support card. */}
       {alternatives.length > 1 && (
-        <section id="benzer-urunler" className="container-main pt-8 pb-8 dt:pt-12" aria-label="Benzer ürünler">
+        <section id="benzer-urunler" className="container-main pt-6 dt:pt-8" aria-label="Benzer ürünler">
           <SectionHeading eyebrow={category.label} title="Benzer Ürünler" action={{ label: 'Tümü', href: category.href }} />
           <div className="pt-3">
             <ProductGrid products={alternatives.slice(0, 4)} columns={4} />

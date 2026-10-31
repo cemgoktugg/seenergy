@@ -34,14 +34,16 @@ These routes are real, not placeholders:
 
 ```
 /                     homepage
-/urun/[slug]          product detail, datasheet style (2026-10-25): photo on a
-                      plate with leader-line callouts (metadata.callouts, x/y
-                      fractions of the photo — set by hand per photo, migration
-                      seenergy-cctv-callouts), model code as the heading, a
-                      3/6-cell spec summary from the product's own sheet, the
-                      offer plate (price or "Fiyat teklifle"), a link row
-                      (teknik föy, karşılaştır, uyumlu NVR/DVR), spec table,
-                      similar products
+/urun/[slug]          product detail (2026-10-31, from the client's mock): compact,
+                      on white, drawn with hairlines. Photo plate + thumbnails;
+                      a 3/6-cell spec summary from the product's own sheet; one
+                      offer box (price or "Fiyat için bize ulaşın", purchase,
+                      assurances); link row; tabs; description beside the spec
+                      table on a light band (a long sheet folds after "Genel");
+                      recorders and similar products. Only this route gets the
+                      plain header (`plain` in site-header.tsx, by pathname).
+                      The leader-line callouts (metadata.callouts) stay in the
+                      database but are no longer drawn
 /kategori             all categories — the tree with its subcategories
 /kategori/[slug]      category listing, for every category and subcategory;
                       a parent lists its subcategories' products too

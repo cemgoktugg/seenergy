@@ -8,7 +8,9 @@
  * Split out of the page so the page itself stays a server component — only the
  * controls that hold state cross into the client.
  *
- * Sales first: "Sepete Ekle" is the one primary action. "Teklif İste" is a
+ * The favourite button sits in the corner of the offer box around this block,
+ * which is `relative` for it. Sales first: "Sepete Ekle" is the one primary
+ * action. "Teklif İste" is a
  * secondary action under it, for project and volume buyers. A product without
  * a price cannot go into a Medusa cart (the cart has no amount to charge), so
  * there — and only there — the quote is the primary action.
@@ -21,7 +23,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { FileText, HardDrive, Heart, Minus, MessageSquareQuote, Plus, Scale, ShoppingCart, Zap } from 'lucide-react';
+import { FileText, HardDrive, Heart, Minus, MessageSquareQuote, Plus, Scale, ShoppingCart } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
@@ -64,30 +66,29 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
     if (await addToCart()) router.push('/sepet');
   };
 
-  const favouriteButton = (visibility = '') => (
-    <button
-      type="button"
-      aria-pressed={favourite}
-      onClick={() => toggle('favourites', product.id)}
-      aria-label={`${product.name} ürününü favorilere ekle`}
-      className={`${visibility} h-13 w-13 shrink-0 place-items-center rounded-full border transition-colors duration-(--duration-fast) ease-in-out ${
-        favourite
-          ? 'border-danger bg-danger/10 text-danger-ink'
-          : 'border-line-strong text-text-secondary hover:border-danger hover:text-danger-ink'
-      }`}
-    >
-      <Heart size={20} strokeWidth={1.8} fill={favourite ? 'currentColor' : 'none'} aria-hidden />
-    </button>
-  );
+  /* Rectangular on hairlines, like the page around them; a stepper's three
+     cells divided by the same 1px line. */
+  const button = 'flex h-13 items-center justify-center gap-2 whitespace-nowrap rounded-(--card-radius) text-[16px] font-bold transition-colors duration-(--duration-fast)';
+  const primary = `${button} bg-signal text-white hover:bg-signal-dark`;
+  const secondary = `${button} border border-text-primary bg-surface-card text-text-primary hover:bg-text-primary hover:text-surface-card`;
 
   return (
     <>
+      <button
+        type="button"
+        aria-pressed={favourite}
+        onClick={() => toggle('favourites', product.id)}
+        aria-label={`${product.name} ürününü favorilere ekle`}
+        className={`absolute right-2 top-2 grid h-11 w-11 place-items-center rounded-full transition-colors duration-(--duration-fast) dt:right-3 dt:top-3 ${
+          favourite ? 'text-danger-ink' : 'text-text-secondary hover:text-danger-ink'
+        }`}
+      >
+        <Heart size={24} strokeWidth={1.5} fill={favourite ? 'currentColor' : 'none'} aria-hidden />
+      </button>
+
       {onRequest ? (
         <div className="mt-4 flex flex-wrap items-stretch gap-2.5">
-          <Link
-            href={quoteHref(product.sku)}
-            className="flex h-13 flex-1 basis-full items-center justify-center gap-2 rounded-full bg-signal text-[16px] font-bold text-white shadow-e2 transition-colors duration-(--duration-fast) hover:bg-signal-dark sm:basis-0"
-          >
+          <Link href={quoteHref(product.sku)} className={`${primary} flex-1 basis-full sm:basis-0`}>
             Teklif al
           </Link>
           {whatsapp ? (
@@ -95,83 +96,74 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
               href={waHref(whatsapp, `Merhaba, ${product.sku} için fiyat almak istiyorum.`)}
               target="_blank"
               rel="noopener"
-              className="flex h-13 flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full border border-text-primary bg-surface-card text-[16px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card"
+              className={`${secondary} flex-1`}
             >
               WhatsApp’tan sor
             </a>
           ) : null}
-          {favouriteButton('grid')}
         </div>
       ) : (
-        <>
-          <div className="mt-5 flex flex-wrap items-stretch gap-2.5">
-            {/* Quantity. Capped at the stock still free of this cart. */}
-            <div
-              role="group"
-              aria-label="Adet"
-              className="flex h-13 items-center rounded-full border border-line-strong bg-surface-card"
-            >
-              <button
-                type="button"
-                aria-label="Adedi azalt"
-                disabled={qty <= 1 || blocked}
-                onClick={() => setQuantity(Math.max(1, qty - 1))}
-                className="grid h-full w-11 place-items-center rounded-l-full text-text-primary transition-colors hover:bg-surface-page disabled:opacity-35"
-              >
-                <Minus size={16} strokeWidth={2.25} aria-hidden />
-              </button>
-              <output aria-live="polite" className="w-8 text-center text-[16px] font-bold tabular-nums text-text-primary">
-                {qty}
-              </output>
-              <button
-                type="button"
-                aria-label="Adedi artır"
-                disabled={qty >= left || blocked}
-                onClick={() => setQuantity(Math.min(left, qty + 1))}
-                className="grid h-full w-11 place-items-center rounded-r-full text-text-primary transition-colors hover:bg-surface-page disabled:opacity-35"
-              >
-                <Plus size={16} strokeWidth={2.25} aria-hidden />
-              </button>
-            </div>
-
+        <div className="mt-4 flex flex-wrap items-stretch gap-2.5">
+          {/* Quantity. Capped at the stock still free of this cart. */}
+          <div
+            role="group"
+            aria-label="Adet"
+            className="flex h-13 shrink-0 items-center divide-x divide-line-strong rounded-(--card-radius) border border-line-strong bg-surface-card"
+          >
             <button
               type="button"
-              disabled={blocked}
-              onClick={() => void addToCart()}
-              className="flex h-13 min-w-[180px] flex-1 items-center justify-center gap-2 whitespace-nowrap rounded-full bg-signal text-[16px] font-bold text-white shadow-e2 transition-[transform,background-color] duration-(--duration-fast) ease-in-out hover:-translate-y-px hover:bg-signal-dark disabled:translate-y-0 disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
+              aria-label="Adedi azalt"
+              disabled={qty <= 1 || blocked}
+              onClick={() => setQuantity(Math.max(1, qty - 1))}
+              className="grid h-full w-11 place-items-center text-text-primary transition-colors hover:bg-surface-page disabled:opacity-35"
             >
-              <ShoppingCart size={19} strokeWidth={2} aria-hidden />
-              {label}
-              {/* The count rides as a pill, not in the label: "Sepete Ekle
-                  (1 sepette)" broke onto two lines on a phone. */}
-              {inCart > 0 && !atStock && !cart.busy && (
-                <span className="hidden rounded-full bg-white/20 px-2 py-0.5 text-[12px] font-bold tabular-nums sm:inline">
-                  {inCart} sepette
-                </span>
-              )}
+              <Minus size={16} strokeWidth={1.75} aria-hidden />
+            </button>
+            <output aria-live="polite" className="grid h-full w-11 place-items-center text-[16px] font-bold tabular-nums text-text-primary">
+              {qty}
+            </output>
+            <button
+              type="button"
+              aria-label="Adedi artır"
+              disabled={qty >= left || blocked}
+              onClick={() => setQuantity(Math.min(left, qty + 1))}
+              className="grid h-full w-11 place-items-center text-text-primary transition-colors hover:bg-surface-page disabled:opacity-35"
+            >
+              <Plus size={16} strokeWidth={1.75} aria-hidden />
             </button>
           </div>
 
-          {/* Second row: buy now, and the favourite beside it — one layout at
-              every width (the heart used to take a row of its own on phones). */}
-          <div className="mt-2.5 flex items-stretch gap-2.5">
-            <button
-              type="button"
-              disabled={blocked}
-              onClick={() => void buyNow()}
-              className="flex h-13 flex-1 items-center justify-center gap-2 rounded-full border-2 border-text-primary bg-surface-card text-[16px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <Zap size={17} strokeWidth={2.25} aria-hidden />
-              Hemen Al
-            </button>
-            {favouriteButton('grid')}
-          </div>
-        </>
+          <button
+            type="button"
+            disabled={blocked}
+            onClick={() => void addToCart()}
+            className={`${primary} min-w-[170px] flex-[1.3] disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary`}
+          >
+            <ShoppingCart size={19} strokeWidth={1.75} aria-hidden />
+            {label}
+            {/* The count rides as a pill, not in the label: "Sepete Ekle
+                (1 sepette)" broke onto two lines on a phone. */}
+            {inCart > 0 && !atStock && !cart.busy && (
+              <span className="hidden rounded-full bg-white/20 px-2 py-0.5 text-[12px] font-bold tabular-nums sm:inline">
+                {inCart} sepette
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            disabled={blocked}
+            onClick={() => void buyNow()}
+            className={`${secondary} min-w-[130px] flex-1 basis-full disabled:cursor-not-allowed disabled:opacity-40 sm:basis-0`}
+          >
+            Hemen Al
+          </button>
+        </div>
       )}
 
       {/* Sticky buy bar, below `dt` only: the desktop buy card stays in view on
-          its own. It floats over the page, so it takes the overlay shadow. */}
-      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface-card/95 px-3 py-2.5 shadow-e3 backdrop-blur dt:hidden">
+          its own. */}
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line-strong bg-surface-card px-3 py-2.5 dt:hidden">
         <div className="flex items-center gap-3">
           <div className="min-w-0">
             <p className="truncate text-[12px] text-text-secondary">{product.sku || product.brand}</p>
@@ -184,7 +176,7 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
           {onRequest ? (
             <Link
               href={quoteHref(product.sku)}
-              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-signal text-[14px] font-bold text-white hover:bg-signal-dark"
+              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-(--card-radius) bg-signal text-[14px] font-bold text-white hover:bg-signal-dark"
             >
               <MessageSquareQuote size={17} strokeWidth={2} aria-hidden />
               Teklif al
@@ -194,7 +186,7 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
               type="button"
               disabled={blocked}
               onClick={() => void addToCart()}
-              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-full bg-signal text-[14px] font-bold text-white hover:bg-signal-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
+              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-(--card-radius) bg-signal text-[14px] font-bold text-white hover:bg-signal-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
             >
               <ShoppingCart size={17} strokeWidth={2} aria-hidden />
               {soldOut ? 'Tükendi' : cart.busy ? 'Ekleniyor…' : 'Sepete Ekle'}
@@ -223,15 +215,14 @@ export function ProductLinks({
   const { has, toggle, count, ready } = useStore();
   const comparing = ready && has('compare', product.id);
   const compareFull = ready && !comparing && count('compare') >= COMPARE_LIMIT;
-  /* Chips, not a third row of buttons — reference next to the purchase. */
   const link =
-    'inline-flex h-9 items-center gap-1.5 rounded-full border border-line bg-surface-card px-3.5 text-[13px] font-semibold text-text-primary transition-colors duration-(--duration-fast) hover:border-text-primary';
+    'inline-flex h-11 items-center gap-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-(--duration-fast) hover:text-text-primary dt:h-9';
 
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-2">
+    <div className="mt-1 flex flex-wrap items-center gap-x-5">
       {datasheet && (
         <a href={datasheet} target="_blank" rel="noopener" className={link}>
-          <FileText size={16} strokeWidth={2} aria-hidden />
+          <FileText size={16} strokeWidth={1.5} aria-hidden />
           Teknik föy (PDF)
         </a>
       )}
@@ -242,18 +233,18 @@ export function ProductLinks({
         aria-pressed={comparing}
         className={`${link} disabled:cursor-not-allowed disabled:opacity-50`}
       >
-        <Scale size={16} strokeWidth={1.9} aria-hidden />
+        <Scale size={16} strokeWidth={1.5} aria-hidden />
         {comparing ? 'Karşılaştırmada' : compareFull ? `Karşılaştırma dolu (${COMPARE_LIMIT})` : 'Karşılaştırmaya ekle'}
       </button>
       {product.price != null && (
         <Link href={quoteHref(product.sku)} className={link}>
-          <MessageSquareQuote size={16} strokeWidth={1.9} aria-hidden />
+          <MessageSquareQuote size={16} strokeWidth={1.5} aria-hidden />
           Toplu alım için teklif
         </Link>
       )}
       {related && (
         <Link href={related.href} className={link}>
-          <HardDrive size={16} strokeWidth={1.9} aria-hidden />
+          <HardDrive size={16} strokeWidth={1.5} aria-hidden />
           {related.label}
         </Link>
       )}

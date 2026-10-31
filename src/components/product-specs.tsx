@@ -1,24 +1,15 @@
 /**
- * Technical specifications — the product page's second half.
+ * Technical specifications — one card beside the description, the sheet of a
+ * datasheet: aligned label and value columns on hairlines.
  *
- * What it replaced: one 1,300px column of label/value rows set in monospace,
- * a "Ticari" group repeating the price and stock the buy box had just shown,
- * and compatibility chips in monospace as well. It read as a data dump.
- *
- * Now:
- *   - every spec group is its own card, headed by an icon and a row count.
- *     From `dt` the cards flow in two balanced CSS columns, so one long group
- *     and two short ones pack instead of leaving a hole under the short side
- *   - values are set in the text face at semibold with tabular figures, on
- *     zebra rows; monospace is kept for identifiers (the SKU) only
- *   - the commercial rows left the table: payment, shipping and stock are
- *     stated once, in the "Sipariş bilgileri" card beside it
- *   - compatibility is a card in the same flow as the groups; order
- *     information and technical support share a short rail that stays in
- *     view, below the condensed header, while the groups scroll past
- *
- * Still a real <table> per group, labelled by its heading, so the row/column
- * relationship survives for screen readers (ECDOS 10 §47).
+ *   - Still a real <table> per group, labelled by its heading, so the
+ *     row/column relationship survives for screen readers (ECDOS 10 §47).
+ *   - The first group (the catalogue facts plus "Genel") always shows; a long
+ *     sheet folds the rest behind one row, so the card stands level with the
+ *     description instead of running 1000px past it.
+ *   - The rows a buyer decides on are set a step bolder than the rest.
+ *   - Commercial facts stay out of the table: price, stock, delivery and
+ *     payment are stated once, in the offer above.
  *
  * Whose values: the product's own, when the admin has written them (product
  * form → "Teknik özellikler", stored in metadata.specs). Otherwise the
@@ -29,61 +20,11 @@
  */
 
 import Link from 'next/link';
-import {
-  BatteryCharging,
-  Binary,
-  Cable,
-  Camera,
-  MessageSquareQuote,
-  ChevronRight,
-  CircleCheck,
-  CircuitBoard,
-  ClipboardList,
-  Info,
-  Gauge,
-  HardDrive,
-  Headphones,
-  Lightbulb,
-  Monitor,
-  PackageCheck,
-  Plug,
-  RadioTower,
-  Ruler,
-  SatelliteDish,
-  ScanEye,
-  Truck,
-  Volume2,
-  Wallet,
-  Wifi,
-  Zap,
-  type LucideIcon,
-} from 'lucide-react';
+import { ChevronRight, CircleCheck, Headphones, Info, Settings } from 'lucide-react';
 
-import { SectionHeading } from '@/components/section-heading';
 import { SpecFold } from '@/components/spec-fold';
-import { brandSlug, categoryMeta, formatPrice, FREE_SHIPPING_FROM, type Product } from '@/data/catalog';
-import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
+import { brandSlug, categoryMeta, type Product } from '@/data/catalog';
 import { categorySpec, type CompatibilityItem, type SpecGroup } from '@/data/specs';
-
-/** Every group title the catalogue's categories use, and its mark. */
-const GROUP_ICONS: Record<string, LucideIcon> = {
-  Genel: ClipboardList,
-  Fiziksel: Ruler,
-  'Sinyal ve alım': SatelliteDish,
-  İletim: RadioTower,
-  Ölçüm: Gauge,
-  Ses: Volume2,
-  'Kod ve öğrenme': Binary,
-  Kayıt: HardDrive,
-  Güç: Zap,
-  Enerji: BatteryCharging,
-  Ekran: Monitor,
-  Bağlantı: Cable,
-  'Ağ ve kablosuz': Wifi,
-  Aydınlatma: Lightbulb,
-  Görüntü: Camera,
-  'Akıllı özellikler': ScanEye,
-};
 
 type Row = {
   label: string;
@@ -98,6 +39,12 @@ type Row = {
 type Group = { title: string; rows: Row[] };
 
 const lower = (text: string) => text.trim().toLocaleLowerCase('tr');
+
+/** A sheet longer than this folds everything after its first group. */
+const FOLD_OVER = 10;
+
+/** The rows that decide a purchase, set a step bolder. */
+const KEY_ROW = /^çözünürlük|^lens|gece|kanal sayısı/i;
 
 /**
  * The catalogue facts first, then the spec groups — the product's own when it
@@ -120,58 +67,45 @@ function groupsOf(product: Product, source: SpecGroup[]): Group[] {
   ];
 }
 
-/** The small graphite tile every card in this section opens with. */
-function IconTile({ icon: Icon }: { icon: LucideIcon }) {
-  return (
-    <span
-      aria-hidden
-      className="grid h-9 w-9 shrink-0 place-items-center rounded-(--card-radius) bg-linear-to-br from-grad-2 to-grad-4 text-white shadow-e1"
-    >
-      <Icon size={17} strokeWidth={2} />
-    </span>
-  );
-}
-
-function SpecCard({ group, index }: { group: Group; index: number }) {
+function SpecTable({ group, index, headed }: { group: Group; index: number; headed: boolean }) {
   const id = `spec-group-${index}`;
   return (
-    <section
-      aria-labelledby={id}
-      className="mb-(--space-grid-gap) break-inside-avoid overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e1"
-    >
-      <div className="flex items-center gap-3 border-b border-line px-4 py-3.5 dt:px-5">
-        <IconTile icon={GROUP_ICONS[group.title] ?? CircuitBoard} />
-        <h3 id={id} className="min-w-0 flex-1 truncate text-[16px] font-extrabold tracking-tight text-text-primary">
-          {group.title}
-        </h3>
-        <span className="shrink-0 rounded-full bg-surface-page px-2.5 py-1 text-[12px] font-semibold tabular-nums text-text-secondary">
-          {group.rows.length} özellik
-        </span>
-      </div>
-
-      <table aria-labelledby={id} className="w-full border-collapse text-left">
+    <section aria-labelledby={id}>
+      <h3
+        id={id}
+        className={
+          headed
+            ? 'border-t border-line bg-surface-page px-4 py-2 text-[12px] font-bold uppercase tracking-[0.08em] text-text-secondary dt:px-5'
+            : 'sr-only'
+        }
+      >
+        {group.title}
+      </h3>
+      <table aria-labelledby={id} className="w-full table-fixed border-collapse text-left">
         <tbody>
           {group.rows.map((row) => (
-            <tr key={row.label} className="even:bg-surface-page">
+            <tr key={row.label} className="border-t border-line">
               <th
                 scope="row"
-                className="w-[42%] px-4 py-3 align-top text-[13px] font-medium leading-snug text-text-secondary dt:pl-5"
+                className="w-[42%] break-words px-4 py-2.5 align-top text-[13px] font-medium leading-snug text-text-secondary dt:pl-5"
               >
                 {row.label}
               </th>
-              <td className="px-4 py-3 align-top text-[14px] font-semibold leading-snug tabular-nums text-text-primary dt:pr-5">
+              <td
+                className={`break-words border-l border-line px-4 py-2.5 align-top text-[14px] leading-snug tabular-nums text-text-primary dt:pr-5 ${
+                  KEY_ROW.test(row.label) ? 'font-bold' : 'font-medium'
+                }`}
+              >
                 {row.href ? (
                   <Link
                     href={row.href}
                     className="inline-flex items-center gap-0.5 underline decoration-line-strong underline-offset-[3px] transition-colors hover:decoration-text-primary"
                   >
                     {row.value}
-                    <ChevronRight size={13} strokeWidth={2.25} aria-hidden className="text-text-secondary" />
+                    <ChevronRight size={13} strokeWidth={1.75} aria-hidden className="text-text-secondary" />
                   </Link>
                 ) : row.mono ? (
-                  <span className="rounded-(--card-radius) border border-line bg-surface-card px-1.5 py-0.5 font-mono text-[12px] uppercase tracking-[0.04em]">
-                    {row.value}
-                  </span>
+                  <span className="font-mono text-[13px] uppercase tracking-[0.04em]">{row.value}</span>
                 ) : (
                   row.value
                 )}
@@ -190,40 +124,33 @@ function SpecCard({ group, index }: { group: Group; index: number }) {
 }
 
 /**
- * Compatibility gets its own card rather than a row buried in the table
+ * Compatibility stays its own block rather than a row buried in the table
  * (docs/COMMERCE_RULES §9): "will this fit what I already have" is the
  * question that blocks the purchase.
  */
-function CompatibilityCard({ items }: { items: CompatibilityItem[] }) {
+function Compatibility({ items }: { items: CompatibilityItem[] }) {
   return (
-    <section
-      aria-labelledby="spec-compatibility"
-      className="mb-(--space-grid-gap) break-inside-avoid overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e1"
-    >
-      <div className="flex items-center gap-3 border-b border-line px-4 py-3.5 dt:px-5">
-        <IconTile icon={Plug} />
-        <div className="min-w-0">
-          <h3 id="spec-compatibility" className="text-[16px] font-extrabold tracking-tight text-text-primary">
-            Uyumluluk
-          </h3>
-          <p className="text-[12px] text-text-secondary">Birlikte çalıştığı sistemler ve bağlantılar</p>
-        </div>
-      </div>
-
-      <dl className="divide-y divide-line">
+    <section aria-labelledby="spec-compatibility">
+      <h3
+        id="spec-compatibility"
+        className="border-t border-line bg-surface-page px-4 py-2 text-[12px] font-bold uppercase tracking-[0.08em] text-text-secondary dt:px-5"
+      >
+        Uyumluluk
+      </h3>
+      <dl>
         {items.map((item) => (
-          <div key={item.label} className="px-4 py-3.5 dt:px-5">
-            <dt className="flex items-start gap-2 text-[13px] font-bold leading-snug text-text-primary">
-              <CircleCheck size={15} strokeWidth={2.25} aria-hidden className="mt-px shrink-0 text-success" />
+          <div key={item.label} className="border-t border-line px-4 py-3 dt:px-5">
+            <dt className="flex items-start gap-2 text-[13px] font-semibold leading-snug text-text-primary">
+              <CircleCheck size={15} strokeWidth={1.75} aria-hidden className="mt-px shrink-0 text-text-secondary" />
               {item.label}
             </dt>
             {/* Keyed by position as well as value: two entries that normalise
                 to the same string must not collide as React keys. */}
-            <dd className="mt-2 flex flex-wrap gap-1.5 pl-[23px]">
+            <dd className="mt-1.5 flex flex-wrap gap-1.5 pl-[23px]">
               {item.values.map((value, index) => (
                 <span
                   key={`${value}-${index}`}
-                  className="rounded-full border border-line bg-surface-page px-2.5 py-1 text-[12px] font-medium leading-tight text-text-primary"
+                  className="rounded-(--card-radius) border border-line px-2 py-1 text-[12px] font-medium leading-tight text-text-primary"
                 >
                   {value}
                 </span>
@@ -239,110 +166,6 @@ function CompatibilityCard({ items }: { items: CompatibilityItem[] }) {
   );
 }
 
-/** Payment, shipping and stock, stated once — they used to be table rows. */
-function OrderCard({ product }: { product: Product }) {
-  /* Price-on-request: no cart, so no shipping threshold, instalments or a
-     stock count of 0 to report — what the buyer needs is how to get a price. */
-  const rows = product.price == null ? [
-    { icon: MessageSquareQuote, label: 'Fiyat', value: 'Teklif ile belirlenir' },
-    { icon: Wallet, label: 'Ödeme', value: 'Havale / EFT' },
-    { icon: PackageCheck, label: 'Stok ve teslim', value: 'Teklifte bildirilir' },
-  ] : [
-    {
-      icon: Truck,
-      label: 'Kargo',
-      value: product.freeShipping
-        ? 'Ücretsiz kargo'
-        : `${formatPrice(FREE_SHIPPING_FROM)} üzeri ücretsiz`,
-    },
-    {
-      icon: Wallet,
-      label: 'Ödeme',
-      value: INSTALMENTS_AVAILABLE && product.instalment ? 'Peşin fiyatına 3 taksit' : 'Havale / EFT veya kapıda ödeme',
-    },
-    {
-      icon: PackageCheck,
-      label: 'Stok',
-      value: product.stock === 0 ? 'Şu anda stokta yok' : `Stokta · ${product.stock} adet`,
-    },
-  ];
-
-  return (
-    <section
-      aria-labelledby="spec-order"
-      className="rounded-(--panel-radius) border border-line bg-surface-card px-4 py-4 shadow-e1 dt:px-5"
-    >
-      <h3 id="spec-order" className="text-[12px] font-bold uppercase tracking-[0.14em] text-text-secondary">
-        Sipariş bilgileri
-      </h3>
-      <dl className="mt-3 space-y-3">
-        {rows.map(({ icon: Icon, label, value }) => (
-          <div key={label} className="flex items-center gap-3">
-            <span
-              aria-hidden
-              className="grid h-8 w-8 shrink-0 place-items-center rounded-(--card-radius) bg-surface-page text-text-primary"
-            >
-              <Icon size={15} strokeWidth={2} />
-            </span>
-            <div className="min-w-0">
-              <dt className="text-[12px] text-text-secondary">{label}</dt>
-              <dd className="text-[13px] font-semibold text-text-primary">{value}</dd>
-            </div>
-          </div>
-        ))}
-      </dl>
-    </section>
-  );
-}
-
-function SupportCard({ product }: { product: Product }) {
-  const category = categoryMeta(product.category);
-  return (
-    <aside
-      aria-label="Teknik destek"
-      className="relative overflow-hidden rounded-(--panel-radius) bg-chrome px-5 py-5 text-white shadow-e2"
-    >
-      <span
-        aria-hidden
-        className="pointer-events-none absolute -right-12 -top-14 h-44 w-44 rounded-full bg-grad-1/20 blur-3xl"
-      />
-      <span aria-hidden className="relative grid h-10 w-10 place-items-center rounded-(--card-radius) bg-white/10 ring-1 ring-white/15">
-        <Headphones size={18} strokeWidth={2} />
-      </span>
-      <p className="relative mt-3 text-[16px] font-extrabold tracking-tight">Teknik destek</p>
-      <p className="relative mt-1.5 text-[13px] leading-relaxed text-white/70">
-        Uyumluluk, montaj veya alternatifler için ürün kodunu{' '}
-        <span className="rounded bg-white/10 px-1 py-px font-mono text-[12px] text-white">{product.sku}</span>{' '}
-        belirterek ekibimize ulaşın.
-      </p>
-      <div className="relative mt-4 flex flex-wrap gap-2">
-        <Link
-          href={`/iletisim?konu=teknik&urun=${encodeURIComponent(product.sku)}`}
-          className="inline-flex items-center gap-1 rounded-full bg-white px-4 h-9 text-[13px] font-bold text-ink-fixed transition-colors duration-(--duration-fast) hover:bg-white/85"
-        >
-          Bize ulaşın
-          <ChevronRight size={14} strokeWidth={2.25} aria-hidden />
-        </Link>
-        <Link
-          href="/kurumsal"
-          className="inline-flex items-center rounded-full border border-white/25 px-4 h-9 text-[13px] font-semibold text-white transition-colors duration-(--duration-fast) hover:bg-white/10"
-        >
-          Kurumsal teklif
-        </Link>
-      </div>
-      <Link
-        href={category.href}
-        className="relative mt-4 flex items-center justify-between gap-2 border-t border-white/10 pt-3 text-[12px] text-white/70 transition-colors hover:text-white"
-      >
-        <span className="min-w-0 truncate">
-          Kategori: <span className="font-semibold text-white">{category.label}</span>
-        </span>
-        <ChevronRight size={14} strokeWidth={2.25} aria-hidden className="shrink-0" />
-      </Link>
-    </aside>
-  );
-}
-
 export function ProductSpecs({ product, specs }: { product: Product; specs: SpecGroup[] }) {
   const own = specs.length > 0;
   const template = categorySpec(product.category)?.groups ?? [];
@@ -354,18 +177,34 @@ export function ProductSpecs({ product, specs }: { product: Product; specs: Spec
      with its own sheet it would put "ONVIF Profile S" under an AHD camera. */
   const compatibility = own ? [] : (categorySpec(product.category)?.compatibility ?? []);
   const rowCount = groups.reduce((total, group) => total + group.rows.length, 0);
+  const headed = groups.length > 1 || compatibility.length > 0;
+
+  const rest = (
+    <>
+      {groups.slice(1).map((group, index) => (
+        <SpecTable key={group.title} group={group} index={index + 1} headed={headed} />
+      ))}
+      {compatibility.length > 0 && <Compatibility items={compatibility} />}
+    </>
+  );
 
   return (
-    <section className="container-main pt-8 dt:pt-12" aria-labelledby="teknik-ozellikler">
-      <SectionHeading eyebrow="Ürün detayları" title="Teknik Özellikler" id="teknik-ozellikler">
-        <span className="hidden rounded-full border border-line bg-surface-card px-3 py-1 text-[12px] font-semibold tabular-nums text-text-secondary sm:inline-flex">
-          {groups.length} grup · {rowCount} özellik
-        </span>
-      </SectionHeading>
+    <section
+      id="teknik-ozellikler"
+      aria-labelledby="teknik-ozellikler-baslik"
+      className="min-w-0 overflow-hidden rounded-(--card-radius) border border-line bg-surface-card"
+    >
+      <h2
+        id="teknik-ozellikler-baslik"
+        className="flex items-center gap-2.5 px-4 py-3.5 text-[20px] font-extrabold tracking-tight text-text-primary dt:px-5"
+      >
+        <Settings size={20} strokeWidth={1.75} aria-hidden className="shrink-0 text-signal" />
+        Teknik Özellikler
+      </h2>
 
       {typical && (
-        <p className="mt-3 flex items-start gap-2 rounded-(--card-radius) border border-line bg-surface-card px-3.5 py-2.5 text-[13px] leading-relaxed text-text-secondary">
-          <Info size={15} strokeWidth={2} aria-hidden className="mt-0.5 shrink-0 text-text-primary" />
+        <p className="flex items-start gap-2 border-t border-line px-4 py-2.5 text-[13px] leading-relaxed text-text-secondary dt:px-5">
+          <Info size={15} strokeWidth={1.75} aria-hidden className="mt-0.5 shrink-0 text-text-primary" />
           <span>
             Bu tablo, <span className="font-semibold text-text-primary">{categoryMeta(product.category).label}</span>{' '}
             kategorisindeki ürünler için tipik değerleri gösterir. Bu ürüne ait kesin değerler için ürün kodunu
@@ -374,34 +213,31 @@ export function ProductSpecs({ product, specs }: { product: Product; specs: Spec
         </p>
       )}
 
-      <div className="mt-4 grid items-start gap-(--space-grid-gap) dt:mt-5 lg:grid-cols-[minmax(0,1fr)_340px] dt:grid-cols-[minmax(0,1fr)_380px]">
-        <div>
-          {/* Compatibility flows WITH the groups rather than heading the rail:
-              in the rail it made that column ~260px taller than the groups, so
-              the rail could never stick. Here it balances the two columns. */}
-          {(() => {
-            const cards = (
-              <div className="dt:columns-2 dt:gap-(--space-grid-gap)">
-                {groups.map((group, index) => (
-                  <SpecCard key={group.title} group={group} index={index} />
-                ))}
-                {compatibility.length > 0 && <CompatibilityCard items={compatibility} />}
-              </div>
-            );
-            /* A short sheet fits a phone screen as it is; only a long one folds. */
-            return rowCount > 8 ? <SpecFold total={rowCount}>{cards}</SpecFold> : cards;
-          })()}
-          <p className="max-w-[80ch] text-[12px] leading-relaxed text-text-secondary">
-            Teknik özellikler üretici tarafından önceden haber verilmeksizin değiştirilebilir. Siparişten önce
-            teyit etmek için ürün kodunu belirterek teknik destek ekibimize ulaşabilirsiniz.
-          </p>
-        </div>
+      <SpecTable group={groups[0]} index={0} headed={headed} />
+      {rowCount > FOLD_OVER ? <SpecFold total={rowCount}>{rest}</SpecFold> : rest}
 
-        <div className="flex flex-col gap-(--space-grid-gap) lg:sticky lg:top-(--sticky-offset)">
-          <OrderCard product={product} />
-          <SupportCard product={product} />
-        </div>
+      <div className="flex items-start gap-2.5 border-t border-line px-4 py-3 text-[13px] leading-relaxed text-text-secondary dt:px-5">
+        <Headphones size={17} strokeWidth={1.75} aria-hidden className="mt-0.5 shrink-0 text-text-primary" />
+        <p>
+          Uyumluluk, montaj veya alternatifler için ürün kodunu belirterek{' '}
+          <Link
+            href={`/iletisim?konu=teknik&urun=${encodeURIComponent(product.sku)}`}
+            className="font-semibold text-text-primary underline decoration-line-strong underline-offset-[3px] hover:decoration-text-primary"
+          >
+            teknik destek ekibimize ulaşın
+          </Link>
+          {' · '}
+          <Link
+            href="/kurumsal"
+            className="font-semibold text-text-primary underline decoration-line-strong underline-offset-[3px] hover:decoration-text-primary"
+          >
+            Kurumsal teklif
+          </Link>
+        </p>
       </div>
+      <p className="border-t border-line px-4 py-2.5 text-[12px] leading-relaxed text-text-secondary dt:px-5">
+        Teknik özellikler üretici tarafından önceden haber verilmeksizin değiştirilebilir.
+      </p>
     </section>
   );
 }

@@ -22,7 +22,6 @@
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
 import { imageProps, imageUrl } from '@/lib/image';
-import type { Callout } from '@/lib/medusa/catalog';
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -88,7 +87,7 @@ const TRACK =
   'flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden';
 
 const ARROW =
-  'grid h-10 w-10 place-items-center rounded-full border border-line bg-surface-card/95 text-text-primary shadow-e2 backdrop-blur transition-[opacity,background-color,color] duration-(--duration-fast) hover:bg-brand hover:text-white focus-visible:opacity-100';
+  'grid h-10 w-10 place-items-center rounded-full border border-line bg-surface-card text-text-primary transition-[opacity,background-color,color] duration-(--duration-fast) hover:bg-brand hover:text-white focus-visible:opacity-100';
 
 function Thumbs({
   images,
@@ -112,10 +111,8 @@ function Thumbs({
           onClick={() => onSelect(index)}
           aria-label={`${index + 1}. görsel`}
           aria-current={index === active ? 'true' : undefined}
-          className={`grid shrink-0 place-items-center overflow-hidden rounded-(--card-radius) border bg-surface-card p-1.5 transition-[border-color,box-shadow,opacity] duration-(--duration-fast) ${size} ${
-            index === active
-              ? 'border-brand opacity-100 ring-2 ring-brand/25'
-              : 'border-line opacity-70 hover:border-line-strong hover:opacity-100'
+          className={`grid shrink-0 place-items-center overflow-hidden rounded-(--card-radius) border bg-surface-card p-1.5 transition-colors duration-(--duration-fast) ${size} ${
+            index === active ? 'border-signal' : 'border-line hover:border-line-strong'
           }`}
         >
           <img {...imageProps(src, 80)} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
@@ -125,71 +122,15 @@ function Thumbs({
   );
 }
 
-/** Photo fraction (0–1) → stage percent: the picture sits in a 7% inset. */
-const onStage = (fraction: number) => 7 + fraction * 86;
-
-/**
- * Datasheet-style labels over the first photo: a dot on the part, a line that
- * breaks once and runs to a tag at the stage edge. Drawn in stage percent so
- * they hold at every width (the picture is square and inset by a percentage).
- * They step aside while the mouse zooms the picture, which they would no
- * longer line up with.
- */
-function CalloutLayer({ callouts }: { callouts: Callout[] }) {
-  return (
-    <div aria-hidden className="pointer-events-none absolute inset-0 transition-opacity duration-(--duration-fast) pointer-fine:group-hover:opacity-0">
-      <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="absolute inset-0 h-full w-full">
-        {callouts.map((c) => {
-          const x = onStage(c.x);
-          const y = onStage(c.y);
-          const ty = onStage(c.ty);
-          const edge = c.side === 'left' ? 3 : 97;
-          const bend = Math.abs(ty - y) < 1 ? x : x + (c.side === 'left' ? -6 : 6);
-          return (
-            <polyline
-              key={`${c.value}-${c.x}`}
-              points={`${x},${y} ${bend},${ty} ${edge},${ty}`}
-              fill="none"
-              stroke="rgb(31 35 40 / 0.55)"
-              strokeWidth="1"
-              vectorEffect="non-scaling-stroke"
-            />
-          );
-        })}
-      </svg>
-      {callouts.map((c) => (
-        <span
-          key={`dot-${c.value}-${c.x}`}
-          className="absolute h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-[rgb(195,19,28)] bg-white shadow-[0_0_0_4px_rgb(195_19_28/0.12)]"
-          style={{ left: `${onStage(c.x)}%`, top: `${onStage(c.y)}%` }}
-        />
-      ))}
-      {callouts.map((c) => (
-        <span
-          key={`tag-${c.value}-${c.x}`}
-          className="absolute -translate-y-1/2 rounded-(--card-radius) border border-[#dadde1] bg-white px-2.5 py-1.5 text-ink-fixed shadow-e1 dt:px-3 dt:py-2"
-          style={{ top: `${onStage(c.ty)}%`, ...(c.side === 'left' ? { left: '3%' } : { right: '3%' }) }}
-        >
-          <span className="block text-[14px] font-bold leading-tight tabular-nums dt:text-[16px]">{c.value}</span>
-          {c.label && <span className="block text-[12px] leading-tight text-[#5f6770]">{c.label}</span>}
-        </span>
-      ))}
-    </div>
-  );
-}
-
 export function ProductGallery({
   images,
   alt,
   badges,
-  callouts = [],
 }: {
   images: string[];
   alt: string;
   /** Server-rendered status pills, laid over the stage's top-left corner. */
   badges?: ReactNode;
-  /** Leader-line labels for the FIRST picture (metadata.callouts). */
-  callouts?: Callout[];
 }) {
   const count = images.length;
   const many = count > 1;
@@ -289,13 +230,10 @@ export function ProductGallery({
       onKeyDown={onKeyDown}
     >
       {/* --- stage ------------------------------------------------------ */}
-      {/* A plate, not a card: the same light steel in both themes (the
-          product photos are shot on white and multiply onto it), with the
-          corner marks of a technical drawing instead of a border and shadow. */}
-      <div className="group relative overflow-hidden rounded-(--panel-radius) bg-[#f4f5f7]">
-        {!badges && <span aria-hidden className="pointer-events-none absolute left-4 top-4 z-10 h-4 w-4 border-l border-t border-[#b9bec5]" />}
-        <span aria-hidden className="pointer-events-none absolute bottom-4 right-4 z-10 h-4 w-4 border-b border-r border-[#b9bec5]" />
-
+      {/* A plate: the same light steel in both themes (the product photos are
+          shot on white and multiply onto it), wider than tall so the buy column
+          beside it keeps the price on the first screen. */}
+      <div className="group relative overflow-hidden rounded-(--card-radius) bg-[#f4f5f7]">
         <div ref={stageRef} className={TRACK}>
           {images.map((src, index) => (
             <div
@@ -304,7 +242,7 @@ export function ProductGallery({
               aria-roledescription={many ? 'görsel' : undefined}
               aria-label={many ? `${index + 1} / ${count}` : undefined}
               aria-hidden={many && index !== active ? true : undefined}
-              className="relative aspect-square w-full shrink-0 snap-center [scroll-snap-stop:always]"
+              className="relative aspect-[5/4] w-full shrink-0 snap-center [scroll-snap-stop:always]"
             >
               <button
                 type="button"
@@ -313,7 +251,7 @@ export function ProductGallery({
                 onPointerLeave={zoomOut}
                 tabIndex={index === active ? 0 : -1}
                 aria-label="Görseli tam ekran aç"
-                className="block h-full w-full cursor-zoom-in overflow-hidden p-[7%]"
+                className="block h-full w-full cursor-zoom-in overflow-hidden p-[5%]"
               >
                 <img
                   {...imageProps(src, 640)}
@@ -328,12 +266,11 @@ export function ProductGallery({
                   className="h-full w-full object-contain mix-blend-multiply transition-transform duration-(--duration-base) ease-out motion-reduce:transition-none"
                 />
               </button>
-              {index === 0 && callouts.length > 0 && <CalloutLayer callouts={callouts} />}
             </div>
           ))}
         </div>
 
-        {badges && <div className="pointer-events-none absolute left-4 top-5 flex flex-col gap-1.5">{badges}</div>}
+        {badges && <div className="pointer-events-none absolute left-3 top-3 flex flex-col gap-1.5">{badges}</div>}
 
         <button
           type="button"
@@ -364,7 +301,7 @@ export function ProductGallery({
             </button>
             <p
               aria-live="polite"
-              className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-chrome/80 px-2.5 py-1 font-mono text-[12px] tabular-nums text-white backdrop-blur"
+              className="pointer-events-none absolute bottom-3 right-3 rounded-full bg-chrome px-2.5 py-1 font-mono text-[12px] tabular-nums text-white"
             >
               {active + 1} / {count}
             </p>
@@ -378,7 +315,7 @@ export function ProductGallery({
           images={images}
           active={active}
           onSelect={show}
-          size="h-16 w-16 dt:h-[76px] dt:w-[76px]"
+          size="h-16 w-20 dt:h-[84px] dt:w-[calc(25%-6px)]"
           stripRef={strip}
         />
       )}

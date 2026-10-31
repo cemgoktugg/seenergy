@@ -21,6 +21,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import {
   Badge as BadgeIcon,
   ChevronDown,
@@ -113,11 +114,14 @@ function SearchField({
   autoFocus = false,
   tone = 'light',
   shortcut = false,
+  squared = false,
 }: {
   id: string;
   autoFocus?: boolean;
   tone?: 'light' | 'dark';
   shortcut?: boolean;
+  /** The product page's plain header: a squared field and a red submit. */
+  squared?: boolean;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -149,10 +153,12 @@ function SearchField({
     <form
       role="search"
       action="/arama"
-      className={`group flex h-[41px] w-full items-stretch overflow-hidden rounded-full border transition-colors duration-(--duration-base) ${dark ? '' : 'dt:h-9'} ${
+      className={`group flex h-[41px] w-full items-stretch overflow-hidden border transition-colors duration-(--duration-base) ${squared ? 'rounded-(--card-radius)' : 'rounded-full'} ${dark ? '' : 'dt:h-9'} ${
         dark
           ? 'border-chrome-line bg-white/10 focus-within:border-grad-1 focus-within:bg-white/15'
-          : 'border-line-strong bg-surface-page focus-within:border-brand focus-within:bg-surface-card'
+          : squared
+            ? 'border-line-strong bg-surface-card focus-within:border-brand'
+            : 'border-line-strong bg-surface-page focus-within:border-brand focus-within:bg-surface-card'
       }`}
     >
       <label htmlFor={id} className="sr-only">
@@ -194,7 +200,9 @@ function SearchField({
         className={`relative grid w-14 shrink-0 place-items-center transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] ${dark ? '' : 'dt:w-11'} ${
           dark
             ? 'bg-white/15 text-white hover:bg-white/25'
-            : 'bg-linear-to-br from-grad-2 to-grad-3 text-white hover:from-grad-3 hover:to-grad-4'
+            : squared
+              ? 'bg-signal text-white hover:bg-signal-dark'
+              : 'bg-linear-to-br from-grad-2 to-grad-3 text-white hover:from-grad-3 hover:to-grad-4'
         }`}
       >
         <Search size={20} strokeWidth={2.25} aria-hidden className={dark ? '' : 'dt:h-4 dt:w-4'} />
@@ -203,7 +211,7 @@ function SearchField({
   );
 }
 
-function HeaderActions() {
+function HeaderActions({ plain = false }: { plain?: boolean }) {
   /* The badge shows 0 until the cart has been read, on purpose: pages render
      statically, so the server HTML cannot know this visitor's cart, and a
      count in the first client pass would disagree with it. */
@@ -214,13 +222,14 @@ function HeaderActions() {
      hierarchy. 24px read too small and 40px too big; a two-line label stood
      taller than the icons and broke the row's alignment. Below `dt` they stay 44px
      icons: the 390 row is at its width limit, and a finger needs the size. */
-  const iconCircle =
-    'relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-8 dt:w-8 dt:bg-brand dt:text-white';
+  const iconCircle = `relative grid h-11 w-11 shrink-0 place-items-center rounded-full text-text-primary transition-colors duration-(--duration-fast) ease-in-out dt:h-8 dt:w-8 ${
+    plain ? '' : 'dt:bg-brand dt:text-white dt:group-hover:bg-brand-dark'
+  }`;
 
   return (
     <div className="flex shrink-0 items-center gap-1 dt:gap-4 min-[85rem]:gap-5">
       {/* Measured: the b2b badge is present at 390 too, not desktop-only. */}
-      <Link
+      {plain ? null : <Link
         href="/toptan-satis"
         /* Hit-tested 44×32 — the width was fine, the height was not. The 32px
            visual keeps the measured badge proportions, so `before` lifts the
@@ -228,16 +237,16 @@ function HeaderActions() {
         className="relative flex h-8 items-center rounded-full bg-brand px-2.5 text-[12px] font-extrabold text-white transition-colors duration-(--duration-fast) ease-in-out before:absolute before:inset-x-0 before:-inset-y-1.5 before:content-[''] hover:bg-brand-dark dt:h-8 dt:px-3 dt:text-[13px] dt:before:hidden"
       >
         b2b
-      </Link>
+      </Link>}
       <Link href="/hesabim" aria-label="Hesabım" className="group flex items-center gap-2">
-        <span className={`${iconCircle} dt:group-hover:bg-brand-dark`}>
-          <User size={20} strokeWidth={1.9} aria-hidden className="dt:h-4 dt:w-4" />
+        <span className={iconCircle}>
+          <User size={20} strokeWidth={plain ? 1.5 : 1.9} aria-hidden className={plain ? '' : 'dt:h-4 dt:w-4'} />
         </span>
         <span className="hidden text-[13px] font-bold leading-none text-text-primary dt:block">Hesabım</span>
       </Link>
       <Link href="/sepet" aria-label={`Sepetim, ${cartCount} ürün`} className="group flex items-center gap-2.5">
-        <span className={`${iconCircle} dt:group-hover:bg-brand-dark`}>
-          <ShoppingCart size={20} strokeWidth={1.9} aria-hidden className="dt:h-4 dt:w-4" />
+        <span className={iconCircle}>
+          <ShoppingCart size={20} strokeWidth={plain ? 1.5 : 1.9} aria-hidden className={plain ? '' : 'dt:h-4 dt:w-4'} />
           {/* Inset rather than hung outside the button: at 320 a negative offset
               pushed the badge past the viewport and the document scrolled 9px.
               Keyed on `bump`: each successful add remounts the badge, which
@@ -463,6 +472,12 @@ function AllCategoriesPanel({ menuModels, onClose }: { menuModels: MenuModels; o
  * catalogue — the mega panel lists them under their subcategory.
  */
 export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuModels?: MenuModels }) {
+  /* The product page's plain header (2026-10-31, from the client's mock): the
+     announcement alone in the top line, no b2b, line icons, a squared search and
+     a flat, narrower category bar. Same links, same panels, same drawer: only
+     the dressing changes, and only on this route. */
+  const plain = usePathname().startsWith('/urun/');
+
   /* The condensed bar carries its own cart badge. It reads the same store as
      the masthead's, so the two cannot disagree — a sticky bar still showing 0
      after something was added would be worse than having no badge there. */
@@ -598,21 +613,26 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
           decision rather than a drift from measured geometry — the 31px height
           is untouched. */}
       <div className="hidden h-[31px] items-center border-b border-chrome-line bg-chrome dt:flex">
-        <div className="container-main relative flex items-center justify-between gap-6">
+        <div className={`container-main relative flex items-center gap-6 ${plain ? 'justify-center' : 'justify-between'}`}>
           {/* Reference centres this promo line across the full bar rather than
               aligning it left, so it reads as an announcement, not a link.
               16px bold was shouting inside a 31px strip; 12.5px with a gradient
               dot announces without dominating. */}
           <p className="flex items-center gap-2 whitespace-nowrap text-[13px] font-semibold text-white">
-            <span
-              aria-hidden
-              className="h-1.5 w-1.5 shrink-0 rounded-full bg-linear-to-r from-grad-1 to-grad-4"
-            />
+            {plain ? (
+              <Truck size={16} strokeWidth={1.5} aria-hidden className="shrink-0" />
+            ) : (
+              <span
+                aria-hidden
+                className="h-1.5 w-1.5 shrink-0 rounded-full bg-linear-to-r from-grad-1 to-grad-4"
+              />
+            )}
             {promo}
           </p>
-          <nav aria-label="Yardımcı bağlantılar">
+          {/* The theme control stays; the links remain in the drawer and footer. */}
+          <nav aria-label="Yardımcı bağlantılar" className={plain ? 'absolute right-0' : ''}>
             <ul className="flex items-center gap-5">
-              {UTILITY_LINKS.map((link) => {
+              {(plain ? [] : UTILITY_LINKS).map((link) => {
                 const Icon = UTILITY_ICONS[link.icon];
                 return (
                   <li key={link.href}>
@@ -626,7 +646,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
                   </li>
                 );
               })}
-              <li className="border-l border-white/15 pl-5">
+              <li className={plain ? '' : 'border-l border-white/15 pl-5'}>
                 <ThemeToggle inline className="text-[12px] font-medium text-white/70 hover:text-white" />
               </li>
             </ul>
@@ -683,12 +703,12 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
               against the leftover flex slot instead and collapse it to ~405.) */}
           <div className="hidden justify-center dt:flex dt:shrink-0 dt:grow-0 dt:basis-[31%] min-[85rem]:basis-[36%] min-[90rem]:basis-[40%]">
             <div className="w-full">
-              <SearchField id="search-desktop" shortcut />
+              <SearchField id="search-desktop" shortcut squared={plain} />
             </div>
           </div>
 
           <div className="ml-auto dt:ml-0 dt:flex dt:flex-1 dt:justify-end">
-            <HeaderActions />
+            <HeaderActions plain={plain} />
           </div>
         </div>
 
@@ -719,7 +739,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
         /* One line, not fourteen two-line labels: "Tüm Kategoriler" opens the
            whole tree, and the bar names the seven categories people shop most
            (NAV_FEATURED) — five at 1200, six from 1280, seven from 1440. */
-        className="nav-metal relative hidden dt:block dt:h-[48px]"
+        className={`relative hidden dt:block ${plain ? 'bg-chrome dt:h-10' : 'nav-metal dt:h-[48px]'}`}
         onMouseLeave={scheduleClose}
       >
         <div className="container-main h-full">
@@ -739,8 +759,10 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
                 /* The bar's one coloured element (2026-10-27, the client wanted
                    it more prominent): the site's signal red, the same red as the
                    cart badge, so the way into every category is found first. */
-                className={`flex h-full items-center gap-2.5 whitespace-nowrap px-5 text-[14px] font-extrabold text-white shadow-[inset_0_1px_0_rgb(255_255_255/0.25)] transition-colors duration-(--duration-fast) ${
-                  openMega === ALL ? 'bg-[rgb(150,12,20)]' : 'bg-[rgb(195,19,28)] hover:bg-[rgb(170,15,24)]'
+                className={`flex h-full items-center gap-2.5 whitespace-nowrap text-[14px] font-extrabold text-white transition-colors duration-(--duration-fast) ${
+                  plain
+                    ? `-ml-3 px-3 ${openMega === ALL ? 'bg-white/10' : 'hover:bg-white/[0.07]'}`
+                    : `px-5 shadow-[inset_0_1px_0_rgb(255_255_255/0.25)] ${openMega === ALL ? 'bg-[rgb(150,12,20)]' : 'bg-[rgb(195,19,28)] hover:bg-[rgb(170,15,24)]'}`
                 }`}
               >
                 <Menu size={18} strokeWidth={2.25} aria-hidden />
@@ -777,7 +799,9 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
                     {item.children && <ChevronDown size={14} strokeWidth={2.25} aria-hidden className="opacity-60" />}
                     <span
                       aria-hidden
-                      className={`absolute inset-x-3 bottom-0 h-[3px] rounded-t-full bg-linear-to-r from-transparent via-white to-transparent shadow-[0_0_10px_rgb(255_255_255/0.6)] transition-opacity duration-(--duration-fast) group-hover:opacity-100 ${
+                      className={`absolute inset-x-3 bottom-0 transition-opacity duration-(--duration-fast) group-hover:opacity-100 ${
+                        plain ? 'h-px bg-white' : 'h-[3px] rounded-t-full bg-linear-to-r from-transparent via-white to-transparent shadow-[0_0_10px_rgb(255_255_255/0.6)]'
+                      } ${
                         open ? 'opacity-100' : 'opacity-0'
                       }`}
                     />
