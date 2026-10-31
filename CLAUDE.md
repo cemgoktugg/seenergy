@@ -328,21 +328,25 @@ The hero slider stands alone across the content container since 2026-10-22:
 the two campaign tiles beside it were removed at the client's request. An
 edge-to-edge version was tried the same day and taken back — the client wants
 it aligned with the bands below, not the viewport.
-**The poster design** (`src/components/hero.tsx`, 2026-10-30) is the default
-and the lesson of that day: what the shop uploads as slide pictures are
-finished posters — logo, headline, feature icons, phone row drawn in; on live
-two ~1:1 posts and one ~2.75:1 banner. So the picture is shown whole and
-untouched (`object-contain`); the same picture, enlarged and blurred, fills
-what it leaves free; the whole slide is one link. Title / description are not
-drawn (the poster has its own) — they name the link for screen readers.
-Arrows sit in the side margins (hidden on a phone, where a square poster is
-full width), the dots stand upright in the right margin, and on a phone the
-artwork stops 40px short so the dots get their own strip. Nothing may be laid
-over the artwork. `fit: cover` still fills edge to edge for true 3:1 art.
-Before it, the same day: a dark oval (to a9f0392), a grey CSS studio (to
+**The default design** (`src/components/hero.tsx`) is the reference's slider
+since 2026-10-31, at the client's request: a flat 3:1 panel, the whole slide
+one link, **no arrows**, the dots (12px, 10 on a phone) on a white pill centred
+at the bottom, an 800ms `ease` move every 5s, swipe on touch. The pause control
+is the pill's last slot — the reference has none; it stays for WCAG 2.2.2.
+What the shop uploads as slide pictures are finished posters — logo, headline,
+feature icons, phone row drawn in; on live two ~1:1 posts and one ~2.75:1
+banner — so the loaded picture's ratio decides: 2.7–3.3 (or `fit: cover`) fills
+the panel, anything else is shown whole on its own heavily blurred, veiled tint
+and stops 32px short, so the pill sits in that strip and not on the poster's
+words. A phone's panel is 3:2 and shows every picture whole: at the reference's
+374 × 124 a square poster is unreadable. Title / description are not drawn (the
+art has its own) — they name the link for screen readers. Art drawn at 3:1
+(1980 × 660) is what makes it match the reference; a square poster cannot.
+Before it, on 2026-10-30: a dark oval (to a9f0392), a grey CSS studio (to
 feb750d), a full-bleed photo blurred towards our copy (to f4b7dbf) — each fine
 with a clean photo and ruinous with the real posters (cropped, their words
-blurred, ours on top). Look at the live slide images before redesigning this.
+blurred, ours on top) — then the posters whole with arrows and upright dots (to
+e9af823). Look at the live slide images before redesigning this.
 The oval's `background` setting stays in the database, unread.
 The other choice is the **light design** (`src/components/hero-light.tsx`):
 white ground, bold title with a red second line (`title_accent`), red
