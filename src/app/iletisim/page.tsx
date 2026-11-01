@@ -223,11 +223,16 @@ function ContactBanner({
           />
         </div>
 
+        {/* The words follow the theme on a phone, where they sit on the card. From
+            `sm` they sit on the artwork's pale arc, which is the same picture in
+            both themes, so there the light theme's ink is pinned. The buttons stay
+            outside: they bring their own ground and do follow the theme. */}
+        <div className="text-text-primary sm:[--color-text-primary:rgb(23_24_26)] sm:[--color-text-secondary:rgb(102_106_108)]">
         <p className="flex items-center gap-3 text-[12px] font-bold uppercase tracking-[0.24em] text-text-secondary sm:text-[13px]">
-          <span aria-hidden className="h-[3px] w-8 rounded-full bg-linear-to-r from-brand-nav to-brand-dark/40" />
+          <span aria-hidden className="h-[3px] w-8 rounded-full bg-linear-to-r from-text-primary to-text-primary/25" />
           {quote ? text.quote_eyebrow : text.eyebrow}
         </p>
-        <h1 id="contact-title" className="mt-1.5 text-[32px] font-extrabold leading-[1.1] tracking-tight text-brand-nav sm:max-w-[300px] sm:text-[40px]">
+        <h1 id="contact-title" className="mt-1.5 text-[32px] font-extrabold leading-[1.1] tracking-tight text-text-primary sm:max-w-[300px] sm:text-[40px]">
           {title}
         </h1>
 
@@ -260,6 +265,7 @@ function ContactBanner({
             </Detail>
           ) : null}
         </dl>
+        </div>
 
         <div className="mt-7 flex flex-wrap gap-3 sm:mt-auto sm:pt-7">
           {company.phone ? (
@@ -276,7 +282,7 @@ function ContactBanner({
               href={mapHref}
               target="_blank"
               rel="noopener"
-              className="inline-flex h-13 flex-1 items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-line-strong bg-surface-card px-6 text-[16px] font-bold text-brand-nav shadow-e1 transition-colors duration-(--duration-fast) hover:border-brand-nav sm:flex-none sm:px-8"
+              className="inline-flex h-13 flex-1 items-center justify-center gap-2.5 whitespace-nowrap rounded-full border border-line-strong bg-surface-card px-6 text-[16px] font-bold text-text-primary shadow-e1 transition-colors duration-(--duration-fast) hover:border-text-primary sm:flex-none sm:px-8"
             >
               <Navigation size={19} strokeWidth={2} aria-hidden />
               {text.directions_label}
@@ -300,7 +306,7 @@ function Detail({ icon: Icon, label, children }: { icon: typeof Phone; label: st
       </span>
       <div className="min-w-0">
         <dt className="text-[13px] font-bold uppercase tracking-[0.18em] text-text-secondary">{label}</dt>
-        <dd className="mt-1 text-[14px] leading-relaxed text-brand-nav sm:text-[16px]">{children}</dd>
+        <dd className="mt-1 text-[14px] leading-relaxed text-text-primary sm:text-[16px]">{children}</dd>
       </div>
     </div>
   );
