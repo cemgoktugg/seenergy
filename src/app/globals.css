@@ -97,6 +97,9 @@
 
   /* Dark chrome: the header stack and the technical data bands. */
   --color-chrome: rgb(20 22 28);
+  /* The product page's showcase: the same anthracite in both themes, because
+     the photos on it do not change with the theme. */
+  --color-showcase: rgb(32 35 41);
   --color-chrome-soft: rgb(32 36 45);
   --color-chrome-line: rgb(52 58 70);
 

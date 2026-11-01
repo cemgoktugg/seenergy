@@ -3,26 +3,18 @@
 /**
  * The product page's section tabs: plain anchors with a hairline under them,
  * so they work with JavaScript off. The script only marks the section being
- * read. Sections side by side (description beside specs) start level, and the
- * first of them stays marked until one further down is reached.
+ * read: the last one whose top has passed under this bar.
  */
 
 import { useEffect, useRef, useState } from 'react';
-import { Download } from 'lucide-react';
 
 /** Where a section counts as reached: under the condensed header and this bar. */
 const READ_LINE = 140;
 
-export function ProductSectionNav({
-  sections,
-  datasheet,
-}: {
-  sections: { id: string; label: string }[];
-  datasheet: string | null;
-}) {
+export function ProductSectionNav({ sections }: { sections: { id: string; label: string }[] }) {
   const [active, setActive] = useState(sections[0]?.id);
-  /* A click on a tab wins over the scroll position while its smooth scroll runs:
-     two level sections scroll to the same place, and the tab clicked stays on. */
+  /* A click on a tab wins over the scroll position while its smooth scroll runs,
+     so the tabs it passes over do not flicker. */
   const clickedAt = useRef(0);
 
   useEffect(() => {
@@ -74,19 +66,6 @@ export function ProductSectionNav({
               </li>
             );
           })}
-          {datasheet && (
-            <li className="ml-auto shrink-0">
-              <a
-                href={datasheet}
-                target="_blank"
-                rel="noopener"
-                className="flex h-11 items-center gap-1.5 px-3 text-[13px] font-semibold text-text-primary"
-              >
-                <Download size={15} strokeWidth={1.75} aria-hidden />
-                Teknik föy
-              </a>
-            </li>
-          )}
         </ul>
       </div>
     </nav>

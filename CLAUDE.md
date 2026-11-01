@@ -34,16 +34,23 @@ These routes are real, not placeholders:
 
 ```
 /                     homepage
-/urun/[slug]          product detail (2026-10-31, from the client's mock): compact,
-                      on white, drawn with hairlines. Photo plate + thumbnails;
-                      a 3/6-cell spec summary from the product's own sheet; one
-                      offer box (price or "Fiyat için bize ulaşın", purchase,
-                      assurances); link row; tabs; description beside the spec
-                      table on a light band (a long sheet folds after "Genel");
-                      recorders and similar products. Only this route gets the
-                      plain header (`plain` in site-header.tsx, by pathname).
-                      The leader-line callouts (metadata.callouts) stay in the
-                      database but are no longer drawn
+/urun/[slug]          product detail (2026-11-01, the client's second brief): 55/45,
+                      an anthracite showcase (--color-showcase, both themes) with
+                      static hairline rings. A transparent cutout stands on it; a
+                      photo with its own ground gets a pale plate, read from the
+                      loaded picture (isCutout, product-gallery.tsx). No blend
+                      modes. Then a 3–4-cell strip from the product's own sheet,
+                      price, quantity + "Sepete Ekle", "Hemen Al", small links,
+                      service list; tabs; description + technical summary on a
+                      light band; the whole sheet in grouped tables (folds after
+                      "Genel" below `lg` only); documents; shelves. "Uyumlu" only
+                      for recorders the product's own text names by code;
+                      otherwise the shelf is "DVR/NVR Kayıt Cihazları". No
+                      promise the data cannot back: the unconditional same-day
+                      line went (it holds for hızlı kargo before 15:00 only).
+                      Only this route gets the plain header (`plain` in
+                      site-header.tsx, by pathname). The leader-line callouts
+                      (metadata.callouts) stay in the database, not drawn
 /kategori             all categories — the tree with its subcategories
 /kategori/[slug]      category listing, for every category and subcategory;
                       a parent lists its subcategories' products too
