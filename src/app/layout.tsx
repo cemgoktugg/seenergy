@@ -6,6 +6,7 @@ import { StoreProvider } from '@/components/cart-store';
 import { CompareBar } from '@/components/compare-bar';
 import { SiteHeader, type MenuModels } from '@/components/site-header';
 import { NewsletterBar, SiteFooter } from '@/components/site-footer';
+import { WhatsAppButton } from '@/components/whatsapp-button';
 import { PRIMARY_NAV, SITE } from '@/data/site';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
@@ -114,6 +115,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             <NewsletterBar whatsapp={company.whatsapp} />
             <SiteFooter company={company} />
             <CompareBar />
+            <WhatsAppButton phone={company.whatsapp} />
           </StoreProvider>
         </CartProvider>
       </body>
