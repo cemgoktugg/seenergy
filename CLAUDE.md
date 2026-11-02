@@ -35,17 +35,17 @@ These routes are real, not placeholders:
 ```
 /                     homepage
 /urun/[slug]          product detail (2026-11-01, the client's second brief): 55/45,
-                      an anthracite showcase (--color-showcase, both themes) with
-                      static hairline rings. A transparent cutout stands on it; a
-                      photo with its own ground gets a pale plate, read from the
-                      loaded picture (isCutout, product-gallery.tsx). No blend
-                      modes. Then a 3–4-cell strip from the product's own sheet,
+                      a white stage in both themes (2026-11-02; the anthracite one
+                      with a plate for white-ground photos is in 262d514).
+                      Then a 3–4-cell strip from the product's own sheet,
                       price, quantity + "Sepete Ekle", "Hemen Al", small links,
-                      service list; tabs; description + technical summary on a
-                      light band; the whole sheet in grouped tables (folds after
-                      "Genel" below `lg` only); documents; shelves. "Uyumlu" only
-                      for recorders the product's own text names by code;
-                      otherwise the shelf is "DVR/NVR Kayıt Cihazları". No
+                      service list; tabs that swap in place and never scroll
+                      (product-tabs.tsx, not sticky): description + technical
+                      summary / the whole sheet in grouped tables (folds after
+                      "Genel" below `lg` only) / documents; shelves. The recorder
+                      shelf and tab were removed at the client's request. No
+                      loading.tsx here: it puts the skeleton into the prerendered
+                      HTML, and the product stays behind a script (see 262d514). No
                       promise the data cannot back: the unconditional same-day
                       line went (it holds for hızlı kargo before 15:00 only).
                       Only this route gets the plain header (`plain` in

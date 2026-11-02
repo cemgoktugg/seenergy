@@ -9,12 +9,10 @@
  *     ProductSlider): swiping works on touch with no gesture code, and the
  *     active picture is read back from the scroll position rather than kept
  *     as a second source of truth.
- *   - Pictures are CONTAINED on an anthracite showcase, never cropped. A
- *     transparent cutout stands on it directly (all the SEENERGY models); a photo
- *     on a white ground (61 of 87 on 2026-11-01) gets a pale plate instead, read
- *     from the loaded picture. No blend mode: multiply on a dark ground would
- *     black the product out, and removing a ground by script would damage it.
- *   - Behind the picture, static hairline arcs, a lens's rings, on the showcase.
+ *   - Pictures are CONTAINED on a white stage, never cropped, in both themes: the
+ *     photos do not change with the theme, and most have a white ground of their
+ *     own (61 of 87 on 2026-11-01) that melts into it. The padding is what keeps
+ *     the product a little away from the stage's edges.
  *   - The first picture is the page's LCP element: eager, `fetchPriority`.
  *     The rest are lazy.
  *   - Zoom follows the pointer only for a mouse; touch gets the full-screen
@@ -23,7 +21,7 @@
  *   - Reduced motion: every programmatic scroll jumps instead of gliding.
  */
 
-import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode, type SyntheticEvent } from 'react';
+import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
 import { imageProps, imageUrl } from '@/lib/image';
 
@@ -87,59 +85,15 @@ function useThumbInView(strip: React.RefObject<HTMLDivElement | null>, active: n
   }, [strip, active]);
 }
 
-/**
- * Is this picture a cutout? Its edge is sampled on a small canvas. The picture
- * comes through the same-origin optimizer, so the canvas is readable; should it
- * ever not be, the answer is "no", and a cutout on a pale plate still looks right.
- */
-function isCutout(img: HTMLImageElement): boolean {
-  try {
-    const size = 24;
-    const canvas = document.createElement('canvas');
-    canvas.width = size;
-    canvas.height = size;
-    const context = canvas.getContext('2d', { willReadFrequently: true });
-    if (!context) return false;
-    context.drawImage(img, 0, 0, size, size);
-    const { data } = context.getImageData(0, 0, size, size);
-    let edge = 0;
-    let clear = 0;
-    for (let y = 0; y < size; y++) {
-      for (let x = 0; x < size; x++) {
-        if (x > 0 && y > 0 && x < size - 1 && y < size - 1) continue;
-        edge++;
-        if (data[(y * size + x) * 4 + 3] < 30) clear++;
-      }
-    }
-    return clear / edge > 0.6;
-  } catch {
-    return false;
-  }
-}
-
-/** The showcase's rings: drawn once, behind every picture, carrying no meaning. */
-function ShowcaseArcs() {
-  return (
-    <svg aria-hidden viewBox="0 0 800 640" preserveAspectRatio="xMidYMid slice" className="pointer-events-none absolute inset-0 h-full w-full">
-      <g fill="none" stroke="#fff" vectorEffect="non-scaling-stroke">
-        <circle cx="400" cy="320" r="190" strokeOpacity="0.07" />
-        <circle cx="400" cy="320" r="262" strokeOpacity="0.06" strokeDasharray="520 300" transform="rotate(-38 400 320)" />
-        <circle cx="400" cy="320" r="340" strokeOpacity="0.05" />
-        <circle cx="400" cy="320" r="430" strokeOpacity="0.04" strokeDasharray="700 650" transform="rotate(150 400 320)" />
-      </g>
-    </svg>
-  );
-}
-
 const TRACK =
   'flex snap-x snap-mandatory overflow-x-auto overscroll-x-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden';
 
 const ARROW =
   'grid h-11 w-11 place-items-center rounded-(--card-radius) border border-line bg-surface-card text-text-primary transition-[opacity,background-color,color] duration-(--duration-fast) hover:bg-brand hover:text-white focus-visible:opacity-100';
 
-/** The same control on the anthracite, with a focus ring that shows on it. */
+/** The same control on the white stage, the same in both themes. */
 const STAGE_CONTROL =
-  'grid h-11 w-11 place-items-center rounded-(--card-radius) border border-white/25 bg-showcase text-white transition-[opacity,background-color] duration-(--duration-fast) hover:bg-[#32363e] focus-visible:opacity-100 focus-visible:outline-white';
+  'grid h-11 w-11 place-items-center rounded-(--card-radius) border border-black/15 bg-white text-ink-fixed transition-[opacity,border-color] duration-(--duration-fast) hover:border-black/50 focus-visible:opacity-100';
 
 function Thumbs({
   images,
@@ -163,8 +117,8 @@ function Thumbs({
           onClick={() => onSelect(index)}
           aria-label={`${index + 1}. görsel`}
           aria-current={index === active ? 'true' : undefined}
-          className={`grid shrink-0 place-items-center overflow-hidden rounded-(--card-radius) border bg-showcase p-1.5 transition-colors duration-(--duration-fast) ${size} ${
-            index === active ? 'border-signal' : 'border-transparent hover:border-line-strong'
+          className={`grid shrink-0 place-items-center overflow-hidden rounded-(--card-radius) border bg-white p-1.5 transition-colors duration-(--duration-fast) ${size} ${
+            index === active ? 'border-signal' : 'border-line hover:border-line-strong'
           }`}
         >
           <img {...imageProps(src, 80)} alt="" loading="lazy" decoding="async" className="h-full w-full object-contain" />
@@ -188,25 +142,10 @@ export function ProductGallery({
   const many = count > 1;
   const [active, setActive] = useState(0);
   const [viewerOpen, setViewerOpen] = useState(false);
-  /* Which pictures are cutouts. Until a picture has been read it has no plate: a
-     white-ground photo is its own pale plate for that moment. */
-  const [plated, setPlated] = useState<Record<number, boolean>>({});
-  const readPicture = (index: number, img: HTMLImageElement) => {
-    if (plated[index] === undefined && img.naturalWidth > 0) {
-      setPlated((known) => ({ ...known, [index]: !isCutout(img) }));
-    }
-  };
 
   const { ref: stageRef, scrollTo: stageTo } = useSnapTrack(count, setActive);
   const { ref: viewerTrackRef, scrollTo: viewerTo } = useSnapTrack(count, setActive);
   const strip = useRef<HTMLDivElement>(null);
-  /* The first picture can finish before hydration, and its load event is gone. */
-  useEffect(() => {
-    const first = stageRef.current?.querySelector('img');
-    if (first?.complete && first.naturalWidth > 0) readPicture(0, first);
-    // Once, on mount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
   const viewerStrip = useRef<HTMLDivElement>(null);
   const viewer = useRef<HTMLDialogElement>(null);
   useThumbInView(strip, active);
@@ -297,11 +236,9 @@ export function ProductGallery({
       onKeyDown={onKeyDown}
     >
       {/* --- stage ------------------------------------------------------ */}
-      {/* The showcase: the same anthracite in both themes. Wider than tall, so it
-          does not take a phone's whole screen, nor push the price down on a desk. */}
-      <div className="group relative overflow-hidden rounded-(--card-radius) bg-showcase">
-        <ShowcaseArcs />
-
+      {/* Wider than tall, so it does not take a phone's whole screen, nor push the
+          price down on a desk. */}
+      <div className="group relative overflow-hidden rounded-(--card-radius) border border-line bg-white">
         <div ref={stageRef} className={TRACK}>
           {images.map((src, index) => (
             <div
@@ -319,12 +256,11 @@ export function ProductGallery({
                 onPointerLeave={zoomOut}
                 tabIndex={index === active ? 0 : -1}
                 aria-label="Görseli tam ekran aç"
-                className="block h-full w-full cursor-zoom-in overflow-hidden p-[4%] focus-visible:outline-white focus-visible:-outline-offset-4"
+                className="block h-full w-full cursor-zoom-in overflow-hidden p-[10%] focus-visible:-outline-offset-4"
               >
                 <img
                   {...imageProps(src, 750)}
                   data-original={src}
-                  onLoad={(event: SyntheticEvent<HTMLImageElement>) => readPicture(index, event.currentTarget)}
                   alt={index === 0 ? alt : `${alt} — ${index + 1}. görsel`}
                   width={800}
                   height={800}
@@ -332,9 +268,7 @@ export function ProductGallery({
                   fetchPriority={index === 0 ? 'high' : undefined}
                   decoding={index === 0 ? 'sync' : 'async'}
                   draggable={false}
-                  className={`h-full w-full object-contain transition-transform duration-(--duration-base) ease-out motion-reduce:transition-none ${
-                    plated[index] ? 'rounded-(--card-radius) bg-[#f6f7f8] p-[3%]' : ''
-                  }`}
+                  className="h-full w-full object-contain transition-transform duration-(--duration-base) ease-out motion-reduce:transition-none"
                 />
               </button>
             </div>
@@ -372,7 +306,7 @@ export function ProductGallery({
             </button>
             <p
               aria-live="polite"
-              className="pointer-events-none absolute bottom-3 right-3 rounded-(--card-radius) bg-showcase px-2 py-1 text-[12px] tabular-nums text-white"
+              className="pointer-events-none absolute bottom-3 right-3 rounded-(--card-radius) bg-ink-fixed px-2 py-1 text-[12px] tabular-nums text-white"
             >
               {active + 1} / {count}
             </p>

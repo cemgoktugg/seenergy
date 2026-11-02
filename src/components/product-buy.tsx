@@ -20,7 +20,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { HardDrive, Heart, Loader2, Minus, MessageSquareQuote, Plus, Scale, ShoppingCart } from 'lucide-react';
+import { Heart, Loader2, Minus, MessageSquareQuote, Plus, Scale, ShoppingCart } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
@@ -215,17 +215,10 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
 }
 
 /**
- * The small controls under the purchase: favourite, compare, a volume quote, and
- * the next thing a buyer of this product needs (recorders for a camera). Text
+ * The small controls under the purchase: favourite, compare, a volume quote. Text
  * and a thin icon, 44px tall to a finger: reference, not purchase.
  */
-export function ProductLinks({
-  product,
-  related,
-}: {
-  product: Product;
-  related?: { label: string; href: string } | null;
-}) {
+export function ProductLinks({ product }: { product: Product }) {
   const { has, toggle, count, ready } = useStore();
   const favourite = ready && has('favourites', product.id);
   const comparing = ready && has('compare', product.id);
@@ -259,12 +252,6 @@ export function ProductLinks({
         <Link href={quoteHref(product.sku)} className={link}>
           <MessageSquareQuote size={16} strokeWidth={1.5} aria-hidden />
           Toplu alım için teklif
-        </Link>
-      )}
-      {related && (
-        <Link href={related.href} className={link}>
-          <HardDrive size={16} strokeWidth={1.5} aria-hidden />
-          {related.label}
         </Link>
       )}
     </div>

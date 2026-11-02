@@ -1,5 +1,5 @@
 /**
- * Technical specifications, full width under the description: every row the
+ * Technical specifications, the content of their tab: every row the
  * product has, grouped as its sheet groups them, labels on the left and values
  * on the right, on white and very light grey rows with hairlines between.
  *
@@ -181,13 +181,11 @@ export function ProductSpecs({ product, specs }: { product: Product; specs: Spec
   );
 
   return (
-    <section id="teknik-ozellikler" aria-labelledby="teknik-ozellikler-baslik" className="container-main pt-6 dt:pt-8">
-      <h2 id="teknik-ozellikler-baslik" className="text-[24px] font-extrabold tracking-tight text-text-primary">
-        Teknik Özellikler
-      </h2>
+    <>
+      <h2 className="sr-only">Teknik Özellikler</h2>
 
       {typical && (
-        <p className="mt-2 flex max-w-[80ch] items-start gap-2 text-[14px] leading-relaxed text-text-secondary">
+        <p className="mb-4 flex max-w-[80ch] items-start gap-2 text-[14px] leading-relaxed text-text-secondary">
           <Info size={16} strokeWidth={1.5} aria-hidden className="mt-0.5 shrink-0 text-text-primary" />
           <span>
             Bu tablo, <span className="font-semibold text-text-primary">{categoryMeta(product.category).label}</span>{' '}
@@ -197,7 +195,7 @@ export function ProductSpecs({ product, specs }: { product: Product; specs: Spec
         </p>
       )}
 
-      <div className="mt-4 lg:columns-2 lg:gap-8">
+      <div className="lg:columns-2 lg:gap-8">
         <SpecTable group={groups[0]} index={0} />
         {rowCount > FOLD_OVER ? <SpecFold total={rowCount}>{rest}</SpecFold> : rest}
       </div>
@@ -205,6 +203,6 @@ export function ProductSpecs({ product, specs }: { product: Product; specs: Spec
       <p className="mt-3 max-w-[80ch] text-[12px] leading-relaxed text-text-secondary">
         Teknik özellikler üretici tarafından önceden haber verilmeksizin değiştirilebilir.
       </p>
-    </section>
+    </>
   );
 }

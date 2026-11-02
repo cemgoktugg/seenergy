@@ -21,12 +21,12 @@
  *   - Service lines state only what the data or the shop's own pages back, and
  *     link to those pages (see ServiceList).
  *
- * Layout (2026-11-01, the client's second brief): an anthracite showcase beside
- * the buy column (55 / 45), section tabs, then the description beside a
- * technical summary on a light band, the full grouped sheet, the documents, and
- * the shelves. Hairlines instead of shadows; the add-to-cart button is the one
- * filled red. Everything shown comes from the product, and what it does not
- * have is left out: no promise here that the product's data cannot back.
+ * Layout (2026-11-01, the client's second brief): a white stage beside the buy
+ * column (55 / 45), then tabs that swap in place (description beside a technical
+ * summary, the full grouped sheet, the documents), then the shelves. Hairlines
+ * instead of shadows; the add-to-cart button is the one filled red. Everything
+ * shown comes from the product, and what it does not have is left out: no promise
+ * here that the product's data cannot back.
  */
 
 import type { Metadata } from 'next';
@@ -59,8 +59,8 @@ import {
 
 import { ProductBuy, ProductLinks } from '@/components/product-buy';
 import { ProductGallery } from '@/components/product-gallery';
-import { ProductSectionNav } from '@/components/product-section-nav';
 import { ProductSpecs } from '@/components/product-specs';
+import { ProductTabs } from '@/components/product-tabs';
 import { SectionHeading } from '@/components/section-heading';
 import { ProductGrid } from '@/components/sections';
 import {
@@ -433,54 +433,22 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const { bySlug, otherModelsOf, alternativesTo, products } = await loadCatalog();
+  const { bySlug, otherModelsOf, alternativesTo } = await loadCatalog();
   const product = bySlug(slug);
   if (!product) notFound();
 
-  /* What a camera buyer needs next: the recorders of the same system in the
-     catalogue (AHD camera → DVR, IP camera → NVR), the camera's own brand first.
-     Recorders themselves get no such section. */
-  const recorderPattern =
-    product.category === 'ahd-sistem' && !/\bdvr\b|kayıt cihaz/i.test(product.name)
-      ? { test: /\bDVR\b|AHD Kayıt Cihaz/i, label: 'DVR' }
-      : product.category === 'ip-sistem' && !/\bnvr\b|kayıt cihaz/i.test(product.name)
-        ? { test: /\bNVR\b/i, label: 'NVR' }
-        : null;
-  const candidates = recorderPattern
-    ? products
-        .filter((item) => item.id !== product.id && recorderPattern.test.test(item.name))
-        .sort((a, b) => Number(b.brand === product.brand) - Number(a.brand === product.brand))
-    : [];
   const [details, { company }] = await Promise.all([loadProductDetails(product.id), loadVitrin()]);
-  /* "Uyumlu" is a claim, so it needs the product's own words: only recorders its
-     description or sheet names by code are called compatible. Otherwise the
-     shelf says what it is, the same system's recorders. */
-  const ownWords = `${details.description} ${JSON.stringify(details.specs)}`;
-  const named = candidates.filter((item) => item.sku && ownWords.includes(item.sku));
-  const recorders = (named.length ? named : candidates).slice(0, 4);
-  const recordersTitle = named.length ? 'Uyumlu Kayıt Cihazları' : `${recorderPattern?.label ?? ''} Kayıt Cihazları`;
-
   /* A brand row of one or two cards left most of a four-column shelf empty.
      Under four other models it has no row of its own: those models lead the
      "Benzer Ürünler" row instead, the rest of it filled from the category. */
   const siblingsAll = otherModelsOf(product);
   const ownRow = siblingsAll.length >= 4;
   const siblings = ownRow ? siblingsAll : [];
-  const alternatives = (
-    ownRow
-      ? alternativesTo(product)
-      : [...siblingsAll, ...alternativesTo(product).filter((item) => !siblingsAll.some((own) => own.id === item.id))]
-  ).filter((item) => !recorders.some((recorder) => recorder.id === item.id));
+  const alternatives = ownRow
+    ? alternativesTo(product)
+    : [...siblingsAll, ...alternativesTo(product).filter((item) => !siblingsAll.some((own) => own.id === item.id))];
   const title = titleOf(product);
   const sheet = sheetOf(product, details.specs);
-  /* The link under the offer jumps to the recorders on this page, or — when
-     the catalogue has none yet — to a search for them. */
-  const related = recorderPattern
-    ? {
-        label: recordersTitle,
-        href: recorders.length ? '#kayit-cihazlari' : `/arama?q=${recorderPattern.label}`,
-      }
-    : null;
   const category = categoryMeta(product.category);
   const { paragraphs, bullets } = partsOf(details.description);
   /* The technical summary: the description's own bullet lines, or, for a
@@ -499,11 +467,86 @@ export default async function ProductPage({
   const documents = details.datasheet ? [{ url: details.datasheet, ...documentOf(details.datasheet) }] : [];
 
   /* The tabs list only what this product actually has. */
-  const sections = [
-    ...(details.description ? [{ id: 'aciklama', label: 'Ürün Açıklaması' }] : []),
-    { id: 'teknik-ozellikler', label: 'Teknik Özellikler' },
-    ...(documents.length > 0 ? [{ id: 'dokumanlar', label: 'Dokümanlar' }] : []),
-    ...(recorders.length > 0 ? [{ id: 'kayit-cihazlari', label: recordersTitle }] : []),
+  const tabs = [
+    ...(details.description
+      ? [
+          {
+            id: 'aciklama',
+            label: 'Ürün Açıklaması',
+            content: (
+              <div className="grid items-start gap-5 lg:grid-cols-[55fr_45fr] dt:gap-8">
+                <div className="min-w-0">
+                  <h2 className="sr-only">Ürün Açıklaması</h2>
+                  <div className="max-w-[68ch] space-y-3 text-[16px] leading-relaxed text-text-primary">
+                    {paragraphs.map((paragraph) => (
+                      <p key={paragraph} className="whitespace-pre-line">
+                        {paragraph}
+                      </p>
+                    ))}
+                  </div>
+                </div>
+                {features.length > 0 && (
+                  <div className="min-w-0">
+                    <h3 className="text-[16px] font-bold text-text-primary">Teknik özet</h3>
+                    <ul className="mt-2 divide-y divide-line border-y border-line">
+                      {features.map((line) => {
+                        const Icon = iconFor(line);
+                        const [head, ...tail] = line.split(' · ');
+                        return (
+                          <li key={line} className="flex items-start gap-3 py-2.5">
+                            <Icon size={20} strokeWidth={1.5} aria-hidden className="mt-px shrink-0 text-signal" />
+                            <span className="min-w-0 text-[14px] leading-snug text-text-primary">
+                              <span className="font-semibold">{head}</span>
+                              {tail.length > 0 && <span className="block text-text-secondary">{tail.join(', ')}</span>}
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ),
+          },
+        ]
+      : []),
+    {
+      id: 'teknik-ozellikler',
+      label: 'Teknik Özellikler',
+      content: <ProductSpecs product={product} specs={details.specs} />,
+    },
+    ...(documents.length > 0
+      ? [
+          {
+            id: 'dokumanlar',
+            label: 'Dokümanlar',
+            content: (
+              <>
+                <h2 className="sr-only">Dokümanlar</h2>
+                <ul className="grid gap-2 lg:grid-cols-2 lg:gap-x-8">
+                  {documents.map((document) => (
+                    <li key={document.url}>
+                      <a
+                        href={document.url}
+                        target="_blank"
+                        rel="noopener"
+                        className="flex min-h-13 items-center gap-3 rounded-(--card-radius) border border-line px-3 py-2 transition-colors duration-(--duration-fast) hover:border-text-primary"
+                      >
+                        <FileText size={24} strokeWidth={1.5} aria-hidden className="shrink-0 text-text-secondary" />
+                        <span className="min-w-0 flex-1 text-[14px] leading-snug">
+                          <span className="block break-words font-semibold text-text-primary">{document.name}</span>
+                          {document.type && <span className="block text-[12px] text-text-secondary">{document.type} dosyası</span>}
+                        </span>
+                        <Download size={20} strokeWidth={1.5} aria-hidden className="shrink-0 text-text-primary" />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </>
+            ),
+          },
+        ]
+      : []),
   ];
 
   return (
@@ -623,98 +666,14 @@ export default async function ProductPage({
                 <PriceBlock product={product} />
               </div>
               <ProductBuy product={product} whatsapp={company.whatsapp || company.phone} />
-              <ProductLinks product={product} related={related} />
+              <ProductLinks product={product} />
               <ServiceList product={product} />
             </div>
           </div>
         </div>
       </section>
 
-      <ProductSectionNav sections={sections} />
-
-      {/* --- description beside its technical summary, on a light band --- */}
-      {details.description && (
-        <section id="aciklama" aria-labelledby="aciklama-baslik" className="border-b border-line bg-surface-page">
-          <div className="container-main grid items-start gap-5 py-6 lg:grid-cols-[55fr_45fr] dt:gap-8 dt:py-8">
-            <div className="min-w-0">
-              <h2 id="aciklama-baslik" className="text-[24px] font-extrabold tracking-tight text-text-primary">
-                Ürün Açıklaması
-              </h2>
-              <div className="mt-3 max-w-[68ch] space-y-3 text-[16px] leading-relaxed text-text-primary">
-                {paragraphs.map((paragraph) => (
-                  <p key={paragraph} className="whitespace-pre-line">
-                    {paragraph}
-                  </p>
-                ))}
-              </div>
-            </div>
-            {features.length > 0 && (
-              <div className="min-w-0">
-                <h3 className="text-[16px] font-bold text-text-primary">Teknik özet</h3>
-                <ul className="mt-2 divide-y divide-line border-y border-line">
-                  {features.map((line) => {
-                    const Icon = iconFor(line);
-                    const [head, ...tail] = line.split(' · ');
-                    return (
-                      <li key={line} className="flex items-start gap-3 py-2.5">
-                        <Icon size={20} strokeWidth={1.5} aria-hidden className="mt-px shrink-0 text-signal" />
-                        <span className="min-w-0 text-[14px] leading-snug text-text-primary">
-                          <span className="font-semibold">{head}</span>
-                          {tail.length > 0 && <span className="block text-text-secondary">{tail.join(', ')}</span>}
-                        </span>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            )}
-          </div>
-        </section>
-      )}
-
-      <ProductSpecs product={product} specs={details.specs} />
-
-      {/* --- documents, named by their file ------------------------------ */}
-      {documents.length > 0 && (
-        <section id="dokumanlar" aria-labelledby="dokumanlar-baslik" className="container-main pt-6 dt:pt-8">
-          <h2 id="dokumanlar-baslik" className="text-[24px] font-extrabold tracking-tight text-text-primary">
-            Dokümanlar
-          </h2>
-          <ul className="mt-3 grid gap-2 lg:grid-cols-2 lg:gap-x-8">
-            {documents.map((document) => (
-              <li key={document.url}>
-                <a
-                  href={document.url}
-                  target="_blank"
-                  rel="noopener"
-                  className="flex min-h-13 items-center gap-3 rounded-(--card-radius) border border-line px-3 py-2 transition-colors duration-(--duration-fast) hover:border-text-primary"
-                >
-                  <FileText size={24} strokeWidth={1.5} aria-hidden className="shrink-0 text-text-secondary" />
-                  <span className="min-w-0 flex-1 text-[14px] leading-snug">
-                    <span className="block break-words font-semibold text-text-primary">{document.name}</span>
-                    {document.type && <span className="block text-[12px] text-text-secondary">{document.type} dosyası</span>}
-                  </span>
-                  <Download size={20} strokeWidth={1.5} aria-hidden className="shrink-0 text-text-primary" />
-                </a>
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {/* --- recorders of the same system -------------------------------- */}
-      {recorders.length > 0 && recorderPattern && (
-        <section id="kayit-cihazlari" className="container-main pt-6 dt:pt-8" aria-label={recordersTitle}>
-          <SectionHeading
-            eyebrow={`${category.label} · ${recorderPattern.label}`}
-            title={recordersTitle}
-            action={{ label: 'Tümü', href: `/arama?q=${recorderPattern.label}` }}
-          />
-          <div className="pt-3">
-            <ProductGrid products={recorders} columns={4} />
-          </div>
-        </section>
-      )}
+      <ProductTabs tabs={tabs} />
 
       {/* --- the brand's other models ------------------------------------ */}
       {siblings.length > 0 && (
