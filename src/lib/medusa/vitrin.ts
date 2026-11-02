@@ -419,7 +419,7 @@ export const hoursLines = (hours: string) =>
 const COMPANY_FALLBACK: Company = {
   legalName: 'SEENERGY Güvenlik Teknolojileri A.Ş.',
   phone: '(0312) 480 1 490',
-  whatsapp: '',
+  whatsapp: '0544 480 1490',
   email: '',
   address: 'İvedik OSB Mahallesi, Melih Gökçek Bulvarı Köşe\nİvedik İş Merkezi 4BJ No: 85\nYenimahalle / Ankara',
   hours: 'Hafta içi 08:00 – 18:00 · Hafta sonu 08:00 – 15:00',

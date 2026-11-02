@@ -53,6 +53,8 @@ export interface QuickProductInput {
    * empty = remove it, so the storefront falls back to the category template.
    */
   specs?: SpecGroup[] | null
+  /** No sheet on the product page; what is in `specs` is kept. Absent = as it is. */
+  specs_off?: boolean
 }
 
 /** One group of the product page's "Teknik Özellikler" table. */
@@ -81,6 +83,7 @@ export interface QuickProduct {
   images: string[]
   /** The product's own spec sheet; empty when it uses the category's. */
   specs: SpecGroup[]
+  specs_off: boolean
   badge: Badge | null
   instalment: boolean
   list_keys: string[]
@@ -214,6 +217,7 @@ function toQuick(
     image: product.thumbnail ?? null,
     images: picturesOf(product),
     specs: cleanSpecs(meta.specs),
+    specs_off: meta.specs_off === true,
     badge: BADGES.includes(meta.badge) ? meta.badge : null,
     instalment: meta.instalment === true,
     list_keys: lists.filter((l) => l.product_ids.includes(product.id)).map((l) => l.key),
@@ -393,6 +397,7 @@ export async function createQuickProduct(container: MedusaContainer, input: Quic
             instalment: input.instalment,
             ...(input.badge ? { badge: input.badge } : {}),
             ...(cleanSpecs(input.specs).length ? { specs: cleanSpecs(input.specs) } : {}),
+            ...(input.specs_off ? { specs_off: true } : {}),
           },
           options: options[0] ? [{ id: options[0].id }] : [{ title: "Model", values: ["Standart"] }],
           variants: [
@@ -475,6 +480,7 @@ export async function updateQuickProduct(
           ...(input.specs !== undefined
             ? { specs: cleanSpecs(input.specs).length ? cleanSpecs(input.specs) : "" }
             : {}),
+          ...(input.specs_off !== undefined ? { specs_off: input.specs_off ? true : "" } : {}),
         },
       } as any,
     },

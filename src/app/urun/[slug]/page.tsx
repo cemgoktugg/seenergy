@@ -448,7 +448,7 @@ export default async function ProductPage({
     ? alternativesTo(product)
     : [...siblingsAll, ...alternativesTo(product).filter((item) => !siblingsAll.some((own) => own.id === item.id))];
   const title = titleOf(product);
-  const sheet = sheetOf(product, details.specs);
+  const sheet = details.specsOff ? [] : sheetOf(product, details.specs);
   const category = categoryMeta(product.category);
   const { paragraphs, bullets } = partsOf(details.description);
   /* The technical summary: the description's own bullet lines, or, for a
@@ -510,11 +510,15 @@ export default async function ProductPage({
           },
         ]
       : []),
-    {
-      id: 'teknik-ozellikler',
-      label: 'Teknik Özellikler',
-      content: <ProductSpecs product={product} specs={details.specs} />,
-    },
+    ...(details.specsOff
+      ? []
+      : [
+          {
+            id: 'teknik-ozellikler',
+            label: 'Teknik Özellikler',
+            content: <ProductSpecs product={product} specs={details.specs} />,
+          },
+        ]),
     ...(documents.length > 0
       ? [
           {
@@ -666,14 +670,14 @@ export default async function ProductPage({
                 <PriceBlock product={product} />
               </div>
               <ProductBuy product={product} whatsapp={company.whatsapp || company.phone} />
-              <ProductLinks product={product} />
+              <ProductLinks product={product} whatsapp={company.whatsapp} />
               <ServiceList product={product} />
             </div>
           </div>
         </div>
       </section>
 
-      <ProductTabs tabs={tabs} />
+      {tabs.length > 0 && <ProductTabs tabs={tabs} />}
 
       {/* --- the brand's other models ------------------------------------ */}
       {siblings.length > 0 && (

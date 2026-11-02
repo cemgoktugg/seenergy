@@ -203,6 +203,9 @@ export interface ProductDetails {
   /** Empty when the admin has not written any: the page falls back to the
    *  category's template and says so. */
   specs: SpecGroup[];
+  /** The admin switched the sheet off for this product: no strip, no tab. What
+   *  was written stays in metadata.specs, for when it is switched on again. */
+  specsOff: boolean;
   /** The manufacturer's datasheet (PDF), when one was uploaded. */
   datasheet: string | null;
   /** Leader-line labels drawn over the first photo (see Callout). */
@@ -268,9 +271,11 @@ export function specsFrom(value: unknown): SpecGroup[] {
 
 export const loadProductDetails = cache(async (id: string): Promise<ProductDetails> => {
   const product = (await loadStoreProducts()).find((item) => item.id === id);
+  const specsOff = product?.metadata?.specs_off === true;
   return {
     description: str(product?.description),
-    specs: specsFrom(product?.metadata?.specs),
+    specs: specsOff ? [] : specsFrom(product?.metadata?.specs),
+    specsOff,
     datasheet: str(product?.metadata?.datasheet_url) || null,
     callouts: calloutsFrom(product?.metadata?.callouts),
   };

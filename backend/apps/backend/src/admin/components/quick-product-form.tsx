@@ -51,6 +51,7 @@ interface FormState {
   stock: string
   images: string[]
   specs: SpecGroup[]
+  specs_off: boolean
   badge: string
   instalment: boolean
   published: boolean
@@ -69,6 +70,7 @@ const fromProduct = (p?: QuickProduct): FormState => ({
   stock: p ? String(p.stock) : "",
   images: p?.images?.length ? p.images : p?.image ? [p.image] : [],
   specs: p?.specs ?? [],
+  specs_off: p?.specs_off ?? false,
   badge: p?.badge ?? NO_BADGE,
   instalment: p?.instalment ?? true,
   published: p ? p.status === "published" : true,
@@ -196,6 +198,7 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
       stock,
       images: form.images,
       specs: form.specs,
+      specs_off: form.specs_off,
       badge: form.badge === NO_BADGE ? null : (form.badge as QuickProduct["badge"]),
       instalment: form.instalment,
       list_keys: form.list_keys,
@@ -387,16 +390,30 @@ export function QuickProductForm({ product }: { product?: QuickProduct }) {
         </div>
       </Section>
 
-      <Section title="4. Teknik özellikler">
-        <div className="md:col-span-2">
-          <SpecsField
-            value={form.specs}
-            onChange={(v) => set("specs", v)}
-            storefront={storefront}
-            categoryHandle={options?.categories.find((c) => c.id === form.category_id)?.handle}
-            categoryName={options?.categories.find((c) => c.id === form.category_id)?.name}
-          />
-        </div>
+      <Section
+        title="4. Teknik özellikler"
+        aside={
+          <label className="txt-compact-small flex items-center gap-x-2">
+            <Switch checked={!form.specs_off} onCheckedChange={(v) => set("specs_off", !v)} />
+            {form.specs_off ? "Kapalı" : "Açık"}
+          </label>
+        }
+      >
+        {form.specs_off ? (
+          <p className="txt-compact-small text-ui-fg-subtle md:col-span-2">
+            Bu ürünün sayfasında teknik özellikler gösterilmez. Daha önce yazdıklarınız silinmez; açınca geri gelir.
+          </p>
+        ) : (
+          <div className="md:col-span-2">
+            <SpecsField
+              value={form.specs}
+              onChange={(v) => set("specs", v)}
+              storefront={storefront}
+              categoryHandle={options?.categories.find((c) => c.id === form.category_id)?.handle}
+              categoryName={options?.categories.find((c) => c.id === form.category_id)?.name}
+            />
+          </div>
+        )}
       </Section>
 
       <Section title="5. Vitrin">

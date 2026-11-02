@@ -161,7 +161,9 @@ Yönetimi** is a one-page product form (name, brand, category, price, sale
 price, stock, images — an ordered gallery, first is the main picture — the
 product's own technical specs (metadata.specs, started from the category
 template via GET /api/spec-template on the storefront), badge, homepage lists) for people who should not need to
-know what a variant or a price list is.
+know what a variant or a price list is. Section 4's switch (`metadata.specs_off`,
+2026-11-02) takes the sheet off the product page, strip and tab, for a product
+with no technical data; what was written is kept.
 
 ```
 backend/apps/backend/src/modules/vitrin/    module: vitrin_list (ordered product

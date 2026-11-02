@@ -60,11 +60,11 @@ const SocialMessage: Glyph = ({ size = 18 }) => (
 );
 
 /** Five on the reference; the video channel (YouTube) and the professional
- *  network (LinkedIn) were removed on 2026-10-28 at the client's request. */
+ *  network (LinkedIn) were removed on 2026-10-28 at the client's request. The
+ *  third mark is WhatsApp, from Şirket bilgileri (see NewsletterBar). */
 const SOCIAL: { label: string; href: string; Icon: Glyph }[] = [
   { label: 'Sosyal medya', href: 'https://example.com', Icon: SocialShare },
   { label: 'Fotoğraf paylaşımı', href: 'https://example.com', Icon: SocialPhoto },
-  { label: 'Mesajlaşma', href: 'https://example.com', Icon: SocialMessage },
 ];
 
 const GROUPED = CATEGORY_TREE.filter((node) => node.children?.length);
@@ -78,12 +78,13 @@ const SINGLES = CATEGORY_TREE.filter((node) => !node.children?.length);
  * because nothing on this band is body copy — the social marks are white discs
  * and the newsletter field is a white pill.
  */
-export function NewsletterBar() {
+export function NewsletterBar({ whatsapp }: { whatsapp: string }) {
+  const channels = whatsapp ? [...SOCIAL, { label: 'WhatsApp', href: waHref(whatsapp), Icon: SocialMessage }] : SOCIAL;
   return (
     <section className="bg-linear-to-r from-grad-1 via-grad-3 to-grad-4 py-4">
       <div className="container-main flex flex-col items-center gap-4 lg:flex-row lg:justify-between">
         <ul className="flex items-center gap-2.5">
-          {SOCIAL.map(({ label, href, Icon }) => (
+          {channels.map(({ label, href, Icon }) => (
             <li key={label}>
               <a
                 href={href}

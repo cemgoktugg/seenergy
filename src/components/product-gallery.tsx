@@ -15,15 +15,15 @@
  *     the product a little away from the stage's edges.
  *   - The first picture is the page's LCP element: eager, `fetchPriority`.
  *     The rest are lazy.
- *   - Zoom follows the pointer only for a mouse; touch gets the full-screen
- *     viewer instead, where the picture is as large as the screen allows.
+ *   - The picture does not react to the pointer (the client, 2026-11-02): a click
+ *     opens the full-screen viewer, where it is as large as the screen allows.
  *   - A gallery of one is just a picture: no strip, no arrows, no counter.
  *   - Reduced motion: every programmatic scroll jumps instead of gliding.
  */
 
 import { useCallback, useEffect, useRef, useState, type KeyboardEvent, type ReactNode } from 'react';
 import { ChevronLeft, ChevronRight, Expand, X } from 'lucide-react';
-import { imageProps, imageUrl } from '@/lib/image';
+import { imageProps } from '@/lib/image';
 
 const prefersReducedMotion = () =>
   typeof window !== 'undefined' && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -196,37 +196,6 @@ export function ProductGallery({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewerOpen]);
 
-  /* Hover zoom, mouse only: the picture scales 2× about the pointer. Written to
-     the element's style directly — re-rendering React on every pointer move
-     would be the expensive way to move a transform origin. */
-  const zoomMove = (event: React.PointerEvent<HTMLElement>) => {
-    if (event.pointerType !== 'mouse') return;
-    const img = event.currentTarget.querySelector('img');
-    if (!img) return;
-    /* At 2× the 640px source went soft. On the first zoom a sharper one is
-       fetched — the optimizer's largest (1200) on a standard screen, the
-       uploaded original on a sharp one — and swapped in only once loaded, so
-       the picture never blanks. Only a picture someone zooms pays for it. */
-    const original = img.dataset.original;
-    if (original && !img.dataset.zoomSource) {
-      const sharp = window.devicePixelRatio > 1.5 ? original : imageUrl(original, 1200);
-      img.dataset.zoomSource = sharp;
-      const next = new Image();
-      next.onload = () => {
-        img.removeAttribute('srcset');
-        img.src = sharp;
-      };
-      next.src = sharp;
-    }
-    const box = event.currentTarget.getBoundingClientRect();
-    img.style.transformOrigin = `${((event.clientX - box.left) / box.width) * 100}% ${((event.clientY - box.top) / box.height) * 100}%`;
-    img.style.transform = 'scale(2)';
-  };
-  const zoomOut = (event: React.PointerEvent<HTMLElement>) => {
-    const img = event.currentTarget.querySelector('img');
-    if (img) img.style.transform = '';
-  };
-
   return (
     <div
       className="flex min-w-0 flex-col gap-2.5 dt:gap-3"
@@ -252,15 +221,12 @@ export function ProductGallery({
               <button
                 type="button"
                 onClick={openViewer}
-                onPointerMove={zoomMove}
-                onPointerLeave={zoomOut}
                 tabIndex={index === active ? 0 : -1}
                 aria-label="Görseli tam ekran aç"
-                className="block h-full w-full cursor-zoom-in overflow-hidden p-[10%] focus-visible:-outline-offset-4"
+                className="block h-full w-full cursor-zoom-in overflow-hidden p-[14%] focus-visible:-outline-offset-4"
               >
                 <img
                   {...imageProps(src, 750)}
-                  data-original={src}
                   alt={index === 0 ? alt : `${alt} — ${index + 1}. görsel`}
                   width={800}
                   height={800}
@@ -268,7 +234,7 @@ export function ProductGallery({
                   fetchPriority={index === 0 ? 'high' : undefined}
                   decoding={index === 0 ? 'sync' : 'async'}
                   draggable={false}
-                  className="h-full w-full object-contain transition-transform duration-(--duration-base) ease-out motion-reduce:transition-none"
+                  className="h-full w-full object-contain"
                 />
               </button>
             </div>

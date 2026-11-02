@@ -82,6 +82,8 @@ export interface QuickProduct {
   images: string[]
   /** The product's own spec sheet; empty when it uses the category's. */
   specs: SpecGroup[]
+  /** The sheet is switched off: not on the product page, but kept. */
+  specs_off: boolean
   badge: "yeni" | "super-firsat" | "cok-satan" | null
   instalment: boolean
   list_keys: string[]
@@ -104,6 +106,7 @@ export interface QuickProductInput {
   images: string[]
   /** Empty = use the category template on the product page. */
   specs: SpecGroup[]
+  specs_off: boolean
   badge: QuickProduct["badge"]
   instalment: boolean
   list_keys: string[]

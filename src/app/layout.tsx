@@ -111,7 +111,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <StoreProvider>
             <SiteHeader promo={announcement} menuModels={menuModels} />
             <main id="icerik">{children}</main>
-            <NewsletterBar />
+            <NewsletterBar whatsapp={company.whatsapp} />
             <SiteFooter company={company} />
             <CompareBar />
           </StoreProvider>

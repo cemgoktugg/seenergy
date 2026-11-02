@@ -81,6 +81,7 @@ export const QuickProductBody = z.object({
     .max(20, "En fazla 20 grup eklenebilir.")
     .nullable()
     .optional(),
+  specs_off: z.boolean().optional(),
   image: z.string().nullable().optional(),
   badge: z.enum(BADGES).nullable().optional(),
   instalment: z.boolean().default(false),

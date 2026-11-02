@@ -8,7 +8,7 @@ import { BrandLogo } from '@/components/brand-mark';
 import { InquiryForm } from '@/components/inquiry-form';
 import { SectionHeading } from '@/components/section-heading';
 import { CONTACT_FIELDS } from '@/data/inquiry-fields';
-import { directionsHref, telHref } from '@/lib/contact';
+import { directionsHref, telHref, waHref } from '@/lib/contact';
 import { imageProps } from '@/lib/image';
 import { DEPARTMENTS, hoursLines, loadVitrin, type Company, type Pages, type StaffMember } from '@/lib/medusa/vitrin';
 
@@ -247,6 +247,11 @@ function ContactBanner({
               <a href={telHref(company.phone)} className="text-[20px] font-extrabold tabular-nums hover:underline">
                 {company.phone}
               </a>
+              {company.whatsapp ? (
+                <a href={waHref(company.whatsapp)} target="_blank" rel="noopener" className="mt-0.5 block text-[14px] font-semibold tabular-nums hover:underline">
+                  WhatsApp: {company.whatsapp}
+                </a>
+              ) : null}
             </Detail>
           ) : null}
           {hours.length > 0 ? (
