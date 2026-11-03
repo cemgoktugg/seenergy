@@ -632,7 +632,7 @@ export default async function ProductPage({
                   <Link
                     href={`/marka/${brandSlug(product.brand)}`}
                     title={`${product.brand} ürünleri`}
-                    className="relative inline-flex h-9 items-center rounded-(--card-radius) border border-text-primary px-3 text-[16px] font-extrabold tracking-[0.02em] text-text-primary transition-colors duration-(--duration-fast) before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] hover:bg-text-primary hover:text-surface-card"
+                    className="relative inline-flex h-11 items-center rounded-(--card-radius) border-2 border-text-primary px-4 text-[20px] font-extrabold sm:text-[24px] tracking-[0.02em] text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card"
                   >
                     {product.brand}
                   </Link>
@@ -647,12 +647,13 @@ export default async function ProductPage({
                 ) : null}
               </div>
 
-              {/* The model code leads: it is what an installer searches for and
-                  quotes. What the product is, is the second line of the heading. */}
+              {/* The brand label above is the largest line (the client,
+                  2026-11-03: the model smaller than the brand); the model code
+                  heads the heading, what the product is is its second line. */}
               <h1 className="mt-2.5 text-text-primary">
-                <span className="block break-words text-[24px] font-extrabold leading-[1.1] tracking-tight sm:text-[32px]">{title.code}</span>
+                <span className="block break-words text-[16px] font-bold leading-[1.2] sm:text-[20px]">{title.code}</span>
                 {title.rest && (
-                  <span className="mt-1 block text-[16px] font-medium leading-snug text-text-secondary dt:text-[20px]">{title.rest}</span>
+                  <span className="mt-0.5 block text-[14px] font-medium leading-snug text-text-secondary sm:text-[16px]">{title.rest}</span>
                 )}
               </h1>
 
