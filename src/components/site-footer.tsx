@@ -10,7 +10,7 @@
 import Link from 'next/link';
 
 import { FooterColumns } from '@/components/footer-columns';
-import { CATEGORY_TREE, categoryHref } from '@/data/categories';
+import { categoryHref, categoryTree } from '@/data/categories';
 import { FOOTER_COLUMNS, PAYMENT_METHODS, SITE } from '@/data/site';
 import { telHref, waHref } from '@/lib/contact';
 import type { Company } from '@/lib/medusa/vitrin';
@@ -67,9 +67,6 @@ const SOCIAL: { label: string; href: string; Icon: Glyph }[] = [
   { label: 'Fotoğraf paylaşımı', href: 'https://example.com', Icon: SocialPhoto },
 ];
 
-const GROUPED = CATEGORY_TREE.filter((node) => node.children?.length);
-const SINGLES = CATEGORY_TREE.filter((node) => !node.children?.length);
-
 /**
  * Newsletter + social strip.
  *
@@ -124,6 +121,9 @@ export function NewsletterBar({ whatsapp }: { whatsapp: string }) {
 
 /** `company`: admin → Vitrin → Şirket bilgileri; empty fields are not shown. */
 export function SiteFooter({ company }: { company: Company }) {
+  // Rendered by the layout after loadCatalog: the live category tree.
+  const GROUPED = categoryTree().filter((node) => node.children?.length);
+  const SINGLES = categoryTree().filter((node) => !node.children?.length);
   return (
     <footer className="bg-surface-page pt-8">
       <div className="container-main">

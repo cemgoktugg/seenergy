@@ -17,15 +17,22 @@ import type { Metadata } from 'next';
 import Link from 'next/link';
 
 import { CatalogShell } from '@/components/catalog-shell';
-import { CATEGORY_TREE, categoryHref } from '@/data/categories';
-import { CATEGORY_META, categoryMeta } from '@/data/catalog';
+import { categoryHref, categoryTree } from '@/data/categories';
+import { categoryMeta, categoryMetaMap } from '@/data/catalog';
 import type { SearchParams } from '@/lib/catalog-query';
 import { loadCatalog } from '@/lib/medusa/catalog';
 
-const keyFor = (slug: string) => (slug in CATEGORY_META ? slug : undefined);
+/* Every lookup below runs after loadCatalog, which installs the live category
+   tree: a category added in the admin has its page without a rebuild
+   (dynamicParams), and a deleted one gets the honest panel. */
+const keyFor = async (slug: string) => {
+  await loadCatalog();
+  return slug in categoryMetaMap() ? slug : undefined;
+};
 
-export function generateStaticParams() {
-  return Object.keys(CATEGORY_META).map((slug) => ({ slug }));
+export async function generateStaticParams() {
+  await loadCatalog();
+  return Object.keys(categoryMetaMap()).map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({
@@ -34,7 +41,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const key = keyFor(slug);
+  const key = await keyFor(slug);
   const title = key ? categoryMeta(key).label : 'Kategori';
   return { title, alternates: { canonical: `/kategori/${slug}` } };
 }
@@ -66,7 +73,7 @@ export default async function CategoryPage({
   searchParams: Promise<SearchParams>;
 }) {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
-  const key = keyFor(slug);
+  const key = await keyFor(slug);
 
   if (!key) {
     return (
@@ -82,7 +89,7 @@ export default async function CategoryPage({
             Aradığınız bölüm aşağıdaki kategorilerden birinde olabilir:
           </p>
           <ul className="mt-6 flex flex-wrap justify-center gap-1.5">
-            {CATEGORY_TREE.map((node) => (
+            {categoryTree().map((node) => (
               <li key={node.slug}>
                 <Link
                   href={categoryHref(node.slug)}

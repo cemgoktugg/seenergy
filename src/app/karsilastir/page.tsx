@@ -36,7 +36,7 @@ import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
 import { useCatalog } from '@/components/catalog-provider';
 import { useCompareItems } from '@/components/compare-data';
-import { categoryMeta, discountPercent, formatPrice, PRICE_ON_REQUEST, type Product } from '@/data/catalog';
+import { discountPercent, formatPrice, PRICE_ON_REQUEST, type Product } from '@/data/catalog';
 import { INSTALMENTS_AVAILABLE } from '@/data/checkout';
 import { keySpecsOf, type SpecGroup } from '@/data/specs';
 import { imageProps } from '@/lib/image';
@@ -145,7 +145,7 @@ export default function ComparePage() {
           </span>
         )),
       ),
-      row('Kategori', products.map((p) => categoryMeta(p.category).label)),
+      row('Kategori', products.map((p) => items[p.id]?.category.label ?? DASH)),
     ],
   };
 
@@ -178,7 +178,7 @@ export default function ComparePage() {
   const diffCount = groups.reduce((total, group) => total + group.rows.filter(differs).length, 0);
   const freeSlots = Math.max(0, COMPARE_LIMIT - products.length);
   const columns = products.length + (freeSlots > 0 ? 1 : 0);
-  const addMoreHref = products[0] ? categoryMeta(products[0].category).href : '/kategori';
+  const addMoreHref = (products[0] && items[products[0].id]?.category.href) || '/kategori';
 
   return (
     <>

@@ -10,7 +10,7 @@
  * Rating fields are explicitly mock and are never emitted as structured data.
  */
 
-import { ALL_CATEGORIES, categoryHref } from '@/data/categories';
+import { allCategories, categoryHref, categoryTreeVersion } from '@/data/categories';
 
 export interface Product {
   id: string;
@@ -67,36 +67,48 @@ export interface CategoryMeta {
   spec?: string;
 }
 
+let metaCache: { version: number; meta: Record<string, CategoryMeta> } | null = null;
+
 /**
- * Every category by key, derived from the one tree in src/data/categories.ts.
- * A key IS the route slug and the Medusa category handle, so a breadcrumb, a
- * spec lookup and a Medusa category all meet on the same string.
+ * Every category by key, derived from the one tree in src/data/categories.ts
+ * (the live one, once loadCategoryTree has installed it). A key IS the route
+ * slug and the Medusa category handle, so a breadcrumb, a spec lookup and a
+ * Medusa category all meet on the same string.
  */
-export const CATEGORY_META: Record<string, CategoryMeta> = Object.fromEntries(
-  ALL_CATEGORIES.map((node) => [
-    node.slug,
-    {
-      label: node.label,
-      href: categoryHref(node.slug),
-      parent: node.parent,
-      children: (node.children ?? []).map((child) => child.slug),
-      spec: node.spec,
-    },
-  ]),
-);
+export function categoryMetaMap(): Record<string, CategoryMeta> {
+  const version = categoryTreeVersion();
+  if (metaCache?.version !== version) {
+    metaCache = {
+      version,
+      meta: Object.fromEntries(
+        allCategories().map((node) => [
+          node.slug,
+          {
+            label: node.label,
+            href: categoryHref(node.slug),
+            parent: node.parent,
+            children: (node.children ?? []).map((child) => child.slug),
+            spec: node.spec,
+          },
+        ]),
+      ),
+    };
+  }
+  return metaCache.meta;
+}
 
 /** A product the tree has no place for (key '') lands on the full index. */
 export const categoryMeta = (category: string): CategoryMeta =>
-  CATEGORY_META[category] ?? { label: 'Tüm Kategoriler', href: '/kategori', children: [] };
+  categoryMetaMap()[category] ?? { label: 'Tüm Kategoriler', href: '/kategori', children: [] };
 
 /** Medusa category handle → catalogue key: the same string, when it is ours. */
 export const categoryKeyFromHandle = (handle: string): string | undefined =>
-  handle in CATEGORY_META ? handle : undefined;
+  handle in categoryMetaMap() ? handle : undefined;
 
 /** A category and its subcategories — what a category page lists. */
 export const categoryAndChildren = (category: string): string[] => [
   category,
-  ...(CATEGORY_META[category]?.children ?? []),
+  ...(categoryMetaMap()[category]?.children ?? []),
 ];
 
 /**

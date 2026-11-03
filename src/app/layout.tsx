@@ -7,7 +7,7 @@ import { CompareBar } from '@/components/compare-bar';
 import { SiteHeader, type MenuModels } from '@/components/site-header';
 import { NewsletterBar, SiteFooter } from '@/components/site-footer';
 import { WhatsAppButton } from '@/components/whatsapp-button';
-import { PRIMARY_NAV, SITE } from '@/data/site';
+import { primaryNav, SITE } from '@/data/site';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
 
@@ -61,8 +61,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
      menu on its own. The brand prefix is dropped: the column already says
      where you are, and "SEENERGY SE-1080LD" ×9 is noise. */
   const { byCategory } = await loadCatalog();
+  // After loadCatalog: the category tree is the live one from Medusa.
+  const nav = primaryNav();
   const menuModels: MenuModels = {};
-  for (const item of PRIMARY_NAV) {
+  for (const item of nav) {
     // A category without subcategories lists its own models under its own
     // href — the all-categories panel shows them when it is selected.
     for (const child of item.children ?? [item]) {
@@ -110,7 +112,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             pages do. */}
         <CartProvider>
           <StoreProvider>
-            <SiteHeader promo={announcement} menuModels={menuModels} />
+            <SiteHeader promo={announcement} nav={nav} menuModels={menuModels} />
             <main id="icerik">{children}</main>
             <NewsletterBar whatsapp={company.whatsapp} />
             <SiteFooter company={company} />

@@ -3,7 +3,7 @@
  * Our own brand identity — nothing here is taken from the reference site.
  */
 
-import { ALL_CATEGORIES, CATEGORY_TREE, categoryHref } from '@/data/categories';
+import { categoryHref, categoryTree } from '@/data/categories';
 
 export const SITE = {
   name: 'SEENERGY',
@@ -28,20 +28,22 @@ export interface NavItem {
 }
 
 /**
- * The fourteen top-level categories, straight from the category tree
- * (src/data/categories.ts).
+ * The top-level categories, straight from the category tree
+ * (src/data/categories.ts — the live one on the server, after loadCatalog).
+ * Built in the root layout and handed to the client header as `nav`.
  *
  * This replaced a hand-written twelve-item nav whose mega panels carried five
  * columns of sub-links per category, invented to fill a measured panel —
  * nearly all of them pointing at categories the catalogue never had. A mega
  * panel now opens only where a category really has subcategories.
  */
-export const PRIMARY_NAV: NavItem[] = CATEGORY_TREE.map((node) => ({
-  label: node.label,
-  short: node.short ?? node.label,
-  href: categoryHref(node.slug),
-  children: node.children?.map((child) => ({ label: child.label, href: categoryHref(child.slug) })),
-}));
+export const primaryNav = (): NavItem[] =>
+  categoryTree().map((node) => ({
+    label: node.label,
+    short: node.short ?? node.label,
+    href: categoryHref(node.slug),
+    children: node.children?.map((child) => ({ label: child.label, href: categoryHref(child.slug) })),
+  }));
 
 /**
  * The categories the nav bar names on one line, in order. Fourteen two-line
@@ -318,17 +320,6 @@ export const FOOTER_COLUMNS = [
     ],
   },
 ];
-
-/**
- * The footer's category block: the whole tree, parents followed by their
- * subcategories, with real hrefs. It used to be thirty labels copied in shape
- * from the reference ("Tv Led Bar", "Fotokapan"…), slugified into links that
- * mostly led nowhere. Twenty-six entries still fill the measured 6-column grid.
- */
-export const POPULAR_CATEGORIES = ALL_CATEGORIES.map((node) => ({
-  label: node.label,
-  href: categoryHref(node.slug),
-}));
 
 /**
  * Accepted payment methods, drawn as neutral text chips.

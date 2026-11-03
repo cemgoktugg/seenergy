@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
 
+import { categoryMeta } from '@/data/catalog';
 import { loadCatalog, loadProductDetails } from '@/lib/medusa/catalog';
 
 /* COMPARE_LIMIT's value. Not imported: it lives in a 'use client' module, and
@@ -38,6 +39,8 @@ export async function GET(request: NextRequest) {
         brand: product.brand,
         sku: product.sku,
         image: product.image,
+        // From the live tree, which the browser does not have.
+        category: { label: categoryMeta(product.category).label, href: categoryMeta(product.category).href },
         specs,
       };
     }),

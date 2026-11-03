@@ -1,5 +1,5 @@
 import { defineRouteConfig } from "@medusajs/admin-sdk"
-import { ArrowPath, MagnifyingGlass, PencilSquare, Photo, Plus, XMark } from "@medusajs/icons"
+import { ArrowPath, MagnifyingGlass, PencilSquare, Photo, Plus, Trash, XMark } from "@medusajs/icons"
 import {
   Badge,
   Button,
@@ -26,6 +26,8 @@ import {
   uploadImage,
   useAllQuickProducts,
   useBatchUpdate,
+  useCreateCategory,
+  useDeleteCategory,
   useTicariCoreSync,
   useVitrin,
   useVitrinOptions,
@@ -148,6 +150,132 @@ function CategoryTree({
         </div>
       ))}
     </nav>
+  )
+}
+
+const TOP = "__ana"
+
+/**
+ * Add and delete categories, above the tree (2026-11-03; under it they fell
+ * below the screen, the tree being taller than it). A new one is
+ * top-level or a subcategory of a top-level one — the storefront's menu has
+ * two levels. Delete is for the selected category and only when it is empty:
+ * the button says what is in the way, and the backend checks again (drafts
+ * count too). The storefront's menu, footer and /kategori follow at once.
+ */
+function CategoryEditor({
+  categories,
+  selected,
+  count,
+  onCreated,
+  onDeleted,
+}: {
+  categories: VitrinCategory[]
+  selected: VitrinCategory | undefined
+  count: number
+  onCreated: (id: string) => void
+  onDeleted: () => void
+}) {
+  const prompt = usePrompt()
+  const create = useCreateCategory()
+  const remove = useDeleteCategory()
+  const [open, setOpen] = useState(false)
+  const [name, setName] = useState("")
+  const [parent, setParent] = useState(TOP)
+  const tops = categories.filter((c) => !c.parent_id).sort((a, b) => a.rank - b.rank)
+  const subs = selected ? categories.filter((c) => c.parent_id === selected.id).length : 0
+
+  const start = () => {
+    setName("")
+    // A subcategory is most often added to the category in view.
+    setParent(selected ? (selected.parent_id ?? selected.id) : TOP)
+    setOpen(true)
+  }
+  const submit = async () => {
+    try {
+      const { category } = await create.mutateAsync({ name: name.trim(), parent_id: parent === TOP ? null : parent })
+      toast.success(`“${category.name}” eklendi`, { description: "Sitedeki menüde ve kategori sayfasında da görünür." })
+      setOpen(false)
+      onCreated(category.id)
+    } catch (error) {
+      toast.error("Kategori eklenemedi", { description: errorText(error) })
+    }
+  }
+  const destroy = async () => {
+    if (!selected) return
+    const ok = await prompt({
+      title: `“${selected.name}” silinsin mi?`,
+      description: "Kategori sitedeki menüden ve kategori listesinden kalkar. Bu geri alınamaz.",
+      confirmText: "Sil",
+      cancelText: "Vazgeç",
+    })
+    if (!ok) return
+    try {
+      await remove.mutateAsync(selected.id)
+      toast.success(`“${selected.name}” silindi`)
+      onDeleted()
+    } catch (error) {
+      toast.error("Kategori silinemedi", { description: errorText(error) })
+    }
+  }
+
+  const blocker = !selected
+    ? null
+    : subs > 0
+      ? `Önce ${subs} alt kategorisini silin.`
+      : count > 0
+        ? `Silmek için önce içindeki ${count} ürünü başka kategoriye taşıyın.`
+        : null
+
+  return (
+    <div className="mb-2 flex flex-col gap-2 border-b px-2 pb-3">
+      {open ? (
+        <form
+          className="flex flex-col gap-2"
+          onSubmit={(e) => {
+            e.preventDefault()
+            void submit()
+          }}
+        >
+          <Input size="small" autoFocus placeholder="Kategori adı" value={name} onChange={(e) => setName(e.target.value)} />
+          <Select size="small" value={parent} onValueChange={setParent}>
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Item value={TOP}>Ana kategori</Select.Item>
+              {tops.map((c) => (
+                <Select.Item key={c.id} value={c.id}>
+                  {c.name} altında
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select>
+          <div className="flex gap-2">
+            <Button size="small" type="submit" isLoading={create.isPending} disabled={name.trim().length < 2}>
+              Ekle
+            </Button>
+            <Button size="small" type="button" variant="secondary" onClick={() => setOpen(false)}>
+              Vazgeç
+            </Button>
+          </div>
+        </form>
+      ) : (
+        <Button size="small" variant="secondary" onClick={start}>
+          <Plus />
+          Kategori ekle
+        </Button>
+      )}
+      {selected && !open ? (
+        <>
+          <Button size="small" variant="secondary" className="text-ui-fg-error" disabled={Boolean(blocker)} isLoading={remove.isPending} onClick={() => void destroy()}>
+            <Trash />
+            “{selected.name}” kategorisini sil
+          </Button>
+          {blocker ? <Text size="xsmall" className="text-ui-fg-muted">{blocker}</Text> : null}
+        </>
+      ) : null}
+    </div>
   )
 }
 
@@ -457,6 +585,13 @@ const ProductsPage = () => {
           <Text size="xsmall" weight="plus" className="text-ui-fg-muted mb-2 px-2 uppercase tracking-wide">
             Kategoriler
           </Text>
+          <CategoryEditor
+            categories={categories}
+            selected={categories.find((c) => c.id === selected)}
+            count={counts.get(selected) ?? 0}
+            onCreated={selectCategory}
+            onDeleted={() => selectCategory(ALL)}
+          />
           <CategoryTree
             categories={categories}
             counts={counts}

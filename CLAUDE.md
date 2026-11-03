@@ -34,8 +34,8 @@ These routes are real, not placeholders:
 
 ```
 /                     homepage
-/urun/[slug]          product detail (2026-11-01, the client's second brief): 50/50
-                      (55/45 until 2026-11-03, when the stage was made smaller),
+/urun/[slug]          product detail (2026-11-01, the client's second brief): 45/55
+                      (55/45 until 2026-11-03, 50/50 for a day; the client wanted the stage smaller),
                       a white stage in both themes (2026-11-02; the anthracite one
                       with a plate for white-ground photos is in 262d514).
                       Then a 3–4-cell strip from the product's own sheet,
@@ -74,15 +74,28 @@ These routes are real, not placeholders:
                       blog cards until 2026-10-27; /blog itself remains)
 ```
 
-**Categories come from one tree: `src/data/categories.ts`** — the client's own
-(2026-09-29): 14 top-level categories, CCTV / Network / Uydu with
-subcategories. The nav bar, mega panel, drawer, homepage board, footer,
-/kategori, category pages, breadcrumbs and spec-template lookup all derive from
-it. A slug is the route AND the Medusa category handle; the Medusa side is
-created by `backend/.../migration-scripts/security-category-tree.ts`, which
-also moved the fitting products and set the previous 12 categories INACTIVE
-(not deleted). Products that fit nowhere stay published without a category.
-Change a slug in both places or neither.
+**Categories are Medusa's, edited in the admin (2026-11-03).** Vitrin → Ürün
+Yönetimi has "Kategori ekle" and "… kategorisini sil" above its tree
+(`POST /admin/vitrin/categories`, `DELETE /admin/vitrin/categories/:id`): two
+levels only (the menu draws two), a duplicate name under the same parent is
+refused, and only an EMPTY category can be deleted — products (drafts too) or
+subcategories have to be moved first; the endpoint says so. The storefront reads
+the active, public categories through `loadCategoryTree()`
+(`src/lib/medusa/categories.ts`, `catalog` tag, rank order) and installs them
+in `src/data/categories.ts` with `setCategoryTree()`; `loadProducts()` does
+that on every server render, so **read the tree (`categoryTree()`,
+`allCategories()`, `categoryMeta()`, `primaryNav()`) only after
+`await loadCatalog()`** — before it you get `DEFAULT_CATEGORY_TREE`, the
+client's hand-written tree of 2026-09-29 (14 top-level, CCTV / Network / Uydu
+with subcategories), which is also the fallback when Medusa does not answer.
+Client components never read it: the header gets `nav` from the layout, the
+compare page gets each product's category from `/api/compare`. `short` and
+`spec` come from a category's metadata, else from the default tree by slug.
+A slug is the route AND the Medusa category handle. On 2026-11-03 live held
+exactly the default tree's 26 categories in its order, so the switch changed
+nothing visible. NetHesap Online owns the category of a linked product: one
+moved into an admin-made category the ERP does not have goes back on the next
+sync.
 
 The listing shell filters entirely through the URL (`?marka=…&fiyat=…&stok=…&ozellik=…&siralama=…`).
 Every filter is a link and no filter state lives in a client component, so a

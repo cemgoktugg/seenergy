@@ -41,7 +41,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { useCart } from '@/components/cart-provider';
 import { formatPrice } from '@/data/catalog';
 import { CATEGORY_ICONS } from '@/components/category-icons';
-import { NAV_FEATURED, PRIMARY_NAV, SITE, UTILITY_LINKS, type NavItem } from '@/data/site';
+import { NAV_FEATURED, SITE, UTILITY_LINKS, type NavItem } from '@/data/site';
 import { imageProps } from '@/lib/image';
 
 const UTILITY_ICONS = { info: Info, phone: Phone, truck: Truck, badge: BadgeIcon };
@@ -411,13 +411,13 @@ function CategoryBody({ item, menuModels, onClose }: { item: NavItem; menuModels
  * left, the one under the pointer opened on the right — so all fourteen are
  * one hover away without fourteen labels crowding the bar.
  */
-function AllCategoriesPanel({ menuModels, onClose }: { menuModels: MenuModels; onClose: () => void }) {
-  const [active, setActive] = useState(PRIMARY_NAV[0].href);
-  const item = PRIMARY_NAV.find((entry) => entry.href === active) ?? PRIMARY_NAV[0];
+function AllCategoriesPanel({ nav, menuModels, onClose }: { nav: NavItem[]; menuModels: MenuModels; onClose: () => void }) {
+  const [active, setActive] = useState(nav[0].href);
+  const item = nav.find((entry) => entry.href === active) ?? nav[0];
   return (
     <div className="flex max-h-[calc(100dvh-200px)] overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e3">
       <ul className="w-[310px] shrink-0 overflow-y-auto border-r border-line bg-surface-page py-2">
-        {PRIMARY_NAV.map((entry) => {
+        {nav.map((entry) => {
           const Icon = CATEGORY_ICONS[entry.href];
           const on = entry.href === active;
           const count = modelsOf(entry, menuModels).length;
@@ -471,7 +471,7 @@ function AllCategoriesPanel({ menuModels, onClose }: { menuModels: MenuModels; o
  * `menuModels` is each subcategory's products, built by the layout from the
  * catalogue — the mega panel lists them under their subcategory.
  */
-export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuModels?: MenuModels }) {
+export function SiteHeader({ promo, nav, menuModels = {} }: { promo: string; nav: NavItem[]; menuModels?: MenuModels }) {
   /* The product page's plain header (2026-10-31, from the client's mock): the
      announcement alone in the top line, no b2b, line icons, a squared search and
      a flat, narrower category bar. Same links, same panels, same drawer: only
@@ -487,7 +487,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
   const [openGroup, setOpenGroup] = useState<string | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [openMega, setOpenMega] = useState<string | null>(null);
-  const featured = NAV_FEATURED.map((href) => PRIMARY_NAV.find((item) => item.href === href)).filter(
+  const featured = NAV_FEATURED.map((href) => nav.find((item) => item.href === href)).filter(
     (item): item is NavItem => Boolean(item),
   );
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -830,9 +830,9 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
             >
               <div className="container-main pt-2">
                 {openMega === ALL ? (
-                  <AllCategoriesPanel menuModels={menuModels} onClose={() => setOpenMega(null)} />
+                  <AllCategoriesPanel nav={nav} menuModels={menuModels} onClose={() => setOpenMega(null)} />
                 ) : (
-                  PRIMARY_NAV.filter((item) => item.href === openMega && item.children).map((item) => (
+                  nav.filter((item) => item.href === openMega && item.children).map((item) => (
                     <div key={item.href} className="flex overflow-hidden rounded-(--panel-radius) border border-line bg-surface-card shadow-e3">
                       <CategoryIntro item={item} menuModels={menuModels} onClose={() => setOpenMega(null)} />
                       <CategoryBody item={item} menuModels={menuModels} onClose={() => setOpenMega(null)} />
@@ -898,7 +898,7 @@ export function SiteHeader({ promo, menuModels = {} }: { promo: string; menuMode
 
             <nav aria-label="Kategoriler" className="flex-1 overflow-y-auto">
               <ul className="divide-y divide-line">
-                {PRIMARY_NAV.map((item) => (
+                {nav.map((item) => (
                   <li key={item.href}>
                     <div className="flex items-center">
                       <Link

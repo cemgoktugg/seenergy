@@ -107,6 +107,15 @@ export const ProductBatchBody = z.object({
 })
 
 /** First zod issue as a single sentence for the admin toast. */
+export const CategoryCreate = z.object({
+  name: z
+    .string()
+    .trim()
+    .min(2, "Kategori adı en az 2 harf olmalı.")
+    .max(60, "Kategori adı en fazla 60 harf olabilir."),
+  parent_id: z.string().startsWith("pcat_").nullable().optional(),
+})
+
 export function firstIssue(error: z.ZodError): string {
   return error.issues[0]?.message ?? "Geçersiz istek."
 }

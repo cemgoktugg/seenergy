@@ -1,18 +1,23 @@
 /**
- * The category tree — the client's own, written out by hand on 2026-09-29:
- * fourteen top-level categories, three of them with subcategories.
+ * The category tree.
+ *
+ * Since 2026-11-03 it is Medusa's: the shop adds and deletes categories in the
+ * admin (Vitrin → Ürün Yönetimi), and `loadCategoryTree()`
+ * (src/lib/medusa/categories.ts) reads the active ones and installs them here
+ * with `setCategoryTree()` before anything renders from them — `loadCatalog()`
+ * does that on every server render, so a page that has loaded the catalogue
+ * reads the live tree. DEFAULT_CATEGORY_TREE below — the client's own, written
+ * out by hand on 2026-09-29 — is what is used until then, and what a browser
+ * bundle sees; client components get the tree as props instead (the header's
+ * `nav`).
  *
  * This is the ONE place the storefront learns what categories exist. The nav
- * bar, the mega panel, the mobile drawer, the homepage board, the footer, the
- * /kategori index, category pages, breadcrumbs and the spec-template lookup
- * all derive from it, where there used to be a hand-written 12-item nav with
- * invented sub-links beside a separate 12-key category map.
+ * bar, the mega panel, the mobile drawer, the footer, the /kategori index,
+ * category pages, breadcrumbs and the spec-template lookup all derive from it.
  *
- * `slug` is the route AND the Medusa category handle — the handles are
- * created by backend/apps/backend/src/migration-scripts/security-category-
- * tree.ts. Change one, change both.
+ * `slug` is the route AND the Medusa category handle.
  *
- * Pure data, no imports: safe in client components.
+ * No imports: safe in client components.
  */
 
 export interface CategoryNode {
@@ -27,7 +32,7 @@ export interface CategoryNode {
   children?: CategoryNode[];
 }
 
-export const CATEGORY_TREE: CategoryNode[] = [
+export const DEFAULT_CATEGORY_TREE: CategoryNode[] = [
   {
     slug: 'cctv-guvenlik-sistemleri',
     label: 'CCTV Güvenlik Sistemleri',
@@ -77,8 +82,28 @@ export const CATEGORY_TREE: CategoryNode[] = [
 
 export const categoryHref = (slug: string) => `/kategori/${slug}`;
 
+export type FlatCategory = CategoryNode & { parent?: string };
+
+const flatten = (tree: CategoryNode[]): FlatCategory[] =>
+  tree.flatMap((node) => [
+    node,
+    ...(node.children ?? []).map((child) => ({ ...child, parent: node.slug, spec: child.spec ?? node.spec })),
+  ]);
+
+let current = { tree: DEFAULT_CATEGORY_TREE, all: flatten(DEFAULT_CATEGORY_TREE), key: '', version: 0 };
+
+/** Install the live tree (server side, from loadCategoryTree). */
+export function setCategoryTree(tree: CategoryNode[]): void {
+  const key = JSON.stringify(tree);
+  if (key === current.key) return;
+  current = { tree, all: flatten(tree), key, version: current.version + 1 };
+}
+
+/** The top-level categories, each with its subcategories. */
+export const categoryTree = (): CategoryNode[] => current.tree;
+
 /** Every category, parents and children, with its parent's slug. */
-export const ALL_CATEGORIES: (CategoryNode & { parent?: string })[] = CATEGORY_TREE.flatMap((node) => [
-  node,
-  ...(node.children ?? []).map((child) => ({ ...child, parent: node.slug, spec: child.spec ?? node.spec })),
-]);
+export const allCategories = (): FlatCategory[] => current.all;
+
+/** Bumped by every setCategoryTree, for lookups derived from the tree. */
+export const categoryTreeVersion = (): number => current.version;

@@ -13,7 +13,7 @@ import Link from 'next/link';
 import { ChevronRight } from 'lucide-react';
 
 import { CATEGORY_ICONS } from '@/components/category-icons';
-import { CATEGORY_TREE, categoryHref } from '@/data/categories';
+import { categoryHref, categoryTree } from '@/data/categories';
 import { loadCatalog } from '@/lib/medusa/catalog';
 
 export const metadata: Metadata = {
@@ -37,7 +37,7 @@ export default async function CategoriesPage() {
             Tüm Kategoriler
           </h1>
           <p className="mt-2 max-w-2xl text-[14px] leading-relaxed text-text-secondary">
-            {CATEGORY_TREE.length} ana kategori ve alt kategorileri.
+            {categoryTree().length} ana kategori ve alt kategorileri.
           </p>
         </div>
       </div>
@@ -47,7 +47,7 @@ export default async function CategoriesPage() {
           beside CCTV's list of four. Columns size each card to its content
           and keep the client's order, reading down each column. */}
       <ul className="mt-(--space-grid-gap) columns-1 gap-(--space-grid-gap) sm:columns-2 dt:columns-3">
-        {CATEGORY_TREE.map((node) => {
+        {categoryTree().map((node) => {
           const href = categoryHref(node.slug);
           const Icon = CATEGORY_ICONS[href];
           const count = byCategory(node.slug).length;

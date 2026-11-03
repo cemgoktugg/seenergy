@@ -8,6 +8,7 @@ import {
   type Product,
 } from '@/data/catalog';
 import type { SpecGroup } from '@/data/specs';
+import { loadCategoryTree } from '@/lib/medusa/categories';
 import { medusa } from '@/lib/medusa/client';
 
 /**
@@ -173,7 +174,8 @@ const loadStoreProducts = cache(async (): Promise<StoreProduct[]> => {
 });
 
 export const loadProducts = cache(async (): Promise<Product[]> => {
-  const products = await loadStoreProducts();
+  // The tree first: a product's category key is checked against it.
+  const [products] = await Promise.all([loadStoreProducts(), loadCategoryTree()]);
 
   // Seeded products keep their original seed order; products added later in
   // the admin follow, oldest first.

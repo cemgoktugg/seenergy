@@ -17,7 +17,7 @@
  * Ratings and reviews appear nowhere, by rule.
  */
 
-import { CATEGORY_META, type Product } from '@/data/catalog';
+import { categoryMetaMap, type Product } from '@/data/catalog';
 
 export interface SpecRow {
   label: string;
@@ -693,6 +693,6 @@ export const CATEGORY_SPECS: Record<string, CategorySpec> = {
  * inheritance — names the template it uses. None named, no template.
  */
 export const categorySpec = (category: string): CategorySpec | undefined => {
-  const template = CATEGORY_META[category]?.spec;
+  const template = categoryMetaMap()[category]?.spec;
   return template ? CATEGORY_SPECS[template] : undefined;
 };

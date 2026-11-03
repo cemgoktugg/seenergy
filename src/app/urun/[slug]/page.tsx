@@ -466,7 +466,7 @@ export default async function ProductPage({
             id: 'aciklama',
             label: 'Ürün Açıklaması',
             content: (
-              <div className="grid items-start gap-5 lg:grid-cols-[50fr_50fr] dt:gap-8">
+              <div className="grid items-start gap-5 lg:grid-cols-[45fr_55fr] dt:gap-8">
                 <div className="min-w-0">
                   <h2 className="sr-only">Ürün Açıklaması</h2>
                   <div className="max-w-[68ch] space-y-3 text-[16px] leading-relaxed text-text-primary">
@@ -606,7 +606,7 @@ export default async function ProductPage({
         <div className="container-main pb-5 pt-3 dt:pb-6 dt:pt-3.5">
           <Breadcrumb product={product} />
 
-          <div className="mt-3 grid gap-5 lg:grid-cols-[50fr_50fr] dt:gap-8">
+          <div className="mt-3 grid gap-5 lg:grid-cols-[45fr_55fr] dt:gap-8">
             {/* Keyed by product: client navigation between two products reuses
                 this position, and the gallery's index must not carry over. */}
             <div className="min-w-0 lg:sticky lg:top-(--sticky-offset) lg:self-start">

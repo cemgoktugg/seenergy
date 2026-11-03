@@ -20,6 +20,7 @@ export interface CompareItem {
   brand: string;
   sku: string;
   image: string;
+  category: { label: string; href: string };
   specs: SpecGroup[];
 }
 

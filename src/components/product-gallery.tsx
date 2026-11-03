@@ -219,7 +219,7 @@ export function ProductGallery({
               aria-roledescription={many ? 'görsel' : undefined}
               aria-label={many ? `${index + 1} / ${count}` : undefined}
               aria-hidden={many && index !== active ? true : undefined}
-              className="relative aspect-[3/2] w-full shrink-0 snap-center [scroll-snap-stop:always] sm:aspect-[16/9] lg:aspect-[5/4]"
+              className="relative aspect-[16/10] w-full shrink-0 snap-center [scroll-snap-stop:always] sm:aspect-[16/9] lg:aspect-[5/4]"
             >
               <button
                 type="button"

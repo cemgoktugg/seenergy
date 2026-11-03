@@ -226,6 +226,25 @@ export function useTicariCoreSync() {
   })
 }
 
+/** A new category in Ürün Yönetimi's tree; top-level without `parent_id`. */
+export function useCreateCategory() {
+  const invalidate = useInvalidate()
+  return useMutation({
+    mutationFn: (body: { name: string; parent_id?: string | null }) =>
+      sdk.client.fetch<{ category: { id: string; name: string } }>("/admin/vitrin/categories", { method: "POST", body }),
+    onSuccess: invalidate,
+  })
+}
+
+/** Removes an empty category; the backend refuses one with products or subcategories. */
+export function useDeleteCategory() {
+  const invalidate = useInvalidate()
+  return useMutation({
+    mutationFn: (id: string) => sdk.client.fetch<{ id: string }>(`/admin/vitrin/categories/${id}`, { method: "DELETE" }),
+    onSuccess: invalidate,
+  })
+}
+
 export function useSaveList() {
   const invalidate = useInvalidate()
   return useMutation({

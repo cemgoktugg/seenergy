@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server';
 
 import { categoryKeyFromHandle } from '@/data/catalog';
 import { categorySpec } from '@/data/specs';
+import { loadCategoryTree } from '@/lib/medusa/categories';
 
 /**
  * GET /api/spec-template?category=<Medusa category handle>
@@ -23,7 +24,9 @@ function allowedOrigin(): string {
   }
 }
 
-export function GET(request: NextRequest) {
+export async function GET(request: NextRequest) {
+  // The live tree: a category added in the admin has a template too.
+  await loadCategoryTree();
   const key = categoryKeyFromHandle(request.nextUrl.searchParams.get('category') ?? '');
   const spec = key ? categorySpec(key) : undefined;
   return NextResponse.json(

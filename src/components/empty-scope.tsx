@@ -16,7 +16,7 @@ import { ClipboardList, MessageCircle, Phone, ShieldCheck, Truck, Wrench } from 
 import { ProductGrid } from '@/components/sections';
 import { SectionHeading } from '@/components/section-heading';
 import type { Product } from '@/data/catalog';
-import { CATEGORY_TREE, categoryHref } from '@/data/categories';
+import { categoryHref, categoryTree } from '@/data/categories';
 import { quoteHref, telHref, waHref } from '@/lib/contact';
 import { loadCatalog } from '@/lib/medusa/catalog';
 import { loadVitrin } from '@/lib/medusa/vitrin';
@@ -35,7 +35,7 @@ export async function EmptyScope({ title }: { title: string }) {
     .map((id) => byId(id))
     .filter((product): product is Product => Boolean(product));
   const picks = (featured.length ? featured : products).slice(0, 8);
-  const stocked = CATEGORY_TREE.filter((node) => byCategory(node.slug).length > 0);
+  const stocked = categoryTree().filter((node) => byCategory(node.slug).length > 0);
 
   return (
     <div className="container-main pb-10 pt-4 dt:pt-6">

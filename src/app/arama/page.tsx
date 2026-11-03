@@ -15,7 +15,7 @@ import Link from 'next/link';
 import { Search } from 'lucide-react';
 
 import { CatalogShell } from '@/components/catalog-shell';
-import { CATEGORY_META, brandSlug } from '@/data/catalog';
+import { brandSlug, categoryMetaMap } from '@/data/catalog';
 import { hrefWith, searchProducts, type SearchParams } from '@/lib/catalog-query';
 import { loadCatalog } from '@/lib/medusa/catalog';
 
@@ -69,7 +69,7 @@ export default async function SearchPage({
             Kategoriler
           </p>
           <ul className="mt-3 flex flex-wrap gap-1.5">
-            {Object.values(CATEGORY_META)
+            {Object.values(categoryMetaMap())
               .filter((meta) => !meta.parent)
               .map((meta) => (
               <li key={meta.href}>
@@ -120,7 +120,7 @@ export default async function SearchPage({
             ilerleyin.
           </p>
           <ul className="mt-6 flex flex-wrap justify-center gap-1.5">
-            {Object.values(CATEGORY_META)
+            {Object.values(categoryMetaMap())
               .filter((meta) => !meta.parent)
               .slice(0, 6)
               .map((meta) => (
