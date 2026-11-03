@@ -12,7 +12,10 @@
  *   - Pictures are CONTAINED on a white stage, never cropped, in both themes: the
  *     photos do not change with the theme, and most have a white ground of their
  *     own (61 of 87 on 2026-11-01) that melts into it. The padding is what keeps
- *     the product a little away from the stage's edges.
+ *     the product a little away from the stage's edges; the scale takes a further
+ *     30% off (the client: 20% on 2026-11-02, a little more on 2026-11-03), the
+ *     same at every breakpoint, where a
+ *     padding in % of the width would not be, the stage's ratio changing.
  *   - The first picture is the page's LCP element: eager, `fetchPriority`.
  *     The rest are lazy.
  *   - The picture does not react to the pointer (the client, 2026-11-02): a click
@@ -234,7 +237,7 @@ export function ProductGallery({
                   fetchPriority={index === 0 ? 'high' : undefined}
                   decoding={index === 0 ? 'sync' : 'async'}
                   draggable={false}
-                  className="h-full w-full object-contain"
+                  className="h-full w-full scale-70 object-contain"
                 />
               </button>
             </div>
