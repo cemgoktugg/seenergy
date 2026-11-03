@@ -10,8 +10,8 @@
  *     top-left    at most ONE merchandising chip (Süper Fırsat / Yeni / Çok Satan)
  *     top-right   favourite, a round button
  *     bottom-left real stock state only: "Son 3 ürün", or "Tükendi"
- *   brand         small muted line, in the brand's own spelling
- *   name          two lines, without the brand repeated at its start
+ *   brand         the lead line, bold, in the brand's own spelling
+ *   name          two lines a size smaller, without the brand repeated at its start
  *   price         previous price (struck, muted) on its own line, then the
  *                 price with the discount beside it
  *
@@ -236,16 +236,18 @@ export function ProductCard({
       {/* --- detail ----------------------------------------------------- */}
       {/* Fixed height so that every card in a row puts its price on the same
           line, whatever the name length or whether there is a discount.
-          12 + brand 14 + 4 + name 36 + 10 + old price 16 + price 26 + 12. */}
+          12 + brand 16 + 4 + name 32 + 10 + old price 16 + price 26 + 12. */}
       <div className={`card-detail relative flex flex-col px-3 ${compact ? 'h-[112px] pt-2' : 'h-[130px] pt-3'}`}>
         {/* Not uppercased: under lang="tr" CSS capitalises i as İ, turning
             Tekniva into "TEKNİVA" — right for Turkish words, wrong for a
             brand's own spelling. */}
-        <p className="truncate text-[12px] font-semibold leading-[14px] tracking-[0.02em] text-text-secondary">
+        {/* The brand leads, the model under it a size smaller (the client,
+            2026-11-03; it was a 12px grey line over a 13px name). */}
+        <p className="truncate text-[14px] font-extrabold leading-[16px] tracking-[0.02em] text-text-primary">
           {product.brand}
         </p>
 
-        <h3 className="mt-1 line-clamp-2 h-[36px] text-[13px] font-medium leading-[18px] text-text-primary">
+        <h3 className="mt-1 line-clamp-2 h-[32px] text-[12px] font-medium leading-[16px] text-text-secondary">
           <Link href={href} className="transition-colors duration-(--duration-fast) hover:text-brand-text">
             {displayName(product)}
           </Link>
