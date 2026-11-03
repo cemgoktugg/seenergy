@@ -39,8 +39,7 @@
 import type { CSSProperties } from 'react';
 import Link from 'next/link';
 
-import { quoteHref } from '@/lib/contact';
-import { Check, Heart, MessageSquareQuote, Scale, ShoppingCart } from 'lucide-react';
+import { Check, Heart, Scale, ShoppingCart } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
@@ -97,11 +96,12 @@ export function ProductCard({
   index?: number;
   chip?: string;
 }) {
-  /* Stock speaks only for a product that can be bought now. A price-on-request
-     model reports its stock in the quote, so its 0 is not "Tükendi" — that
-     greyed out the client's whole CCTV range. */
+  /* A product without a price is not for sale either: "Tükendi", with no quote
+     to ask for one (the client, 2026-11-03 — until then it read "Teklif İste"
+     and its stock was not reported). Its price row says it, so the stage chip
+     is only for a priced product that ran out. */
   const sellable = product.price != null;
-  const soldOut = sellable && product.stock <= 0;
+  const soldOut = !sellable || product.stock <= 0;
   const lowStock = sellable && !soldOut && product.stock <= LOW_STOCK;
   /* Shared store, not local state: a favourite added from a listing used to be
      forgotten the moment you navigated, and the header badge never saw a cart
@@ -221,7 +221,7 @@ export function ProductCard({
           <Scale size={16} strokeWidth={1.9} aria-hidden />
         </button>
 
-        {soldOut ? (
+        {soldOut && sellable ? (
           <span className="pointer-events-none absolute bottom-2 left-2 rounded-full bg-ink-fixed/85 px-2.5 py-1 text-[12px] font-bold leading-none text-white">
             Tükendi
           </span>
@@ -279,19 +279,9 @@ export function ProductCard({
               proportional digits make those columns visibly ragged. */}
           <div className="flex h-9 items-center justify-between gap-2">
             {product.price == null ? (
-              <>
-                <p aria-hidden className="card-touch text-[13px] font-bold leading-tight text-text-primary sm:text-[14px]">
-                  {PRICE_ON_REQUEST}
-                </p>
-                <Link
-                  href={quoteHref(product.sku)}
-                  aria-label={`${product.name} için teklif isteyin`}
-                  className="card-quick inline-flex h-9 items-center gap-1.5 rounded-full border border-line-strong px-3.5 text-[13px] font-bold text-text-primary transition-colors duration-(--duration-fast) hover:border-brand hover:bg-brand hover:text-white"
-                >
-                  <MessageSquareQuote size={15} strokeWidth={2} aria-hidden />
-                  Teklif İste
-                </Link>
-              </>
+              <p aria-hidden className="card-quick text-[14px] font-bold leading-tight text-text-secondary">
+                {PRICE_ON_REQUEST}
+              </p>
             ) : (
               <>
                 <p aria-hidden className="text-[16px] font-extrabold leading-none tracking-[-0.01em] tabular-nums text-text-primary sm:text-[20px] dt:text-[20px]">
@@ -325,28 +315,16 @@ export function ProductCard({
             by the same amount. With a pointer it is the round button in the
             price row above, and this block is not rendered visible. */}
         <div className="card-cta">
-          {/* No price: nothing to put in a cart — the action is a quote. */}
-          {product.price == null ? (
-            <Link
-              href={quoteHref(product.sku)}
-              aria-label={`${product.name} için teklif isteyin`}
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark"
-            >
-              <MessageSquareQuote size={16} strokeWidth={2} aria-hidden />
-              Teklif İste
-            </Link>
-          ) : (
-            <button
-              type="button"
-              disabled={soldOut}
-              onClick={() => void cart.add(product.variantId, 1, product.name)}
-              aria-label={`${product.name} ürününü sepete ekle`}
-              className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
-            >
-              <ShoppingCart size={16} strokeWidth={2} aria-hidden />
-              {soldOut ? 'Tükendi' : added ? 'Sepete Eklendi' : 'Sepete Ekle'}
-            </button>
-          )}
+          <button
+            type="button"
+            disabled={soldOut}
+            onClick={() => void cart.add(product.variantId, 1, product.name)}
+            aria-label={`${product.name} ürününü sepete ekle`}
+            className="flex h-10 w-full items-center justify-center gap-2 rounded-full bg-brand text-[14px] font-semibold text-white shadow-e2 transition-colors duration-(--duration-fast) ease-in-out hover:bg-brand-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary disabled:shadow-none"
+          >
+            <ShoppingCart size={16} strokeWidth={2} aria-hidden />
+            {soldOut ? 'Tükendi' : added ? 'Sepete Eklendi' : 'Sepete Ekle'}
+          </button>
         </div>
       </div>
     </article>

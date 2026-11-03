@@ -34,7 +34,8 @@ These routes are real, not placeholders:
 
 ```
 /                     homepage
-/urun/[slug]          product detail (2026-11-01, the client's second brief): 55/45,
+/urun/[slug]          product detail (2026-11-01, the client's second brief): 50/50
+                      (55/45 until 2026-11-03, when the stage was made smaller),
                       a white stage in both themes (2026-11-02; the anthracite one
                       with a plate for white-ground photos is in 262d514).
                       Then a 3–4-cell strip from the product's own sheet,
@@ -150,7 +151,7 @@ table and saved together through `POST /admin/vitrin/product-batch`
 keep those rows unsaved); bulk % price / % discount / publish / move
 category on ticked rows; a picture dropped on a thumbnail becomes the main
 one. **An empty price is valid**: the variant then has no TRY price and the
-storefront shows "Fiyat için teklif isteyin" (the 25 CCTV models) — the form
+storefront shows "Tükendi" (the 25 CCTV models; see below) — the form
 used to force a price on them. The product form steps through its category
 (?kategori=, Önceki/Sonraki), warns before leaving unsaved, and "Benzerini
 ekle" (?kopya=<id>) starts a sibling model.
@@ -232,8 +233,12 @@ datasheets: titles, descriptions and specs in
 gitignored `src/CCTV/`). Migration `seenergy-cctv-sheets` uploads them through
 the file module — fill-only, it never overwrites an admin edit. The PDF link is
 `metadata.datasheet_url`. These models have no price yet: `Product.price` is
-`null`, which the storefront shows as "Fiyat için teklif isteyin" with a
-"Teklif İste" link instead of add-to-cart, and stock is then not reported.
+`null`, which the storefront shows as **"Tükendi"** — card, product page,
+compare — with no quote and no WhatsApp line (the client, 2026-11-03: "teklif
+al ve WhatsApp'tan sor olmasın, direkt tükendi yazsın"; it was "Fiyat için
+teklif isteyin" + "Teklif İste" until then). A priced product at stock 0 gets
+the same single disabled button. A volume quote and WhatsApp stay only on a
+product that is for sale.
 
 **Şirket bilgileri** (Vitrin block `company`): legal name, phone, WhatsApp,
 e-mail, address, hours, MERSİS, tax, KEP, bank / IBAN. Footer, contact card,

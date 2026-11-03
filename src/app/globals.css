@@ -930,11 +930,10 @@ html.reveal-ready [data-reveal]:not(.is-revealed) {
 
 /* Product card actions: a pointer gets the round cart button in the price
    row (`.card-quick`), a finger the full-width button under it (`.card-cta`)
-   — never both. `.card-touch` is the price-on-request text, which a pointer
-   sees as the "Teklif İste" pill instead. */
+   — never both. A product without a price says "Tükendi" in the price row to
+   a pointer, on the disabled full-width button to a finger. */
 @media (hover: hover) {
-  .card-cta,
-  .card-touch {
+  .card-cta {
     display: none;
   }
 }

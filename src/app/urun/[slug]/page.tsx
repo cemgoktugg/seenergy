@@ -68,7 +68,6 @@ import {
   categoryMeta,
   discountPercent,
   formatPrice,
-  PRICE_ON_REQUEST,
   FREE_SHIPPING_FROM,
   type Product,
 } from '@/data/catalog';
@@ -338,16 +337,9 @@ function StockNote({ product }: { product: Product }) {
 function PriceBlock({ product }: { product: Product }) {
   const discount = discountPercent(product);
 
-  /* No price yet: the block says so instead of printing a 0. */
-  if (product.price == null) {
-    return (
-      <div>
-        <p className="text-[24px] font-extrabold leading-tight tracking-tight text-text-primary">Fiyat için bize ulaşın</p>
-        <p className="mt-1 text-[14px] text-text-secondary">Güncel fiyat ve stok bilgisi için teklif isteyin.</p>
-        <p className="sr-only">{PRICE_ON_REQUEST}</p>
-      </div>
-    );
-  }
+  /* No price: not for sale, and the buy block's one "Tükendi" button says so
+     (the client, 2026-11-03: no quote or WhatsApp asking for a price). */
+  if (product.price == null) return null;
 
   return (
     <div>
@@ -474,7 +466,7 @@ export default async function ProductPage({
             id: 'aciklama',
             label: 'Ürün Açıklaması',
             content: (
-              <div className="grid items-start gap-5 lg:grid-cols-[55fr_45fr] dt:gap-8">
+              <div className="grid items-start gap-5 lg:grid-cols-[50fr_50fr] dt:gap-8">
                 <div className="min-w-0">
                   <h2 className="sr-only">Ürün Açıklaması</h2>
                   <div className="max-w-[68ch] space-y-3 text-[16px] leading-relaxed text-text-primary">
@@ -614,7 +606,7 @@ export default async function ProductPage({
         <div className="container-main pb-5 pt-3 dt:pb-6 dt:pt-3.5">
           <Breadcrumb product={product} />
 
-          <div className="mt-3 grid gap-5 lg:grid-cols-[55fr_45fr] dt:gap-8">
+          <div className="mt-3 grid gap-5 lg:grid-cols-[50fr_50fr] dt:gap-8">
             {/* Keyed by product: client navigation between two products reuses
                 this position, and the gallery's index must not carry over. */}
             <div className="min-w-0 lg:sticky lg:top-(--sticky-offset) lg:self-start">
@@ -640,7 +632,7 @@ export default async function ProductPage({
                   <Link
                     href={`/marka/${brandSlug(product.brand)}`}
                     title={`${product.brand} ürünleri`}
-                    className="relative inline-flex h-7 items-center rounded-(--card-radius) border border-line-strong px-2.5 font-bold text-text-primary transition-colors duration-(--duration-fast) before:absolute before:inset-x-0 before:-inset-y-2 before:content-[''] hover:border-text-primary"
+                    className="relative inline-flex h-9 items-center rounded-(--card-radius) border border-text-primary px-3 text-[16px] font-extrabold tracking-[0.02em] text-text-primary transition-colors duration-(--duration-fast) before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] hover:bg-text-primary hover:text-surface-card"
                   >
                     {product.brand}
                   </Link>
@@ -658,7 +650,7 @@ export default async function ProductPage({
               {/* The model code leads: it is what an installer searches for and
                   quotes. What the product is, is the second line of the heading. */}
               <h1 className="mt-2.5 text-text-primary">
-                <span className="block break-words text-[32px] font-extrabold leading-[1.1] tracking-tight dt:text-[40px]">{title.code}</span>
+                <span className="block break-words text-[24px] font-extrabold leading-[1.1] tracking-tight sm:text-[32px]">{title.code}</span>
                 {title.rest && (
                   <span className="mt-1 block text-[16px] font-medium leading-snug text-text-secondary dt:text-[20px]">{title.rest}</span>
                 )}
@@ -666,10 +658,12 @@ export default async function ProductPage({
 
               {sheet.length > 0 && <SpecSheet cells={sheet} />}
 
-              <div className="mt-4">
-                <PriceBlock product={product} />
-              </div>
-              <ProductBuy product={product} whatsapp={company.whatsapp || company.phone} />
+              {product.price != null && (
+                <div className="mt-4">
+                  <PriceBlock product={product} />
+                </div>
+              )}
+              <ProductBuy product={product} />
               <ProductLinks product={product} whatsapp={company.whatsapp} />
               <ServiceList product={product} />
             </div>

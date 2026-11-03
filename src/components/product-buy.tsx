@@ -7,10 +7,11 @@
  * Split out of the page so the page itself stays a server component — only the
  * controls that hold state cross into the client.
  *
- * Sales first: "Sepete Ekle" is the one primary action. "Teklif İste" is a
- * secondary action under it, for project and volume buyers. A product without
- * a price cannot go into a Medusa cart (the cart has no amount to charge), so
- * there — and only there — the quote is the primary action.
+ * Sales first: "Sepete Ekle" is the one primary action; a volume quote is a
+ * small link under it. A product without a price (a Medusa cart has no amount
+ * to charge) or without stock shows one disabled "Tükendi" and nothing else —
+ * no quote, no WhatsApp (the client, 2026-11-03; a priceless product's primary
+ * action was "Teklif al" until then).
  *
  * The sticky bar is the reason this storefront has no mobile bottom navigation
  * (docs/INFORMATION_ARCHITECTURE §8); that decision assumes this bar exists, so
@@ -28,14 +29,16 @@ import { priceLabel, type Product } from '@/data/catalog';
 
 import { quoteHref, waHref } from '@/lib/contact';
 
-export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?: string }) {
+export function ProductBuy({ product }: { product: Product }) {
   /* The cart is Medusa's, shared through CartProvider: the header badge, the
      cards and the cart page all read the same response this button updates. */
   const cart = useCart();
   const router = useRouter();
   const inCart = cart.quantityOf(product.variantId);
-  const onRequest = product.price == null;
+  /* Without a price, or a stock, the product is not for sale: one "Tükendi"
+     and nothing to ask (the client, 2026-11-03). */
   const soldOut = product.stock === 0;
+  const unavailable = soldOut || product.price == null;
   /* Stock is enforced by Medusa; capping the stepper at what is left saves
      the visitor a round trip to an error. */
   const left = Math.max(0, product.stock - inCart);
@@ -50,7 +53,7 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
       : atStock
         ? 'Stoktaki tümü sepette'
         : 'Sepete Ekle';
-  const blocked = soldOut || atStock || cart.busy;
+  const blocked = unavailable || atStock || cart.busy;
 
   const addToCart = async () => {
     const ok = await cart.add(product.variantId, qty, product.name);
@@ -81,32 +84,10 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
   return (
     <>
       <div ref={block} className="mt-4">
-        {onRequest ? (
-          <div className="flex flex-wrap items-stretch gap-2">
-            <Link href={quoteHref(product.sku)} className={`${primary} flex-1 basis-full sm:basis-0`}>
-              Teklif al
-            </Link>
-            {whatsapp ? (
-              <a
-                href={waHref(whatsapp, `Merhaba, ${product.sku} için fiyat almak istiyorum.`)}
-                target="_blank"
-                rel="noopener"
-                className={`${secondary} flex-1`}
-              >
-                WhatsApp’tan sor
-              </a>
-            ) : null}
-          </div>
-        ) : soldOut ? (
-          /* Sold out: nothing to add, so the way forward is asking. */
-          <div className="flex flex-wrap items-stretch gap-2">
-            <button type="button" disabled className={`${button} flex-1 basis-full cursor-not-allowed bg-line-strong text-text-secondary sm:basis-0`}>
-              Tükendi
-            </button>
-            <Link href={quoteHref(product.sku)} className={`${secondary} flex-1`}>
-              Stok için bize yazın
-            </Link>
-          </div>
+        {unavailable ? (
+          <button type="button" disabled className={`${button} w-full cursor-not-allowed bg-line-strong text-text-secondary`}>
+            Tükendi
+          </button>
         ) : (
           <>
             <div className="flex items-stretch gap-2">
@@ -182,31 +163,19 @@ export function ProductBuy({ product, whatsapp }: { product: Product; whatsapp?:
         <div className="flex items-center gap-3">
           <div className="min-w-0">
             <p className="truncate text-[12px] text-text-secondary">{product.sku || product.brand}</p>
-            <p
-              className={`font-extrabold leading-tight tabular-nums text-text-primary ${onRequest ? 'text-[13px]' : 'text-[16px]'}`}
-            >
-              {onRequest ? 'Fiyat teklifle' : priceLabel(product.price)}
-            </p>
+            {product.price != null && (
+              <p className="text-[16px] font-extrabold leading-tight tabular-nums text-text-primary">{priceLabel(product.price)}</p>
+            )}
           </div>
-          {onRequest ? (
-            <Link
-              href={quoteHref(product.sku)}
-              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-(--card-radius) bg-signal text-[14px] font-bold text-white hover:bg-signal-dark"
-            >
-              <MessageSquareQuote size={17} strokeWidth={1.5} aria-hidden />
-              Teklif al
-            </Link>
-          ) : (
-            <button
-              type="button"
-              disabled={blocked}
-              onClick={() => void addToCart()}
-              className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-(--card-radius) bg-signal text-[14px] font-bold text-white hover:bg-signal-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
-            >
-              <ShoppingCart size={17} strokeWidth={1.5} aria-hidden />
-              {soldOut ? 'Tükendi' : cart.busy ? 'Ekleniyor…' : 'Sepete Ekle'}
-            </button>
-          )}
+          <button
+            type="button"
+            disabled={blocked}
+            onClick={() => void addToCart()}
+            className="ml-auto flex h-11 flex-1 items-center justify-center gap-2 rounded-(--card-radius) bg-signal text-[14px] font-bold text-white hover:bg-signal-dark disabled:cursor-not-allowed disabled:bg-line-strong disabled:text-text-secondary"
+          >
+            {unavailable ? null : <ShoppingCart size={17} strokeWidth={1.5} aria-hidden />}
+            {unavailable ? 'Tükendi' : cart.busy ? 'Ekleniyor…' : 'Sepete Ekle'}
+          </button>
         </div>
       </div>
       )}
@@ -224,6 +193,8 @@ export function ProductLinks({ product, whatsapp }: { product: Product; whatsapp
   const favourite = ready && has('favourites', product.id);
   const comparing = ready && has('compare', product.id);
   const compareFull = ready && !comparing && count('compare') >= COMPARE_LIMIT;
+  // Nothing to ask about a product that is not for sale.
+  const forSale = product.price != null && product.stock > 0;
   const link =
     'inline-flex h-11 items-center gap-1.5 text-[13px] font-medium text-text-secondary transition-colors duration-(--duration-fast) hover:text-text-primary';
 
@@ -249,13 +220,13 @@ export function ProductLinks({ product, whatsapp }: { product: Product; whatsapp
         <Scale size={16} strokeWidth={1.5} aria-hidden />
         {comparing ? 'Karşılaştırmada' : compareFull ? `Karşılaştırma dolu (${COMPARE_LIMIT})` : 'Karşılaştır'}
       </button>
-      {product.price != null && (
+      {forSale && (
         <Link href={quoteHref(product.sku)} className={link}>
           <MessageSquareQuote size={16} strokeWidth={1.5} aria-hidden />
           Toplu alım için teklif
         </Link>
       )}
-      {product.price != null && whatsapp ? (
+      {forSale && whatsapp ? (
         <a href={waHref(whatsapp, `Merhaba, ${product.sku} hakkında bilgi almak istiyorum.`)} target="_blank" rel="noopener" className={link}>
           <MessageCircle size={16} strokeWidth={1.5} aria-hidden />
           WhatsApp’tan sor

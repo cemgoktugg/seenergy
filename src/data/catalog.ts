@@ -115,8 +115,10 @@ export const discountPercent = (product: Product): number | null =>
     ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100)
     : null;
 
-/** What a price-on-request product says where a price would be. */
-export const PRICE_ON_REQUEST = 'Fiyat için teklif isteyin';
+/** What a product without a price says where a price would be. It is not for
+ *  sale: "Tükendi", with no quote or WhatsApp to ask for one (the client,
+ *  2026-11-03; it read "Fiyat için teklif isteyin" until then). */
+export const PRICE_ON_REQUEST = 'Tükendi';
 
 /** A price for display, or the price-on-request line when there is none. */
 export const priceLabel = (price: number | null): string =>

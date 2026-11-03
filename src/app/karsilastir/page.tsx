@@ -30,8 +30,7 @@
 import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
 
-import { quoteHref } from '@/lib/contact';
-import { ArrowLeft, Check, MessageSquareQuote, Minus, Plus, Scale, ShoppingCart, X } from 'lucide-react';
+import { ArrowLeft, Check, Minus, Plus, Scale, ShoppingCart, X } from 'lucide-react';
 
 import { useCart } from '@/components/cart-provider';
 import { COMPARE_LIMIT, useStore } from '@/components/cart-store';
@@ -117,7 +116,7 @@ export default function ComparePage() {
       ),
       row(
         'Stok',
-        products.map((p) => (p.price == null ? 'Teklifte bildirilir' : p.stock === 0 ? 'Tükendi' : 'Stokta')),
+        products.map((p) => (p.price == null || p.stock === 0 ? 'Tükendi' : 'Stokta')),
       ),
       row(
         'Ücretsiz kargo',
@@ -127,7 +126,7 @@ export default function ComparePage() {
       row(
         'Ödeme',
         products.map((p) =>
-          p.price == null ? 'Teklif ile' : INSTALMENTS_AVAILABLE && p.instalment ? 'Peşin fiyatına 3 taksit' : 'Havale / EFT, kapıda',
+          p.price == null ? DASH : INSTALMENTS_AVAILABLE && p.instalment ? 'Peşin fiyatına 3 taksit' : 'Havale / EFT, kapıda',
         ),
       ),
     ],
@@ -281,15 +280,7 @@ export default function ComparePage() {
                           )}
                         </div>
                         <div className="mt-auto pt-2">
-                          {product.price == null ? (
-                            <Link
-                              href={quoteHref(product.sku)}
-                              className="flex h-10 w-full items-center justify-center gap-1.5 rounded-full border border-line-strong text-[13px] font-semibold text-text-primary transition-colors hover:border-text-primary"
-                            >
-                              <MessageSquareQuote size={15} strokeWidth={2} aria-hidden />
-                              Teklif İste
-                            </Link>
-                          ) : (
+                          {product.price == null ? null : (
                             <button
                               type="button"
                               disabled={product.stock === 0 || cart.busy}
