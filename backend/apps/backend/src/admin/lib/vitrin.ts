@@ -236,11 +236,18 @@ export function useCreateCategory() {
   })
 }
 
-/** Removes an empty category; the backend refuses one with products or subcategories. */
+/**
+ * Removes a category. One with products needs `urunler`: a category id to move
+ * them to, or "kategorisiz". One with subcategories is refused.
+ */
 export function useDeleteCategory() {
   const invalidate = useInvalidate()
   return useMutation({
-    mutationFn: (id: string) => sdk.client.fetch<{ id: string }>(`/admin/vitrin/categories/${id}`, { method: "DELETE" }),
+    mutationFn: ({ id, urunler }: { id: string; urunler?: string }) =>
+      sdk.client.fetch<{ id: string; moved: number }>(`/admin/vitrin/categories/${id}`, {
+        method: "DELETE",
+        query: urunler ? { urunler } : undefined,
+      }),
     onSuccess: invalidate,
   })
 }

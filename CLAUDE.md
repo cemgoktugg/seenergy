@@ -78,8 +78,11 @@ These routes are real, not placeholders:
 Yönetimi has "Kategori ekle" and "… kategorisini sil" above its tree
 (`POST /admin/vitrin/categories`, `DELETE /admin/vitrin/categories/:id`): two
 levels only (the menu draws two), a duplicate name under the same parent is
-refused, and only an EMPTY category can be deleted — products (drafts too) or
-subcategories have to be moved first; the endpoint says so. The storefront reads
+refused. Delete is always pressable (greyed, it read as broken to the client):
+an empty category asks once; one with products (drafts too) asks where they go
+— its parent preselected, any category, or "Kategorisiz bırak" — and
+`?urunler=<id>|kategorisiz` moves them before deleting (409 without it); one
+with subcategories says to delete those first. The storefront reads
 the active, public categories through `loadCategoryTree()`
 (`src/lib/medusa/categories.ts`, `catalog` tag, rank order) and installs them
 in `src/data/categories.ts` with `setCategoryTree()`; `loadProducts()` does

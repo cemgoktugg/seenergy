@@ -154,14 +154,18 @@ function CategoryTree({
 }
 
 const TOP = "__ana"
+const LOOSE = "kategorisiz"
 
 /**
  * Add and delete categories, above the tree (2026-11-03; under it they fell
  * below the screen, the tree being taller than it). A new one is
  * top-level or a subcategory of a top-level one — the storefront's menu has
- * two levels. Delete is for the selected category and only when it is empty:
- * the button says what is in the way, and the backend checks again (drafts
- * count too). The storefront's menu, footer and /kategori follow at once.
+ * two levels. Delete is for the selected category and always pressable (a greyed
+ * one read as broken to the client): an empty one asks once; one with products
+ * asks where they go first — the parent for a subcategory, any other category,
+ * or none — and the backend moves them before deleting. One with subcategories
+ * says to delete those first. The storefront's menu, footer and /kategori follow
+ * at once.
  */
 function CategoryEditor({
   categories,
@@ -179,57 +183,73 @@ function CategoryEditor({
   const prompt = usePrompt()
   const create = useCreateCategory()
   const remove = useDeleteCategory()
-  const [open, setOpen] = useState(false)
+  const [mode, setMode] = useState<"idle" | "add" | "delete">("idle")
   const [name, setName] = useState("")
   const [parent, setParent] = useState(TOP)
+  const [moveTo, setMoveTo] = useState(LOOSE)
   const tops = categories.filter((c) => !c.parent_id).sort((a, b) => a.rank - b.rank)
   const subs = selected ? categories.filter((c) => c.parent_id === selected.id).length : 0
+  const targets = [...categories].filter((c) => c.id !== selected?.id).sort((a, b) => a.label.localeCompare(b.label, "tr"))
 
-  const start = () => {
+  // Another category selected: whatever was open belonged to the previous one.
+  useEffect(() => setMode("idle"), [selected?.id])
+
+  const startAdd = () => {
     setName("")
     // A subcategory is most often added to the category in view.
     setParent(selected ? (selected.parent_id ?? selected.id) : TOP)
-    setOpen(true)
+    setMode("add")
   }
   const submit = async () => {
     try {
       const { category } = await create.mutateAsync({ name: name.trim(), parent_id: parent === TOP ? null : parent })
       toast.success(`“${category.name}” eklendi`, { description: "Sitedeki menüde ve kategori sayfasında da görünür." })
-      setOpen(false)
+      setMode("idle")
       onCreated(category.id)
     } catch (error) {
       toast.error("Kategori eklenemedi", { description: errorText(error) })
     }
   }
-  const destroy = async () => {
+  const destroy = async (urunler?: string) => {
     if (!selected) return
+    const where =
+      urunler === undefined
+        ? ""
+        : urunler === LOOSE
+          ? ` İçindeki ${count} ürün kategorisiz kalır (yayında kalır, hiçbir kategori sayfasında görünmez).`
+          : ` İçindeki ${count} ürün “${categories.find((c) => c.id === urunler)?.label ?? ""}” kategorisine taşınır.`
     const ok = await prompt({
       title: `“${selected.name}” silinsin mi?`,
-      description: "Kategori sitedeki menüden ve kategori listesinden kalkar. Bu geri alınamaz.",
-      confirmText: "Sil",
+      description: `Kategori sitedeki menüden ve kategori listesinden kalkar.${where} Bu geri alınamaz.`,
+      confirmText: urunler === undefined ? "Sil" : "Taşı ve sil",
       cancelText: "Vazgeç",
     })
     if (!ok) return
     try {
-      await remove.mutateAsync(selected.id)
+      await remove.mutateAsync({ id: selected.id, urunler })
       toast.success(`“${selected.name}” silindi`)
+      setMode("idle")
       onDeleted()
     } catch (error) {
       toast.error("Kategori silinemedi", { description: errorText(error) })
     }
   }
-
-  const blocker = !selected
-    ? null
-    : subs > 0
-      ? `Önce ${subs} alt kategorisini silin.`
-      : count > 0
-        ? `Silmek için önce içindeki ${count} ürünü başka kategoriye taşıyın.`
-        : null
+  const pressDelete = () => {
+    if (!selected) return
+    if (subs > 0) {
+      toast.error(`“${selected.name}” silinemedi`, {
+        description: `${subs} alt kategorisi var. Önce onları seçip silin, sonra bu kategoriyi.`,
+      })
+      return
+    }
+    if (count === 0) return void destroy()
+    setMoveTo(selected.parent_id ?? LOOSE)
+    setMode("delete")
+  }
 
   return (
     <div className="mb-2 flex flex-col gap-2 border-b px-2 pb-3">
-      {open ? (
+      {mode === "add" ? (
         <form
           className="flex flex-col gap-2"
           onSubmit={(e) => {
@@ -255,26 +275,56 @@ function CategoryEditor({
             <Button size="small" type="submit" isLoading={create.isPending} disabled={name.trim().length < 2}>
               Ekle
             </Button>
-            <Button size="small" type="button" variant="secondary" onClick={() => setOpen(false)}>
+            <Button size="small" type="button" variant="secondary" onClick={() => setMode("idle")}>
               Vazgeç
             </Button>
           </div>
         </form>
+      ) : mode === "delete" && selected ? (
+        <div className="flex flex-col gap-2">
+          <Text size="small" weight="plus">
+            “{selected.name}” içinde {count} ürün var. Silmeden önce nereye taşınsın?
+          </Text>
+          <Select size="small" value={moveTo} onValueChange={setMoveTo}>
+            <Select.Trigger>
+              <Select.Value />
+            </Select.Trigger>
+            <Select.Content>
+              <Select.Item value={LOOSE}>Kategorisiz bırak</Select.Item>
+              {targets.map((c) => (
+                <Select.Item key={c.id} value={c.id}>
+                  {c.label}
+                </Select.Item>
+              ))}
+            </Select.Content>
+          </Select>
+          <div className="flex gap-2">
+            <Button size="small" variant="danger" isLoading={remove.isPending} onClick={() => void destroy(moveTo)}>
+              Taşı ve sil
+            </Button>
+            <Button size="small" variant="secondary" onClick={() => setMode("idle")}>
+              Vazgeç
+            </Button>
+          </div>
+        </div>
       ) : (
-        <Button size="small" variant="secondary" onClick={start}>
-          <Plus />
-          Kategori ekle
-        </Button>
-      )}
-      {selected && !open ? (
         <>
-          <Button size="small" variant="secondary" className="text-ui-fg-error" disabled={Boolean(blocker)} isLoading={remove.isPending} onClick={() => void destroy()}>
-            <Trash />
-            “{selected.name}” kategorisini sil
+          <Button size="small" variant="secondary" onClick={startAdd}>
+            <Plus />
+            Kategori ekle
           </Button>
-          {blocker ? <Text size="xsmall" className="text-ui-fg-muted">{blocker}</Text> : null}
+          {selected ? (
+            <Button size="small" variant="secondary" className="text-ui-fg-error" isLoading={remove.isPending} onClick={pressDelete}>
+              <Trash />
+              “{selected.name}” kategorisini sil
+            </Button>
+          ) : (
+            <Text size="xsmall" className="text-ui-fg-muted">
+              Silmek için listeden bir kategori seçin.
+            </Text>
+          )}
         </>
-      ) : null}
+      )}
     </div>
   )
 }
