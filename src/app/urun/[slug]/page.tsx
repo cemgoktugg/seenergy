@@ -218,13 +218,20 @@ function Breadcrumb({ product }: { product: Product }) {
  * the brand the label above already names. "SEENERGY SE-IPC5083LD 5MP IP Dome
  * Kamera" becomes SE-IPC5083LD over "5MP IP Dome Kamera". A name without a
  * leading code (a token with a digit) stays whole.
+ *
+ * A code may carry "+" parts — "SE-1024 + 2GE 10/100MBPS 24 Port PoE Switch"
+ * is SE-1024 + 2GE over the rest (the client, 2026-11-04: many models are
+ * named so; without this the "+" failed the match and the whole name became
+ * the code). Spaces around the "+" are optional.
  */
+const TITLE_CODE = /^([A-Z0-9][A-Z0-9.-]*\d[A-Z0-9.-]*(?:\s*\+\s*[A-Z0-9][A-Z0-9.-]*)*)\s+(.+)$/;
+
 function titleOf(product: Product): { code: string; rest: string } {
   const brand = product.brand.toLocaleLowerCase('tr');
   const bare = product.name.toLocaleLowerCase('tr').startsWith(brand + ' ')
     ? product.name.slice(product.brand.length + 1).trim()
     : product.name;
-  const match = bare.match(/^([A-Z0-9][A-Z0-9.-]*\d[A-Z0-9.-]*)\s+(.+)$/);
+  const match = bare.match(TITLE_CODE);
   return match ? { code: match[1], rest: match[2] } : { code: bare, rest: '' };
 }
 
