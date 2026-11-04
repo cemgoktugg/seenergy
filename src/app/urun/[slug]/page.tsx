@@ -639,7 +639,7 @@ export default async function ProductPage({
                   <Link
                     href={`/marka/${brandSlug(product.brand)}`}
                     title={`${product.brand} ürünleri`}
-                    className="relative inline-flex h-11 items-center rounded-(--card-radius) border-2 border-text-primary px-4 text-[20px] font-extrabold sm:text-[24px] tracking-[0.02em] text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card"
+                    className="relative inline-flex h-9 items-center rounded-(--card-radius) border-2 border-text-primary px-3 text-[16px] font-extrabold sm:text-[20px] tracking-[0.02em] before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card"
                   >
                     {product.brand}
                   </Link>
