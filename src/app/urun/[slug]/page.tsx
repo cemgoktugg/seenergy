@@ -247,6 +247,14 @@ const SHEET_ORDER = [
   /optik|yakınlaştırma/i,
   /bağlantı/i,
   /video sıkıştırma|kodlama/i,
+  /* Storage (memory cards, SSDs, disks). Anchored: a camera's "Kayıt
+     kapasitesi" or "Ağ arayüzü" must not match. */
+  /^kapasite$/i,
+  /^dönüş hızı$/i,
+  /^önbellek$/i,
+  /^okuma hızı$/i,
+  /^yazma hızı$/i,
+  /^hız sınıfı$/i,
   /disk/i,
   /giriş voltajı|besleme/i,
   /güç tüketimi/i,
@@ -633,13 +641,16 @@ export default async function ProductPage({
 
             <div className="min-w-0">
               {/* Brand label, category; the code only when the title does not
-                  carry it. */}
+                  carry it. The label's 34px / 19px / 15px are off the type
+                  scale on purpose: the client sized it by eye (2026-11-04,
+                  "%20 daha küçük", then "%5 daha"). The ::before keeps a 44px
+                  hit area. */}
               <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1">
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]">
                   <Link
                     href={`/marka/${brandSlug(product.brand)}`}
                     title={`${product.brand} ürünleri`}
-                    className="relative inline-flex h-9 items-center rounded-(--card-radius) border-2 border-text-primary px-3 text-[16px] font-extrabold sm:text-[20px] tracking-[0.02em] before:absolute before:inset-x-0 before:-inset-y-1 before:content-[''] text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card"
+                    className="relative inline-flex h-[34px] items-center rounded-(--card-radius) border-2 border-text-primary px-3 text-[15px] font-extrabold sm:text-[19px] tracking-[0.02em] before:absolute before:inset-x-0 before:-inset-y-[5px] before:content-[''] text-text-primary transition-colors duration-(--duration-fast) hover:bg-text-primary hover:text-surface-card"
                   >
                     {product.brand}
                   </Link>
